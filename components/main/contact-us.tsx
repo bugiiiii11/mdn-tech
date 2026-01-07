@@ -88,7 +88,7 @@ export const ContactUs = () => {
           Contact Us
         </h1>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Have a project in mind? Let's discuss how we can bring your vision to life.
+          Have a project in mind? Let&apos;s discuss how we can bring your vision to life.
         </p>
       </motion.div>
 
@@ -106,8 +106,8 @@ export const ContactUs = () => {
               Get in Touch
             </h2>
             <p className="text-gray-400 mb-8 leading-relaxed">
-              We're here to help! Whether you have a question about our services, 
-              need a quote, or want to discuss your next project, we'd love to hear from you.
+              We&apos;re here to help! Whether you have a question about our services, 
+              need a quote, or want to discuss your next project, we&apos;d love to hear from you.
             </p>
           </div>
 
@@ -267,7 +267,7 @@ export const ContactUs = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 rounded-lg bg-green-500/20 border border-green-500/50 text-green-400 text-sm text-center"
                 >
-                  Thank you! We'll get back to you soon.
+                  Thank you! We&apos;ll get back to you soon.
                 </motion.div>
               )}
             </form>
