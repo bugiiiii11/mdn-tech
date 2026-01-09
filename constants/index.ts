@@ -347,27 +347,27 @@ export const FOOTER_DATA = [
 export const NAV_LINKS = [
   {
     title: "About Us",
-    link: "#about-us",
+    link: "/#about-us",
   },
   {
     title: "Services",
-    link: "#services",
+    link: "/#services",
   },
   {
     title: "Process",
-    link: "#process",
+    link: "/#process",
   },
   {
     title: "Projects",
-    link: "#projects",
+    link: "/#projects",
   },
   {
     title: "Team",
-    link: "#team",
+    link: "/team",
   },
   {
     title: "Contact Us",
-    link: "#contact-us",
+    link: "/#contact-us",
   },
 ] as const;
 
@@ -377,10 +377,10 @@ export const LINKS = {
 
 export const TEAM_MEMBERS = [
   {
-    name: "Alex Johnson",
-    role: "Lead Full-Stack Developer",
+    name: "Martin Jeřábek",
+    role: "Chief executive officer",
     image: "/team/1.png",
-    bio: "Passionate about building scalable web applications and leading technical teams to deliver exceptional results.",
+    bio: "Visionary leader with a passion for driving innovation and excellence. Martin brings strategic thinking and business acumen to transform ideas into successful digital solutions, fostering growth and building lasting client relationships.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -388,55 +388,23 @@ export const TEAM_MEMBERS = [
     },
   },
   {
-    name: "Sarah Chen",
-    role: "Senior UI/UX Designer",
+    name: "Martin Hromek",
+    role: "Chief technology officer", 
     image: "/team/2.png",
-    bio: "Creative designer with expertise in user experience and modern interface design. Transforming ideas into beautiful, functional designs.",
+    bio: "Technology architect and innovation catalyst with deep expertise in modern software engineering. Martin leads our technical strategy, ensuring we deliver cutting-edge solutions that are scalable, secure, and built for the future.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
     },
   },
   {
-    name: "Michael Rodriguez",
-    role: "Blockchain Architect",
-    image: "/team/3.png",
-    bio: "Specialized in smart contract development and DeFi protocols. Building the future of decentralized applications.",
+    name: "Eric Lukas",
+    role: "Full-Stack Engineer",
+    image: "/team/Eric Lukas.jpg",
+    bio: "Versatile full-stack developer specializing in building robust, performant applications from concept to deployment. Eric combines frontend elegance with backend reliability to create seamless digital experiences that users love.",
     socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
-      twitter: "https://twitter.com",
-    },
-  },
-  {
-    name: "Emily Watson",
-    role: "AI/ML Engineer",
-    image: "/team/4.png",
-    bio: "Expert in machine learning and AI integration. Creating intelligent solutions that drive business value.",
-    socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
-    },
-  },
-  {
-    name: "David Kim",
-    role: "Mobile Developer",
-    image: "/team/5.png",
-    bio: "Native and cross-platform mobile app developer. Delivering seamless experiences on iOS and Android.",
-    socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
-      twitter: "https://twitter.com",
-    },
-  },
-  {
-    name: "Lisa Anderson",
-    role: "DevOps Engineer",
-    image: "/team/6.png",
-    bio: "Infrastructure and automation specialist. Ensuring reliable, scalable deployments and optimal system performance.",
-    socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
+      linkedin: "https://www.linkedin.com/in/eric-lukas/",
+      github: "https://github.com/ericlukas",
     },
   },
 ] as const;

@@ -38,7 +38,7 @@ export const Encryption = () => {
             </span>{" "}
             & Performance
           </h2>
-          <p className="text-lg text-gray-400 text-center max-w-2xl">
+          <p className="text-lg text-gray-400 text-center">
             Built with security-first architecture and optimized for scale
           </p>
         </motion.div>
