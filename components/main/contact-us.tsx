@@ -51,19 +51,19 @@ export const ContactUs = () => {
     {
       icon: EnvelopeIcon,
       label: "Email",
-      value: "contact@example.com",
-      link: "mailto:contact@example.com",
+      value: "contact@mdntech.org",
+      link: "mailto:contact@mdntech.org",
     },
     {
       icon: PhoneIcon,
       label: "Phone",
-      value: "+971 XX XXX XXXX",
-      link: "tel:+971XXXXXXXXX",
+      value: "+971 58 228 3256",
+      link: "tel:+971582283256",
     },
     {
       icon: MapPinIcon,
       label: "Location",
-      value: "Dubai, UAE",
+      value: "United Arab Emirates",
       link: "#",
     },
   ];
@@ -136,7 +136,7 @@ export const ContactUs = () => {
           </div>
 
           {/* Social Links */}
-          <motion.div
+          {/* <motion.div
             variants={slideInFromLeft(0.6)}
             initial="hidden"
             whileInView="visible"
@@ -159,7 +159,7 @@ export const ContactUs = () => {
                 </motion.a>
               ))}
             </div>
-          </motion.div>
+          </motion.div> */}
         </motion.div>
 
         {/* Contact Form */}

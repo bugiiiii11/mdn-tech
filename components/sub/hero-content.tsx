@@ -64,14 +64,6 @@ export const HeroContent = () => {
           <motion.a
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            href="#contact-us"
-            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold transition-all duration-300"
-          >
-            Start Your Project
-          </motion.a>
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             href="#about-us"
             className="py-3 px-8 border border-[#7042f88b] text-center text-white cursor-pointer rounded-lg font-semibold hover:bg-[#7042f815] transition-all duration-300"
           >

@@ -125,14 +125,14 @@ export const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-4 text-gray-400">
             <Link
-              href="#privacy"
+              href="/privacy"
               className="hover:text-white transition-colors"
             >
               Privacy Policy
             </Link>
             <span className="text-gray-600">•</span>
             <Link
-              href="#terms"
+              href="/terms"
               className="hover:text-white transition-colors"
             >
               Terms of Conditions
