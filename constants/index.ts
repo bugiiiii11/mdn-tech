@@ -379,7 +379,7 @@ export const TEAM_MEMBERS = [
   {
     name: "Martin Jeřábek",
     role: "Chief executive officer",
-    image: "/team/1.png",
+    image: "/team/1.jpg",
     bio: "Visionary leader with a passion for driving innovation and excellence. Martin brings strategic thinking and business acumen to transform ideas into successful digital solutions, fostering growth and building lasting client relationships.",
     socials: {
       linkedin: "https://linkedin.com",
@@ -390,7 +390,7 @@ export const TEAM_MEMBERS = [
   {
     name: "Martin Hromek",
     role: "Chief technology officer", 
-    image: "/team/2.png",
+    image: "/team/2.jpg",
     bio: "Technology architect and innovation catalyst with deep expertise in modern software engineering. Martin leads our technical strategy, ensuring we deliver cutting-edge solutions that are scalable, secure, and built for the future.",
     socials: {
       linkedin: "https://linkedin.com",
@@ -400,7 +400,7 @@ export const TEAM_MEMBERS = [
   {
     name: "Eric Lukas",
     role: "Full-Stack Engineer",
-    image: "/team/Eric Lukas.jpg",
+    image: "/team/3.jpg",
     bio: "Versatile full-stack developer specializing in building robust, performant applications from concept to deployment. Eric combines frontend elegance with backend reliability to create seamless digital experiences that users love.",
     socials: {
       linkedin: "https://www.linkedin.com/in/eric-lukas/",
