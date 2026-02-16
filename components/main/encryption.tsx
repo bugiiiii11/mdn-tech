@@ -88,32 +88,32 @@ export const Encryption = () => {
           {[
             {
               title: "End-to-End Encryption",
-              description: "AES-256 encryption for data at rest and in transit",
+              description: "AES-256 encryption for data at rest and in transit across all client projects",
               delay: 0.3,
             },
             {
-              title: "Zero-Trust Architecture",
-              description: "Every request verified, every access authenticated",
+              title: "Secured Smart Contracts",
+              description: "Smart contracts deployed across DeFi, NFT marketplace, and decentralized applications",
               delay: 0.4,
             },
             {
-              title: "SOC 2 Compliant",
-              description: "Enterprise-grade security standards and audits",
+              title: "Pursuing SOC 2 Compliance",
+              description: "Building towards enterprise-grade security certification and formal audit readiness",
               delay: 0.5,
             },
             {
-              title: "99.9% Uptime SLA",
-              description: "High availability with redundant infrastructure",
+              title: "Enterprise-Proven Infrastructure",
+              description: "Robust architectures built for BMW, Accenture, ČSOB, and Telecom environments",
               delay: 0.6,
             },
             {
               title: "Real-Time Monitoring",
-              description: "24/7 threat detection and automated response",
+              description: "24/7 system monitoring with automated alerts and incident response",
               delay: 0.7,
             },
             {
-              title: "GDPR & Compliance",
-              description: "Full compliance with international data protection laws",
+              title: "GDPR & Data Compliance",
+              description: "Full compliance with international data protection laws and UAE regulations",
               delay: 0.8,
             },
           ].map((feature, index) => (

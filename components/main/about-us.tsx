@@ -235,12 +235,47 @@ export const AboutUs = () => {
         </h2>
 
         <p className="text-lg text-gray-400 mb-2 text-center max-w-3xl leading-relaxed">
-          A Dubai-based development studio delivering web, mobile, AI, and blockchain solutions for startups and enterprises worldwide.
+          A UAE-based development studio delivering web, mobile, AI, and blockchain solutions for startups and enterprises worldwide.
         </p>
 
         <p className="text-lg text-gray-400 mb-16 text-center max-w-3xl leading-relaxed">
           We specialize in turning complex technical ideas into scalable, production-ready systems.
         </p>
+      </motion.div>
+
+      {/* Proven Experience */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { y: -30, opacity: 0 },
+          visible: {
+            y: 0,
+            opacity: 1,
+            transition: { delay: 0.3, duration: 0.5 },
+          },
+        }}
+        className="flex flex-col items-center justify-center max-w-4xl w-full mb-16"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 text-center">
+          Built by Engineers Who&apos;ve Shipped at Scale
+        </h2>
+        <p className="text-lg text-gray-400 mb-8 text-center max-w-3xl leading-relaxed">
+          M.D.N Tech is new. Our expertise isn&apos;t. Our founding team has spent decades building production systems for enterprise clients, scaling startups, and shipping products used by millions. We brought that experience together under one roof — so you get senior-level execution from day one.
+        </p>
+        <p className="text-sm text-gray-500 italic mb-4">Our team has delivered for</p>
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-lg font-semibold text-gray-300">
+          <span>BMW</span>
+          <span className="text-gray-600">·</span>
+          <span>Accenture</span>
+          <span className="text-gray-600">·</span>
+          <span>ČSOB</span>
+          <span className="text-gray-600">·</span>
+          <span>Telecom</span>
+          <span className="text-gray-600">·</span>
+          <span>Cryptomeda</span>
+        </div>
       </motion.div>
 
       {/* Impact Metrics */}
@@ -316,7 +351,7 @@ export const AboutUs = () => {
               delay: 0.9,
             },
             {
-              title: "Dubai-Based, Global Reach",
+              title: "UAE-Based, Global Reach",
               description: "UAE presence with international delivery standards.",
               delay: 1.0,
             },

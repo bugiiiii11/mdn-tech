@@ -181,62 +181,62 @@ const TechResultCard = ({ icon, category, results, index }: TechResultProps) => 
 const techResults = [
   {
     icon: "/icons/AI.svg",
-    category: "AI & Machine Learning",
+    category: "Artificial Intelligence",
     results: [
-      { metric: "LLM Integrations", value: "15+" },
-      { metric: "AI Models Deployed", value: "25+" },
-      { metric: "Processing Speed", value: "10x faster" },
-      { metric: "Accuracy Rate", value: "98.5%" },
+      { metric: "AI-Powered Apps Built", value: "5+" },
+      { metric: "LLM Models Integrated", value: "10+" },
+      { metric: "Workflows Automated", value: "25+" },
+      { metric: "Documents & Reports AI-Generated", value: "200+" },
     ],
   },
   {
     icon: "/icons/Web3.svg",
     category: "Blockchain & Web3",
     results: [
-      { metric: "Smart Contracts", value: "30+" },
-      { metric: "DeFi Protocols", value: "12+" },
-      { metric: "Total Value Locked", value: "$5M+" },
-      { metric: "Security Audits", value: "100% passed" },
+      { metric: "Smart Contracts Deployed", value: "50+" },
+      { metric: "Web3 Partnerships", value: "100+" },
+      { metric: "Web3 Conferences Attended", value: "15+" },
+      { metric: "VCs Onboarded", value: "70+" },
     ],
   },
   {
     icon: "/icons/FullStack.svg",
     category: "Full-Stack Development",
     results: [
-      { metric: "Web Platforms", value: "20+" },
-      { metric: "API Endpoints", value: "500+" },
-      { metric: "Response Time", value: "<100ms" },
-      { metric: "Uptime", value: "99.9%" },
+      { metric: "Web Platforms Delivered", value: "20+" },
+      { metric: "APIs Developed", value: "100+" },
+      { metric: "Microservices Built", value: "20+" },
+      { metric: "Cloud Deployments", value: "30+" },
     ],
   },
   {
     icon: "/icons/Mobile.svg",
     category: "Mobile Development",
     results: [
-      { metric: "Mobile Apps", value: "15+" },
-      { metric: "App Store Rating", value: "4.8/5" },
-      { metric: "Active Users", value: "50K+" },
-      { metric: "Crash Rate", value: "<0.1%" },
+      { metric: "Mobile Apps Built", value: "20+" },
+      { metric: "Telegram Mini Apps", value: "5" },
+      { metric: "App Features Delivered", value: "50+" },
+      { metric: "Enterprise Mobile Projects", value: "20+" },
     ],
   },
   {
     icon: "/icons/UI.svg",
-    category: "UI/UX & Design",
+    category: "Enterprise Solutions & Consulting",
     results: [
-      { metric: "Design Systems", value: "8+" },
-      { metric: "Conversion Rate", value: "+45%" },
-      { metric: "User Satisfaction", value: "96%" },
-      { metric: "Design Awards", value: "5+" },
+      { metric: "Corporate Clients Served", value: "10+" },
+      { metric: "Industries Covered", value: "5" },
+      { metric: "Successful Project Deliveries", value: "30+" },
+      { metric: "Long-Term Partnerships", value: "10+" },
     ],
   },
   {
     icon: "/icons/Game.svg",
     category: "Game Development",
     results: [
-      { metric: "Games Launched", value: "10+" },
-      { metric: "Active Players", value: "100K+" },
-      { metric: "Frame Rate", value: "60 FPS" },
-      { metric: "User Retention", value: "75%" },
+      { metric: "Unity Games Built", value: "5" },
+      { metric: "Game Mechanics Designed", value: "15+" },
+      { metric: "In-Game Economies Designed", value: "5" },
+      { metric: "Web3 Game Integrations", value: "10+" },
     ],
   },
 ];
@@ -373,7 +373,7 @@ export const Projects = () => {
       </div>
 
       {/* Projects Grid Section */}
-      <motion.div
+      {/* <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -419,7 +419,7 @@ export const Projects = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </motion.div>
+      </motion.div> */}
     </section>
   )
 }

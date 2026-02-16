@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { LINKS, NAV_LINKS, SOCIALS } from "@/constants";
-import { motion } from "framer-motion";
-import { slideInFromLeft } from "@/lib/motion";
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,9 +12,9 @@ export const Navbar = () => {
     <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-10">
       {/* Navbar Container */}
       <div className="w-full h-full flex items-center justify-between m-auto px-[10px]">
-        {/* Logo + Name */}
+        {/* Logo + Name - always links to homepage */}
         <Link
-          href="#"
+          href="/"
           className="flex items-center"
         >
           <div className="flex font-bold ml-[10px] text-gray-300">M.D.N Tech</div>
@@ -37,12 +35,12 @@ export const Navbar = () => {
           </div>
         </div>
 
-        <motion.a
-          variants={slideInFromLeft(1)}
+        <Link
+          href="/#contact-us"
           className="py-2 hidden md:flex px-4 button-primary text-center text-white cursor-pointer rounded-lg max-w-[200px]"
         >
           Start Project
-        </motion.a>
+        </Link>
 
         {/* Hamburger Menu */}
         <button

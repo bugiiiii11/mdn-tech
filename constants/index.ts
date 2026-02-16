@@ -378,9 +378,9 @@ export const LINKS = {
 export const TEAM_MEMBERS = [
   {
     name: "Martin Jeřábek",
-    role: "Chief executive officer",
+    role: "CEO",
     image: "/team/1.jpg",
-    bio: "Visionary leader with a passion for driving innovation and excellence. Martin brings strategic thinking and business acumen to transform ideas into successful digital solutions, fostering growth and building lasting client relationships.",
+    bio: "A decade in blockchain and five years leading a Web3 gaming project as CEO. Former Project Manager at ČSOB Bank, delivering smart banking mobile app features. AI enthusiast leveraging multiple LLMs daily across content, analysis, and documentation.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -389,9 +389,9 @@ export const TEAM_MEMBERS = [
   },
   {
     name: "Martin Hromek",
-    role: "Chief technology officer", 
+    role: "CTO",
     image: "/team/2.jpg",
-    bio: "Technology architect and innovation catalyst with deep expertise in modern software engineering. Martin leads our technical strategy, ensuring we deliver cutting-edge solutions that are scalable, secure, and built for the future.",
+    bio: "Enterprise architect with 20 years of experience building mission-critical systems for BMW, Accenture, ČSOB Insurance, and Telecom. Led the full technical build of a Web3 gaming ecosystem as CTO — from smart contracts to live operations.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -401,7 +401,7 @@ export const TEAM_MEMBERS = [
     name: "Eric Lukas",
     role: "Full-Stack Engineer",
     image: "/team/3.jpg",
-    bio: "Versatile full-stack developer specializing in building robust, performant applications from concept to deployment. Eric combines frontend elegance with backend reliability to create seamless digital experiences that users love.",
+    bio: "Versatile full-stack developer who has shipped across industries — from AI-powered healthcare apps to enterprise CRM, ERP, and full ecosystem builds. Specializes in turning complex requirements into clean, performant applications across mobile and web.",
     socials: {
       linkedin: "https://www.linkedin.com/in/eric-lukas/",
       github: "https://github.com/ericlukas",
