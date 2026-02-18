@@ -144,7 +144,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
             </p>
 
             {/* Social Links */}
-            <div className="flex items-center gap-3 mt-auto">
+            {/* <div className="flex items-center gap-3 mt-auto">
               {member.socials.linkedin && (
                 <motion.a
                   href={member.socials.linkedin}
@@ -181,7 +181,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
                   <RxTwitterLogo className="w-5 h-5" />
                 </motion.a>
               )}
-            </div>
+            </div> */}
           </div>
 
           {/* Floating particles */}

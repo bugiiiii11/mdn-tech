@@ -69,10 +69,10 @@ export const ContactUs = () => {
   ];
 
   const socialLinks = [
-    { icon: RxLinkedinLogo, link: "https://linkedin.com", label: "LinkedIn" },
+    { icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/", label: "LinkedIn" },
     { icon: RxGithubLogo, link: "https://github.com", label: "GitHub" },
-    { icon: RxTwitterLogo, link: "https://twitter.com", label: "Twitter" },
-    { icon: RxInstagramLogo, link: "https://instagram.com", label: "Instagram" },
+    { icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg", label: "Twitter" },
+    { icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/", label: "Instagram" },
   ];
 
   return (
