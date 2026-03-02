@@ -248,20 +248,42 @@ export default function TeamPage() {
         </div>
 
         {/* Header Section */}
-        <motion.div
+        <motion.h1
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={slideInFromTop}
-          className="relative z-10 text-center mb-16 max-w-4xl mx-auto"
+          variants={{
+            hidden: { opacity: 0, y: -20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { duration: 0.5 },
+            },
+          }}
+          className="relative z-10 text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 mb-6">
-            Meet Our Team
-          </h1>
-          <p className="text-xl text-gray-400 leading-relaxed">
-            We&apos;re a passionate group of innovators, creators, and problem-solvers dedicated to delivering exceptional digital experiences. Get to know the talented individuals who make our vision a reality.
-          </p>
-        </motion.div>
+          Meet Our Team
+        </motion.h1>
+
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={{
+            hidden: { opacity: 0, y: -20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: {
+                delay: 0.2,
+                duration: 0.5,
+              },
+            },
+          }}
+          className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-3xl"
+        >
+          Our engineers don&apos;t specialize in one layer — they own all of them. AI systems, backend, frontend, infrastructure, and everything in between. We apply what actually works in production, not what performs in benchmarks. What used to take months now takes weeks or even days. What used to require large teams is now delivered by a single full-stack AI engineer.
+        </motion.p>
 
         {/* Team Grid */}
         <div className="relative z-10 w-full max-w-7xl">
