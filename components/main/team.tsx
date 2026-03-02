@@ -247,10 +247,17 @@ export const Team = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={slideInFromTop}
+        variants={{
+          hidden: { opacity: 0, y: -20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5 },
+          },
+        }}
         className="relative z-10 text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        Our Team
+        Meet Our Team
       </motion.h1>
 
       <motion.p

@@ -77,20 +77,39 @@ export const ContactUs = () => {
 
   return (
     <section id="contact-us" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 min-h-screen w-full">
-      <motion.div
-        variants={slideInFromTop}
+      <motion.h1
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="mb-12 text-center"
+        variants={{
+          hidden: { opacity: 0, y: -20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5 },
+          },
+        }}
+        className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        <h1 className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10">
-          Start Your Project
-        </h1>
-        <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-          We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you&apos;re building — we&apos;ll tell you how we&apos;d approach it.
-        </p>
-      </motion.div>
+        Start Your Project
+      </motion.h1>
+
+      <motion.p
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { opacity: 0, y: -20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, delay: 0.2 },
+          },
+        }}
+        className="text-lg text-gray-400 max-w-3xl mx-auto mb-12 text-center"
+      >
+        We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you&apos;re building — we&apos;ll tell you how we&apos;d approach it.
+      </motion.p>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Contact Information */}
