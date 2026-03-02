@@ -323,7 +323,7 @@ export const Skills = () => {
         }}
         className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
       >
-        We don't just use AI as a tool — we build with it at the core. Every project is engineered by full-stack AI engineers who combine deep technical expertise with the latest AI models, autonomous agents, and spec-driven workflows to deliver production-ready systems at a pace traditional development cannot match.
+        We don&apos;t just use AI as a tool — we build with it at the core. Every project is engineered by full-stack AI engineers who combine deep technical expertise with the latest AI models, autonomous agents, and spec-driven workflows to deliver production-ready systems at a pace traditional development cannot match.
       </motion.p>
 
       <div className="w-full max-w-6xl">

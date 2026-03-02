@@ -289,7 +289,7 @@ export const Process = () => {
         }}
         className="text-lg text-gray-400 text-center mb-16 max-w-3xl"
       >
-        Our five-phase methodology is built around one principle: no phase begins until the previous one is approved. Each phase is AI-accelerated to compress timelines, fully documented so nothing lives only in someone's head, and reviewed by both our engineers and you before we move forward.
+        Our five-phase methodology is built around one principle: no phase begins until the previous one is approved. Each phase is AI-accelerated to compress timelines, fully documented so nothing lives only in someone&apos;s head, and reviewed by both our engineers and you before we move forward.
       </motion.p>
 
       {/* Timeline */}

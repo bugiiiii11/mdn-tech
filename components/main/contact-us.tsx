@@ -88,7 +88,7 @@ export const ContactUs = () => {
           Start Your Project
         </h1>
         <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-          We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you're building — we'll tell you how we'd approach it.
+          We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you&apos;re building — we&apos;ll tell you how we&apos;d approach it.
         </p>
       </motion.div>
 

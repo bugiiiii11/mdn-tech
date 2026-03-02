@@ -270,7 +270,7 @@ export const Team = () => {
         }}
         className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-3xl"
       >
-        Our engineers don't specialize in one layer — they own all of them. AI systems, backend, frontend, infrastructure, and everything in between. We apply what actually works in production, not what performs in benchmarks. What used to take months now takes weeks or even days. What used to require large teams is now delivered by a single full-stack AI engineer.
+        Our engineers don&apos;t specialize in one layer — they own all of them. AI systems, backend, frontend, infrastructure, and everything in between. We apply what actually works in production, not what performs in benchmarks. What used to take months now takes weeks or even days. What used to require large teams is now delivered by a single full-stack AI engineer.
       </motion.p>
 
       {/* Team Grid */}
