@@ -3,6 +3,7 @@
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { slideInFromTop } from "@/lib/motion";
+import { FaRocket, FaShieldAlt, FaBrain, FaRobot, FaLock, FaUsers } from "react-icons/fa";
 
 interface AnimatedCounterProps {
   value: number;
@@ -49,6 +50,7 @@ interface FeatureCardProps {
     title: string;
     description: string;
     delay: number;
+    icon: React.ComponentType<{ className?: string }>;
   };
   index: number;
 }
@@ -161,7 +163,15 @@ const FeatureCard = ({ item, index }: FeatureCardProps) => {
               whileHover={{ rotate: 360, scale: 1.1 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded"></div>
+              <item.icon className="w-6 h-6 text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-cyan-400" style={{ fill: 'url(#icon-gradient)' }} />
+              <svg width="0" height="0">
+                <defs>
+                  <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgb(168, 85, 247)" />
+                    <stop offset="100%" stopColor="rgb(34, 211, 238)" />
+                  </linearGradient>
+                </defs>
+              </svg>
             </motion.div>
 
             <h4 className="text-xl font-semibold text-white mb-3">
@@ -259,31 +269,37 @@ export const AboutUs = () => {
               title: "10× Faster Development Cycles",
               description: "Our engineers use Claude Code, autonomous agent teams, and spec-driven workflows to compress months of development into weeks. A feature that requires a traditional developer a sprint takes our AI engineers hours. We don't guess — we plan with AI, validate the plan, then execute with precision. The result: faster delivery without technical debt.",
               delay: 0.3,
+              icon: FaRocket,
             },
             {
               title: "Production-Quality from Day One",
               description: "We don't ship prototypes and call them products. Every system is built with TypeScript strict mode, automated testing, security hardening, and CI/CD pipelines from the first commit. AI accelerates our velocity; our engineering standards ensure what ships is production-ready, secure, and maintainable.",
               delay: 0.4,
+              icon: FaShieldAlt,
             },
             {
               title: "The Latest Models, Applied Correctly",
               description: "We work with GPT-4o, Claude Opus 4.5, Gemini, Llama, Mistral, and emerging models as they release. We know which model to use for which task, how to chain them, how to guard against prompt injection, and how to build systems that remain reliable when models are updated or swapped.",
               delay: 0.5,
+              icon: FaBrain,
             },
             {
               title: "Autonomous Agents That Actually Work",
               description: "We design multi-agent systems where specialized AI agents handle research, planning, implementation, and validation in parallel. Our agent architectures are built for production: with proper sandboxing, fallback logic, approval gates, and observability. Not chatbot demos — real autonomous systems doing real work.",
               delay: 0.6,
+              icon: FaRobot,
             },
             {
               title: "Security-Hardened by Default",
               description: "Security is not a phase for us — it is woven into every layer. Every API endpoint is authenticated, rate-limited, and validated. Every AI integration is sandboxed. Every deployment goes through automated security scanning before it reaches production.",
               delay: 0.7,
+              icon: FaLock,
             },
             {
               title: "Single Team, Full Depth",
               description: "You work with full-stack AI engineers who understand the entire system — from database schema to AI model selection to mobile UI. No handoffs between siloed specialists. No translation loss between design, backend, and AI teams. One team with complete ownership.",
               delay: 0.8,
+              icon: FaUsers,
             },
           ].map((item, index) => (
             <FeatureCard key={index} item={item} index={index} />
