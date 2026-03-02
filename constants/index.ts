@@ -368,7 +368,7 @@ export const NAV_LINKS = [
   },
   {
     title: "Team",
-    link: "/team",
+    link: "/#team",
   },
   {
     title: "Contact Us",
