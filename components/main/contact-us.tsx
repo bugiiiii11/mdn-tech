@@ -89,7 +89,7 @@ export const ContactUs = () => {
             transition: { duration: 0.5 },
           },
         }}
-        className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
+        className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         Start Your Project
       </motion.h1>

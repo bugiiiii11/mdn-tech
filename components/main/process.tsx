@@ -267,7 +267,7 @@ export const Process = () => {
         whileInView="visible"
         viewport={{ once: true }}
         variants={slideInFromTop}
-        className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
+        className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         How We Build
       </motion.h1>
