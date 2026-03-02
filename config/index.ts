@@ -37,4 +37,7 @@ export const siteConfig: Metadata = {
   authors: {
     name: "M.D.N Tech",
   },
+  icons: {
+    icon: "/favicon.png",
+  },
 } as const;

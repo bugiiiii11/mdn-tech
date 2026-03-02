@@ -181,12 +181,12 @@ const TechResultCard = ({ icon, category, results, index }: TechResultProps) => 
 const techResults = [
   {
     icon: "/icons/AI.svg",
-    category: "Artificial Intelligence",
+    category: "AI & Agent Systems",
     results: [
-      { metric: "AI-Powered Apps Built", value: "5+" },
+      { metric: "AI-Powered Production Apps Built", value: "5+" },
       { metric: "LLM Models Integrated", value: "10+" },
-      { metric: "Workflows Automated", value: "25+" },
-      { metric: "Documents & Reports AI-Generated", value: "200+" },
+      { metric: "Autonomous Agent Workflows Deployed", value: "25+" },
+      { metric: "Average Development Time Reduction", value: "60%+" },
     ],
   },
   {
@@ -354,11 +354,11 @@ export const Projects = () => {
         }}
         className="text-lg text-gray-400 text-center mb-12 max-w-2xl"
       >
-        Measurable outcomes across every technology we deliver
+        Numbers built on real projects — not projections
       </motion.p>
 
       {/* Technology Results Grid */}
-      <div className="w-full max-w-7xl mb-16">
+      <div className="w-full max-w-6xl mb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {techResults.map((tech, index) => (
             <TechResultCard

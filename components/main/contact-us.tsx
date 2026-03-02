@@ -85,10 +85,10 @@ export const ContactUs = () => {
         className="mb-12 text-center"
       >
         <h1 className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10">
-          Contact Us
+          Start Your Project
         </h1>
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Have a project in mind? Let&apos;s discuss how we can bring your vision to life.
+        <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+          We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you're building — we'll tell you how we'd approach it.
         </p>
       </motion.div>
 
@@ -103,11 +103,10 @@ export const ContactUs = () => {
         >
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
-              Get in Touch
+              Let&apos;s Build Something That Matters
             </h2>
             <p className="text-gray-400 mb-8 leading-relaxed">
-              We&apos;re here to help! Whether you have a question about our services, 
-              need a quote, or want to discuss your next project, we&apos;d love to hear from you.
+              Whether you&apos;re exploring an AI integration for an existing product, building a new platform from scratch, or need a technical audit of your current system — we&apos;re ready to talk.
             </p>
           </div>
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { SparklesIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -15,16 +14,15 @@ export const HeroContent = () => {
     <motion.div
       initial="hidden"
       animate="visible"
-      className="flex flex-row h-[650px] items-center justify-center px-20 mt-40 w-full z-[20]"
+      className="flex flex-row h-[650px] items-center justify-center px-4 md:px-20 mt-40 w-full z-[20]"
     >
       <div className="h-full w-full flex flex-col items-center gap-5 justify-center m-auto text-start">
         <motion.div
           variants={slideInFromTop}
-          className="Welcome-box py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9]]"
+          className="Welcome-box py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9]] invisible"
         >
-          <SparklesIcon className="text-[#b49bff] mr-[10px] h-5 w-5" />
           <h1 className="Welcome-text text-[13px]">
-            UAE-Based • Global Reach • Enterprise Solutions
+            UAE-Based · AI-Powered Development · Global Delivery
           </h1>
         </motion.div>
 
@@ -34,11 +32,12 @@ export const HeroContent = () => {
         >
           <span className="text-center">
             <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-purple-500 to-cyan-500">
-              Build Digital
+              Build Smarter.
+
             </span>
             <br />
             <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-cyan-500 to-purple-500">
-              Excellence
+              Ship Faster.
             </span>
           </span>
         </motion.div>
@@ -47,14 +46,14 @@ export const HeroContent = () => {
           variants={slideInFromLeft(0.8)}
           className="text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
         >
-          Transforming ideas into scalable, production-ready systems
+          From idea to production-ready AI systems — faster, smarter, and more secure than traditional development
         </motion.p>
 
         <motion.p
           variants={slideInFromLeft(0.9)}
           className="text-base md:text-lg text-gray-400 my-2 max-w-[700px] text-center leading-relaxed"
         >
-          AI-powered solutions • Blockchain systems • Enterprise architecture • Mobile experiences
+          We are a team of full-stack AI engineers who build complex products using the latest AI models, autonomous agents, and modern engineering practices.
         </motion.p>
 
         <motion.div
@@ -64,10 +63,18 @@ export const HeroContent = () => {
           <motion.a
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            href="#about-us"
-            className="py-3 px-8 border border-[#7042f88b] text-center text-white cursor-pointer rounded-lg font-semibold hover:bg-[#7042f815] transition-all duration-300"
+            href="#contact-us"
+            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
           >
-            Learn More
+            Start Your Project
+          </motion.a>
+          <motion.a
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            href="#process"
+            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
+          >
+            See How We Build
           </motion.a>
         </motion.div>
       </div>

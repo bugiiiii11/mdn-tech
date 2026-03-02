@@ -17,6 +17,7 @@ interface ProcessStepProps {
 const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -138,11 +139,36 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
 
             {/* Content */}
             <div className="relative z-10 transform-gpu">
-              <h3 className="text-xl font-semibold text-white mb-4">
-                {step.title}
-              </h3>
+              <div
+                className="flex items-center justify-between cursor-pointer group/title"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                <h3 className="text-xl font-semibold text-white">
+                  {step.title}
+                </h3>
+                <motion.svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-cyan-400 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  animate={{ rotate: isExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </motion.svg>
+              </div>
 
-              <ul className="space-y-3">
+              <motion.ul
+                initial={false}
+                animate={{
+                  height: isExpanded ? "auto" : 0,
+                  opacity: isExpanded ? 1 : 0,
+                  marginTop: isExpanded ? 16 : 0,
+                }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-3 overflow-hidden"
+              >
                 {step.items.map((item, i) => (
                   <motion.li
                     key={i}
@@ -156,7 +182,7 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
                     <span className="leading-relaxed">{item}</span>
                   </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
             </div>
 
             {/* Shine sweep effect */}
@@ -182,28 +208,53 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
 
 const processSteps = [
   {
-    title: "Discovery & Strategy",
-    items: ["Business goals", "Technical feasibility"],
+    title: "Discovery & Specification",
+    items: [
+      "Deep discovery session analyzing requirements and competitive landscape",
+      "Comprehensive specification document (SPEC.md) as single source of truth",
+      "Requirements, acceptance criteria, data models, API contracts documented",
+      "Explicit non-goals defined to eliminate scope creep"
+    ],
     delay: 0.2,
   },
   {
-    title: "Architecture & Design",
-    items: ["System design", "UX/UI prototypes"],
+    title: "Architecture & System Design",
+    items: [
+      "Complete system architecture: tech stack, database schema, API structure",
+      "Security model and AI integration points designed upfront",
+      "Every decision documented with rationale",
+      "Architecture validated against performance and scalability requirements"
+    ],
     delay: 0.4,
   },
   {
-    title: "Development",
-    items: ["Agile sprints", "Weekly demos"],
+    title: "AI-Accelerated Development",
+    items: [
+      "Full-stack AI engineers using Claude Code agent teams",
+      "Automated code generation with human judgment on critical decisions",
+      "AI handles repetitive work; engineers handle creativity and context",
+      "Production-ready code with tests and documentation from day one"
+    ],
     delay: 0.6,
   },
   {
-    title: "Testing & Security",
-    items: ["QA, performance", "Blockchain audits"],
+    title: "Testing & Security Validation",
+    items: [
+      "Automated unit, integration, and end-to-end testing",
+      "AI-powered code review scanning for vulnerabilities",
+      "Test coverage and performance benchmarks",
+      "No code reaches production without passing quality gates"
+    ],
     delay: 0.8,
   },
   {
-    title: "Launch & Scale",
-    items: ["Cloud deployment", "Ongoing support"],
+    title: "Deployment & Continuous Improvement",
+    items: [
+      "Zero-downtime pipelines with automated rollback capability",
+      "Full observability: error tracking, performance monitoring, analytics",
+      "Proactive performance optimization post-launch",
+      "Ongoing support with rapid feature iteration"
+    ],
     delay: 1.0,
   },
 ];
@@ -218,7 +269,7 @@ export const Process = () => {
         variants={slideInFromTop}
         className="text-[40px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        How We Work
+        How We Build
       </motion.h1>
 
       <motion.p
@@ -236,9 +287,9 @@ export const Process = () => {
             },
           },
         }}
-        className="text-lg text-gray-400 text-center mb-16 max-w-2xl"
+        className="text-lg text-gray-400 text-center mb-16 max-w-3xl"
       >
-        Our proven 5-step process ensures your project is delivered on time, on budget, and exceeds expectations
+        Our five-phase methodology is built around one principle: no phase begins until the previous one is approved. Each phase is AI-accelerated to compress timelines, fully documented so nothing lives only in someone's head, and reviewed by both our engineers and you before we move forward.
       </motion.p>
 
       {/* Timeline */}

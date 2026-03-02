@@ -14,10 +14,17 @@ export const Navbar = () => {
       <div className="w-full h-full flex items-center justify-between m-auto px-[10px]">
         {/* Logo + Name - always links to homepage */}
         <Link
-          href="/"
-          className="flex items-center"
+          href="/#home"
+          className="flex items-center gap-2"
         >
-          <div className="flex font-bold ml-[10px] text-gray-300">M.D.N Tech</div>
+          <Image
+            src="/logo.png"
+            alt="M.D.N Tech"
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
+          <div className="flex font-bold text-gray-300">M.D.N Tech</div>
         </Link>
 
         {/* Web Navbar */}

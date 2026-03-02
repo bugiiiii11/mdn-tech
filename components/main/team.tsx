@@ -268,13 +268,13 @@ export const Team = () => {
             },
           },
         }}
-        className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-2xl"
+        className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-3xl"
       >
-        Meet the talented individuals who bring innovation and expertise to every project
+        Our engineers don't specialize in one layer — they own all of them. AI systems, backend, frontend, infrastructure, and everything in between. We apply what actually works in production, not what performs in benchmarks. What used to take months now takes weeks or even days. What used to require large teams is now delivered by a single full-stack AI engineer.
       </motion.p>
 
       {/* Team Grid */}
-      <div className="relative z-10 w-full max-w-7xl">
+      <div className="relative z-10 w-full max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {TEAM_MEMBERS.map((member, index) => (
             <TeamMemberCard key={member.name} member={member} index={index} />
