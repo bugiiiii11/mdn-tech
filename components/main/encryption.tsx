@@ -38,7 +38,7 @@ export const Encryption = () => {
           }}
           className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
         >
-          Enterprise Security & Performance
+          AI Tools We Use Daily
         </motion.h1>
 
         <motion.p
@@ -55,7 +55,7 @@ export const Encryption = () => {
           }}
           className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
         >
-          Built with security-first architecture and optimized for scale
+          The models and platforms powering every project we deliver
         </motion.p>
 
         {/* Lock Icon Section */}
@@ -94,41 +94,41 @@ export const Encryption = () => {
           </div>
 
           <div className="Welcome-box px-[15px] py-[4px] z-[20] border my-[20px] border-[#7042F88B] opacity-[0.9]">
-            <h1 className="Welcome-text text-[12px]">Bank-Grade Security</h1>
+            <h1 className="Welcome-text text-[12px]">AI-Native Stack</h1>
           </div>
         </motion.div>
 
-        {/* Security Features Grid */}
+        {/* AI Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-12">
           {[
             {
-              title: "End-to-End Encryption",
-              description: "AES-256 encryption for data at rest and in transit across all client projects",
+              title: "Claude Opus & Sonnet",
+              description: "Research, analysis, strategy and docs — our AI brain behind every project decision.",
               delay: 0.3,
             },
             {
-              title: "Secured Smart Contracts",
-              description: "Smart contracts deployed across DeFi, NFT marketplace, and decentralized applications",
+              title: "Claude Code",
+              description: "AI agent for development. Writes code, runs tests, reviews PRs — weeks of work in days.",
               delay: 0.4,
             },
             {
-              title: "Pursuing SOC 2 Compliance",
-              description: "Building towards enterprise-grade security certification and formal audit readiness",
+              title: "OpenClaw & N8N",
+              description: "Autonomous agents for dev and marketing workflows — running 24/7, no human intervention.",
               delay: 0.5,
             },
             {
-              title: "Enterprise-Proven Infrastructure",
-              description: "Robust architectures built for BMW, Accenture, ČSOB, and Telecom environments",
+              title: "Midjourney & Nano Banana",
+              description: "AI visual generation for UI concepts, brand assets, and graphics — produced in minutes.",
               delay: 0.6,
             },
             {
-              title: "Real-Time Monitoring",
-              description: "24/7 system monitoring with automated alerts and incident response",
+              title: "Sora, VEO & Seadance",
+              description: "State-of-the-art video generation for social content, demos, and motion assets in hours.",
               delay: 0.7,
             },
             {
-              title: "GDPR & Data Compliance",
-              description: "Full compliance with international data protection laws and UAE regulations",
+              title: "Suno AI",
+              description: "AI music for branded audio, video soundtracks, and original royalty-free tracks.",
               delay: 0.8,
             },
           ].map((feature, index) => (
@@ -154,11 +154,8 @@ export const Encryption = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <p className="text-xl md:text-2xl font-medium text-gray-200 mb-4">
-            Secure your data with enterprise-grade encryption
-          </p>
-          <p className="text-base text-gray-400 max-w-2xl">
-            From smart contract audits to API security, we ensure your systems are protected at every layer.
+          <p className="text-base text-gray-400 max-w-3xl leading-relaxed">
+            These are the tools we reach for every day — but our stack never stands still. We continuously evaluate and adopt the latest AI models and platforms as they emerge, because for us, AI is not just a productivity tool. It is our core engineering discipline.
           </p>
         </motion.div>
       </div>
