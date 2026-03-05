@@ -55,7 +55,7 @@ export const Encryption = () => {
           }}
           className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
         >
-          The models and platforms powering every project we deliver
+          The models and platforms powering projects we deliver
         </motion.p>
 
         {/* Lock Icon Section */}
@@ -155,7 +155,7 @@ export const Encryption = () => {
           className="text-center"
         >
           <p className="text-base text-gray-400 max-w-3xl leading-relaxed">
-            These are the tools we reach for every day — but our stack never stands still. We continuously evaluate and adopt the latest AI models and platforms as they emerge, because for us, AI is not just a productivity tool. It is our core engineering discipline.
+            These are the tools we reach for every day — but our stack never stands still. We continuously evaluate and adopt the latest AI models and platforms as they emerge.
           </p>
         </motion.div>
       </div>

@@ -279,7 +279,7 @@ export const AboutUs = () => {
             },
             {
               title: "The Latest Models, Applied Correctly",
-              description: "We work with GPT-4o, Claude Opus 4.5, Gemini, Llama, Mistral, and emerging models as they release. We know which model to use for which task, how to chain them, how to guard against prompt injection, and how to build systems that remain reliable when models are updated or swapped.",
+              description: "We work with Claude, ChatGPT, Gemini, Midjourney, and emerging models as they release. We know which model to use for which task, how to chain them, how to guard against prompt injection, and how to build systems that remain reliable when models are updated or swapped.",
               delay: 0.5,
               icon: FaBrain,
             },
