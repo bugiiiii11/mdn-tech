@@ -163,15 +163,7 @@ const FeatureCard = ({ item, index }: FeatureCardProps) => {
               whileHover={{ rotate: 360, scale: 1.1 }}
               transition={{ duration: 0.6 }}
             >
-              <item.icon className="w-6 h-6 text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-cyan-400" style={{ fill: 'url(#icon-gradient)' }} />
-              <svg width="0" height="0">
-                <defs>
-                  <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgb(168, 85, 247)" />
-                    <stop offset="100%" stopColor="rgb(34, 211, 238)" />
-                  </linearGradient>
-                </defs>
-              </svg>
+              <item.icon className="w-6 h-6 text-cyan-400" />
             </motion.div>
 
             <h4 className="text-xl font-semibold text-white mb-3">
