@@ -58,44 +58,98 @@ export const Navbar = () => {
         </button>
       </div>
 
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="absolute top-[65px] left-0 w-screen bg-[#030014] p-5 flex flex-col items-center text-gray-300 md:hidden">
-          {/* Links */}
-          <div className="flex flex-col items-center gap-4">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.title}
-                href={link.link}
-                className="cursor-pointer hover:text-[rgb(112,66,248)] transition text-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.title}
-              </Link>
-            ))}
-            <Link
-              href={LINKS.sourceCode}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="cursor-pointer hover:text-[rgb(112,66,248)] transition text-center"
+        <div className="absolute top-[65px] left-0 w-screen bg-gradient-to-b from-[#030014] to-[#0a0118] backdrop-blur-lg border-t border-[#7042f861] shadow-2xl md:hidden z-40">
+          <div className="relative p-6">
+            {/* Close button */}
+            <button
               onClick={() => setIsMobileMenuOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-lg border border-[#7042f838] bg-[#7042f815] hover:border-[#7042f8] text-gray-400 hover:text-cyan-400 transition-all duration-300"
             >
-              Source Code
-            </Link>
-          </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {/* Links */}
+            <div className="flex flex-col gap-2 mb-6">
+              {NAV_LINKS.map((link, index) => (
+                <Link
+                  key={link.title}
+                  href={link.link}
+                  className="group relative px-4 py-3 rounded-lg overflow-hidden transition-all duration-300"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {/* Animated background */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 border border-[#7042f838] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-          {/* Social Icons */}
-          <div className="flex justify-center gap-6 mt-6">
-            {SOCIALS.map(({ link, name, icon: Icon }) => (
+                  {/* Link text */}
+                  <span className="relative text-gray-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 font-medium transition-all duration-300">
+                    {link.title}
+                  </span>
+                </Link>
+              ))}
+
               <Link
-                href={link}
+                href={LINKS.sourceCode}
                 target="_blank"
                 rel="noreferrer noopener"
-                key={name}
+                className="group relative px-4 py-3 rounded-lg overflow-hidden transition-all duration-300"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Icon className="h-8 w-8 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 border border-[#7042f838] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative text-gray-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 font-medium transition-all duration-300">
+                  Source Code
+                </span>
               </Link>
-            ))}
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mb-6" />
+
+            {/* Social Icons */}
+            <div className="flex justify-center gap-4">
+              {SOCIALS.map(({ link, name, icon: Icon }) => (
+                <Link
+                  href={link}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  key={name}
+                  className="group relative p-3 rounded-lg border border-[#7042f838] bg-[#7042f815] hover:border-[#7042f8] transition-all duration-300"
+                >
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500/0 to-cyan-500/0 group-hover:from-purple-500/20 group-hover:to-cyan-500/20 transition-all duration-300" />
+                  <Icon className="relative h-6 w-6 text-gray-400 group-hover:text-cyan-400 transition-colors duration-300" />
+                </Link>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <Link
+              href="/#contact-us"
+              className="mt-6 w-full block"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <div className="w-full py-3 px-6 button-primary text-center text-white rounded-lg font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200">
+                Start Project
+              </div>
+            </Link>
           </div>
         </div>
       )}

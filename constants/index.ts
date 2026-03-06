@@ -1,4 +1,4 @@
-import { FaYoutube, FaFacebook } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
 import {
   RxDiscordLogo,
   RxGithubLogo,
@@ -95,12 +95,7 @@ export const SOCIALS = [
     link: "https://www.instagram.com/mdntechorg/",
   },
   {
-    name: "Facebook",
-    icon: FaFacebook,
-    link: "https://facebook.com",
-  },
-  {
-    name: "Twitter",
+    name: "X",
     icon: RxTwitterLogo,
     link: "https://x.com/MDNTechOrg",
   },
@@ -316,12 +311,12 @@ export const FOOTER_DATA = [
         link: "https://www.instagram.com/mdntechorg/",
       },
       {
-        name: "Twitter",
+        name: "X",
         icon: RxTwitterLogo,
         link: "https://x.com/MDNTechOrg",
       },
       {
-        name: "Linkedin",
+        name: "LinkedIn",
         icon: RxLinkedinLogo,
         link: "https://www.linkedin.com/company/mdntech/",
       },
