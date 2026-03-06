@@ -9,7 +9,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="w-screen h-[65px] fixed top-0 left-0 right-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50">
+    <div className="w-full h-[65px] fixed top-0 left-0 right-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50">
       {/* Navbar Container */}
       <div className="w-full h-full flex items-center justify-between px-3 md:px-10">
         {/* Logo + Name - always links to homepage */}
@@ -68,7 +68,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="absolute top-[65px] left-0 w-screen bg-gradient-to-b from-[#030014] to-[#0a0118] backdrop-blur-lg border-t border-[#7042f861] shadow-2xl md:hidden z-40">
+        <div className="absolute top-[65px] left-0 right-0 bg-gradient-to-b from-[#030014] to-[#0a0118] backdrop-blur-lg border-t border-[#7042f861] shadow-2xl md:hidden z-40">
           <div className="relative p-6">
             {/* Close button */}
             <button
@@ -87,7 +87,7 @@ export const Navbar = () => {
             </button>
             {/* Links */}
             <div className="flex flex-col gap-2 mb-6">
-              {NAV_LINKS.map((link, index) => (
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.title}
                   href={link.link}
@@ -104,20 +104,6 @@ export const Navbar = () => {
                   </span>
                 </Link>
               ))}
-
-              <Link
-                href={LINKS.sourceCode}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group relative px-4 py-3 rounded-lg overflow-hidden transition-all duration-300"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute inset-0 border border-[#7042f838] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative text-gray-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-cyan-400 font-medium transition-all duration-300">
-                  Source Code
-                </span>
-              </Link>
             </div>
 
             {/* Divider */}

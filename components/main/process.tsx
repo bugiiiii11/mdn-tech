@@ -261,7 +261,7 @@ const processSteps = [
 
 export const Process = () => {
   return (
-    <section id="process" className="flex flex-col items-center justify-center py-20 px-4 md:px-20">
+    <section id="process" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 w-full max-w-full overflow-hidden">
       <motion.h1
         initial="hidden"
         whileInView="visible"

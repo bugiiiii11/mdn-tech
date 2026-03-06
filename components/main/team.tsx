@@ -230,7 +230,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
 
 export const Team = () => {
   return (
-    <section id="team" className="relative flex flex-col items-center justify-center py-20 px-4 md:px-20 overflow-hidden">
+    <section id="team" className="relative flex flex-col items-center justify-center py-20 px-4 md:px-20 overflow-hidden w-full max-w-full">
       {/* World Map Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
         <Image

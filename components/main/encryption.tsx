@@ -7,16 +7,16 @@ import { slideInFromTop, slideInFromLeft, slideInFromRight } from "@/lib/motion"
 
 export const Encryption = () => {
   return (
-    <section id="security" className="flex flex-row relative items-center justify-center min-h-screen w-full h-full py-20 px-4 md:px-20">
+    <section id="security" className="flex flex-row relative items-center justify-center min-h-screen w-full max-w-full h-full py-20 px-4 md:px-20 overflow-hidden">
       {/* Background Video */}
-      <div className="w-full flex items-start justify-center absolute -z-10">
+      <div className="w-full max-w-full flex items-start justify-center absolute -z-10 overflow-hidden">
         <video
           loop
           muted
           autoPlay
           playsInline
           preload="false"
-          className="w-full h-auto opacity-30"
+          className="w-full max-w-full h-auto opacity-30"
         >
           <source src="/videos/encryption-bg.webm" type="video/webm" />
         </video>

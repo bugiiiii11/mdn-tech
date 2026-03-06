@@ -290,7 +290,7 @@ export const Skills = () => {
   return (
     <section
       id="services"
-      className="flex flex-col items-center justify-center gap-3 h-full relative overflow-hidden py-20 px-4 md:px-20"
+      className="flex flex-col items-center justify-center gap-3 h-full relative overflow-hidden py-20 px-4 md:px-20 w-full max-w-full"
     >
       <motion.h1
         initial="hidden"

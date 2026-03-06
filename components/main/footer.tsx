@@ -16,19 +16,19 @@ export const Footer = () => {
 
   const socials = [
     { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
-    { name: "Twitter", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
+    { name: "X", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
     { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
   ];
 
   return (
     <>
       {/* Blackhole effect - clipped to show only top half, stuck to footer */}
-      <div className="relative w-full overflow-hidden" style={{ height: '270px' }}>
+      <div className="relative w-full max-w-full overflow-hidden" style={{ height: '270px' }}>
         <video
           autoPlay
           muted
           loop
-          className="absolute top-0 left-0 w-full pointer-events-none object-contain -z-20"
+          className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain -z-20"
           style={{ height: '540px' }}
         >
           <source src="/videos/blackhole.webm" type="video/webm" />
@@ -36,7 +36,7 @@ export const Footer = () => {
       </div>
 
       {/* Footer */}
-      <footer className="w-full relative bg-[#050518]">
+      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 mb-6">
           {/* Left: Brand + description */}

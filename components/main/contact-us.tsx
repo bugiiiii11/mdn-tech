@@ -76,7 +76,7 @@ export const ContactUs = () => {
   ];
 
   return (
-    <section id="contact-us" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 min-h-screen w-full">
+    <section id="contact-us" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 min-h-screen w-full max-w-full overflow-hidden">
       <motion.h1
         initial="hidden"
         whileInView="visible"
