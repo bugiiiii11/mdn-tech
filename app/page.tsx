@@ -9,8 +9,8 @@ import { ContactUs } from "@/components/main/contact-us";
 
 export default function Home() {
   return (
-    <main className="h-full w-full">
-      <div className="flex flex-col gap-20">
+    <main className="h-full w-full overflow-x-hidden">
+      <div className="flex flex-col gap-20 max-w-full">
         <Hero />
         <AboutUs />
         <Skills />

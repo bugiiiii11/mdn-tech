@@ -9,26 +9,26 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-3 md:px-10 overflow-x-hidden">
+    <div className="w-screen h-[65px] fixed top-0 left-0 right-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50">
       {/* Navbar Container */}
-      <div className="w-full h-full flex items-center justify-between m-auto gap-2 max-w-full">
+      <div className="w-full h-full flex items-center justify-between px-3 md:px-10">
         {/* Logo + Name - always links to homepage */}
         <Link
           href="/#home"
-          className="flex items-center gap-1.5 md:gap-2 flex-shrink-0"
+          className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 min-w-0"
         >
           <Image
             src="/logo.png"
             alt="M.D.N Tech"
             width={32}
             height={32}
-            className="w-7 h-7 md:w-8 md:h-8"
+            className="w-7 h-7 md:w-8 md:h-8 flex-shrink-0"
           />
-          <div className="flex font-bold text-gray-300 text-sm md:text-base whitespace-nowrap">M.D.N Tech</div>
+          <div className="font-bold text-gray-300 text-sm md:text-base whitespace-nowrap overflow-hidden text-ellipsis">M.D.N Tech</div>
         </Link>
 
         {/* Web Navbar */}
-        <div className="hidden md:flex w-[500px] h-full flex-row items-center justify-between ">
+        <div className="hidden md:flex w-[500px] h-full flex-row items-center justify-between">
           <div className="flex items-center justify-between w-full h-auto border border-[rgba(112,66,248,0.38)] bg-[rgba(3,0,20,0.37)] mr-[15px] px-[20px] py-[10px] rounded-full text-gray-200">
             {NAV_LINKS.map((link) => (
               <Link
@@ -51,7 +51,7 @@ export const Navbar = () => {
 
         {/* Hamburger Menu */}
         <button
-          className="md:hidden text-white focus:outline-none text-2xl flex-shrink-0 p-1"
+          className="md:hidden text-white focus:outline-none text-xl flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
@@ -60,7 +60,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="absolute top-[65px] left-0 w-full bg-[#030014] p-5 flex flex-col items-center text-gray-300 md:hidden">
+        <div className="absolute top-[65px] left-0 w-screen bg-[#030014] p-5 flex flex-col items-center text-gray-300 md:hidden">
           {/* Links */}
           <div className="flex flex-col items-center gap-4">
             {NAV_LINKS.map((link) => (
