@@ -9,9 +9,9 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-10">
+    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-4 md:px-10">
       {/* Navbar Container */}
-      <div className="w-full h-full flex items-center justify-between m-auto px-[10px]">
+      <div className="w-full h-full flex items-center justify-between m-auto">
         {/* Logo + Name - always links to homepage */}
         <Link
           href="/#home"
