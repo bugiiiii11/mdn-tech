@@ -9,22 +9,22 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-4 md:px-10">
+    <div className="w-full h-[65px] fixed top-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50 px-3 md:px-10 overflow-x-hidden">
       {/* Navbar Container */}
-      <div className="w-full h-full flex items-center justify-between m-auto">
+      <div className="w-full h-full flex items-center justify-between m-auto gap-2 max-w-full">
         {/* Logo + Name - always links to homepage */}
         <Link
           href="/#home"
-          className="flex items-center gap-2"
+          className="flex items-center gap-1.5 md:gap-2 flex-shrink-0"
         >
           <Image
             src="/logo.png"
             alt="M.D.N Tech"
             width={32}
             height={32}
-            className="w-8 h-8"
+            className="w-7 h-7 md:w-8 md:h-8"
           />
-          <div className="flex font-bold text-gray-300">M.D.N Tech</div>
+          <div className="flex font-bold text-gray-300 text-sm md:text-base whitespace-nowrap">M.D.N Tech</div>
         </Link>
 
         {/* Web Navbar */}
@@ -51,7 +51,7 @@ export const Navbar = () => {
 
         {/* Hamburger Menu */}
         <button
-          className="md:hidden text-white focus:outline-none text-4xl"
+          className="md:hidden text-white focus:outline-none text-2xl flex-shrink-0 p-1"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           ☰
