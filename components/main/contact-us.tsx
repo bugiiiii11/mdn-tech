@@ -108,7 +108,7 @@ export const ContactUs = () => {
         }}
         className="text-lg text-gray-400 max-w-3xl mx-auto mb-12 text-center"
       >
-        We work with founders, product teams, and enterprises who need a technical partner that understands both the product vision and the engineering depth required to realize it. Tell us what you&apos;re building — we&apos;ll tell you how we&apos;d approach it.
+        Got an idea, a problem, or a half-finished product that needs a strong technical partner? We work with founders and product teams who want to move fast without sacrificing quality. Tell us what you&apos;re building.
       </motion.p>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -125,7 +125,7 @@ export const ContactUs = () => {
               Let&apos;s Build Something That Matters
             </h2>
             <p className="text-gray-400 mb-8 leading-relaxed">
-              Whether you&apos;re exploring an AI integration for an existing product, building a new platform from scratch, or need a technical audit of your current system — we&apos;re ready to talk.
+              Whether you are launching your first product or scaling an existing one — if you need a team that moves at the speed of your ambition, let&apos;s talk. No long procurement processes. No committees. Just a direct conversation with the engineers who will build it.
             </p>
           </div>
 

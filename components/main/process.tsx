@@ -228,12 +228,12 @@ const processSteps = [
     delay: 0.4,
   },
   {
-    title: "AI-Accelerated Development",
+    title: "Development & Execution",
     items: [
-      "Full-stack AI engineers using Claude Code agent teams",
-      "Automated code generation with human judgment on critical decisions",
-      "AI handles repetitive work; engineers handle creativity and context",
-      "Production-ready code with tests and documentation from day one"
+      "A dedicated engineer is assigned to lead the full build — responsible for every layer of the system",
+      "Our core team remains available throughout — ready to step in, review, or support where needed",
+      "Modern engineering tooling handles repetitive tasks; the engineer owns every decision and every line",
+      "Production-ready code with tests and documentation from the first commit"
     ],
     delay: 0.6,
   },
@@ -289,7 +289,7 @@ export const Process = () => {
         }}
         className="text-lg text-gray-400 text-center mb-16 max-w-3xl"
       >
-        Our five-phase methodology is built around one principle: no phase begins until the previous one is approved. Each phase is AI-accelerated to compress timelines, fully documented so nothing lives only in someone&apos;s head, and reviewed by both our engineers and you before we move forward.
+        Five phases. Full documentation. No phase begins until the previous one is approved — by our engineers and by you. We built this process to eliminate surprises, protect timelines, and ensure the final product matches what was agreed from day one.
       </motion.p>
 
       {/* Timeline */}

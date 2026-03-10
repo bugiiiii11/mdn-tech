@@ -46,14 +46,14 @@ export const HeroContent = () => {
           variants={slideInFromLeft(0.8)}
           className="text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
         >
-          From idea to production-ready AI systems — faster, smarter, and more secure than traditional development
+          From idea to production-ready systems — faster, smarter, and more secure than traditional development
         </motion.p>
 
         <motion.p
           variants={slideInFromLeft(0.9)}
           className="text-base md:text-lg text-gray-400 my-2 max-w-[700px] text-center leading-relaxed"
         >
-          We are a team of full-stack AI engineers who build complex products using the latest AI models, autonomous agents, and modern engineering practices.
+          We are a team of full-stack AI engineers — developers who have mastered every phase of the project lifecycle. We move fast without cutting corners: production-ready systems, in a fraction of the time and cost of traditional development.
         </motion.p>
 
         <motion.div

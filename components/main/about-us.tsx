@@ -3,7 +3,7 @@
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { slideInFromTop } from "@/lib/motion";
-import { FaRocket, FaShieldAlt, FaBrain, FaRobot, FaLock, FaUsers } from "react-icons/fa";
+import { FaRocket, FaShieldAlt, FaBrain, FaUsers } from "react-icons/fa";
 
 interface AnimatedCounterProps {
   value: number;
@@ -212,7 +212,7 @@ export const AboutUs = () => {
         variants={slideInFromTop}
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        Why AI Engineering Changes Everything
+        Why Our Approach Changes Everything
       </motion.h1>
 
       <motion.div
@@ -233,7 +233,7 @@ export const AboutUs = () => {
         className="flex flex-col items-center justify-center max-w-4xl w-full"
       >
         <p className="text-lg text-gray-400 mb-16 text-center max-w-3xl leading-relaxed">
-          In 2026, the difference between a good development partner and a great one is how deeply AI is embedded in their engineering practice.
+          We combine years of full-stack experience with modern AI engineering practices — building faster, more securely, and with a level of ownership that traditional team structures simply cannot match.
         </p>
       </motion.div>
 
@@ -258,40 +258,28 @@ export const AboutUs = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             {
-              title: "10× Faster Development Cycles",
-              description: "Our engineers use Claude Code, autonomous agent teams, and spec-driven workflows to compress months of development into weeks. A feature that requires a traditional developer a sprint takes our AI engineers hours. We don't guess — we plan with AI, validate the plan, then execute with precision. The result: faster delivery without technical debt.",
+              title: "Weeks, Not Months",
+              description: "What takes a traditional team months of back-and-forth, handoffs, and reviews, our engineers complete in weeks. Not by cutting corners — but by eliminating every inefficiency that slows conventional development down.",
               delay: 0.3,
               icon: FaRocket,
             },
             {
-              title: "Production-Quality from Day One",
-              description: "We don't ship prototypes and call them products. Every system is built with TypeScript strict mode, automated testing, security hardening, and CI/CD pipelines from the first commit. AI accelerates our velocity; our engineering standards ensure what ships is production-ready, secure, and maintainable.",
+              title: "One Engineer. Full Lifecycle.",
+              description: "Most projects at M.D.N Tech are owned end-to-end by a single full-stack AI engineer — acting as architect, developer, and project lead at the same time. No translation loss between teams. No handoffs. One person with complete context, driving the project from discovery to production.",
               delay: 0.4,
+              icon: FaUsers,
+            },
+            {
+              title: "Production-Ready from Day One",
+              description: "We don't ship prototypes dressed as products. Every feature is tested, every endpoint is secured, and every deployment is validated before it goes live. The result is software that works at scale — from day one.",
+              delay: 0.5,
               icon: FaShieldAlt,
             },
             {
-              title: "The Latest Models, Applied Correctly",
-              description: "We work with Claude, ChatGPT, Gemini, Midjourney, and emerging models as they release. We know which model to use for which task, how to chain them, how to guard against prompt injection, and how to build systems that remain reliable when models are updated or swapped.",
-              delay: 0.5,
-              icon: FaBrain,
-            },
-            {
-              title: "Autonomous Agents That Actually Work",
-              description: "We design multi-agent systems where specialized AI agents handle research, planning, implementation, and validation in parallel. Our agent architectures are built for production: with proper sandboxing, fallback logic, approval gates, and observability. Not chatbot demos — real autonomous systems doing real work.",
+              title: "Every Layer. One Team.",
+              description: "Front end, back end, mobile, infrastructure, design implementation, SEO — one team, no silos. Our engineers are built to own the whole product, which means faster decisions, cleaner architecture, and a final product that holds together under real-world conditions.",
               delay: 0.6,
-              icon: FaRobot,
-            },
-            {
-              title: "Security-Hardened by Default",
-              description: "Security is not a phase for us — it is woven into every layer. Every API endpoint is authenticated, rate-limited, and validated. Every AI integration is sandboxed. Every deployment goes through automated security scanning before it reaches production.",
-              delay: 0.7,
-              icon: FaLock,
-            },
-            {
-              title: "Single Team, Full Depth",
-              description: "You work with full-stack AI engineers who understand the entire system — from database schema to AI model selection to mobile UI. No handoffs between siloed specialists. No translation loss between design, backend, and AI teams. One team with complete ownership.",
-              delay: 0.8,
-              icon: FaUsers,
+              icon: FaBrain,
             },
           ].map((item, index) => (
             <FeatureCard key={index} item={item} index={index} />

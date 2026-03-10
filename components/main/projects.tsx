@@ -183,10 +183,10 @@ const techResults = [
     icon: "/icons/AI.svg",
     category: "AI & Agent Systems",
     results: [
-      { metric: "AI-Powered Production Apps Built", value: "5+" },
-      { metric: "LLM Models Integrated", value: "10+" },
-      { metric: "Autonomous Agent Workflows Deployed", value: "25+" },
-      { metric: "Average Development Time Reduction", value: "60%+" },
+      { metric: "AI-Powered Apps Built", value: "5+" },
+      { metric: "Automated Workflows Deployed", value: "25+" },
+      { metric: "Development Speed Increase", value: "10×" },
+      { metric: "Full Project Lifecycles Delivered", value: "30+" },
     ],
   },
   {
@@ -195,7 +195,7 @@ const techResults = [
     results: [
       { metric: "Smart Contracts Deployed", value: "50+" },
       { metric: "Web3 Partnerships", value: "100+" },
-      { metric: "Web3 Conferences Attended", value: "15+" },
+      { metric: "Web3 Games Launched", value: "2" },
       { metric: "VCs Onboarded", value: "70+" },
     ],
   },
@@ -214,19 +214,19 @@ const techResults = [
     category: "Mobile Development",
     results: [
       { metric: "Mobile Apps Built", value: "20+" },
-      { metric: "Telegram Mini Apps", value: "5" },
+      { metric: "Telegram Mini Apps", value: "3" },
       { metric: "App Features Delivered", value: "50+" },
       { metric: "Enterprise Mobile Projects", value: "20+" },
     ],
   },
   {
     icon: "/icons/UI.svg",
-    category: "Enterprise Solutions & Consulting",
+    category: "Enterprise Track Record",
     results: [
-      { metric: "Corporate Clients Served", value: "10+" },
-      { metric: "Industries Covered", value: "5" },
-      { metric: "Successful Project Deliveries", value: "30+" },
-      { metric: "Long-Term Partnerships", value: "10+" },
+      { metric: "Enterprise Systems Built", value: "20+" },
+      { metric: "Years Delivering For Corporates", value: "30+" },
+      { metric: "Corporate Clients Served", value: "8" },
+      { metric: "Enterprise Mobile Projects", value: "10+" },
     ],
   },
   {
@@ -354,7 +354,7 @@ export const Projects = () => {
         }}
         className="text-lg text-gray-400 text-center mb-12 max-w-2xl"
       >
-        Numbers built on real projects — not projections
+        Years of combined experience — now under one roof.
       </motion.p>
 
       {/* Technology Results Grid */}

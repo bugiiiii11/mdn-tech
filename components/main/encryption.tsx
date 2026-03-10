@@ -38,7 +38,7 @@ export const Encryption = () => {
           }}
           className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
         >
-          AI Tools We Use Daily
+          Our Engineering Stack
         </motion.h1>
 
         <motion.p
@@ -55,7 +55,7 @@ export const Encryption = () => {
           }}
           className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
         >
-          The models and platforms powering projects we deliver
+          A modern, production-tested stack — chosen for performance, reliability, and the ability to move fast without creating technical debt.
         </motion.p>
 
         {/* Lock Icon Section */}
@@ -94,7 +94,7 @@ export const Encryption = () => {
           </div>
 
           <div className="Welcome-box px-[15px] py-[4px] z-[20] border my-[20px] border-[#7042F88B] opacity-[0.9]">
-            <h1 className="Welcome-text text-[12px]">AI-Native Stack</h1>
+            <h1 className="Welcome-text text-[12px]">Production-Tested Stack</h1>
           </div>
         </motion.div>
 
@@ -102,33 +102,33 @@ export const Encryption = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-12">
           {[
             {
-              title: "Claude Opus & Sonnet",
-              description: "Research, analysis, strategy and docs — our AI brain behind every project decision.",
+              title: "Web & Frontend",
+              description: "React · Next.js · Vite · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion",
               delay: 0.3,
             },
             {
-              title: "Claude Code",
-              description: "AI agent for development. Writes code, runs tests, reviews PRs — weeks of work in days.",
+              title: "Backend & APIs",
+              description: "Node.js · Python · Java · FastAPI · tRPC · GraphQL · REST",
               delay: 0.4,
             },
             {
-              title: "OpenClaw & N8N",
-              description: "Autonomous agents for dev and marketing workflows — running 24/7, no human intervention.",
+              title: "Database & Storage",
+              description: "PostgreSQL · Supabase · MongoDB · Redis · SQL · S3-compatible storage",
               delay: 0.5,
             },
             {
-              title: "Midjourney & Nano Banana",
-              description: "AI visual generation for UI concepts, brand assets, and graphics — produced in minutes.",
+              title: "Infrastructure & DevOps",
+              description: "Vercel · Railway · AWS · Docker · GitHub · CI/CD pipelines",
               delay: 0.6,
             },
             {
-              title: "Sora, VEO & Seadance",
-              description: "State-of-the-art video generation for social content, demos, and motion assets in hours.",
+              title: "AI & Intelligent Systems",
+              description: "LLM integration · RAG pipelines · AI agents · MCP servers · Claude Code",
               delay: 0.7,
             },
             {
-              title: "Suno AI",
-              description: "AI music for branded audio, video soundtracks, and original royalty-free tracks.",
+              title: "Game Development",
+              description: "Unity · Unreal Engine 5 · Web3 game integrations",
               delay: 0.8,
             },
           ].map((feature, index) => (
@@ -155,7 +155,7 @@ export const Encryption = () => {
           className="text-center"
         >
           <p className="text-base text-gray-400 max-w-3xl leading-relaxed">
-            These are the tools we reach for every day — but our stack never stands still. We continuously evaluate and adopt the latest AI models and platforms as they emerge.
+            This is the stack we reach for every day — but our tools never stand still. We continuously evaluate and adopt the latest technologies as they emerge.
           </p>
         </motion.div>
       </div>

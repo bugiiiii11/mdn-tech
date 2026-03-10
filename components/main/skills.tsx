@@ -256,33 +256,33 @@ const ServiceCard = ({ icon, title, description, index }: ServiceCardProps) => {
 const services = [
   {
     icon: "/icons/AI.svg",
-    title: "AI Systems & Agent Engineering",
-    description: "We design and deploy production-grade AI systems: LLM integration across OpenAI, Anthropic Claude, and open-source models; Retrieval-Augmented Generation (RAG) pipelines; autonomous multi-agent architectures that execute complex workflows without human intervention; AI-powered automation replacing entire operational processes. We build AI that does real work — not demos.",
+    title: "AI & Intelligent Systems",
+    description: "From intelligent automation to AI-native product features, we build systems that think, adapt, and operate without constant human input. Production-grade AI engineering — designed to solve real business problems at scale.",
   },
   {
     icon: "/icons/Web3.svg",
     title: "Blockchain & Web3",
-    description: "Smart contract development, DeFi protocol architecture, wallet integrations, and on-chain analytics systems. We build secure, audited contracts and scalable Web3 infrastructure — enhanced by AI-powered verification and on-chain intelligence tools.",
+    description: "Smart contracts, DeFi systems, TGE launches, liquidity creation, and wallet integrations — built by engineers with hands-on experience across the full Web3 stack. Secure by design. Deployed with precision.",
   },
   {
     icon: "/icons/FullStack.svg",
     title: "Full-Stack Development",
-    description: "Scalable backend systems, RESTful and GraphQL APIs, microservices architecture, and cloud-native infrastructure on AWS, GCP, and Azure. We write clean, maintainable, production-hardened code — accelerated by AI-assisted development that compresses build cycles without compromising quality.",
+    description: "Scalable web platforms, APIs, and microservices built on a modern, proven stack: React, Next.js, TypeScript, Supabase, Railway, and Vercel. We write clean, maintainable code that performs under real traffic and scales without expensive rewrites.",
   },
   {
     icon: "/icons/Mobile.svg",
     title: "Mobile Development",
-    description: "Native-quality iOS and Android apps built with React Native and Flutter. We integrate AI features natively — on-device inference, intelligent personalization, voice interfaces — and support Telegram Mini Apps and Web3 wallet connections. Enterprise-grade mobile with modern AI capabilities.",
+    description: "Native-quality iOS and Android apps built with React Native and Flutter. Full AI feature integration, mobile-optimized performance, Telegram Mini Apps, and Web3 wallet support. Enterprise-grade mobile, delivered by engineers who understand the full product.",
   },
   {
     icon: "/icons/UI.svg",
     title: "UI/UX & Product Design",
-    description: "Research-backed UX, AI-assisted design systems, and conversion-focused product experiences. We use AI tools to accelerate research synthesis, generate design variations, and produce consistent component libraries that translate directly to code — eliminating the gap between design and implementation.",
+    description: "UX research, design systems, and pixel-perfect implementation from Figma designs. We handle the full design-to-code pipeline — including mobile optimization and SEO/GEO best practices — so nothing is lost between design intent and live product.",
   },
   {
     icon: "/icons/Game.svg",
     title: "Game Development",
-    description: "Unity and Unreal Engine game development with intelligent NPC systems, procedural content generation, dynamic in-game economies, and Web3 integrations. We apply AI to create game experiences that adapt, evolve, and surprise players at runtime.",
+    description: "Unity and Unreal Engine 5 — from game mechanics and economy design to Web3 integrations and multiplayer systems. Built by developers who understand both the technical depth and the player experience.",
   },
 ];
 
@@ -323,7 +323,7 @@ export const Skills = () => {
         }}
         className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
       >
-        We don&apos;t just use AI as a tool — we build with it at the core. Every project is engineered by full-stack AI engineers who combine deep technical expertise with the latest AI models, autonomous agents, and spec-driven workflows to deliver production-ready systems at a pace traditional development cannot match.
+        We build across the full stack of modern product development. Whether you need an AI-powered platform, a Web3 system, a mobile app, or a production-ready web product — we have the depth to deliver it end to end.
       </motion.p>
 
       <div className="w-full max-w-6xl">

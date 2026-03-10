@@ -380,7 +380,7 @@ export const TEAM_MEMBERS = [
     name: "Martin Jeřábek",
     role: "CEO",
     image: "/team/1.jpg",
-    bio: "A decade in blockchain and five years leading a Web3 gaming project as CEO. Former Project Manager at ČSOB Bank, delivering smart banking mobile app features. AI enthusiast leveraging multiple LLMs daily across content, analysis, and documentation.",
+    bio: "Martin is the first point of contact for every project at M.D.N Tech — responsible for client relationships, project lifecycle oversight, and delivery confirmation. With 10 years in the blockchain and Web3 space, he brings strategic depth to every engagement: from scoping the right technical approach to ensuring the final product lands exactly as agreed.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -391,7 +391,7 @@ export const TEAM_MEMBERS = [
     name: "Martin Hromek",
     role: "CTO",
     image: "/team/2.jpg",
-    bio: "Enterprise architect with 20 years of experience building mission-critical systems for BMW, Accenture, ČSOB Insurance, and Telecom. Led the full technical build of a Web3 gaming ecosystem as CTO — from smart contracts to live operations.",
+    bio: "20 years building enterprise systems. 5 years as a blockchain CTO. Martin has designed and delivered mission-critical infrastructure at a scale most engineers never encounter — and brings that depth to every project at M.D.N Tech. His focus: architecture that holds, infrastructure that scales, blockchain that works.",
     socials: {
       linkedin: "https://linkedin.com",
       github: "https://github.com",
@@ -399,9 +399,9 @@ export const TEAM_MEMBERS = [
   },
   {
     name: "Eric Lukas",
-    role: "Full-Stack Engineer",
+    role: "Full-Stack AI Engineer",
     image: "/team/3.jpg",
-    bio: "Versatile full-stack developer who has shipped across industries — from AI-powered healthcare apps to enterprise CRM, ERP, and full ecosystem builds. Specializes in turning complex requirements into clean, performant applications across mobile and web.",
+    bio: "Eric is a full-stack AI engineer with 8 years of experience shipping production web apps, mobile applications, and AI integrations. With over 30 projects delivered across industries — from healthcare and fintech to enterprise tooling — he brings the breadth to handle full product builds independently. He leads frontend, mobile, and AI integration work, turning complex requirements into clean, performant applications on web and native platforms.",
     socials: {
       linkedin: "https://www.linkedin.com/in/eric-lukas/",
       github: "https://github.com/ericlukas",
