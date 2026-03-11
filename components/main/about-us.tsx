@@ -259,7 +259,7 @@ export const AboutUs = () => {
           {[
             {
               title: "Weeks, Not Months",
-              description: "What takes a traditional team months of back-and-forth, handoffs, and reviews, our engineers complete in weeks. Not by cutting corners — but by eliminating every inefficiency that slows conventional development down.",
+              description: "What takes a traditional team months of back-and-forth, handoffs, and reviews, our engineers complete in weeks, smaller projects in days. Not by cutting corners — but by eliminating every inefficiency that slows conventional development down.",
               delay: 0.3,
               icon: FaRocket,
             },

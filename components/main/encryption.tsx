@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+// import Image from "next/image"; // Uncomment when restoring lock icon section
 
 import { slideInFromTop, slideInFromLeft, slideInFromRight } from "@/lib/motion";
 
@@ -58,7 +58,7 @@ export const Encryption = () => {
           A modern, production-tested stack — chosen for performance, reliability, and the ability to move fast without creating technical debt.
         </motion.p>
 
-        {/* Lock Icon Section */}
+        {/* Lock Icon Section - Hidden for now, uncomment to restore
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -75,6 +75,7 @@ export const Encryption = () => {
             },
           }}
           className="flex flex-col items-center justify-center mb-12"
+
         >
           <div className="flex flex-col items-center group cursor-pointer w-auto h-auto">
             <Image
@@ -97,38 +98,54 @@ export const Encryption = () => {
             <h1 className="Welcome-text text-[12px]">Production-Tested Stack</h1>
           </div>
         </motion.div>
+        */}
 
         {/* AI Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-12">
           {[
             {
               title: "Web & Frontend",
-              description: "React · Next.js · Vite · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion",
+              description: "React · Next.js · Vue · Svelte · TypeScript · Tailwind CSS · shadcn/ui · Framer Motion · Three.js · WebAssembly",
               delay: 0.3,
             },
             {
               title: "Backend & APIs",
-              description: "Node.js · Python · Java · FastAPI · tRPC · GraphQL · REST",
+              description: "Node.js · Python · Go · Rust · FastAPI · NestJS · GraphQL · tRPC · REST · WebSockets · Kafka",
               delay: 0.4,
             },
             {
               title: "Database & Storage",
-              description: "PostgreSQL · Supabase · MongoDB · Redis · SQL · S3-compatible storage",
+              description: "PostgreSQL · MongoDB · Redis · Supabase · Pinecone · Elasticsearch · Prisma · Snowflake · S3-compatible storage",
               delay: 0.5,
             },
             {
               title: "Infrastructure & DevOps",
-              description: "Vercel · Railway · AWS · Docker · GitHub · CI/CD pipelines",
+              description: "AWS · Google Cloud · Azure · Vercel · Netlify · Docker · Kubernetes · Terraform · GitHub Actions · Prometheus · Grafana",
               delay: 0.6,
             },
             {
               title: "AI & Intelligent Systems",
-              description: "LLM integration · RAG pipelines · AI agents · MCP servers · Claude Code",
+              description: "OpenAI · Anthropic · LangChain · LlamaIndex · RAG pipelines · AI agents · Vector databases · Fine-tuning · MCP servers · Claude Code",
               delay: 0.7,
             },
             {
               title: "Game Development",
-              description: "Unity · Unreal Engine 5 · Web3 game integrations",
+              description: "Unity · Unreal Engine 5 · Godot · Blender · Photon · Web3 gaming · AR/VR",
+              delay: 0.8,
+            },
+            {
+              title: "Mobile",
+              description: "React Native · Flutter · Swift · Kotlin · Progressive Web Apps (PWA)",
+              delay: 0.8,
+            },
+            {
+              title: "Payment & E-commerce",
+              description: "Stripe · Shopify · Medusa · Paddle · Lemon Squeezy · Crypto payments",
+              delay: 0.8,
+            },
+            {
+              title: "CMS & Digital Experience",
+              description: "Sanity · Contentful · Strapi · WordPress · Payload CMS · TinaCMS",
               delay: 0.8,
             },
           ].map((feature, index) => (

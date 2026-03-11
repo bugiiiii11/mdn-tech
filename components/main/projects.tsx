@@ -180,26 +180,6 @@ const TechResultCard = ({ icon, category, results, index }: TechResultProps) => 
 
 const techResults = [
   {
-    icon: "/icons/AI.svg",
-    category: "AI & Agent Systems",
-    results: [
-      { metric: "AI-Powered Apps Built", value: "5+" },
-      { metric: "Automated Workflows Deployed", value: "25+" },
-      { metric: "Development Speed Increase", value: "10×" },
-      { metric: "Full Project Lifecycles Delivered", value: "30+" },
-    ],
-  },
-  {
-    icon: "/icons/Web3.svg",
-    category: "Blockchain & Web3",
-    results: [
-      { metric: "Smart Contracts Deployed", value: "50+" },
-      { metric: "Web3 Partnerships", value: "100+" },
-      { metric: "Web3 Games Launched", value: "2" },
-      { metric: "VCs Onboarded", value: "70+" },
-    ],
-  },
-  {
     icon: "/icons/FullStack.svg",
     category: "Full-Stack Development",
     results: [
@@ -220,16 +200,6 @@ const techResults = [
     ],
   },
   {
-    icon: "/icons/UI.svg",
-    category: "Enterprise Track Record",
-    results: [
-      { metric: "Enterprise Systems Built", value: "20+" },
-      { metric: "Years Delivering For Corporates", value: "30+" },
-      { metric: "Corporate Clients Served", value: "8" },
-      { metric: "Enterprise Mobile Projects", value: "10+" },
-    ],
-  },
-  {
     icon: "/icons/Game.svg",
     category: "Game Development",
     results: [
@@ -237,6 +207,36 @@ const techResults = [
       { metric: "Game Mechanics Designed", value: "15+" },
       { metric: "In-Game Economies Designed", value: "5" },
       { metric: "Web3 Game Integrations", value: "10+" },
+    ],
+  },
+  {
+    icon: "/icons/Web3.svg",
+    category: "Blockchain & Web3",
+    results: [
+      { metric: "Smart Contracts Deployed", value: "50+" },
+      { metric: "Web3 Partnerships", value: "100+" },
+      { metric: "Web3 Games Released", value: "2" },
+      { metric: "Community members", value: "100k+" },
+    ],
+  },
+  {
+    icon: "/icons/AI.svg",
+    category: "AI & Agent Systems",
+    results: [
+      { metric: "AI-Powered Apps Built", value: "5+" },
+      { metric: "Automated Workflows Deployed", value: "25+" },
+      { metric: "Development Speed Increase", value: "10×" },
+      { metric: "Full Project Lifecycles Delivered", value: "30+" },
+    ],
+  },
+  {
+    icon: "/icons/UI.svg",
+    category: "Enterprise Track Record",
+    results: [
+      { metric: "Enterprise Systems Built", value: "20+" },
+      { metric: "Years Delivering For Corporates", value: "30+" },
+      { metric: "Corporate Clients Served", value: "8" },
+      { metric: "Enterprise Mobile Projects", value: "10+" },
     ],
   },
 ];

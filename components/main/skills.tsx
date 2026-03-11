@@ -255,16 +255,6 @@ const ServiceCard = ({ icon, title, description, index }: ServiceCardProps) => {
 
 const services = [
   {
-    icon: "/icons/AI.svg",
-    title: "AI & Intelligent Systems",
-    description: "From intelligent automation to AI-native product features, we build systems that think, adapt, and operate without constant human input. Production-grade AI engineering — designed to solve real business problems at scale.",
-  },
-  {
-    icon: "/icons/Web3.svg",
-    title: "Blockchain & Web3",
-    description: "Smart contracts, DeFi systems, TGE launches, liquidity creation, and wallet integrations — built by engineers with hands-on experience across the full Web3 stack. Secure by design. Deployed with precision.",
-  },
-  {
     icon: "/icons/FullStack.svg",
     title: "Full-Stack Development",
     description: "Scalable web platforms, APIs, and microservices built on a modern, proven stack: React, Next.js, TypeScript, Supabase, Railway, and Vercel. We write clean, maintainable code that performs under real traffic and scales without expensive rewrites.",
@@ -275,14 +265,24 @@ const services = [
     description: "Native-quality iOS and Android apps built with React Native and Flutter. Full AI feature integration, mobile-optimized performance, Telegram Mini Apps, and Web3 wallet support. Enterprise-grade mobile, delivered by engineers who understand the full product.",
   },
   {
+    icon: "/icons/Game.svg",
+    title: "Game Development",
+    description: "Unity and Unreal Engine 5 — from game mechanics and economy design to Web3 integrations and multiplayer systems. Built by developers who understand both the technical depth and the player experience.",
+  },
+  {
     icon: "/icons/UI.svg",
     title: "UI/UX & Product Design",
     description: "UX research, design systems, and pixel-perfect implementation from Figma designs. We handle the full design-to-code pipeline — including mobile optimization and SEO/GEO best practices — so nothing is lost between design intent and live product.",
   },
   {
-    icon: "/icons/Game.svg",
-    title: "Game Development",
-    description: "Unity and Unreal Engine 5 — from game mechanics and economy design to Web3 integrations and multiplayer systems. Built by developers who understand both the technical depth and the player experience.",
+    icon: "/icons/Web3.svg",
+    title: "Blockchain & Web3",
+    description: "Smart contracts, DeFi systems, TGE launches, liquidity creation, and wallet integrations — built by engineers with hands-on experience across the full Web3 stack. Secure by design. Deployed with precision.",
+  },
+   {
+    icon: "/icons/AI.svg",
+    title: "AI & Intelligent Systems",
+    description: "From intelligent automation to AI-native product features, we build systems that think, adapt, and operate without constant human input. Production-grade AI engineering — designed to solve real business problems at scale.",
   },
 ];
 
