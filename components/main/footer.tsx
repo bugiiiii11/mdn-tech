@@ -7,11 +7,48 @@ import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo } from "react-icons/rx";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Subscribed:", email);
-    setEmail("");
+    setIsSubmitting(true);
+    setStatus("idle");
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setStatus("error");
+        setMessage(data.error || "Failed to subscribe");
+      } else {
+        setStatus("success");
+        setMessage(data.message || "Successfully subscribed!");
+        setEmail("");
+      }
+
+      setTimeout(() => {
+        setStatus("idle");
+        setMessage("");
+      }, 4000);
+    } catch (error) {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+      setTimeout(() => {
+        setStatus("idle");
+        setMessage("");
+      }, 4000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const socials = [
@@ -70,22 +107,32 @@ export const Footer = () => {
             <div className="max-w-[280px]">
               <h4 className="text-white text-sm font-medium mb-1">Stay Updated</h4>
               <p className="text-gray-500 text-sm mb-3">Subscribe to our newsletter for the latest updates.</p>
-              <form onSubmit={handleSubscribe} className="flex gap-2 mb-4">
+              <form onSubmit={handleSubscribe} className="flex gap-2 mb-2">
                 <input
                   type="email"
+                  id="newsletter-email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="flex-1 min-w-0 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-purple-500/40"
+                  autoComplete="email"
+                  disabled={isSubmitting}
+                  className="flex-1 min-w-0 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-purple-500/40 disabled:opacity-50"
                 />
                 <button
                   type="submit"
-                  className="shrink-0 px-4 py-2 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold"
+                  disabled={isSubmitting}
+                  className="shrink-0 px-4 py-2 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Subscribe
+                  {isSubmitting ? "..." : "Subscribe"}
                 </button>
               </form>
+              {status !== "idle" && (
+                <p className={`text-xs mb-2 ${status === "success" ? "text-green-400" : "text-red-400"}`}>
+                  {message}
+                </p>
+              )}
               <div className="flex items-center gap-1">
                 {socials.map(({ name, icon: Icon, link }) => (
                   <Link
