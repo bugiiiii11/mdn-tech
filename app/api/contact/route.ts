@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import emailjs from "@emailjs/nodejs";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,33 +12,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email via EmailJS
-    await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID!,
-      process.env.EMAILJS_TEMPLATE_ID!,
-      {
-        name,
-        email,
-        message,
+    // Send email via EmailJS REST API
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        publicKey: process.env.EMAILJS_PUBLIC_KEY!,
-        privateKey: process.env.EMAILJS_PRIVATE_KEY!,
+      body: JSON.stringify({
+        service_id: process.env.EMAILJS_SERVICE_ID,
+        template_id: process.env.EMAILJS_TEMPLATE_ID,
+        user_id: process.env.EMAILJS_PUBLIC_KEY,
+        accessToken: process.env.EMAILJS_PRIVATE_KEY,
+        template_params: {
+          name,
+          email,
+          message,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("EmailJS error:", response.status, errorText);
+
+      if (response.status === 429 || errorText.includes("limit")) {
+        return NextResponse.json(
+          { error: "Monthly email limit reached. Please contact us directly at contact@mdntech.org" },
+          { status: 429 }
+        );
       }
-    );
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("EmailJS error:", error);
-
-    // Check if it's a quota exceeded error
-    if (error?.status === 429 || error?.text?.includes("limit")) {
       return NextResponse.json(
-        { error: "Monthly email limit reached. Please contact us directly at contact@mdntech.org" },
-        { status: 429 }
+        { error: "Failed to send message. Please try again." },
+        { status: 500 }
       );
     }
 
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Contact API error:", error);
     return NextResponse.json(
       { error: "Failed to send message. Please try again." },
       { status: 500 }
