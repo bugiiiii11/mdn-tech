@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
 import {
   EnvelopeIcon,
   PhoneIcon,
@@ -16,6 +17,7 @@ import {
 import { slideInFromTop, slideInFromLeft, slideInFromRight } from "@/lib/motion";
 
 export const ContactUs = () => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,34 +41,28 @@ export const ContactUs = () => {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 429) {
-          setSubmitStatus("limit");
-          setErrorMessage(data.error);
-        } else {
-          setSubmitStatus("error");
-          setErrorMessage(data.error || "Something went wrong");
-        }
-        setTimeout(() => setSubmitStatus("idle"), 8000);
-        return;
-      }
+      await emailjs.sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        formRef.current!,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      );
 
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });
       setTimeout(() => setSubmitStatus("idle"), 5000);
-    } catch (error) {
-      console.error("Contact form error:", error);
-      setSubmitStatus("error");
-      setErrorMessage("Network error. Please try again.");
-      setTimeout(() => setSubmitStatus("idle"), 5000);
+    } catch (error: any) {
+      console.error("EmailJS error:", error);
+
+      // Check for quota exceeded
+      if (error?.status === 429 || error?.text?.includes("limit")) {
+        setSubmitStatus("limit");
+        setErrorMessage("Monthly limit reached. Please email us directly at contact@mdntech.org");
+      } else {
+        setSubmitStatus("error");
+        setErrorMessage("Failed to send message. Please try again.");
+      }
+      setTimeout(() => setSubmitStatus("idle"), 8000);
     } finally {
       setIsSubmitting(false);
     }
@@ -217,7 +213,7 @@ export const ContactUs = () => {
             {/* Glow effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-xl blur-xl -z-10"></div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               {/* Name Field */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
