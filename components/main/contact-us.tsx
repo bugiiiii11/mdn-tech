@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { 
+import {
   EnvelopeIcon,
   PhoneIcon,
   MapPinIcon
@@ -22,7 +22,8 @@ export const ContactUs = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error" | "limit">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -35,16 +36,40 @@ export const ContactUs = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
+    setErrorMessage("");
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          setSubmitStatus("limit");
+          setErrorMessage(data.error);
+        } else {
+          setSubmitStatus("error");
+          setErrorMessage(data.error || "Something went wrong");
+        }
+        setTimeout(() => setSubmitStatus("idle"), 8000);
+        return;
+      }
+
       setSubmitStatus("success");
       setFormData({ name: "", email: "", message: "" });
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setSubmitStatus("idle"), 3000);
-    }, 1000);
+      setTimeout(() => setSubmitStatus("idle"), 5000);
+    } catch (error) {
+      console.error("Contact form error:", error);
+      setSubmitStatus("error");
+      setErrorMessage("Network error. Please try again.");
+      setTimeout(() => setSubmitStatus("idle"), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -286,6 +311,28 @@ export const ContactUs = () => {
                   className="p-4 rounded-lg bg-green-500/20 border border-green-500/50 text-green-400 text-sm text-center"
                 >
                   Thank you! We&apos;ll get back to you soon.
+                </motion.div>
+              )}
+
+              {/* Error Message */}
+              {submitStatus === "error" && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400 text-sm text-center"
+                >
+                  {errorMessage || "Something went wrong. Please try again or email us directly."}
+                </motion.div>
+              )}
+
+              {/* Limit Exceeded Message */}
+              {submitStatus === "limit" && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-lg bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 text-sm text-center"
+                >
+                  {errorMessage || "Monthly limit reached. Please email us directly at contact@mdntech.org"}
                 </motion.div>
               )}
             </form>
