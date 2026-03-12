@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import emailjs from "@emailjs/nodejs";
 
-// Initialize EmailJS with private key (server-side)
-emailjs.init({
-  publicKey: process.env.EMAILJS_PUBLIC_KEY!,
-  privateKey: process.env.EMAILJS_PRIVATE_KEY!,
-});
-
 export async function POST(request: NextRequest) {
   try {
     const { name, email, message } = await request.json();
@@ -27,6 +21,10 @@ export async function POST(request: NextRequest) {
         name,
         email,
         message,
+      },
+      {
+        publicKey: process.env.EMAILJS_PUBLIC_KEY!,
+        privateKey: process.env.EMAILJS_PRIVATE_KEY!,
       }
     );
 
