@@ -231,6 +231,7 @@ export const ContactUs = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  autoComplete="name"
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                   placeholder="Your Name"
                 />
@@ -253,6 +254,7 @@ export const ContactUs = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  autoComplete="email"
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                   placeholder="your.email@example.com"
                 />
@@ -274,6 +276,7 @@ export const ContactUs = () => {
                   value={formData.message}
                   onChange={handleChange}
                   required
+                  autoComplete="off"
                   rows={6}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 resize-none"
                   placeholder="Tell us about your project..."

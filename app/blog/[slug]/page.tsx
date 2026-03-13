@@ -282,7 +282,7 @@ export default function BlogPostPage() {
               </motion.div>
             )}
 
-            {/* CTA Section - Centered */}
+            {/* Back to Blog - Centered */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -290,15 +290,13 @@ export default function BlogPostPage() {
               transition={{ duration: 0.3 }}
               className="mt-16 text-center"
             >
-              <p className="text-gray-400 mb-4">Ready to build with AI-native development?</p>
               <Link
-                href="/#contact-us"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-semibold hover:from-purple-600 hover:to-cyan-600 transition-all duration-300"
+                href="/blog"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm text-gray-300 hover:text-white hover:border-purple-500/50 transition-all duration-300 group"
               >
-                Start Your Project
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-5 w-5 group-hover:-translate-x-1 transition-transform"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -307,9 +305,10 @@ export default function BlogPostPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    d="M7 16l-4-4m0 0l4-4m-4 4h18"
                   />
                 </svg>
+                <span className="font-medium">Back to Blog</span>
               </Link>
             </motion.div>
           </motion.div>

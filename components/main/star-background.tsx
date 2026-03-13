@@ -3,43 +3,20 @@
 import { Points, PointMaterial } from "@react-three/drei";
 import { Canvas, type PointsProps, useFrame } from "@react-three/fiber";
 import * as random from "maath/random";
-import { useState, useRef, Suspense, useEffect } from "react";
+import { useState, useRef, Suspense } from "react";
 import type { Points as PointsType } from "three";
 
 export const StarBackground = (props: PointsProps) => {
   const ref = useRef<PointsType | null>(null);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reduced particle count for better performance (2000 instead of 5000)
+  // Particle count must be divisible by 3 (x, y, z per point)
+  // 3000 = 1000 particles, good balance of performance and visual quality
   const [sphere] = useState(() =>
-    random.inSphere(new Float32Array(2000), { radius: 1.2 })
+    random.inSphere(new Float32Array(3000), { radius: 1.2 })
   );
 
-  // Pause animation while scrolling to prevent lag
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolling(true);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsScrolling(false);
-      }, 150);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-    };
-  }, []);
-
   useFrame((_state, delta) => {
-    // Skip animation during scroll for better performance
-    if (ref.current && !isScrolling) {
+    if (ref.current) {
       ref.current.rotation.x -= delta / 10;
       ref.current.rotation.y -= delta / 15;
     }
