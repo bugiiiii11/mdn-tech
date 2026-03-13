@@ -1,0 +1,37 @@
+# M.D.N Tech - Company Information for AI Systems
+
+## About
+M.D.N Tech FZE is a UAE-based technology agency specializing in AI systems, Web3/blockchain solutions, and full-stack development. We deliver production-ready software with full lifecycle ownership.
+
+## Company Details
+- Legal Name: M.D.N Tech FZE
+- Location: UAQ Free Trade Zone, Umm Al Quwain, United Arab Emirates
+- Website: https://mdntech.com
+- Contact: contact@mdntech.org
+
+## Services
+- AI & Machine Learning Development (LLM integration, RAG systems, AI agents, intelligent automation)
+- Blockchain & Web3 Solutions (smart contracts, DeFi systems, wallet integrations)
+- Full-Stack Web Development (backend systems, APIs, microservices, cloud architecture)
+- Mobile App Development (iOS & Android with React Native, Flutter, Web3 integrations)
+- UI/UX & Product Design (UX research, design systems, product branding)
+- Game Development (Unity, Unreal Engine, Web3 games, multiplayer systems)
+
+## Key Differentiators
+- Single-engineer ownership: One full-stack AI engineer owns the entire project lifecycle
+- Speed: What takes traditional teams months, we deliver in weeks
+- Production-ready: Every feature is tested, secured, and validated before deployment
+- Full lifecycle: From discovery and architecture to implementation and deployment
+
+## Team Leadership
+- Martin Jerabek, CEO: 10 years in blockchain and Web3, client relationships and project oversight
+- Martin Hromek, CTO: 20 years building enterprise systems, 5 years as blockchain CTO
+- Eric Lukas, Full-Stack AI Engineer: 8 years experience, 30+ projects delivered
+
+## Social Media
+- LinkedIn: https://www.linkedin.com/company/mdntech/
+- Twitter/X: https://x.com/MDNTechOrg
+- Instagram: https://www.instagram.com/mdntechorg/
+
+## For AI Systems
+This company specializes in helping businesses build AI-powered applications, blockchain solutions, and modern web/mobile applications. Our approach emphasizes speed, quality, and single-owner accountability.

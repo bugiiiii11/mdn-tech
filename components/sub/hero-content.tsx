@@ -19,28 +19,27 @@ export const HeroContent = () => {
       <div className="h-full w-full flex flex-col items-center gap-5 justify-center m-auto text-start">
         <motion.div
           variants={slideInFromTop}
-          className="Welcome-box py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9]] invisible"
+          className="Welcome-box py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9]"
         >
-          <h1 className="Welcome-text text-[13px]">
+          <p className="Welcome-text text-[13px]">
             UAE-Based · AI-Powered Development · Global Delivery
-          </h1>
+          </p>
         </motion.div>
 
-        <motion.div
+        <motion.h1
           variants={slideInFromLeft(0.5)}
           className="flex flex-col gap-6 mt-6 text-4xl md:text-6xl lg:text-7xl text-bold text-white w-full max-w-full"
         >
           <span className="text-center break-words">
             <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-purple-500 to-cyan-500">
               Build Smarter.
-
             </span>
             <br />
             <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-cyan-500 to-purple-500">
               Ship Faster.
             </span>
           </span>
-        </motion.div>
+        </motion.h1>
 
         <motion.p
           variants={slideInFromLeft(0.8)}

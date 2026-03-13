@@ -79,7 +79,7 @@ export const Footer = () => {
             {/* Brand + description */}
             <div className="max-w-[280px]">
               <Link href="/#home" className="inline-flex items-center gap-2.5 mb-3">
-                <Image src="/logo.png" alt="" width={32} height={32} className="w-8 h-8 opacity-90" />
+                <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
               <p className="text-gray-500 text-sm leading-relaxed">
