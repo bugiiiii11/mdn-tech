@@ -1,22 +1,16 @@
 import { MetadataRoute } from "next";
-
-const BLOG_POSTS = [
-  "ai-engineering-2026",
-  "web3-enterprise-adoption",
-  "full-stack-ownership",
-  "production-ready-ai",
-  "mobile-web3-integration",
-  "scaling-without-rewrites",
-];
+import { getAllPosts } from "@/data/blog-posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://mdntech.com";
 
-  const blogUrls = BLOG_POSTS.map((slug) => ({
-    url: `${baseUrl}/blog/${slug}`,
+  const posts = getAllPosts();
+
+  const blogUrls = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.id}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
-    priority: 0.6,
+    priority: post.content.length > 3 ? 0.8 : 0.6, // Higher priority for full articles
   }));
 
   return [

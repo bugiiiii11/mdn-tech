@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           variants={slideInFromTop}
           className="relative z-10 text-center mb-16 max-w-4xl mx-auto"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 mb-6">
+          <h1 className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 mb-6">
             Privacy Policy
           </h1>
           <p className="text-lg text-gray-400">

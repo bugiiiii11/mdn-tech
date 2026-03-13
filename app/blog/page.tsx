@@ -1,95 +1,43 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
-
-// Blog post data - you can move this to a separate file or CMS later
-const BLOG_POSTS = [
-  {
-    id: "ai-engineering-2026",
-    title: "The Rise of AI Engineering in 2026",
-    excerpt: "How AI-native development practices are reshaping the software industry and what it means for modern product teams.",
-    image: "/blog/placeholder-1.jpg",
-    category: "AI & Engineering",
-    date: "March 5, 2026",
-    readTime: "8 min read",
-  },
-  {
-    id: "web3-enterprise-adoption",
-    title: "Web3 Enterprise Adoption: Beyond the Hype",
-    excerpt: "A practical look at how enterprises are implementing blockchain technology for real business value.",
-    image: "/blog/placeholder-2.jpg",
-    category: "Blockchain & Web3",
-    date: "February 28, 2026",
-    readTime: "6 min read",
-  },
-  {
-    id: "full-stack-ownership",
-    title: "Why Full-Stack Ownership Beats Team Handoffs",
-    excerpt: "The case for single-engineer ownership and how it accelerates delivery without sacrificing quality.",
-    image: "/blog/placeholder-3.jpg",
-    category: "Engineering",
-    date: "February 20, 2026",
-    readTime: "5 min read",
-  },
-  {
-    id: "production-ready-ai",
-    title: "Building Production-Ready AI Systems",
-    excerpt: "From prototype to production: the engineering practices that separate demos from real AI products.",
-    image: "/blog/placeholder-4.jpg",
-    category: "AI & Engineering",
-    date: "February 15, 2026",
-    readTime: "10 min read",
-  },
-  {
-    id: "mobile-web3-integration",
-    title: "Mobile Apps Meet Web3: A Developer's Guide",
-    excerpt: "Integrating wallet connections, on-chain data, and Web3 features into React Native and Flutter apps.",
-    image: "/blog/placeholder-5.jpg",
-    category: "Mobile & Web3",
-    date: "February 8, 2026",
-    readTime: "7 min read",
-  },
-  {
-    id: "scaling-without-rewrites",
-    title: "Scaling Without Expensive Rewrites",
-    excerpt: "Architecture decisions that let your codebase grow without accumulating technical debt.",
-    image: "/blog/placeholder-6.jpg",
-    category: "Engineering",
-    date: "February 1, 2026",
-    readTime: "6 min read",
-  },
-];
+import { getAllPosts, BlogPost } from "@/data/blog-posts";
+import { slideInFromTop } from "@/lib/motion";
 
 interface BlogCardProps {
-  post: typeof BLOG_POSTS[0];
+  post: BlogPost;
   index: number;
 }
 
 const BlogCard = ({ post, index }: BlogCardProps) => {
+  // Check if this is a full article (has more than just intro + callout)
+  const isFullArticle = post.content.length > 3;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.1, 0.3) }}
+      className="group will-change-transform"
     >
       <Link href={`/blog/${post.id}`} className="block">
         <div className="relative h-full rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-purple-500/50 hover:bg-[#7042f825]">
           {/* Image Container */}
           <div className="relative h-48 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 z-10" />
-            {/* Placeholder gradient when no image */}
+            {/* Placeholder gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 via-[#030014] to-cyan-900/50" />
-            {/* Uncomment when you have actual images */}
-            {/* <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            /> */}
+
+            {/* Featured Badge for full articles */}
+            {isFullArticle && (
+              <div className="absolute top-4 right-4 z-20">
+                <span className="px-2 py-1 text-xs font-medium text-cyan-400 bg-cyan-500/20 backdrop-blur-sm rounded-full border border-cyan-500/30">
+                  Featured
+                </span>
+              </div>
+            )}
 
             {/* Category Badge */}
             <div className="absolute top-4 left-4 z-20">
@@ -117,6 +65,18 @@ const BlogCard = ({ post, index }: BlogCardProps) => {
             <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
               {post.excerpt}
             </p>
+
+            {/* Tags */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 text-xs text-gray-400 bg-[#7042f810] rounded border border-[#7042f830]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
 
             {/* Read More Link */}
             <div className="mt-4 flex items-center gap-2 text-cyan-400 text-sm font-medium group-hover:gap-3 transition-all duration-300">
@@ -149,48 +109,31 @@ const BlogCard = ({ post, index }: BlogCardProps) => {
 };
 
 export default function BlogPage() {
+  const posts = getAllPosts();
+
   return (
     <main className="min-h-screen w-full pt-20">
       <section className="relative flex flex-col items-center justify-center py-20 px-4 md:px-8 lg:px-20 overflow-hidden">
         {/* Header */}
-        <motion.h1
+        <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0, y: -20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.5 },
-            },
-          }}
-          className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
+          variants={slideInFromTop}
+          className="relative z-10 text-center mb-16 max-w-4xl mx-auto"
         >
-          Our Blog
-        </motion.h1>
-
-        <motion.p
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0, y: -20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.5, delay: 0.2 },
-            },
-          }}
-          className="text-lg text-gray-400 text-center mb-16 max-w-2xl"
-        >
-          Insights on AI engineering, Web3 development, and building production-ready systems from the M.D.N Tech team.
-        </motion.p>
+          <h1 className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 mb-6">
+            Our Blog
+          </h1>
+          <p className="text-lg text-gray-400">
+            Insights on AI engineering, Web3 development, and building production-ready systems from the M.D.N Tech team.
+          </p>
+        </motion.div>
 
         {/* Blog Grid */}
         <div className="relative z-10 w-full max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {BLOG_POSTS.map((post, index) => (
+            {posts.map((post, index) => (
               <BlogCard key={post.id} post={post} index={index} />
             ))}
           </div>
