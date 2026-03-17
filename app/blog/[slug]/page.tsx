@@ -87,5 +87,83 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   const relatedPosts = getRelatedPosts(post.id, 2);
 
-  return <BlogPostContent post={post} relatedPosts={relatedPosts} />;
+  // Parse date for ISO format
+  const dateMatch = post.date.match(/(\w+)\s+(\d+),\s+(\d+)/);
+  const isoDate = dateMatch
+    ? new Date(`${dateMatch[1]} ${dateMatch[2]}, ${dateMatch[3]}`).toISOString()
+    : new Date().toISOString();
+
+  // Article JSON-LD schema for rich snippets
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.metaDescription || post.excerpt,
+    image: `https://mdntech.com${post.image || "/og-image.png"}`,
+    datePublished: isoDate,
+    dateModified: isoDate,
+    author: {
+      "@type": "Organization",
+      name: post.author,
+      url: "https://mdntech.com",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "M.D.N Tech FZE",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://mdntech.com/logo.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://mdntech.com/blog/${post.id}`,
+    },
+    keywords: post.tags.join(", "),
+    articleSection: post.category,
+  };
+
+  // Breadcrumb schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://mdntech.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://mdntech.com/blog",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `https://mdntech.com/blog/${post.id}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
+      />
+      <BlogPostContent post={post} relatedPosts={relatedPosts} />
+    </>
+  );
 }

@@ -154,8 +154,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
         {/* Header - Clean style like Terms page */}
         <motion.div
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={slideInFromTop}
           className="relative z-10 text-center mb-16 max-w-4xl mx-auto"
         >
@@ -178,7 +177,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           >
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm text-gray-300 hover:text-white hover:border-purple-500/50 transition-all duration-300 group"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#7042f88b] bg-[#7042f815]  text-gray-300 hover:text-white hover:border-purple-500/50 transition-all duration-300 group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -201,12 +200,10 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="will-change-transform"
           >
-            <div className="p-8 md:p-12 rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm">
+            <div className="p-8 md:p-12 rounded-xl border border-[#7042f88b] bg-[#0c0424]/80">
               {/* Excerpt */}
               <p className="text-xl text-gray-300 leading-relaxed mb-8 pb-8 border-b border-purple-500/20">
                 {post.excerpt}
@@ -234,9 +231,8 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             {relatedPosts.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.3 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
                 className="mt-8"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">Related Articles</h3>
@@ -251,14 +247,13 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             {/* Back to Blog - Centered */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.3 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
               className="mt-16 text-center"
             >
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm text-gray-300 hover:text-white hover:border-purple-500/50 transition-all duration-300 group"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815]  text-gray-300 hover:text-white hover:border-purple-500/50 transition-all duration-300 group"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

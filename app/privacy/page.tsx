@@ -10,8 +10,7 @@ export default function PrivacyPage() {
         {/* Header */}
         <motion.div
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={slideInFromTop}
           className="relative z-10 text-center mb-16 max-w-4xl mx-auto"
         >
@@ -27,12 +26,11 @@ export default function PrivacyPage() {
         <div className="relative z-10 w-full max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="prose prose-invert prose-lg max-w-none"
           >
-            <div className="p-8 md:p-12 rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm text-gray-300 leading-relaxed">
+            <div className="p-8 md:p-12 rounded-xl border border-[#7042f88b] bg-[#0c0424]/80 text-gray-300 leading-relaxed">
               
               {/* Introduction */}
               <section className="mb-12">
