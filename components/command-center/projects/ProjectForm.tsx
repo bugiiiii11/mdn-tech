@@ -25,6 +25,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
     start_date: project?.start_date ?? '',
     target_end_date: project?.target_end_date ?? '',
     budget_total: project?.budget_total ?? '',
+    budget_spent: project?.budget_spent ?? '',
     description: project?.description ?? '',
     repository_url: project?.repository_url ?? '',
     staging_url: project?.staging_url ?? '',
@@ -46,7 +47,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
     const payload = {
       ...form,
       budget_total: form.budget_total ? parseFloat(form.budget_total) : null,
-      budget_spent: project?.budget_spent ?? 0,
+      budget_spent: form.budget_spent ? parseFloat(form.budget_spent) : 0,
       start_date: form.start_date || null,
       target_end_date: form.target_end_date || null,
     }
@@ -105,9 +106,14 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <input type="date" value={form.target_end_date} onChange={e => set('target_end_date', e.target.value)} className={input} />
           </Field>
         </div>
-        <Field label="Budget (USD)">
-          <input type="number" min="0" step="100" value={form.budget_total} onChange={e => set('budget_total', e.target.value)} placeholder="10000" className={input} />
-        </Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Budget total (USD)">
+            <input type="number" min="0" step="100" value={form.budget_total} onChange={e => set('budget_total', e.target.value)} placeholder="10000" className={input} />
+          </Field>
+          <Field label="Budget spent (USD)">
+            <input type="number" min="0" step="100" value={form.budget_spent} onChange={e => set('budget_spent', e.target.value)} placeholder="0" className={input} />
+          </Field>
+        </div>
       </Section>
 
       {/* URLs */}
