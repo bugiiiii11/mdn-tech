@@ -6,6 +6,9 @@
 |---|------|-------|-------------|
 | 1 | 2026-03-21 | Performance fixes, skills setup | Fixed subpage performance, blog title gradient, added session management skills |
 | 2 | 2026-03-21 | Command Center planning, skill restructure | Restructured skills to correct format, created CC PRD, business analysis, and 6-phase development plan |
+| 3 | 2026-03-21 | Phase 1: Auth, projects, team, dashboard | Supabase setup, middleware auth, full project CRUD, layout restructure for route groups, Vercel fixes |
+| 4 | 2026-03-21 | Phase 2: Communications, budget, knowledge base | Comms log, budget health meters, KB markdown rendering, project tabs with all views |
+| 5 | 2026-03-21 | Chatbots KB management | Chatbot CRUD, per-chatbot knowledge base entries, export as unified .md |
 
 ## What Was Done (Session 1) -- Performance fixes and skills setup
 
@@ -33,30 +36,63 @@
    - Knowledge base renders `.md` files for skills, docs, and howtos
    - Stack additions: `@supabase/supabase-js`, `@supabase/ssr`, `shadcn/ui`, `recharts`, `zod`, `react-hook-form`
 
+## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
+
+1. **Supabase project configured** -- Connected Supabase project (ref: ijfgwzacaabzeknlpaff), added env vars to `.env.local` and Vercel dashboard. Created `lib/supabase/client.ts`, `server.ts`, `middleware.ts` using `@supabase/ssr`. Ran `001_core_tables.sql` migration (projects, team_members, milestones, communications, activity_log + RLS + `handle_new_user()` trigger).
+
+2. **Route group restructure** -- Moved all marketing pages into `app/(marketing)/` route group to fix nested `<html><body>` issue that was causing Vercel build failures. Root `app/layout.tsx` stripped to minimal; `app/(marketing)/layout.tsx` holds StarsCanvas, Navbar, Footer. Committed: `60d434d`.
+
+3. **Phase 1 build** -- Auth (login page, middleware session guard), project CRUD (list/new/detail/edit), team workload page with utilization bars, dashboard with KPI cards and project table. Files: `app/command-center/login/page.tsx`, `app/command-center/dashboard/page.tsx`, `app/command-center/projects/`, `app/command-center/team/page.tsx`, `components/command-center/`. Committed: `1ea7010`.
+
+4. **Vercel build fixes** -- Added `export const dynamic = 'force-dynamic'` to all CC server pages to prevent static prerender errors. Fixed lucide-react missing dependency. Committed: `9cd088c`.
+
+## What Was Done (Session 4) -- Phase 2: Communications, budget, knowledge base
+
+1. **Communications log** -- Global feed with QuickAddComm form (project, channel, direction, contact, subject, summary, action items) and CommFeed with channel/action-item filters. Files: `app/command-center/communications/page.tsx`, `components/command-center/communications/QuickAddComm.tsx`, `components/command-center/communications/CommFeed.tsx`.
+
+2. **Budget tracking** -- Budget health meter (green <80%, yellow 80-100%, red >100%), remaining budget display, over-budget warning banner embedded in project detail tabs. Files: `components/command-center/projects/ProjectTabs.tsx`.
+
+3. **Knowledge base (markdown)** -- Reads `.md` files from `command-center/knowledge/` using gray-matter, groups by category, renders with react-markdown + remark-gfm + @tailwindcss/typography. Added design system doc and stack guide. Files: `app/command-center/knowledge/`, `components/command-center/knowledge/KnowledgeContent.tsx`, `command-center/knowledge/docs/design-system.md`, `command-center/knowledge/docs/stack-guide.md`.
+
+4. **Project tabs** -- Tabbed project detail view: Overview / Milestones / Budget / Communications, all rendered from a single page. Fixed TypeScript error with Supabase joined relations returning arrays. Committed: `da82b56`.
+
+## What Was Done (Session 5) -- Chatbots KB management
+
+1. **Chatbots section** -- Full CRUD for chatbots (name, type, client, linked project, status, description). Sidebar nav entry added. Files: `app/command-center/chatbots/page.tsx`, `new/page.tsx`, `[id]/page.tsx`, `[id]/edit/page.tsx`, `components/command-center/chatbots/ChatbotForm.tsx`.
+
+2. **KB entry management** -- Per-chatbot knowledge base entries stored in Supabase (`chatbot_kb_entries` table). Entries grouped by category (about, tone, products, pricing, faq, policies, support, general, other) with word counts. Create/edit/delete with markdown textarea. Files: `app/command-center/chatbots/[id]/entries/`, `components/command-center/chatbots/KBEntryForm.tsx`, `components/command-center/chatbots/KBEntryList.tsx`.
+
+3. **Export** -- Client-side export button concatenates all entries into one structured `.md` file sorted by category, triggers browser download. File: `components/command-center/chatbots/KBExportButton.tsx`.
+
+4. **Supabase migration** -- Created `supabase/migrations/002_chatbots.sql` with `chatbots` and `chatbot_kb_entries` tables + RLS. Committed: `4cdb302`.
+
 ## What To Do Next
 
 | Priority | Task | Notes |
 |----------|------|-------|
-| 1 | Command Center Phase 1 setup | Create Supabase project, generate 3 API tokens, add app.mdntech.org domain in Vercel, configure DNS |
-| 2 | Command Center Phase 1 build | Auth, middleware routing, project CRUD, "Today" dashboard -- see command-center/DEVELOPMENT-PLAN.md |
-| 3 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
-| 4 | Add structured data / schema markup | JSON-LD for Organization, BlogPosting, WebSite |
-| 5 | Add unit tests | Install vitest, test blog data helpers and components |
+| 1 | Phase 3: Infrastructure monitoring | Supabase Management API, Railway GraphQL, Vercel REST -- health status, cost analytics, polling worker |
+| 2 | Enter all 10 projects in Command Center | 5 active + 5 in analysis; fill real data |
+| 3 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
+| 4 | Add Anthropic API key | Add to .env.local and Vercel when ready for Phase 4 AI features |
+| 5 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `app/layout.tsx` | Root layout with metadata |
-| `app/blog/page.tsx` | Blog listing page |
-| `app/blog/[slug]/BlogPostContent.tsx` | Blog post client component |
-| `app/privacy/page.tsx` | Privacy policy page |
-| `app/terms/page.tsx` | Terms and conditions page |
-| `app/not-found.tsx` | Custom 404 page |
-| `data/blog-posts.ts` | Blog post content data |
-| `seo-audit/ACTION-PLAN.md` | SEO improvement roadmap |
-| `.claude/skills/` | Session management skills (start, wrap, doc-update, save, test) |
-| `.claude/testing.md` | Testing infrastructure reference |
+| `app/layout.tsx` | Root layout (minimal -- html/body only) |
+| `app/(marketing)/layout.tsx` | Marketing layout with StarsCanvas, Navbar, Footer |
+| `app/command-center/layout.tsx` | CC layout: dark bg, Sidebar + main content |
+| `middleware.ts` | Session guard: redirects unauthenticated users to login |
+| `lib/supabase/client.ts` | Supabase browser client |
+| `lib/supabase/server.ts` | Supabase server client |
+| `supabase/migrations/001_core_tables.sql` | Core schema: projects, team, milestones, communications + RLS |
+| `supabase/migrations/002_chatbots.sql` | Chatbots + KB entries schema + RLS |
+| `components/command-center/projects/ProjectTabs.tsx` | Project detail: Overview/Milestones/Budget/Communications tabs |
+| `components/command-center/chatbots/KBExportButton.tsx` | Export all KB entries as unified .md download |
+| `components/command-center/knowledge/KnowledgeContent.tsx` | Renders .md files with react-markdown + typography |
+| `command-center/knowledge/docs/design-system.md` | Unified brand reference: colors, typography, components |
+| `command-center/knowledge/docs/stack-guide.md` | New project setup guide (Next.js, Supabase, Railway, Vercel) |
 | `command-center/PRD.md` | Command Center product requirements |
-| `command-center/BUSINESS-ANALYSIS.md` | Competitive research and feature matrix |
 | `command-center/DEVELOPMENT-PLAN.md` | 6-phase development plan with architecture and schema |
+| `.claude/skills/` | Session management skills (start, wrap, doc-update, save, test) |
