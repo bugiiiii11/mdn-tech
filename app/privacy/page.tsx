@@ -38,7 +38,7 @@ export default function PrivacyPage() {
                   1. Introduction
                 </h2>
                 <p className="mb-4">
-                  M.D.N Tech FZE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.mdntech.org and use our services.
+                  M.D.N Tech FZE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.mdntech.com and use our services.
                 </p>
                 <div className="bg-[#7042f810] p-6 rounded-lg border border-purple-500/20 my-6">
                   <p className="font-semibold text-white mb-3">Company Details:</p>
@@ -413,7 +413,7 @@ export default function PrivacyPage() {
                 <div className="bg-[#7042f810] p-6 rounded-lg border border-purple-500/20">
                   <p className="font-semibold text-white mb-3">Notice of Changes:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
-                    <li>Updated policy will be posted on www.mdntech.org with a new &quot;Last Updated&quot; date</li>
+                    <li>Updated policy will be posted on www.mdntech.com with a new &quot;Last Updated&quot; date</li>
                     <li>For material changes, we will notify you via email or prominent website notice</li>
                     <li>Continued use of our services after changes constitutes acceptance</li>
                   </ul>
@@ -435,7 +435,7 @@ export default function PrivacyPage() {
                   <p className="text-gray-300 mb-1">Umm Al Quwain, United Arab Emirates</p>
                   <p className="text-gray-300 mb-1">Email: contact@mdntech.org</p>
                   <p className="text-gray-300 mb-1">Data Protection Contact: Martin Jerabek</p>
-                  <p className="text-gray-300">Website: www.mdntech.org</p>
+                  <p className="text-gray-300">Website: www.mdntech.com</p>
                 </div>
               </section>
 

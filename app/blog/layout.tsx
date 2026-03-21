@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     description:
       "Technical insights and industry perspectives from our full-stack AI engineers.",
   },
+  alternates: {
+    canonical: "https://mdntech.com/blog",
+  },
 };
 
 export default function BlogLayout({

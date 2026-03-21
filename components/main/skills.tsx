@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ServiceCardProps {
   icon: string;
@@ -292,7 +293,7 @@ export const Skills = () => {
       id="services"
       className="flex flex-col items-center justify-center gap-3 h-full relative overflow-hidden py-20 px-4 md:px-20 w-full max-w-full"
     >
-      <motion.h1
+      <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -307,7 +308,7 @@ export const Skills = () => {
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         What We Build
-      </motion.h1>
+      </motion.h2>
 
       <motion.p
         initial="hidden"
@@ -340,11 +341,37 @@ export const Skills = () => {
         </div>
       </div>
 
+      {/* Blog CTA */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, delay: 0.3 },
+          },
+        }}
+        className="mt-12"
+      >
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815] text-white font-semibold hover:bg-[#7042f825] transition-all duration-300 group"
+        >
+          Read our engineering blog
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </Link>
+      </motion.div>
+
       <div className="w-full h-full absolute">
         <div className="w-full h-full z-[-10] opacity-30 absolute flex items-center justify-center bg-cover">
           <video
             className="w-full h-auto"
-            preload="false"
+            preload="none"
             playsInline
             loop
             muted

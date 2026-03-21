@@ -166,9 +166,9 @@ const FeatureCard = ({ item, index }: FeatureCardProps) => {
               <item.icon className="w-6 h-6 text-cyan-400" />
             </motion.div>
 
-            <h4 className="text-xl font-semibold text-white mb-3">
+            <h3 className="text-xl font-semibold text-white mb-3">
               {item.title}
-            </h4>
+            </h3>
 
             <motion.p
               className="text-gray-400 leading-relaxed"
@@ -205,7 +205,7 @@ const FeatureCard = ({ item, index }: FeatureCardProps) => {
 export const AboutUs = () => {
   return (
     <section id="about-us" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 w-full max-w-full overflow-hidden">
-      <motion.h1
+      <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -213,7 +213,7 @@ export const AboutUs = () => {
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         Why Our Approach Changes Everything
-      </motion.h1>
+      </motion.h2>
 
       <motion.div
         initial="hidden"

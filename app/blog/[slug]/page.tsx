@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   // Article JSON-LD schema for rich snippets
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: post.metaDescription || post.excerpt,
     image: `https://mdntech.com${post.image || "/og-image.png"}`,

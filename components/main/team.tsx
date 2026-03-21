@@ -243,7 +243,7 @@ export const Team = () => {
         />
       </div>
 
-      <motion.h1
+      <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -258,7 +258,7 @@ export const Team = () => {
         className="relative z-10 text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         Meet Our Team
-      </motion.h1>
+      </motion.h2>
 
       <motion.p
         initial="hidden"

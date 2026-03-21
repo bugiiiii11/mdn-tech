@@ -1,16 +1,8 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ProjectCard } from "@/components/sub/project-card";
-import { PROJECTS } from "@/constants";
 import Image from "next/image";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 import { useState, useRef } from "react";
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
 
 interface TechResultProps {
   icon: string;
@@ -241,80 +233,6 @@ const techResults = [
   },
 ];
 
-// Extended projects with more details
-const extendedProjects = [
-  {
-    ...PROJECTS[0],
-    category: "Full-Stack",
-    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
-  },
-  {
-    ...PROJECTS[1],
-    category: "UI/UX",
-    technologies: ["React", "CSS3", "Animation"],
-  },
-  {
-    ...PROJECTS[2],
-    category: "Web Design",
-    technologies: ["Next.js", "Three.js", "WebGL"],
-  },
-  {
-    title: "AI-Powered Analytics Platform",
-    description: "Enterprise analytics platform with real-time AI insights, predictive modeling, and automated reporting for data-driven decision making.",
-    image: "/projects/project-1.png",
-    link: "https://example.com",
-    category: "AI/ML",
-    technologies: ["Python", "TensorFlow", "React", "PostgreSQL"],
-  },
-  {
-    title: "DeFi Trading Dashboard",
-    description: "Advanced DeFi trading interface with real-time market data, portfolio tracking, and automated yield farming strategies.",
-    image: "/projects/project-2.png",
-    link: "https://example.com",
-    category: "Blockchain",
-    technologies: ["Solidity", "Web3", "React", "Ethereum"],
-  },
-  {
-    title: "E-Commerce Mobile App",
-    description: "Native mobile shopping experience with AR product preview, secure payments, and personalized recommendations.",
-    image: "/projects/project-3.png",
-    link: "https://example.com",
-    category: "Mobile",
-    technologies: ["React Native", "Node.js", "MongoDB", "Stripe"],
-  },
-  {
-    title: "Cloud Infrastructure Platform",
-    description: "Scalable cloud management platform with automated deployment, monitoring, and resource optimization.",
-    image: "/projects/project-1.png",
-    link: "https://example.com",
-    category: "Full-Stack",
-    technologies: ["AWS", "Docker", "Kubernetes", "Go"],
-  },
-  {
-    title: "Healthcare Management System",
-    description: "Comprehensive healthcare platform with patient records, appointment scheduling, and telemedicine capabilities.",
-    image: "/projects/project-2.png",
-    link: "https://example.com",
-    category: "Full-Stack",
-    technologies: ["React", "Node.js", "PostgreSQL", "HIPAA"],
-  },
-  {
-    title: "NFT Marketplace",
-    description: "Decentralized NFT marketplace with multi-chain support, auction system, and creator royalties.",
-    image: "/projects/project-3.png",
-    link: "https://example.com",
-    category: "Web3",
-    technologies: ["Solidity", "IPFS", "Next.js", "Ethereum"],
-  },
-  {
-    title: "Real-Time Collaboration Tool",
-    description: "Team collaboration platform with live editing, video conferencing, and project management features.",
-    image: "/projects/project-1.png",
-    link: "https://example.com",
-    category: "Full-Stack",
-    technologies: ["WebSocket", "React", "Node.js", "Redis"],
-  },
-];
 
 
 export const Projects = () => {
@@ -323,7 +241,7 @@ export const Projects = () => {
       id="projects"
       className="flex flex-col items-center justify-center py-20 px-4 md:px-20 w-full max-w-full overflow-hidden"
     >
-      <motion.h1
+      <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -338,7 +256,7 @@ export const Projects = () => {
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         Our Results
-      </motion.h1>
+      </motion.h2>
 
       <motion.p
         initial="hidden"
@@ -372,54 +290,6 @@ export const Projects = () => {
         </div>
       </div>
 
-      {/* Projects Grid Section */}
-      {/* <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={{
-          hidden: { opacity: 0, y: 20 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.5 },
-          },
-        }}
-        className="w-full max-w-7xl"
-      >
-        <h2 className="text-[32px] font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center mb-8">
-          Featured Projects
-        </h2>
-        <Swiper
-          slidesPerView={1}
-          spaceBetween={10}
-          pagination={{
-            clickable: true,
-          }}
-          breakpoints={{
-            640: {
-              slidesPerView: 1,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 40,
-            },
-            1024: {
-              slidesPerView: 3,
-              spaceBetween: 50,
-            },
-          }}
-          modules={[Pagination]}
-          className="mySwiper"
-        >
-          {PROJECTS.map((project) => (
-            <SwiperSlide key={project.title}>
-              <ProjectCard src={project.image} title={project.title} description={project.description} link={project.link} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </motion.div> */}
     </section>
   )
 }

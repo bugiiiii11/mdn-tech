@@ -38,7 +38,7 @@ export default function TermsPage() {
                   1. Introduction and Agreement
                 </h2>
                 <p className="mb-4">
-                  These Terms & Conditions (&quot;Terms&quot;) constitute a legally binding agreement between M.D.N Tech FZE (&quot;Company,&quot; &quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) and you (&quot;Client,&quot; &quot;you,&quot; or &quot;your&quot;) governing your use of our website www.mdntech.org and our IT services.
+                  These Terms & Conditions (&quot;Terms&quot;) constitute a legally binding agreement between M.D.N Tech FZE (&quot;Company,&quot; &quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) and you (&quot;Client,&quot; &quot;you,&quot; or &quot;your&quot;) governing your use of our website www.mdntech.com and our IT services.
                 </p>
                 <div className="bg-[#7042f810] p-6 rounded-lg border border-purple-500/20 my-6">
                   <p className="font-semibold text-white mb-3">Company Details:</p>
@@ -47,7 +47,7 @@ export default function TermsPage() {
                     <li><span className="text-purple-400">Registration:</span> UAQ Free Trade Zone, United Arab Emirates</li>
                     <li><span className="text-purple-400">Address:</span> Al Shmookh Business Center M 1003, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E</li>
                     <li><span className="text-purple-400">Contact:</span> contact@mdntech.org</li>
-                    <li><span className="text-purple-400">Website:</span> www.mdntech.org</li>
+                    <li><span className="text-purple-400">Website:</span> www.mdntech.com</li>
                   </ul>
                 </div>
                 <p>
@@ -879,7 +879,7 @@ export default function TermsPage() {
                   <p className="text-gray-300 mb-1">One UAQ, UAQ Free Trade Zone</p>
                   <p className="text-gray-300 mb-1">Umm Al Quwain, United Arab Emirates</p>
                   <p className="text-gray-300 mb-1">Email: contact@mdntech.org</p>
-                  <p className="text-gray-300 mb-1">Website: www.mdntech.org</p>
+                  <p className="text-gray-300 mb-1">Website: www.mdntech.com</p>
                   <p className="text-gray-300">Contact Person: Martin Jerabek</p>
                 </div>
               </section>

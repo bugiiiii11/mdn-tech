@@ -98,7 +98,7 @@ export const ContactUs = () => {
 
   return (
     <section id="contact-us" className="flex flex-col items-center justify-center py-20 px-4 md:px-20 min-h-screen w-full max-w-full overflow-hidden">
-      <motion.h1
+      <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -113,7 +113,7 @@ export const ContactUs = () => {
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
         Start Your Project
-      </motion.h1>
+      </motion.h2>
 
       <motion.p
         initial="hidden"

@@ -15,7 +15,7 @@ export const Encryption = () => {
           muted
           autoPlay
           playsInline
-          preload="false"
+          preload="none"
           className="w-full max-w-full h-auto opacity-30"
         >
           <source src="/videos/encryption-bg.webm" type="video/webm" />
@@ -24,7 +24,7 @@ export const Encryption = () => {
 
       <div className="flex flex-col items-center justify-center w-full max-w-6xl relative z-10">
         {/* Main Title */}
-        <motion.h1
+        <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -39,7 +39,7 @@ export const Encryption = () => {
           className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
         >
           Our Engineering Stack
-        </motion.h1>
+        </motion.h2>
 
         <motion.p
           initial="hidden"

@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    canonical: "https://mdntech.com/privacy",
+  },
 };
 
 export default function PrivacyLayout({

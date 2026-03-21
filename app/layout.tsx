@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Cedarville_Cursive } from "next/font/google";
 import type { PropsWithChildren } from "react";
 
 import { Footer } from "@/components/main/footer";
@@ -11,6 +11,12 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const cedarvilleCursive = Cedarville_Cursive({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-cedarville-cursive",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: "#030014",
@@ -27,7 +33,7 @@ const organizationSchema = {
   logo: "https://mdntech.com/logo.png",
   description:
     "UAE-based tech agency specializing in AI systems, Web3 solutions, and full-stack development with global delivery.",
-  foundingDate: "2024",
+  foundingDate: "2024-01-01",
   address: {
     "@type": "PostalAddress",
     streetAddress:
@@ -38,6 +44,7 @@ const organizationSchema = {
   contactPoint: {
     "@type": "ContactPoint",
     email: "contact@mdntech.org",
+    telephone: "+971582283256",
     contactType: "sales",
     availableLanguage: "English",
   },
@@ -63,6 +70,7 @@ const websiteSchema = {
   url: "https://mdntech.com",
   description:
     "Ship production-ready AI systems, Web3 solutions, and full-stack applications faster.",
+  inLanguage: "en",
   publisher: {
     "@type": "Organization",
     name: "M.D.N Tech FZE",
@@ -89,7 +97,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body
         className={cn(
           "bg-[#030014] overflow-y-auto overflow-x-hidden",
-          inter.className
+          inter.className,
+          cedarvilleCursive.variable
         )}
       >
         <StarsCanvas />

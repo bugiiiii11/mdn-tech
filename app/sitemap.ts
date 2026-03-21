@@ -6,44 +6,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const posts = getAllPosts();
 
-  const blogUrls = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.id}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: post.content.length > 3 ? 0.8 : 0.6, // Higher priority for full articles
-  }));
+  const blogUrls = posts.map((post) => {
+    const dateMatch = post.date.match(/(\w+)\s+(\d+),\s+(\d+)/);
+    const lastMod = dateMatch
+      ? new Date(`${dateMatch[1]} ${dateMatch[2]}, ${dateMatch[3]}`)
+      : new Date("2026-03-01");
+
+    return {
+      url: `${baseUrl}/blog/${post.id}`,
+      lastModified: lastMod,
+    };
+  });
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/team`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
+      lastModified: new Date("2026-03-13"),
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
+      lastModified: new Date("2026-03-13"),
     },
     ...blogUrls,
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
+      lastModified: new Date("2026-01-20"),
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
+      lastModified: new Date("2026-01-20"),
     },
   ];
 }
