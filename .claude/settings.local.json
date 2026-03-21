@@ -16,7 +16,16 @@
       "Bash(npx tsc:*)",
       "Bash(ffmpeg -version)",
       "Bash(find /c/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main -not -path */node_modules/* -not -path */.next/* -type f -name *.tsx -o -name *.ts -o -name *.json)",
-      "Bash(node -e \"require\\(''@supabase/supabase-js''\\); console.log\\(''ok''\\)\")"
+      "Bash(node -e \"require\\(''@supabase/supabase-js''\\); console.log\\(''ok''\\)\")",
+      "Bash(mkdir -p app/\\\\\\(marketing\\\\\\))",
+      "Bash(cp app/page.tsx app/\\\\\\(marketing\\\\\\)/page.tsx)",
+      "Bash(cp app/not-found.tsx app/\\\\\\(marketing\\\\\\)/not-found.tsx)",
+      "Bash(cp -r app/blog app/\\\\\\(marketing\\\\\\)/blog)",
+      "Bash(cp -r app/privacy app/\\\\\\(marketing\\\\\\)/privacy)",
+      "Bash(cp -r app/terms app/\\\\\\(marketing\\\\\\)/terms)",
+      "Bash(rm app/page.tsx app/not-found.tsx)",
+      "Bash(rm -rf app/blog app/privacy app/terms)",
+      "Bash(npx next:*)"
     ],
     "additionalDirectories": [
       "C:\\Users\\cryptomeda\\Desktop\\Swarm\\myprojects\\M.D.N-Tech-main\\.claude\\skills"
