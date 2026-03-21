@@ -9,6 +9,7 @@
 | 3 | 2026-03-21 | Phase 1: Auth, projects, team, dashboard | Supabase setup, middleware auth, full project CRUD, layout restructure for route groups, Vercel fixes |
 | 4 | 2026-03-21 | Phase 2: Communications, budget, knowledge base | Comms log, budget health meters, KB markdown rendering, project tabs with all views |
 | 5 | 2026-03-21 | Chatbots KB management | Chatbot CRUD, per-chatbot knowledge base entries, export as unified .md |
+| 6 | 2026-03-21 | Phase 3: Infrastructure monitoring | Provider clients for Supabase/Railway/Vercel, API route, dashboard with auto-refresh, Anthropic API key added |
 
 ## What Was Done (Session 1) -- Performance fixes and skills setup
 
@@ -66,15 +67,26 @@
 
 4. **Supabase migration** -- Created `supabase/migrations/002_chatbots.sql` with `chatbots` and `chatbot_kb_entries` tables + RLS. Committed: `4cdb302`.
 
+## What Was Done (Session 6) -- Phase 3: Infrastructure monitoring
+
+1. **Infrastructure types** -- Shared TypeScript types for Supabase Management API, Railway GraphQL, and Vercel REST responses including provider health, projects, services, and deployments. File: `lib/infrastructure/types.ts`.
+
+2. **Provider clients** -- Three typed API wrappers that gracefully handle missing/invalid keys with `not_configured` status. Supabase Management API fetches project list and health. Railway GraphQL queries projects, services, and recent deployments. Vercel REST fetches projects and deployments. Files: `lib/infrastructure/supabase-mgmt.ts`, `lib/infrastructure/railway.ts`, `lib/infrastructure/vercel.ts`.
+
+3. **API route** -- Auth-protected `GET /api/infrastructure` endpoint that fetches all three providers in parallel and returns a unified `InfrastructureOverview` response. File: `app/api/infrastructure/route.ts`.
+
+4. **Infrastructure dashboard** -- Replaced placeholder page with full monitoring dashboard. Features: service health cards (color-coded status badges), Supabase and Vercel project detail tables, combined Railway+Vercel deployment list with relative timestamps, auto-refresh every 60s, manual refresh button, loading skeletons, setup guide when API keys aren't configured. Files: `app/command-center/infrastructure/page.tsx`, `components/command-center/infrastructure/ServiceCard.tsx`, `components/command-center/infrastructure/DeploymentList.tsx`, `components/command-center/infrastructure/InfraClient.tsx`. Committed: `9622fb5`.
+
+5. **Anthropic API key** -- Added real API key to `.env.local` (user also added to Vercel env vars for production). Ready for Phase 4 AI features.
+
 ## What To Do Next
 
 | Priority | Task | Notes |
 |----------|------|-------|
-| 1 | Phase 3: Infrastructure monitoring | Supabase Management API, Railway GraphQL, Vercel REST -- health status, cost analytics, polling worker |
-| 2 | Enter all 10 projects in Command Center | 5 active + 5 in analysis; fill real data |
-| 3 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
-| 4 | Add Anthropic API key | Add to .env.local and Vercel when ready for Phase 4 AI features |
-| 5 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
+| 1 | Enter all 10 projects in Command Center | 5 active + 5 in analysis; fill real data (Royal Stroje first) |
+| 2 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
+| 3 | Phase 4: AI features | Anthropic key is ready; chatbot AI responses, project summaries, etc. |
+| 4 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
 
 ## Key Files
 
@@ -95,4 +107,7 @@
 | `command-center/knowledge/docs/stack-guide.md` | New project setup guide (Next.js, Supabase, Railway, Vercel) |
 | `command-center/PRD.md` | Command Center product requirements |
 | `command-center/DEVELOPMENT-PLAN.md` | 6-phase development plan with architecture and schema |
+| `lib/infrastructure/` | Provider clients: supabase-mgmt.ts, railway.ts, vercel.ts, types.ts |
+| `app/api/infrastructure/route.ts` | Auth-protected infrastructure status API (all providers in parallel) |
+| `components/command-center/infrastructure/` | ServiceCard, DeploymentList, InfraClient (auto-refresh dashboard) |
 | `.claude/skills/` | Session management skills (start, wrap, doc-update, save, test) |
