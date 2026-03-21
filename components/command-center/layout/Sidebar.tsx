@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Activity,
   BookOpen,
+  Bot,
   Settings,
   LogOut,
 } from 'lucide-react'
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/command-center/communications', label: 'Communications', icon: MessageSquare },
   { href: '/command-center/infrastructure', label: 'Infrastructure', icon: Activity },
   { href: '/command-center/knowledge', label: 'Knowledge', icon: BookOpen },
+  { href: '/command-center/chatbots', label: 'Chatbots', icon: Bot },
   { href: '/command-center/settings', label: 'Settings', icon: Settings },
 ]
 
