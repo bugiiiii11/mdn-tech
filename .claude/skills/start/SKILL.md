@@ -1,4 +1,5 @@
 ---
+name: start
 description: Session initialization -- read project state, show what's next, flag anything stale or uncommitted
 ---
 

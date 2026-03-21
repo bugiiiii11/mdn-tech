@@ -1,4 +1,5 @@
 ---
+name: wrap
 description: Check session state -- auto-detect dirty files, commit & push if needed, update docs if stale
 ---
 

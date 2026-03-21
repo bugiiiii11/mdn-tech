@@ -1,4 +1,5 @@
 ---
+name: doc-update
 description: Update project documentation (handoff.md) based on this session's work
 ---
 

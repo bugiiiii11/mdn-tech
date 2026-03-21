@@ -1,4 +1,5 @@
 ---
+name: test
 description: Run available tests -- lint, type checks, and build verification for M.D.N Tech Next.js site
 ---
 

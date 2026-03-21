@@ -1,4 +1,5 @@
 ---
+name: save
 description: Emergency context save -- dump session state before compaction hits
 ---
 

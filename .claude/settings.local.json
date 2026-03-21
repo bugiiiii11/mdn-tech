@@ -14,7 +14,11 @@
       "Bash(npm run:*)",
       "Bash(echo \"EXIT_CODE:$?\")",
       "Bash(npx tsc:*)",
-      "Bash(ffmpeg -version)"
+      "Bash(ffmpeg -version)",
+      "Bash(find /c/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main -not -path */node_modules/* -not -path */.next/* -type f -name *.tsx -o -name *.ts -o -name *.json)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\cryptomeda\\Desktop\\Swarm\\myprojects\\M.D.N-Tech-main\\.claude\\skills"
     ]
   },
   "hooks": {
