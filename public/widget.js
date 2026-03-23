@@ -58,54 +58,70 @@
   var CSS = '\
     :host { all: initial; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }\
     * { box-sizing: border-box; margin: 0; padding: 0; }\
-    .mdn-bubble { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; z-index: 2147483647; border: none; }\
-    .mdn-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,0.4); }\
+    .mdn-bubble { position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, opacity 0.2s; z-index: 2147483647; border: none; opacity: 1; }\
+    .mdn-bubble:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,0,0,0.4); }\
+    .mdn-bubble.hidden { transform: scale(0); opacity: 0; pointer-events: none; }\
     .mdn-bubble svg { width: 26px; height: 26px; fill: white; }\
-    .mdn-panel { position: fixed; bottom: 88px; right: 20px; width: 380px; max-height: 520px; border-radius: 16px; background: #0d0d20; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; overflow: hidden; z-index: 2147483647; }\
-    .mdn-panel.open { display: flex; }\
-    .mdn-header { padding: 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }\
-    .mdn-header-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }\
+    .mdn-panel { position: fixed; bottom: 88px; right: 20px; width: 380px; max-height: 520px; border-radius: 16px; background: #0d0d20; box-shadow: 0 8px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; z-index: 2147483647; transform: translateY(16px) scale(0.95); opacity: 0; pointer-events: none; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease; }\
+    .mdn-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }\
+    .mdn-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; }\
+    .mdn-header-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; animation: mdnPulse 2s infinite; }\
+    @keyframes mdnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }\
     .mdn-header-name { color: #fff; font-weight: 600; font-size: 14px; flex: 1; }\
-    .mdn-header-close { background: none; border: none; color: #666; cursor: pointer; font-size: 18px; padding: 4px; line-height: 1; }\
-    .mdn-header-close:hover { color: #fff; }\
+    .mdn-header-tag { font-size: 10px; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 10px; }\
+    .mdn-header-close { background: none; border: none; color: #666; cursor: pointer; font-size: 20px; padding: 4px 6px; line-height: 1; border-radius: 8px; transition: background 0.15s, color 0.15s; }\
+    .mdn-header-close:hover { color: #fff; background: rgba(255,255,255,0.08); }\
     .mdn-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 200px; max-height: 360px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }\
-    .mdn-msg { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-wrap: break-word; }\
+    .mdn-msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.55; word-wrap: break-word; animation: mdnFadeIn 0.25s ease; }\
+    @keyframes mdnFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }\
     .mdn-msg a { color: inherit; text-decoration: underline; }\
     .mdn-msg ul { margin: 4px 0; padding-left: 18px; }\
     .mdn-msg-user { align-self: flex-end; color: #fff; border-bottom-right-radius: 4px; }\
-    .mdn-msg-assistant { align-self: flex-start; background: rgba(255,255,255,0.06); color: #d1d5db; border-bottom-left-radius: 4px; }\
+    .mdn-msg-assistant { align-self: flex-start; background: rgba(255,255,255,0.07); color: #d1d5db; border-bottom-left-radius: 4px; }\
     .mdn-msg-assistant strong { color: #fff; }\
-    .mdn-typing { align-self: flex-start; padding: 10px 18px; background: rgba(255,255,255,0.06); border-radius: 12px; display: none; }\
-    .mdn-typing.show { display: flex; gap: 4px; }\
-    .mdn-typing span { width: 6px; height: 6px; border-radius: 50%; background: #888; animation: mdnBounce 1.2s infinite; }\
+    .mdn-typing { align-self: flex-start; padding: 12px 18px; background: rgba(255,255,255,0.06); border-radius: 14px; display: none; }\
+    .mdn-typing.show { display: flex; gap: 5px; align-items: center; }\
+    .mdn-typing span { width: 7px; height: 7px; border-radius: 50%; background: #888; animation: mdnBounce 1.2s infinite; }\
     .mdn-typing span:nth-child(2) { animation-delay: 0.2s; }\
     .mdn-typing span:nth-child(3) { animation-delay: 0.4s; }\
     @keyframes mdnBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }\
-    .mdn-input-row { padding: 12px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 8px; }\
-    .mdn-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; resize: none; font-family: inherit; }\
+    .mdn-input-row { padding: 12px; display: flex; gap: 8px; }\
+    .mdn-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 13px; outline: none; resize: none; font-family: inherit; transition: border-color 0.2s; }\
     .mdn-input::placeholder { color: #555; }\
-    .mdn-input:focus { border-color: rgba(255,255,255,0.2); }\
-    .mdn-send { width: 38px; height: 38px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; flex-shrink: 0; }\
+    .mdn-input:focus { border-color: rgba(255,255,255,0.25); }\
+    .mdn-send { width: 38px; height: 38px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s, transform 0.15s; flex-shrink: 0; }\
+    .mdn-send:hover:not(:disabled) { transform: scale(1.05); }\
     .mdn-send:disabled { opacity: 0.4; cursor: default; }\
     .mdn-send svg { width: 18px; height: 18px; fill: white; }\
     .mdn-powered { text-align: center; padding: 6px; font-size: 10px; color: #444; }\
-    .mdn-powered a { color: #666; text-decoration: none; }\
-    @media (max-width: 480px) { .mdn-panel { width: calc(100vw - 16px); right: 8px; bottom: 80px; max-height: 70vh; } .mdn-bubble { bottom: 14px; right: 14px; } }\
+    .mdn-powered a { color: #555; text-decoration: none; }\
+    .mdn-powered a:hover { color: #888; }\
+    @media (max-width: 480px) {\
+      .mdn-panel { width: calc(100vw - 16px); right: 8px; bottom: 80px; max-height: 65vh; }\
+      .mdn-bubble { bottom: 70px; right: 14px; width: 50px; height: 50px; }\
+      .mdn-bubble svg { width: 22px; height: 22px; }\
+    }\
   ';
 
   // Create widget
   function init(config) {
     CONFIG = config;
     var color = config.primaryColor || '#7c3aed';
+    var borderColor = color;
 
     var container = document.createElement('div');
     container.id = 'mdn-chat-widget';
     document.body.appendChild(container);
     var shadow = container.attachShadow({ mode: 'open' });
 
-    // Inject CSS
+    // Inject CSS with dynamic border color
     var style = document.createElement('style');
-    style.textContent = CSS;
+    style.textContent = CSS + '\
+      .mdn-panel { border: 1.5px solid ' + borderColor + '40; }\
+      .mdn-panel.open { border-color: ' + borderColor + '60; }\
+      .mdn-header { border-bottom: 1px solid ' + borderColor + '25; background: linear-gradient(180deg, ' + borderColor + '12 0%, transparent 100%); }\
+      .mdn-input-row { border-top: 1px solid ' + borderColor + '20; }\
+    ';
     shadow.appendChild(style);
 
     // Bubble
@@ -122,6 +138,7 @@
       <div class="mdn-header">\
         <div class="mdn-header-dot" style="background:' + color + '"></div>\
         <div class="mdn-header-name">' + esc(config.name) + '</div>\
+        <span class="mdn-header-tag">AI</span>\
         <button class="mdn-header-close">&times;</button>\
       </div>\
       <div class="mdn-messages"></div>\
@@ -131,7 +148,7 @@
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>\
         </button>\
       </div>\
-      <div class="mdn-powered">Powered by <a href="https://mdntech.org" target="_blank">M.D.N Tech</a></div>\
+      <div class="mdn-powered">Powered by <a href="https://www.mdntech.org" target="_blank">M.D.N Tech</a></div>\
     ';
     shadow.appendChild(panel);
 
@@ -172,18 +189,22 @@
       if (show) messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    // Toggle
+    // Toggle with animation
     function toggle() {
       STATE.open = !STATE.open;
-      panel.className = 'mdn-panel' + (STATE.open ? ' open' : '');
       if (STATE.open) {
+        panel.classList.add('open');
+        bubble.classList.add('hidden');
         // Add greeting if no messages
         if (STATE.messages.length === 0) {
           STATE.messages.push({ role: 'assistant', content: config.greeting });
           saveState();
         }
         renderMessages();
-        input.focus();
+        setTimeout(function() { input.focus(); }, 300);
+      } else {
+        panel.classList.remove('open');
+        bubble.classList.remove('hidden');
       }
     }
 
