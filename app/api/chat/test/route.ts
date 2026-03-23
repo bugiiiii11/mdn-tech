@@ -26,7 +26,7 @@ export async function GET() {
   try {
     const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_CHATBOT_API_KEY })
     const msg = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20241022',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 20,
       messages: [{ role: 'user', content: 'Say "hello" in one word.' }],
     })
