@@ -7,7 +7,7 @@
   var chatbotId = script.getAttribute('data-chatbot-id');
   if (!chatbotId) return console.warn('[MDN Chat] Missing data-chatbot-id');
 
-  var baseUrl = script.src.replace(/\/widget\.js.*$/, '');
+  var baseUrl = script.src.replace(/\/widget\.js.*$/, '').replace('://mdntech.org', '://www.mdntech.org');
   var CONFIG = null;
   var STATE = {
     open: false,
