@@ -17,7 +17,7 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
   return (
     <div
       className={cn(
-        "overflow-y-auto overflow-x-hidden",
+        "bg-[#030014] overflow-y-auto overflow-x-hidden",
         inter.className,
         cedarvilleCursive.variable
       )}
