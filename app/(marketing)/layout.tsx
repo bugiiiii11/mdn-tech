@@ -23,11 +23,9 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
       )}
     >
       <StarsCanvas />
-      <div className="relative" style={{ zIndex: 2 }}>
-        <Navbar />
-        {children}
-        <Footer />
-      </div>
+      <Navbar />
+      {children}
+      <Footer />
     </div>
   );
 }

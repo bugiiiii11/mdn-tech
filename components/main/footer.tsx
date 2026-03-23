@@ -66,7 +66,7 @@ export const Footer = () => {
           muted
           loop
           playsInline
-          className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain -z-10"
+          className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain"
           style={{ height: '540px' }}
         >
           <source src="/videos/blackhole.webm" type="video/webm" />
@@ -74,7 +74,7 @@ export const Footer = () => {
       </div>
 
       {/* Footer */}
-      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden" style={{ zIndex: 2 }}>
+      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden">
         <div className="max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-4 relative z-10">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-6">
             {/* Brand + description */}

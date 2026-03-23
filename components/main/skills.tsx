@@ -358,7 +358,7 @@ export const Skills = () => {
       >
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815] text-white font-semibold hover:bg-[#7042f825] transition-all duration-300 group"
+          className="relative z-10 inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-[#7042f88b] bg-[#7042f815] text-white font-semibold hover:bg-[#7042f825] transition-all duration-300 group"
         >
           Read our engineering blog
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
