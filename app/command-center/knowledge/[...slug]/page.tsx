@@ -33,10 +33,10 @@ export default async function KnowledgeDocPage({ params }: { params: Promise<{ s
             <span className="text-xs text-gray-400 capitalize">{data.category}</span>
           )}
           {data.updated && (
-            <span className="text-xs text-gray-600">Updated {data.updated}</span>
+            <span className="text-xs text-gray-600">Updated {String(data.updated)}</span>
           )}
-          {data.tags?.map((t: string) => (
-            <span key={t} className="text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">{t}</span>
+          {data.tags?.map((t: unknown, i: number) => (
+            <span key={i} className="text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">{String(t)}</span>
           ))}
         </div>
       </div>

@@ -33,8 +33,8 @@ function getKnowledgeDocs(): DocMeta[] {
           slug: rel,
           title: data.title ?? file.replace('.md', ''),
           category: data.category ?? 'doc',
-          tags: data.tags ?? [],
-          updated: data.updated ?? '',
+          tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+          updated: data.updated ? String(data.updated) : '',
         })
       }
     }
