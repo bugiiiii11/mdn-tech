@@ -7,9 +7,9 @@ export const Hero = () => {
         autoPlay
         muted
         loop
-        poster="/videos/hero-poster.webp"
         preload="auto"
-        className="rotate-180 absolute top-[-340px] left-0 w-full h-full object-contain -z-20 max-w-full"
+        playsInline
+        className="rotate-180 absolute top-[-340px] left-0 w-full h-full object-contain z-0 max-w-full pointer-events-none"
       >
         <source src="/videos/blackhole.webm" type="video/webm" />
       </video>

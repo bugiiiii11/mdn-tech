@@ -44,11 +44,13 @@ export const StarBackground = (props: PointsProps) => {
 };
 
 export const StarsCanvas = () => (
-  <div className="w-full h-auto fixed inset-0 -z-10 overflow-hidden">
+  <div className="w-full h-auto fixed inset-0 -z-10 overflow-hidden pointer-events-none">
     <Canvas
       camera={{ position: [0, 0, 1] }}
-      dpr={[1, 1.5]} // Limit device pixel ratio for performance
-      performance={{ min: 0.5 }} // Allow quality reduction on lower-end devices
+      dpr={[1, 1.5]}
+      performance={{ min: 0.5 }}
+      gl={{ alpha: true }}
+      style={{ background: 'transparent' }}
     >
       <Suspense fallback={null}>
         <StarBackground />
