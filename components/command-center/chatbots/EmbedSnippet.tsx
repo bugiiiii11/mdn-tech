@@ -5,7 +5,7 @@ import { Copy, Check } from 'lucide-react'
 
 export function EmbedSnippet({ chatbotId }: { chatbotId: string }) {
   const [copied, setCopied] = useState(false)
-  const snippet = `<script src="https://mdntech.org/widget.js" data-chatbot-id="${chatbotId}"></script>`
+  const snippet = `<script src="https://www.mdntech.org/widget.js" data-chatbot-id="${chatbotId}"></script>`
 
   function copy() {
     navigator.clipboard.writeText(snippet)
