@@ -3,16 +3,16 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Bot, Plus, Download } from 'lucide-react'
+import { Bot, Plus, MessageCircle } from 'lucide-react'
 import { KBEntryList } from '@/components/command-center/chatbots/KBEntryList'
 import { KBExportButton } from '@/components/command-center/chatbots/KBExportButton'
+import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
+import { EmbedSnippet } from '@/components/command-center/chatbots/EmbedSnippet'
 
 const typeColor = {
   internal: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
   client: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
 }
-
-const CATEGORIES = ['general', 'about', 'products', 'faq', 'policies', 'tone', 'pricing', 'support', 'other']
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -20,9 +20,11 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
   if (!user) redirect('/command-center/login')
 
   const { id } = await params
-  const [{ data: chatbot }, { data: entries }] = await Promise.all([
+  const [{ data: chatbot }, { data: entries }, { count: convCount }, { count: msgCount }] = await Promise.all([
     supabase.from('chatbots').select('*, projects(name)').eq('id', id).single(),
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
+    supabase.from('chat_conversations').select('*', { count: 'exact', head: true }).eq('chatbot_id', id),
+    supabase.from('chat_messages').select('*', { count: 'exact', head: true }).eq('chatbot_id', id),
   ])
 
   if (!chatbot) notFound()
@@ -71,7 +73,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
         <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4">
           <p className="text-xs text-gray-400">KB entries</p>
           <p className="text-2xl font-semibold text-white mt-1">{(entries ?? []).length}</p>
@@ -84,7 +86,37 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
           <p className="text-xs text-gray-400">Total words</p>
           <p className="text-2xl font-semibold text-white mt-1">{totalWords.toLocaleString()}</p>
         </div>
+        <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4">
+          <p className="text-xs text-gray-400">Conversations</p>
+          <p className="text-2xl font-semibold text-white mt-1">{convCount ?? 0}</p>
+        </div>
+        <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4">
+          <p className="text-xs text-gray-400">Messages</p>
+          <p className="text-2xl font-semibold text-white mt-1">{msgCount ?? 0}</p>
+        </div>
       </div>
+
+      {/* Conversations link */}
+      {(convCount ?? 0) > 0 && (
+        <Link
+          href={`/command-center/chatbots/${chatbot.id}/conversations`}
+          className="flex items-center gap-2 px-4 py-3 bg-[#0d0d20] border border-white/5 rounded-xl hover:border-purple-500/20 transition-colors group"
+        >
+          <MessageCircle className="w-4 h-4 text-purple-400" />
+          <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+            View all conversations ({convCount})
+          </span>
+          <span className="text-gray-600 ml-auto text-xs">→</span>
+        </Link>
+      )}
+
+      {/* Deploy */}
+      {chatbot.status === 'active' && (
+        <EmbedSnippet chatbotId={chatbot.id} />
+      )}
+
+      {/* Widget Config */}
+      <WidgetConfigForm chatbotId={chatbot.id} config={chatbot.widget_config ?? {}} />
 
       {/* KB entries by category */}
       <div className="space-y-4">
