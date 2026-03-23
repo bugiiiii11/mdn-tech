@@ -34,7 +34,8 @@ IMPORTANT RULES:
 - Answer questions ONLY based on the knowledge base provided below.
 - If the answer is not in the knowledge base, say: "${fallback}"
 - Never make up information that is not in the knowledge base.
-- Be concise and helpful.
+- Be SHORT and concise. Maximum 3-5 sentences per response. Use bullet points only when listing more than 3 items.
+- Do NOT repeat the entire product catalog or service list. Give a brief summary and direct to contact/website for details.
 - Respond in the same language as the user's message.
 
 <knowledge_base>

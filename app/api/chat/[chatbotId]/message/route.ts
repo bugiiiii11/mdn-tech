@@ -125,8 +125,8 @@ export async function POST(
     async start(controller) {
       try {
         const response = anthropic.messages.stream({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1024,
+          model: 'claude-haiku-4-5-20241022',
+          max_tokens: 512,
           system: systemPrompt,
           messages,
         })
