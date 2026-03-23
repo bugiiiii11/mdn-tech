@@ -44,13 +44,13 @@ export const StarBackground = (props: PointsProps) => {
 };
 
 export const StarsCanvas = () => (
-  <div className="w-full h-auto fixed inset-0 overflow-hidden pointer-events-none mix-blend-screen" style={{ zIndex: 10 }}>
+  <div className="w-full h-auto fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 10 }}>
     <Canvas
       camera={{ position: [0, 0, 1] }}
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
       gl={{ alpha: true }}
-      style={{ background: 'transparent' }}
+      style={{ background: 'transparent', pointerEvents: 'none' }}
     >
       <Suspense fallback={null}>
         <StarBackground />
