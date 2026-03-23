@@ -66,7 +66,7 @@ export const Footer = () => {
           muted
           loop
           playsInline
-          className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain z-0"
+          className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain z-0 mix-blend-screen"
           style={{ height: '540px' }}
         >
           <source src="/videos/blackhole.webm" type="video/webm" />
