@@ -114,7 +114,7 @@ export async function POST(
   }))
 
   // Stream Claude response
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_CHATBOT_API_KEY })
 
   let fullResponse = ''
   let inputTokens = 0

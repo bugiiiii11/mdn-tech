@@ -9,7 +9,7 @@ export async function GET() {
   const checks: Record<string, string> = {}
 
   // Check env vars
-  checks.anthropicKey = process.env.ANTHROPIC_API_KEY ? 'set (' + process.env.ANTHROPIC_API_KEY.slice(0, 12) + '...)' : 'MISSING'
+  checks.anthropicKey = process.env.CLAUDE_CHATBOT_API_KEY ? 'set (' + process.env.CLAUDE_CHATBOT_API_KEY.slice(0, 12) + '...)' : 'MISSING'
   checks.supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? 'set' : 'MISSING'
   checks.serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ? 'set (' + process.env.SUPABASE_SERVICE_ROLE_KEY.slice(0, 12) + '...)' : 'MISSING'
 
@@ -24,7 +24,7 @@ export async function GET() {
 
   // Test Anthropic
   try {
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_CHATBOT_API_KEY })
     const msg = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 20,
