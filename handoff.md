@@ -10,32 +10,7 @@
 | 4 | 2026-03-21 | Phase 2: Communications, budget, knowledge base | Comms log, budget health meters, KB markdown rendering, project tabs with all views |
 | 5 | 2026-03-21 | Chatbots KB management | Chatbot CRUD, per-chatbot knowledge base entries, export as unified .md |
 | 6 | 2026-03-21 | Phase 3: Infrastructure monitoring | Provider clients for Supabase/Railway/Vercel, API route, dashboard with auto-refresh, Anthropic API key added |
-
-## What Was Done (Session 1) -- Performance fixes and skills setup
-
-1. **Subpage performance fixes** -- Identified backdrop-blur and whileInView animations as lag sources on blog, privacy, and terms pages. Replaced backdrop-blur-sm with solid bg-[#0c0424]/80, switched whileInView to animate-on-mount. Files: `app/blog/page.tsx`, `app/blog/[slug]/BlogPostContent.tsx`, `app/privacy/page.tsx`, `app/terms/page.tsx`. Committed: `949c25e`.
-
-2. **Blog title gradient fix** -- "Our Blog" title was plain blue instead of matching the purple-to-cyan gradient used on other pages. Fixed gradient classes and added `inline-block` display. Files: `app/blog/page.tsx`. Committed: `949c25e`.
-
-3. **Prior work committed** -- Staged and committed accumulated changes from previous sessions: SEO updates (robots.ts, sitemap.ts), blog posts, layout improvements, team page removal, custom 404 page, SEO audit reports. Committed: `55adac4`.
-
-4. **Session management skills** -- Created `/start`, `/wrap`, `/doc-update`, `/save` skills adapted for single-repo M.D.N Tech project (based on Swarm multi-repo templates). Also committed existing `/test` skill and testing docs. Files: `.claude/skills/start.md`, `.claude/skills/wrap.md`, `.claude/skills/doc-update.md`, `.claude/skills/save.md`. Committed: `77d6507`.
-
-## What Was Done (Session 2) -- Command Center planning and skill restructure
-
-1. **Skill restructure** -- Moved all 5 skills from `.claude/skills/<name>.md` to `.claude/skills/<name>/SKILL.md` directory format so `/start`, `/wrap`, `/save`, `/test`, `/doc-update` are recognized by Claude Code. Committed: `bf81a4a`.
-
-2. **Command Center PRD** -- Created product requirements document covering project management, team workload, client communications, budget tracking, and infrastructure monitoring (Supabase/Railway/Vercel). File: `command-center/PRD.md`. Committed: `bf81a4a`.
-
-3. **Command Center Business Analysis** -- Competitive research across 15+ tools (Linear, Plane, Grafana, Datadog, Uptime Kuma, etc.). Extracted 30+ feature ideas mapped to phases. File: `command-center/BUSINESS-ANALYSIS.md`. Committed: `bf81a4a`.
-
-4. **Command Center Development Plan** -- Detailed 6-phase roadmap with architecture decisions (subdomain routing via middleware, one API token per provider), full database schema (SQL), file organization, knowledge base design, and pre-Phase 1 setup checklist. File: `command-center/DEVELOPMENT-PLAN.md`. Committed: `bf81a4a`.
-
-5. **Architecture decisions made:**
-   - Same repo, served at `app.mdntech.org` via Next.js middleware subdomain routing
-   - 3 API tokens total (Supabase Management, Railway, Vercel) -- one per provider covers all projects
-   - Knowledge base renders `.md` files for skills, docs, and howtos
-   - Stack additions: `@supabase/supabase-js`, `@supabase/ssr`, `shadcn/ui`, `recharts`, `zod`, `react-hook-form`
+| 7 | 2026-03-23 | RLS fix, params migration, knowledge fix | Fixed RLS infinite recursion, async params for Next.js 15, gray-matter Date coercion, added Royal Stroje project |
 
 ## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
 
@@ -79,14 +54,27 @@
 
 5. **Anthropic API key** -- Added real API key to `.env.local` (user also added to Vercel env vars for production). Ready for Phase 4 AI features.
 
+## What Was Done (Session 7) -- RLS fix, params migration, knowledge fix
+
+1. **RLS infinite recursion fix** -- `team_members` had a self-referencing "Admins can manage team members" policy causing 500 errors on all writes. Created `public.is_admin()` SECURITY DEFINER function, replaced all recursive admin policies across 5 tables (team_members, projects, milestones, communications, activity_log). Also set user role to `admin`. Applied via Supabase SQL Editor.
+
+2. **Async params migration** -- Updated all 7 dynamic pages to use `Promise<>` params type (Next.js 15 requirement): project detail, project edit, chatbot detail, chatbot edit, KB entry new, KB entry edit, knowledge slug. Committed: `a29ed75`.
+
+3. **Knowledge page crash fix** -- `gray-matter` auto-parses YAML dates into JavaScript Date objects, which are not valid React children (React error #31). Fixed by coercing `updated` and `tags` fields to strings via `String()`. Committed: `0950e01`.
+
+4. **Vercel file tracing** -- Added `experimental.outputFileTracingIncludes` to `next.config.js` so knowledge `.md` files are bundled into Vercel serverless functions. Committed: `a29ed75`.
+
+5. **Royal Stroje project added** -- First project entered in Command Center (Vercel FE + Supabase, no Railway).
+
 ## What To Do Next
 
 | Priority | Task | Notes |
 |----------|------|-------|
-| 1 | Enter all 10 projects in Command Center | 5 active + 5 in analysis; fill real data (Royal Stroje first) |
-| 2 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
-| 3 | Phase 4: AI features | Anthropic key is ready; chatbot AI responses, project summaries, etc. |
-| 4 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
+| 1 | Enter remaining 9 projects in Command Center | Royal Stroje done; 4 more active + 5 in analysis |
+| 2 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
+| 3 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
+| 4 | Phase 4: AI features | Anthropic key is ready; chatbot AI responses, project summaries, etc. |
+| 5 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
 
 ## Key Files
 
