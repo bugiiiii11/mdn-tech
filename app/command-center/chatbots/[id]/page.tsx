@@ -14,14 +14,15 @@ const typeColor = {
 
 const CATEGORIES = ['general', 'about', 'products', 'faq', 'policies', 'tone', 'pricing', 'support', 'other']
 
-export default async function ChatbotDetailPage({ params }: { params: { id: string } }) {
+export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/command-center/login')
 
+  const { id } = await params
   const [{ data: chatbot }, { data: entries }] = await Promise.all([
-    supabase.from('chatbots').select('*, projects(name)').eq('id', params.id).single(),
-    supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', params.id).order('sort_order').order('category'),
+    supabase.from('chatbots').select('*, projects(name)').eq('id', id).single(),
+    supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
   ])
 
   if (!chatbot) notFound()

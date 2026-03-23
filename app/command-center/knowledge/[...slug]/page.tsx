@@ -7,12 +7,13 @@ import path from 'path'
 import matter from 'gray-matter'
 import { KnowledgeContent } from '@/components/command-center/knowledge/KnowledgeContent'
 
-export default async function KnowledgeDocPage({ params }: { params: { slug: string[] } }) {
+export default async function KnowledgeDocPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/command-center/login')
 
-  const slugPath = params.slug.join('/')
+  const { slug } = await params
+  const slugPath = slug.join('/')
   const filePath = path.join(process.cwd(), 'command-center', 'knowledge', `${slugPath}.md`)
 
   if (!fs.existsSync(filePath)) notFound()

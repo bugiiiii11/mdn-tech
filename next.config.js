@@ -6,6 +6,12 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+  experimental: {
+    outputFileTracingIncludes: {
+      "/command-center/knowledge": ["./command-center/knowledge/**/*.md"],
+      "/command-center/knowledge/*": ["./command-center/knowledge/**/*.md"],
+    },
+  },
   async headers() {
     return [
       {

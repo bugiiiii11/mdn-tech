@@ -8,23 +8,26 @@ export default async function ProjectDetailPage({
   params,
   searchParams,
 }: {
-  params: { id: string }
-  searchParams: { tab?: string }
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ tab?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/command-center/login')
 
+  const { id: paramId } = await params
+  const { tab } = await searchParams
+
   const [{ data: project }, { data: communications }, { data: members }] = await Promise.all([
     supabase
       .from('projects')
       .select(`*, milestones(id, name, due_date, status, assigned_to), project_assignments(member_id, team_members(id, full_name))`)
-      .eq('id', params.id)
+      .eq('id', paramId)
       .single(),
     supabase
       .from('communications')
       .select(`id, channel, direction, subject, summary, action_items, contact_name, occurred_at, team_members(full_name)`)
-      .eq('project_id', params.id)
+      .eq('project_id', paramId)
       .order('occurred_at', { ascending: false }),
     supabase
       .from('team_members')
@@ -34,7 +37,7 @@ export default async function ProjectDetailPage({
 
   if (!project) notFound()
 
-  const tab = searchParams.tab ?? 'overview'
+  const currentTab = tab ?? 'overview'
 
   return (
     <div className="p-6 max-w-4xl space-y-5">
@@ -62,7 +65,7 @@ export default async function ProjectDetailPage({
         milestones={project.milestones ?? []}
         communications={communications ?? []}
         members={members ?? []}
-        currentTab={tab}
+        currentTab={currentTab}
         userId={user.id}
       />
     </div>
