@@ -11,6 +11,7 @@
 | 5 | 2026-03-21 | Chatbots KB management | Chatbot CRUD, per-chatbot knowledge base entries, export as unified .md |
 | 6 | 2026-03-21 | Phase 3: Infrastructure monitoring | Provider clients for Supabase/Railway/Vercel, API route, dashboard with auto-refresh, Anthropic API key added |
 | 7 | 2026-03-23 | RLS fix, params migration, knowledge fix | Fixed RLS infinite recursion, async params for Next.js 15, gray-matter Date coercion, added Royal Stroje project |
+| 8 | 2026-03-24 | Phase 4: AI Commander chatbot widget | Embeddable chatbot widget, Claude API streaming, conversation storage, widget config UI, marketing animation fixes |
 
 ## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
 
@@ -66,15 +67,33 @@
 
 5. **Royal Stroje project added** -- First project entered in Command Center (Vercel FE + Supabase, no Railway).
 
+## What Was Done (Session 8) -- Phase 4: AI Commander chatbot widget
+
+1. **Embeddable chat widget** -- Vanilla JS widget (`public/widget.js`) with Shadow DOM for style isolation. Features: streaming responses, session persistence, markdown rendering, typing indicator, smooth open/close animations, brand color theming, responsive mobile layout. Embed via single script tag. Committed: `9ce3460`.
+
+2. **Chat API routes** -- Public `/api/chat/[chatbotId]/config` (GET) and `/api/chat/[chatbotId]/message` (POST with SSE streaming). Uses Anthropic Claude Haiku 4.5 for cost efficiency (~$0.004/msg). Service-role Supabase client bypasses RLS. CORS headers at Next.js config level. Rate limiting (20 req/min/IP). Committed: `9ce3460`.
+
+3. **Conversation storage** -- New `chat_conversations` and `chat_messages` tables (migration `003_chat_conversations.sql`). Widget config stored as JSONB on chatbots table. Conversations viewable in Command Center with filters and message thread viewer. Committed: `9ce3460`.
+
+4. **Command Center chatbot UI** -- Widget config form (greeting, system prompt, colors, fallback message), embed code snippet with copy button, conversation/message stats on chatbot detail page, conversations list page, conversation detail page. Committed: `9ce3460`.
+
+5. **CORS and deployment fixes** -- Added CORS headers at `next.config.js` level for `/api/chat/*`. Fixed `www.mdntech.org` redirect issue (widget always uses www). Created diagnostic endpoint `/api/chat/test`. Separate `CLAUDE_CHATBOT_API_KEY` env var for chatbot service. Committed: `04645c6`, `be6dbc6`, `f93271b`.
+
+6. **Cost optimization** -- Switched from Claude Sonnet ($0.04/msg) to Haiku 4.5 ($0.004/msg). Prompt tuned for 2-3 sentence responses. Max tokens reduced to 512. Committed: `89c7fe3`, `481d01f`.
+
+7. **Marketing site fixes** -- Fixed broken star background (canvas transparency with `gl={{ alpha: true }}`), blackhole video z-index and `playsInline` for iOS, proper z-layering (stars z-0 behind content). Removed Projects and Blog from navbar. Fixed mobile hero button cutoff. Committed: `1eda0c2` through `45de12d`.
+
 ## What To Do Next
 
 | Priority | Task | Notes |
 |----------|------|-------|
 | 1 | Enter remaining 9 projects in Command Center | Royal Stroje done; 4 more active + 5 in analysis |
-| 2 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
-| 3 | Add remaining knowledge base docs | Skills docs for wrap/save/doc-update, howto guides for Railway/Supabase/Vercel |
-| 4 | Phase 4: AI features | Anthropic key is ready; chatbot AI responses, project summaries, etc. |
-| 5 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations (lower priority) |
+| 2 | Remove /api/chat/test diagnostic endpoint | Temporary -- remove after confirming chatbot stability |
+| 3 | Blackhole video dark edge | Cosmetic -- dark border visible around video on desktop; needs careful blend approach |
+| 4 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
+| 5 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
+| 6 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
+| 7 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
 
 ## Key Files
 
@@ -98,4 +117,14 @@
 | `lib/infrastructure/` | Provider clients: supabase-mgmt.ts, railway.ts, vercel.ts, types.ts |
 | `app/api/infrastructure/route.ts` | Auth-protected infrastructure status API (all providers in parallel) |
 | `components/command-center/infrastructure/` | ServiceCard, DeploymentList, InfraClient (auto-refresh dashboard) |
+| `public/widget.js` | Embeddable chatbot widget (vanilla JS, Shadow DOM) |
+| `app/api/chat/[chatbotId]/message/route.ts` | Streaming chat API (Claude Haiku 4.5 + SSE) |
+| `app/api/chat/[chatbotId]/config/route.ts` | Public chatbot config endpoint |
+| `lib/chat/prompt.ts` | System prompt builder from KB entries |
+| `lib/chat/cors.ts` | CORS headers utility |
+| `lib/supabase/service.ts` | Service-role Supabase client (bypasses RLS) |
+| `supabase/migrations/003_chat_conversations.sql` | Chat conversations + messages schema |
+| `components/command-center/chatbots/WidgetConfigForm.tsx` | Widget settings editor |
+| `components/command-center/chatbots/EmbedSnippet.tsx` | Deploy snippet with copy button |
+| `components/command-center/chatbots/ConversationList.tsx` | Conversations list with filters |
 | `.claude/skills/` | Session management skills (start, wrap, doc-update, save, test) |
