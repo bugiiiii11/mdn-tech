@@ -270,16 +270,8 @@ export const NAV_LINKS = [
     link: "/#process",
   },
   {
-    title: "Projects",
-    link: "/#projects",
-  },
-  {
     title: "Team",
     link: "/#team",
-  },
-  {
-    title: "Blog",
-    link: "/blog",
   },
   {
     title: "Contact Us",
