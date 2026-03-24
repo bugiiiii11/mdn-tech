@@ -74,7 +74,7 @@ export const Footer = () => {
       </div>
 
       {/* Footer */}
-      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden" style={{ zIndex: 2 }}>
+      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden" style={{ zIndex: 11 }}>
         <div className="max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-4 relative z-10">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-6">
             {/* Brand + description */}
