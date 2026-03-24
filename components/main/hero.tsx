@@ -2,14 +2,14 @@ import { HeroContent } from "@/components/sub/hero-content";
 
 export const Hero = () => {
   return (
-    <div id="home" className="relative flex flex-col h-full w-full max-w-full">
+    <div id="home" className="relative flex flex-col h-full w-full max-w-full overflow-hidden">
       <video
         autoPlay
         muted
         loop
         preload="auto"
         playsInline
-        className="rotate-180 absolute top-[-340px] md:top-[-340px] left-0 w-full h-auto object-cover max-w-full pointer-events-none mix-blend-screen"
+        className="rotate-180 absolute top-[-340px] left-0 w-full h-full object-contain max-w-full pointer-events-none"
       >
         <source src="/videos/blackhole.webm" type="video/webm" />
       </video>
