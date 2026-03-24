@@ -12,6 +12,7 @@
 | 6 | 2026-03-21 | Phase 3: Infrastructure monitoring | Provider clients for Supabase/Railway/Vercel, API route, dashboard with auto-refresh, Anthropic API key added |
 | 7 | 2026-03-23 | RLS fix, params migration, knowledge fix | Fixed RLS infinite recursion, async params for Next.js 15, gray-matter Date coercion, added Royal Stroje project |
 | 8 | 2026-03-24 | Phase 4: AI Commander chatbot widget | Embeddable chatbot widget, Claude API streaming, conversation storage, widget config UI, marketing animation fixes |
+| 9 | 2026-03-24 | Chatbots dashboard + prompt tuning | Chatbots page stats table with usage metrics, fixed chatbot repeating earlier conversation topics |
 
 ## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
 
@@ -83,17 +84,24 @@
 
 7. **Marketing site fixes** -- Fixed broken star background (canvas transparency with `gl={{ alpha: true }}`), blackhole video z-index and `playsInline` for iOS, proper z-layering (stars z-0 behind content). Removed Projects and Blog from navbar. Fixed mobile hero button cutoff. Committed: `1eda0c2` through `45de12d`.
 
+## What Was Done (Session 9) -- Chatbots dashboard + prompt tuning
+
+1. **Chatbots page redesigned** -- Replaced single-line chatbot list with summary cards (total messages, unique visitors, conversations, API cost) and a full stats table matching the projects page layout. Stats aggregated from `chat_conversations` and `chat_messages` tables. Haiku 4.5 token pricing used for cost calculation. Committed: `658a71b`.
+
+2. **Chatbot prompt fix** -- Added conversation history instructions to system prompt to stop Claude from repeating information from earlier messages. Added rules: only answer latest message, never recap, respond to casual greetings without product dumps. Committed: `21db874`.
+
 ## What To Do Next
 
 | Priority | Task | Notes |
 |----------|------|-------|
 | 1 | Enter remaining 9 projects in Command Center | Royal Stroje done; 4 more active + 5 in analysis |
-| 2 | Remove /api/chat/test diagnostic endpoint | Temporary -- remove after confirming chatbot stability |
-| 3 | Blackhole video dark edge | Cosmetic -- dark border visible around video on desktop; needs careful blend approach |
-| 4 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
-| 5 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
-| 6 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
-| 7 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
+| 2 | Test chatbot prompt improvements | Verify Royal Stroje bot no longer repeats earlier topics in conversation |
+| 3 | Remove /api/chat/test diagnostic endpoint | Temporary -- remove after confirming chatbot stability |
+| 4 | Blackhole video dark edge | Cosmetic -- dark border visible around video on desktop; needs careful blend approach |
+| 5 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
+| 6 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
+| 7 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
+| 8 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
 
 ## Key Files
 
