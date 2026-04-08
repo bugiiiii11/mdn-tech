@@ -13,6 +13,7 @@
 | 7 | 2026-03-23 | RLS fix, params migration, knowledge fix | Fixed RLS infinite recursion, async params for Next.js 15, gray-matter Date coercion, added Royal Stroje project |
 | 8 | 2026-03-24 | Phase 4: AI Commander chatbot widget | Embeddable chatbot widget, Claude API streaming, conversation storage, widget config UI, marketing animation fixes |
 | 9 | 2026-03-24 | Chatbots dashboard + prompt tuning | Chatbots page stats table with usage metrics, fixed chatbot repeating earlier conversation topics |
+| 10 | 2026-04-08 | Mobile UI polish | Blackhole positioning, process steps inline badges, blog button fix, contact section tightening, removed hero badge |
 
 ## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
 
@@ -90,6 +91,18 @@
 
 2. **Chatbot prompt fix** -- Added conversation history instructions to system prompt to stop Claude from repeating information from earlier messages. Added rules: only answer latest message, never recap, respond to casual greetings without product dumps. Committed: `21db874`.
 
+## What Was Done (Session 10) -- Mobile UI polish
+
+1. **Blackhole video mobile fix** -- Scaled video to 350% width on mobile and centered horizontally so the blackhole ring matches desktop proportions. Mobile offset tuned to `top-[-355px]`. Desktop unchanged. File: `components/main/hero.tsx`. Committed: `8bfb437`.
+
+2. **Process steps mobile redesign** -- Replaced separate circle + timeline layout on mobile with inline numbered badges inside card titles. Desktop keeps the left-side circle + timeline connector. Reduced card padding and title size on mobile. Tighter step gap on mobile (`gap-6` vs `gap-12`). File: `components/main/process.tsx`. Committed: `8bfb437`.
+
+3. **Blog button fix** -- Skills section background video overlay was blocking click/hover on "Read our engineering blog" button. Added `-z-10` and `pointer-events-none` to the video wrapper. File: `components/main/skills.tsx`. Committed: `8bfb437`.
+
+4. **Hero badge removed** -- Removed "UAE-Based · AI-Powered Development · Global Delivery" badge from hero for cleaner layout. Cleaned up unused `slideInFromTop` import. File: `components/sub/hero-content.tsx`. Committed: `8bfb437`.
+
+5. **Contact section mobile tightening** -- Smaller heading (`text-xl`), tighter margins, smaller body text on mobile. File: `components/main/contact-us.tsx`. Committed: `8bfb437`.
+
 ## What To Do Next
 
 | Priority | Task | Notes |
@@ -97,11 +110,10 @@
 | 1 | Enter remaining 9 projects in Command Center | Royal Stroje done; 4 more active + 5 in analysis |
 | 2 | Test chatbot prompt improvements | Verify Royal Stroje bot no longer repeats earlier topics in conversation |
 | 3 | Remove /api/chat/test diagnostic endpoint | Temporary -- remove after confirming chatbot stability |
-| 4 | Blackhole video dark edge | Cosmetic -- dark border visible around video on desktop; needs careful blend approach |
-| 5 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
-| 6 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
-| 7 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
-| 8 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
+| 4 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
+| 5 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
+| 6 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
+| 7 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
 
 ## Key Files
 
