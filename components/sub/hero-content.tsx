@@ -6,7 +6,6 @@ import Image from "next/image";
 import {
   slideInFromLeft,
   slideInFromRight,
-  slideInFromTop,
 } from "@/lib/motion";
 
 export const HeroContent = () => {
@@ -17,15 +16,6 @@ export const HeroContent = () => {
       className="flex flex-row min-h-[650px] pb-20 items-center justify-center px-3 md:px-20 mt-40 md:pb-0 w-full max-w-full z-[20]"
     >
       <div className="h-full w-full flex flex-col items-center gap-5 justify-center m-auto text-start">
-        <motion.div
-          variants={slideInFromTop}
-          className="Welcome-box py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9]"
-        >
-          <p className="Welcome-text text-[13px]">
-            UAE-Based · AI-Powered Development · Global Delivery
-          </p>
-        </motion.div>
-
         <motion.h1
           variants={slideInFromLeft(0.5)}
           className="flex flex-col gap-6 mt-6 text-4xl md:text-6xl lg:text-7xl text-bold text-white w-full max-w-full"

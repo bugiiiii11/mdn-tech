@@ -9,7 +9,7 @@ export const Hero = () => {
         loop
         preload="auto"
         playsInline
-        className="rotate-180 absolute top-[-340px] left-0 w-full h-full object-contain -z-10 max-w-full pointer-events-none"
+        className="rotate-180 absolute top-[-355px] md:top-[-340px] left-1/2 -translate-x-1/2 w-[350%] md:w-full md:left-0 md:translate-x-0 h-full object-contain -z-10 pointer-events-none"
       >
         <source src="/videos/blackhole.webm" type="video/webm" />
       </video>

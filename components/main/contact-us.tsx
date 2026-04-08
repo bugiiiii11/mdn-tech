@@ -127,7 +127,7 @@ export const ContactUs = () => {
             transition: { duration: 0.5, delay: 0.2 },
           },
         }}
-        className="text-lg text-gray-400 max-w-3xl mx-auto mb-12 text-center"
+        className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-8 md:mb-12 text-center"
       >
         Got an idea, a problem, or a half-finished product that needs a strong technical partner? We work with founders and product teams who want to move fast without sacrificing quality. Tell us what you&apos;re building.
       </motion.p>
@@ -142,10 +142,10 @@ export const ContactUs = () => {
           className="space-y-8"
         >
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
               Let&apos;s Build Something That Matters
             </h2>
-            <p className="text-gray-400 mb-8 leading-relaxed">
+            <p className="text-gray-400 mb-6 leading-relaxed text-sm md:text-base">
               Whether you are launching your first product or scaling an existing one — if you need a team that moves at the speed of your ambition, let&apos;s talk. No long procurement processes. No committees. Just a direct conversation with the engineers who will build it.
             </p>
           </div>

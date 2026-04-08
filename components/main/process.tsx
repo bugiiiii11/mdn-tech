@@ -50,13 +50,13 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
   };
 
   return (
-    <div className="relative flex flex-col md:flex-row items-start gap-6 md:gap-8">
-      {/* Timeline connector - only show on desktop and not for last item */}
+    <div className="relative flex flex-row items-start gap-4 md:gap-8">
+      {/* Timeline connector - desktop only */}
       {!isLast && (
-        <div className="hidden md:block absolute left-6 top-20 w-0.5 h-[calc(100%+3rem)] bg-gradient-to-b from-purple-500/50 via-cyan-500/50 to-transparent" />
+        <div className="hidden md:block absolute left-6 top-14 w-0.5 h-[calc(100%+1rem)] bg-gradient-to-b from-purple-500/50 via-cyan-500/50 to-transparent" />
       )}
 
-      {/* Step number circle */}
+      {/* Step number circle - desktop only */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         whileInView={{ scale: 1, opacity: 1 }}
@@ -66,7 +66,7 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
           duration: 0.5,
           ease: [0.16, 1, 0.3, 1],
         }}
-        className="relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 border-4 border-[#030014] flex items-center justify-center shadow-lg"
+        className="hidden md:flex relative z-10 flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 border-4 border-[#030014] items-center justify-center shadow-lg"
       >
         <span className="text-white font-bold text-lg">{index + 1}</span>
       </motion.div>
@@ -103,7 +103,7 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
       >
         <div className="relative h-full transform-gpu">
           {/* Main card */}
-          <div className="relative h-full p-6 rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm overflow-hidden transform-gpu">
+          <div className="relative h-full p-4 md:p-6 rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm overflow-hidden transform-gpu">
             {/* Floating particles */}
             {[...Array(6)].map((_, i) => (
               <motion.div
@@ -143,7 +143,8 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
                 className="flex items-center justify-between cursor-pointer group/title"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-base md:text-xl font-semibold text-white flex items-center gap-3">
+                  <span className="md:hidden flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-xs font-bold">{index + 1}</span>
                   {step.title}
                 </h3>
                 <motion.svg
@@ -294,7 +295,7 @@ export const Process = () => {
 
       {/* Timeline */}
       <div className="w-full max-w-4xl">
-        <div className="flex flex-col gap-8 md:gap-12">
+        <div className="flex flex-col gap-6 md:gap-12">
           {processSteps.map((step, index) => (
             <ProcessStepCard
               key={step.title}
