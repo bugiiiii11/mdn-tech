@@ -1,8 +1,12 @@
+> **SUPERSEDED 2026-04-16.** The active plan now lives at `MindPalace/Projects/MDN-Tech/development-plan.md` (v2). Phases 1-3 of this document were substantially implemented in Sessions 3-10 of [handoff.md](../handoff.md); the strategic direction shifted with the product-platform repositioning (see [mdntech-website-rebuild.md](./mdntech-website-rebuild.md)) and the architectural decisions locked in [MIND-PALACE-BRIEFING.md](./MIND-PALACE-BRIEFING.md). **This file is kept for historical reference only -- do not treat its schema, phase numbering, or roadmap as current.**
+
+---
+
 # M.D.N Tech Command Center -- Development Plan
 
 **Version:** 1.0
 **Date:** 2026-03-21
-**Status:** Draft
+**Status:** Superseded (see banner above)
 
 ---
 
