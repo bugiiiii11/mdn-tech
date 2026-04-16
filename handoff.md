@@ -14,6 +14,29 @@
 | 8 | 2026-03-24 | Phase 4: AI Commander chatbot widget | Embeddable chatbot widget, Claude API streaming, conversation storage, widget config UI, marketing animation fixes |
 | 9 | 2026-03-24 | Chatbots dashboard + prompt tuning | Chatbots page stats table with usage metrics, fixed chatbot repeating earlier conversation topics |
 | 10 | 2026-04-08 | Mobile UI polish | Blackhole positioning, process steps inline badges, blog button fix, contact section tightening, removed hero badge |
+| 11 | 2026-04-16 | Plan lock v2 + Phase 1.1a domain | Reconciled repo plan with Mind Palace draft, locked architectural decisions D1-D6, added PLAN.md pointer, froze old DEVELOPMENT-PLAN.md, configured Supabase MCP, added admin.mdntech.org domain + DNS |
+
+## What Was Done (Session 11) -- Plan lock v2 + Phase 1.1a domain
+
+1. **Reconciled two planning drafts** -- repo plan (2026-03-21) and Mind Palace draft (2026-04-16) had drifted from each other and from actual code. Produced [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) as the ground-truth handoff capturing current schema (migrations 001-003), what's already built through Session 10, and 6 decisions that needed locking.
+
+2. **Locked 6 architectural decisions (D1-D6):**
+   - D1: CC moves from `mdntech.org/command-center` to `admin.mdntech.org`; customer portal takes `app.mdntech.org`
+   - D2: Single Supabase project (`ijfgwzacaabzeknlpaff`) for CC + portal, segmented by RLS, not by DB
+   - D3: Two-table user model -- `team_members` (founders only, 2 rows, role 'admin') + `customers` (portal users); `handle_new_user()` branches on `raw_user_meta_data->>'account_type'`
+   - D4: `clients` (internal CRM) and `customers` (portal users) stay as separate tables with optional FK link
+   - D5: `owner_id` pattern on customer-facing resources (nullable in migration 004, tighten later -- hybrid path)
+   - D6: Mind Palace holds the authoritative plan; repo gets a pointer stub
+
+3. **Mind Palace adopted the briefing as v2 plan** -- new authoritative plan lives at `MindPalace/Projects/MDN-Tech/development-plan.md`. v1 archived. Agent-phase gate tightened: agents wait until migration 004 is deployed and stable in production. ChatKit free-tier locked at 50 messages (was 20 in briefing, revisited against Haiku cost reality).
+
+4. **Repo-side plan handoff** -- created [PLAN.md](PLAN.md) at repo root as a 3-section pointer to the Mind Palace plan. Added SUPERSEDED banner to [command-center/DEVELOPMENT-PLAN.md](command-center/DEVELOPMENT-PLAN.md). Added [command-center/mdntech-website-rebuild.md](command-center/mdntech-website-rebuild.md) to the repo (was previously loose). Committed: `127f888`.
+
+5. **MCP Supabase configured** -- added [.mcp.json](.mcp.json) at repo root using the hosted OAuth variant (`https://mcp.supabase.com/mcp?project_ref=ijfgwzacaabzeknlpaff`), no token in repo. Follows the pattern already used in the TradingBot project. Activation pending Claude Code restart in next session. Committed: `127f888`.
+
+6. **Skill refinements committed** -- the `/doc-update`, `/save`, `/start`, `/wrap` skills accumulated quality improvements over several sessions (decisions.md handling, Mind Palace check in /start, emergency snapshot consumption, tighter templates). Also committed yarn.lock catching up to `@anthropic-ai/sdk` that was added to package.json in Session 8. Committed: `656ddc1`.
+
+7. **Phase 1.1a complete -- admin.mdntech.org domain** -- added `admin.mdntech.org` in Vercel dashboard, created CNAME record at Hostinger (registrar). Initially used `cname.vercel-dns.com` target; updated to the newer project-specific target (`acc5f640d7a16557.vercel-dns-017.com`) per Vercel's recommendation. Domain resolving as of session end; Vercel shows Valid Configuration.
 
 ## What Was Done (Session 3) -- Phase 1: Auth, projects, team, dashboard
 
@@ -105,15 +128,18 @@
 
 ## What To Do Next
 
+Phase 1 of the Mind Palace v2 plan (CC stabilization). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+
 | Priority | Task | Notes |
 |----------|------|-------|
-| 1 | Enter remaining 9 projects in Command Center | Royal Stroje done; 4 more active + 5 in analysis |
-| 2 | Test chatbot prompt improvements | Verify Royal Stroje bot no longer repeats earlier topics in conversation |
-| 3 | Remove /api/chat/test diagnostic endpoint | Temporary -- remove after confirming chatbot stability |
-| 4 | Fix knowledge page date display | Dates render as full UTC strings; format to YYYY-MM-DD |
-| 5 | Add remaining knowledge base docs | Skills docs, howto guides for Railway/Supabase/Vercel |
-| 6 | Phase 5: Notifications and alerts | Slack/email integrations, deployment alerts, budget warnings |
-| 7 | SEO action plan implementation | Follow seo-audit/ACTION-PLAN.md recommendations |
+| 1 | Verify MCP Supabase connection | After Claude Code restart, confirm `.mcp.json` server is approved and OAuth flow works |
+| 2 | Phase 1.1b -- middleware host-branching for admin.mdntech.org | Rewrite `admin.*` -> `/command-center/*`; 301 `mdntech.org/command-center/*` to `admin.mdntech.org/*` |
+| 3 | Phase 1.4 -- cleanup | Delete `/api/chat/test`, fix knowledge page date display (format: "Apr 16, 2026") |
+| 4 | Phase 1.2 -- role simplification cleanup | Doc-only; team_members schema stays, but only 'admin' role ever issued |
+| 5 | Phase 1.3 -- enter 6 remaining internal projects into CC | Royal Stroje done; list in Mind Palace project frontmatter |
+| 6 | Phase 2 kickoff -- migration 004 (schema evolution for portal) | customers, clients, customer_products, product_usage tables + owner_id on chatbots + rewritten RLS + rewritten handle_new_user() |
+| 7 | Phase 3 -- website rebuild (parallel track to portal) | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 8 | SEO action plan implementation | Follow `seo-audit/ACTION-PLAN.md` recommendations (unchanged from prior sessions) |
 
 ## Key Files
 
@@ -148,3 +174,8 @@
 | `components/command-center/chatbots/EmbedSnippet.tsx` | Deploy snippet with copy button |
 | `components/command-center/chatbots/ConversationList.tsx` | Conversations list with filters |
 | `.claude/skills/` | Session management skills (start, wrap, doc-update, save, test) |
+| [PLAN.md](PLAN.md) | Plan pointer -- Mind Palace is authoritative; this is the repo stub |
+| [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) | Architectural decisions briefing (D1-D6 locked 2026-04-16), migration 004 spec, phase sequencing |
+| [command-center/mdntech-website-rebuild.md](command-center/mdntech-website-rebuild.md) | Website rebuild spec (input to Phase 3) |
+| [.mcp.json](.mcp.json) | Supabase MCP server config (hosted OAuth, scoped to project `ijfgwzacaabzeknlpaff`) |
+| [decisions.md](decisions.md) | Decision log -- locked architectural decisions with reasoning |
