@@ -25,10 +25,19 @@
       "Bash(cp -r app/terms app/\\\\\\(marketing\\\\\\)/terms)",
       "Bash(rm app/page.tsx app/not-found.tsx)",
       "Bash(rm -rf app/blog app/privacy app/terms)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(cat /c/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main/app/command-center/projects/[id]/page.tsx)",
+      "Bash(grep '\"\"gray-matter\"\"' package.json)",
+      "Bash(ls -la \"c:\\\\Users\\\\cryptomeda\\\\Desktop\\\\Swarm\\\\myprojects\\\\M.D.N-Tech-main\\\\app\\\\command-center\\\\chatbots\"\" 2>/dev/null || echo \"Path not found \")",
+      "Read(//c/Users/cryptomeda/.claude/projects/c--Users-cryptomeda-Desktop-Swarm-myprojects-M-D-N-Tech-main/memory/**)",
+      "Bash(mkdir -p \"c:/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main/app/api/chat/[chatbotId]/config\")",
+      "Bash(mkdir -p \"c:/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main/app/api/chat/[chatbotId]/message\")",
+      "Bash(find \"c:/Users/cryptomeda/Desktop/Swarm/myprojects/M.D.N-Tech-main/app/\\(marketing\\)\" -type f -name \"page.tsx\")",
+      "Read(//c/Users/cryptomeda/Desktop/Swarm/myprojects/M-D-N-Tech-main/**)"
     ],
     "additionalDirectories": [
-      "C:\\Users\\cryptomeda\\Desktop\\Swarm\\myprojects\\M.D.N-Tech-main\\.claude\\skills"
+      "C:\\Users\\cryptomeda\\Desktop\\Swarm\\myprojects\\M.D.N-Tech-main\\.claude\\skills",
+      "c:\\Users\\cryptomeda\\Desktop\\Swarm\\myprojects\\M.D.N-Tech-main\\app\\command-center\\chatbots\\[id]\\conversations"
     ]
   },
   "hooks": {
