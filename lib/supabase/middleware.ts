@@ -21,24 +21,29 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // 2. On admin host, rewrite paths to /command-center/* internally
+  // 2. On admin host, strip /command-center prefix from URLs (redirect to clean path)
+  if (isAdminHost(host) && pathname.startsWith('/command-center')) {
+    const cleanPath = pathname.replace(/^\/command-center/, '') || '/'
+    const url = new URL(`https://${ADMIN_HOST}${cleanPath}`)
+    url.search = request.nextUrl.search
+    return NextResponse.redirect(url)
+  }
+
+  // 3. On admin host, rewrite clean paths to /command-center/* internally
   if (isAdminHost(host)) {
-    // Skip rewrite if already targeting /command-center (internal rewrites)
-    if (!pathname.startsWith('/command-center')) {
-      // Public chat API passthrough
-      if (pathname.startsWith('/api/chat/')) {
-        return NextResponse.next()
-      }
-
-      // Map admin root to dashboard
-      const internalPath = pathname === '/'
-        ? '/command-center/dashboard'
-        : `/command-center${pathname}`
-
-      const url = request.nextUrl.clone()
-      url.pathname = internalPath
-      return NextResponse.rewrite(url)
+    // Public chat API passthrough
+    if (pathname.startsWith('/api/chat/')) {
+      return NextResponse.next()
     }
+
+    // Map admin root to dashboard
+    const internalPath = pathname === '/'
+      ? '/command-center/dashboard'
+      : `/command-center${pathname}`
+
+    const url = request.nextUrl.clone()
+    url.pathname = internalPath
+    return NextResponse.rewrite(url)
   }
 
   // --- Public route passthrough ---
