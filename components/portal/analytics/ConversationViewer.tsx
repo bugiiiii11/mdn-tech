@@ -8,10 +8,10 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
-  feedback?: {
+  message_feedback?: Array<{
     id: string;
     rating: 'correct' | 'incorrect' | 'helpful' | 'not_helpful';
-  } | null;
+  }> | null;
 }
 
 interface Conversation {
@@ -154,46 +154,54 @@ export function ConversationViewer({
                           {/* Feedback buttons for assistant messages */}
                           {msg.role === 'assistant' && (
                             <div className="flex gap-2 mt-3">
-                              <button
-                                onClick={() => handleFeedback(msg.id, 'correct')}
-                                disabled={submittingId === msg.id}
-                                className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                                  msg.feedback?.rating === 'correct'
-                                    ? 'bg-green-900/50 text-green-300 border border-green-700'
-                                    : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
-                                } disabled:opacity-50`}
-                                title="Mark as correct answer"
-                              >
-                                <ThumbsUp size={14} />
-                                <span>Correct</span>
-                              </button>
+                              {(() => {
+                                const feedback = msg.message_feedback?.[0];
+                                const rating = feedback?.rating;
+                                return (
+                                  <>
+                                    <button
+                                      onClick={() => handleFeedback(msg.id, 'correct')}
+                                      disabled={submittingId === msg.id}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                                        rating === 'correct'
+                                          ? 'bg-green-900/50 text-green-300 border border-green-700'
+                                          : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
+                                      } disabled:opacity-50`}
+                                      title="Mark as correct answer"
+                                    >
+                                      <ThumbsUp size={14} />
+                                      <span>Correct</span>
+                                    </button>
 
-                              <button
-                                onClick={() => handleFeedback(msg.id, 'incorrect')}
-                                disabled={submittingId === msg.id}
-                                className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                                  msg.feedback?.rating === 'incorrect'
-                                    ? 'bg-red-900/50 text-red-300 border border-red-700'
-                                    : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
-                                } disabled:opacity-50`}
-                                title="Mark as incorrect answer"
-                              >
-                                <ThumbsDown size={14} />
-                                <span>Incorrect</span>
-                              </button>
+                                    <button
+                                      onClick={() => handleFeedback(msg.id, 'incorrect')}
+                                      disabled={submittingId === msg.id}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                                        rating === 'incorrect'
+                                          ? 'bg-red-900/50 text-red-300 border border-red-700'
+                                          : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
+                                      } disabled:opacity-50`}
+                                      title="Mark as incorrect answer"
+                                    >
+                                      <ThumbsDown size={14} />
+                                      <span>Incorrect</span>
+                                    </button>
 
-                              <button
-                                onClick={() => handleFeedback(msg.id, 'helpful')}
-                                disabled={submittingId === msg.id}
-                                className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                                  msg.feedback?.rating === 'helpful'
-                                    ? 'bg-blue-900/50 text-blue-300 border border-blue-700'
-                                    : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
-                                } disabled:opacity-50`}
-                                title="Mark as helpful"
-                              >
-                                <span>✋ Helpful</span>
-                              </button>
+                                    <button
+                                      onClick={() => handleFeedback(msg.id, 'helpful')}
+                                      disabled={submittingId === msg.id}
+                                      className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
+                                        rating === 'helpful'
+                                          ? 'bg-blue-900/50 text-blue-300 border border-blue-700'
+                                          : 'bg-gray-700/30 text-gray-400 hover:bg-gray-700/50 border border-gray-600'
+                                      } disabled:opacity-50`}
+                                      title="Mark as helpful"
+                                    >
+                                      <span>✋ Helpful</span>
+                                    </button>
+                                  </>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>

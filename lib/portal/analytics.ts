@@ -228,8 +228,7 @@ export async function getConversationsWithMessages(
       source_url,
       started_at,
       message_count,
-      chat_messages(id, role, content, created_at),
-      message_feedback(id, rating)
+      chat_messages(id, role, content, created_at, message_feedback(id, rating))
     `
     )
     .eq('chatbot_id', chatbotId)
@@ -252,9 +251,9 @@ export async function getConversationsWithMessages(
     }
 
     if (filter === 'untagged') {
-      const feedback = conv.message_feedback as any[];
       return messages.some((msg) => {
-        const hasRating = feedback?.some((f) => f.id === msg.id);
+        const feedback = msg.message_feedback as any[] | null;
+        const hasRating = feedback && feedback.length > 0;
         return !hasRating;
       });
     }
