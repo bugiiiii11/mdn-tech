@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ThumbsUp, ThumbsDown, AlertCircle } from 'lucide-react';
 
 interface Message {
@@ -12,6 +12,31 @@ interface Message {
     id: string;
     rating: 'correct' | 'incorrect' | 'helpful' | 'not_helpful';
   }> | null;
+}
+
+// Client-side feedback loader
+async function loadFeedbackForMessages(messageIds: string[]): Promise<Map<string, any>> {
+  if (messageIds.length === 0) return new Map();
+
+  try {
+    const response = await fetch('/api/portal/feedback/load', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messageIds }),
+    });
+
+    if (!response.ok) throw new Error('Failed to load feedback');
+    const feedbacks = await response.json();
+
+    const feedbackMap = new Map<string, any>();
+    feedbacks.forEach((f: any) => {
+      feedbackMap.set(f.message_id, f);
+    });
+    return feedbackMap;
+  } catch (error) {
+    console.error('Error loading feedback:', error);
+    return new Map();
+  }
 }
 
 interface Conversation {
@@ -36,6 +61,16 @@ export function ConversationViewer({
 }: ConversationViewerProps) {
   const [expandedConvId, setExpandedConvId] = useState<string | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [feedbackMap, setFeedbackMap] = useState<Map<string, any>>(new Map());
+
+  useEffect(() => {
+    // Load feedback for all messages
+    const messageIds = conversations.flatMap(conv =>
+      (conv.chat_messages as any[])?.map(msg => msg.id) || []
+    );
+
+    loadFeedbackForMessages(messageIds).then(setFeedbackMap);
+  }, [conversations]);
 
   if (conversations.length === 0) {
     return (
@@ -155,7 +190,7 @@ export function ConversationViewer({
                           {msg.role === 'assistant' && (
                             <div className="flex gap-2 mt-3">
                               {(() => {
-                                const feedback = msg.message_feedback?.[0];
+                                const feedback = feedbackMap.get(msg.id);
                                 const rating = feedback?.rating;
                                 return (
                                   <>

@@ -219,8 +219,8 @@ export async function getConversationsWithMessages(
   fallbackMessage: string,
   filter: 'all' | 'fallback' | 'untagged' = 'all'
 ) {
-  // Fetch conversations with messages
-  const { data: conversations } = await supabase
+  // Fetch conversations with messages (no feedback - client will load separately)
+  const { data: conversations, error } = await supabase
     .from('chat_conversations')
     .select(
       `
@@ -235,56 +235,27 @@ export async function getConversationsWithMessages(
     .eq('chatbot_id', chatbotId)
     .order('started_at', { ascending: false });
 
-  if (!conversations) return [];
-
-  // Fetch feedback for all messages in these conversations
-  const messageIds = conversations.flatMap(conv =>
-    (conv.chat_messages as any[])?.map(msg => msg.id) || []
-  );
-
-  let feedbackMap = new Map<string, any>();
-  if (messageIds.length > 0) {
-    const { data: feedbacks } = await supabase
-      .from('message_feedback')
-      .select('id, message_id, rating')
-      .in('message_id', messageIds);
-
-    if (feedbacks) {
-      feedbacks.forEach(f => {
-        feedbackMap.set(f.message_id, f);
-      });
-    }
+  if (error) {
+    console.error('Failed to fetch conversations:', error);
+    return [];
   }
 
-  // Attach feedback to messages and filter
-  const enrichedConversations = conversations.map(conv => ({
-    ...conv,
-    chat_messages: (conv.chat_messages as any[])?.map(msg => ({
-      ...msg,
-      message_feedback: feedbackMap.get(msg.id) ? [feedbackMap.get(msg.id)] : null,
-    })) || [],
-  }));
+  if (!conversations) return [];
 
-  return enrichedConversations.filter((conv) => {
-    const messages = conv.chat_messages as any[];
-    if (!messages) return true;
+  // Simple in-memory filtering by fallback/untagged (no RLS complexity)
+  return conversations.filter((conv) => {
+    const messages = (conv.chat_messages as any[]) || [];
+    if (messages.length === 0) return true;
 
     if (filter === 'fallback') {
       return messages.some(
         (msg) =>
           msg.role === 'assistant' &&
-          msg.content.toLowerCase().includes(fallbackMessage.toLowerCase())
+          msg.content?.toLowerCase().includes(fallbackMessage.toLowerCase())
       );
     }
 
-    if (filter === 'untagged') {
-      return messages.some((msg) => {
-        const feedback = msg.message_feedback;
-        const hasRating = feedback && feedback.length > 0;
-        return !hasRating;
-      });
-    }
-
+    // 'untagged' filter will be handled client-side after feedback loads
     return true;
   });
 }
