@@ -153,7 +153,7 @@ export async function getTopKeywords(
     const words = msg.content
       .toLowerCase()
       .split(/[\s\p{P}]+/u)
-      .filter((word) => word.length > 2 && !STOPWORDS.has(word));
+      .filter((word: string) => word.length > 2 && !STOPWORDS.has(word));
 
     words.forEach((word) => {
       wordCount.set(word, (wordCount.get(word) || 0) + 1);

@@ -10,13 +10,13 @@ export function UsageMeter({ customerId, product }: { customerId: string; produc
   const [limit, setLimit] = useState(50)
   const [loading, setLoading] = useState(true)
 
-  const limits: Record<string, number> = {
-    chatkit: 50,
-    signakit: 100,
-    tradekit: 100,
-  }
-
   useEffect(() => {
+    const limits: Record<string, number> = {
+      chatkit: 50,
+      signakit: 100,
+      tradekit: 100,
+    }
+
     async function fetchUsage() {
       const now = new Date()
       const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -40,7 +40,7 @@ export function UsageMeter({ customerId, product }: { customerId: string; produc
     }
 
     fetchUsage()
-  }, [customerId, product, supabase, limits])
+  }, [customerId, product, supabase])
 
   const percentage = Math.round((used / limit) * 100)
   const isLimitReached = used >= limit
