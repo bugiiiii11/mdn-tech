@@ -2,18 +2,17 @@
 
 **Authoritative plan:** `MindPalace/Projects/MDN-Tech/development-plan.md` (v2, locked 2026-04-16)
 
-**Last synced:** 2026-04-16
+**Last synced:** 2026-04-17
 
 ## Active phase
 
-**Phase 1 -- CC stabilization.** Small prep work before the portal build:
+**Phase 2 -- Portal build (`app.mdntech.org`).** Phase 1 (CC stabilization) is complete as of Session 12 (2026-04-17). Now building the customer-facing portal:
 
-- 1.1 Move CC from `mdntech.org/command-center` to `admin.mdntech.org` (Vercel domain + DNS CNAME + middleware host-branching)
-- 1.2 Role simplification cleanup -- CC only ever has 2 founders (admins); engineer/viewer roles in schema go unused
-- 1.3 Enter the remaining 6 internal projects into CC (Royal Stroje already entered)
-- 1.4 Minor cleanup: delete `/api/chat/test`, fix knowledge page date format
+- Migration 004 deployed (customers, clients, customer_products, product_usage, owner_id on chatbots, rewritten RLS + handle_new_user)
+- Portal scaffold live: login, signup, dashboard, ChatKit listing, SignaKit/TradeKit placeholders, settings
+- Next: ChatKit customer CRUD, free-tier caps, auth hardening
 
-After Phase 1, work begins on Phase 2 (portal build at `app.mdntech.org`) and Phase 3 (website rebuild, parallel track, launches with portal).
+Phase 3 (website rebuild) runs in parallel; launches with portal. Phase 1 leftovers (1.2 role cleanup, 1.3 project data entry) are low priority and can slot in anytime.
 
 ## Related docs in this repo
 

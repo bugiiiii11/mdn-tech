@@ -79,3 +79,15 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Alternatives:** stdio variant with token in `~/.claude.json` (works, but config doesn't travel); stdio with env-var token reference (middle ground but requires env-var expansion support).
 
 ---
+
+## 2026-04-17 -- Session 12 -- Portal uses same Next.js app with host-branching
+
+**Decision:** The customer portal (`app.mdntech.org`) runs in the same Next.js project as the marketing site and Command Center, using middleware host-branching to route requests to `app/portal/*` internally.
+
+**Why:** Shares design tokens, Supabase clients, chatbot API infrastructure, and build pipeline. One deploy covers all three surfaces. The middleware pattern proved clean for admin.mdntech.org in the same session and scales naturally to a third host.
+
+**Alternatives:** Separate Next.js project for portal (independent release cadence, but duplicates shared code and requires separate Vercel project); monorepo with Turborepo (overkill for 2-person team at current scale).
+
+**Revisit:** If the portal grows to need its own release cadence or the shared build becomes a bottleneck.
+
+---

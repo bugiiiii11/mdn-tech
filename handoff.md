@@ -15,6 +15,21 @@
 | 9 | 2026-03-24 | Chatbots dashboard + prompt tuning | Chatbots page stats table with usage metrics, fixed chatbot repeating earlier conversation topics |
 | 10 | 2026-04-08 | Mobile UI polish | Blackhole positioning, process steps inline badges, blog button fix, contact section tightening, removed hero badge |
 | 11 | 2026-04-16 | Plan lock v2 + Phase 1.1a domain | Reconciled repo plan with Mind Palace draft, locked architectural decisions D1-D6, added PLAN.md pointer, froze old DEVELOPMENT-PLAN.md, configured Supabase MCP, added admin.mdntech.org domain + DNS |
+| 12 | 2026-04-17 | Phase 1 complete + Phase 2 portal scaffold | admin.mdntech.org middleware + clean URLs, Phase 1 cleanup done, migration 004 deployed, customer portal at app.mdntech.org with login/signup/dashboard/ChatKit/settings |
+
+## What Was Done (Session 12) -- Phase 1 complete + Phase 2 portal scaffold
+
+1. **MCP Supabase verified** -- Server connected via OAuth. Fixed `.mcp.json` schema error (removed invalid `"type": "url"` field). MCP tools not yet injected into Claude Code session but server shows connected. Committed: `3b4afa8`.
+
+2. **Phase 1.1b -- admin.mdntech.org middleware** -- Added host-branching to `lib/supabase/middleware.ts`. Requests to `admin.mdntech.org` rewrite internally to `/command-center/*`. Requests to `mdntech.org/command-center/*` 301-redirect to `admin.mdntech.org/*`. Auth redirects adapt to use clean admin URLs. Committed: `3b4afa8`.
+
+3. **Clean URLs on admin subdomain** -- Added redirect to strip `/command-center` prefix when sidebar links navigate to `admin.mdntech.org/command-center/projects` etc. Now all URLs show clean paths (`/projects`, `/team`). Deleted `/api/chat/test` diagnostic endpoint. Committed: `4663286`.
+
+4. **Knowledge page date fix** -- Fixed `gray-matter` Date objects rendering as raw timestamps. Now displays as "Apr 16, 2026" using `toLocaleDateString`. Committed: `cbac838`.
+
+5. **Migration 004 deployed** -- Portal schema applied to Supabase. New tables: `customers` (portal users), `clients` (internal CRM with optional FK to customers), `customer_products` (product enrollment per customer), `product_usage` (metering for free-tier caps). Added `owner_id` to `chatbots` for customer-owned ChatKit bots. Added `is_customer()` helper function. Rewrote `handle_new_user()` to branch on `account_type` metadata. Rewrote chatbot/KB/conversation RLS for owner_id pattern. Committed: `8ae94da`.
+
+6. **Customer portal scaffold (app.mdntech.org)** -- Full portal route group at `app/portal/`. Middleware host-branching for `app.mdntech.org` (same pattern as admin). Pages: login, signup (sets `account_type: customer` + `signup_source` in Supabase metadata), dashboard with product cards and active products table, ChatKit listing with per-bot stats, SignaKit and TradeKit coming-soon placeholders, settings page. `PortalShell` sidebar component with nav. Vercel domain + Hostinger CNAME configured. Committed: `e79426e`.
 
 ## What Was Done (Session 11) -- Plan lock v2 + Phase 1.1a domain
 
@@ -128,16 +143,16 @@
 
 ## What To Do Next
 
-Phase 1 of the Mind Palace v2 plan (CC stabilization). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+Phase 2 of the Mind Palace v2 plan (portal build at `app.mdntech.org`). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
 
 | Priority | Task | Notes |
 |----------|------|-------|
-| 1 | Verify MCP Supabase connection | After Claude Code restart, confirm `.mcp.json` server is approved and OAuth flow works |
-| 2 | Phase 1.1b -- middleware host-branching for admin.mdntech.org | Rewrite `admin.*` -> `/command-center/*`; 301 `mdntech.org/command-center/*` to `admin.mdntech.org/*` |
-| 3 | Phase 1.4 -- cleanup | Delete `/api/chat/test`, fix knowledge page date display (format: "Apr 16, 2026") |
-| 4 | Phase 1.2 -- role simplification cleanup | Doc-only; team_members schema stays, but only 'admin' role ever issued |
-| 5 | Phase 1.3 -- enter 6 remaining internal projects into CC | Royal Stroje done; list in Mind Palace project frontmatter |
-| 6 | Phase 2 kickoff -- migration 004 (schema evolution for portal) | customers, clients, customer_products, product_usage tables + owner_id on chatbots + rewritten RLS + rewritten handle_new_user() |
+| 1 | ChatKit customer CRUD | Create/edit/delete chatbots, KB entry management, widget config, embed snippet -- reuse CC components where possible |
+| 2 | ChatKit new chatbot flow | `app/portal/chatkit/new/page.tsx` -- auto-enroll `customer_products` row on first chatbot creation |
+| 3 | Free-tier caps via product_usage | Track message count per customer per period; enforce 50-message ChatKit cap; show usage in portal dashboard |
+| 4 | Portal auth hardening | Ensure admin users can't accidentally log into portal (and vice versa); test signup → email confirm → dashboard flow end-to-end |
+| 5 | Phase 1.2 -- role simplification cleanup | Doc-only; team_members schema stays, but only 'admin' role ever issued |
+| 6 | Phase 1.3 -- enter 6 remaining internal projects into CC | Royal Stroje done; list in Mind Palace project frontmatter |
 | 7 | Phase 3 -- website rebuild (parallel track to portal) | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
 | 8 | SEO action plan implementation | Follow `seo-audit/ACTION-PLAN.md` recommendations (unchanged from prior sessions) |
 
@@ -148,11 +163,18 @@ Phase 1 of the Mind Palace v2 plan (CC stabilization). See [PLAN.md](PLAN.md) an
 | `app/layout.tsx` | Root layout (minimal -- html/body only) |
 | `app/(marketing)/layout.tsx` | Marketing layout with StarsCanvas, Navbar, Footer |
 | `app/command-center/layout.tsx` | CC layout: dark bg, Sidebar + main content |
-| `middleware.ts` | Session guard: redirects unauthenticated users to login |
+| `app/portal/layout.tsx` | Portal layout (customer-facing) |
+| `app/portal/dashboard/page.tsx` | Portal dashboard with product cards |
+| `app/portal/login/page.tsx` | Portal login |
+| `app/portal/signup/page.tsx` | Portal signup (sets account_type: customer) |
+| `app/portal/chatkit/page.tsx` | ChatKit listing (customer's own chatbots) |
+| `components/portal/PortalShell.tsx` | Portal sidebar with product nav |
+| `middleware.ts` | Session guard + host-branching for admin/app/marketing |
 | `lib/supabase/client.ts` | Supabase browser client |
 | `lib/supabase/server.ts` | Supabase server client |
 | `supabase/migrations/001_core_tables.sql` | Core schema: projects, team, milestones, communications + RLS |
 | `supabase/migrations/002_chatbots.sql` | Chatbots + KB entries schema + RLS |
+| `supabase/migrations/004_portal_schema.sql` | Portal schema: customers, clients, customer_products, product_usage, owner_id, rewritten RLS + handle_new_user() |
 | `components/command-center/projects/ProjectTabs.tsx` | Project detail: Overview/Milestones/Budget/Communications tabs |
 | `components/command-center/chatbots/KBExportButton.tsx` | Export all KB entries as unified .md download |
 | `components/command-center/knowledge/KnowledgeContent.tsx` | Renders .md files with react-markdown + typography |
