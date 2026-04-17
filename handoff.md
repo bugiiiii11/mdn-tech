@@ -16,6 +16,15 @@
 | 10 | 2026-04-08 | Mobile UI polish | Blackhole positioning, process steps inline badges, blog button fix, contact section tightening, removed hero badge |
 | 11 | 2026-04-16 | Plan lock v2 + Phase 1.1a domain | Reconciled repo plan with Mind Palace draft, locked architectural decisions D1-D6, added PLAN.md pointer, froze old DEVELOPMENT-PLAN.md, configured Supabase MCP, added admin.mdntech.org domain + DNS |
 | 12 | 2026-04-17 | Phase 1 complete + Phase 2 portal scaffold | admin.mdntech.org middleware + clean URLs, Phase 1 cleanup done, migration 004 deployed, customer portal at app.mdntech.org with login/signup/dashboard/ChatKit/settings |
+| 13 | 2026-04-17 | ChatKit customer portal (Priorities 1-3) | Customer CRUD for chatbots + KB, auto-enroll in product, free-tier 50-msg/mo limit with graceful disable, usage meters on dashboard + detail page |
+
+## What Was Done (Session 13) -- ChatKit customer portal (Priorities 1-3)
+
+1. **ChatKit customer CRUD (Priority 1)** -- Full create/edit/delete for customer-owned chatbots at `/portal/chatkit/`. Pages: new, [id], [id]/edit, [id]/entries/new, [id]/entries/[entryId]/edit. Reused CC components (KBEntryList, WidgetConfigForm, EmbedSnippet, KBExportButton). Delete button with confirmation. RLS ensures customers only access their own via `owner_id`. Files: `components/portal/chatbots/{PortalChatbotForm,PortalKBEntryForm,DeleteChatbotButton}.tsx`. Committed: `912c2c4`.
+
+2. **Auto-enroll on first chatbot (Priority 2)** -- PortalChatbotForm auto-inserts `customer_products` row (product='chatkit', plan='free', status='active') when customer creates first chatbot. Idempotent via unique constraint. Committed: `912c2c4`.
+
+3. **Free-tier message caps (Priority 3)** -- 50 messages/month limit for ChatKit free tier. Created `lib/chat/usage.ts` with monthly period logic and limit checking. Config endpoint returns `disabled: true` if limit exceeded. Message endpoint rejects 429 if over limit and increments usage on success. Widget skips rendering if disabled (graceful UX: no UI on customer website). Portal shows `UsageMeter` component with progress bar + warnings at 75%/90%. Visible on dashboard + chatbot detail page. Files: `lib/chat/usage.ts`, `components/portal/UsageMeter.tsx`, updated `app/api/chat/[chatbotId]/{config,message}/route.ts`, `public/widget.js`. Committed: `0249f4c`.
 
 ## What Was Done (Session 12) -- Phase 1 complete + Phase 2 portal scaffold
 
@@ -143,18 +152,18 @@
 
 ## What To Do Next
 
-Phase 2 of the Mind Palace v2 plan (portal build at `app.mdntech.org`). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+Phase 2 portal build continues. Priorities 1-3 (ChatKit customer CRUD + free-tier caps) complete. See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
 
-| Priority | Task | Notes |
-|----------|------|-------|
-| 1 | ChatKit customer CRUD | Create/edit/delete chatbots, KB entry management, widget config, embed snippet -- reuse CC components where possible |
-| 2 | ChatKit new chatbot flow | `app/portal/chatkit/new/page.tsx` -- auto-enroll `customer_products` row on first chatbot creation |
-| 3 | Free-tier caps via product_usage | Track message count per customer per period; enforce 50-message ChatKit cap; show usage in portal dashboard |
-| 4 | Portal auth hardening | Ensure admin users can't accidentally log into portal (and vice versa); test signup → email confirm → dashboard flow end-to-end |
-| 5 | Phase 1.2 -- role simplification cleanup | Doc-only; team_members schema stays, but only 'admin' role ever issued |
-| 6 | Phase 1.3 -- enter 6 remaining internal projects into CC | Royal Stroje done; list in Mind Palace project frontmatter |
-| 7 | Phase 3 -- website rebuild (parallel track to portal) | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 8 | SEO action plan implementation | Follow `seo-audit/ACTION-PLAN.md` recommendations (unchanged from prior sessions) |
+| Priority | Task | Status | Notes |
+|----------|------|--------|-------|
+| 1 | ChatKit customer CRUD | ✅ Complete | Customer-owned chatbots, KB mgmt, delete, RLS filtering |
+| 2 | ChatKit new chatbot flow | ✅ Complete | Auto-enroll in customer_products |
+| 3 | Free-tier caps via product_usage | ✅ Complete | 50-msg/mo limit, widget graceful disable, usage meters |
+| 4 | Portal auth hardening | Pending | Ensure admin/portal separation; test signup → email confirm → dashboard flow end-to-end |
+| 5 | Phase 1.2 -- role simplification cleanup | Pending | Doc-only; team_members schema stays, only 'admin' role issued |
+| 6 | Phase 1.3 -- enter 6 remaining internal projects into CC | Pending | Royal Stroje done; list in Mind Palace project frontmatter |
+| 7 | Phase 3 -- website rebuild (parallel track to portal) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 8 | SEO action plan implementation | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations (unchanged from prior sessions) |
 
 ## Key Files
 
@@ -167,8 +176,17 @@ Phase 2 of the Mind Palace v2 plan (portal build at `app.mdntech.org`). See [PLA
 | `app/portal/dashboard/page.tsx` | Portal dashboard with product cards |
 | `app/portal/login/page.tsx` | Portal login |
 | `app/portal/signup/page.tsx` | Portal signup (sets account_type: customer) |
-| `app/portal/chatkit/page.tsx` | ChatKit listing (customer's own chatbots) |
+| `app/portal/chatkit/page.tsx` | ChatKit listing with stats (customer's own chatbots) |
+| `app/portal/chatkit/new/page.tsx` | New chatbot form (auto-enrolls in customer_products) |
+| `app/portal/chatkit/[id]/page.tsx` | Chatbot detail: KB + widget config + embed snippet + usage meter |
+| `app/portal/chatkit/[id]/edit/page.tsx` | Edit chatbot |
+| `app/portal/chatkit/[id]/entries/{new,[entryId]/edit}/page.tsx` | KB entry create/edit |
+| `components/portal/chatbots/PortalChatbotForm.tsx` | Portal-specific form (no projects field, auto-enroll) |
+| `components/portal/chatbots/PortalKBEntryForm.tsx` | Portal KB entry form (redirects to /portal paths) |
+| `components/portal/chatbots/DeleteChatbotButton.tsx` | Delete with confirmation |
+| `components/portal/UsageMeter.tsx` | Free-tier usage progress bar + warnings |
 | `components/portal/PortalShell.tsx` | Portal sidebar with product nav |
+| `lib/chat/usage.ts` | Usage tracking: checkUsageLimit, incrementUsage, free-tier limits |
 | `middleware.ts` | Session guard + host-branching for admin/app/marketing |
 | `lib/supabase/client.ts` | Supabase browser client |
 | `lib/supabase/server.ts` | Supabase server client |
@@ -186,8 +204,8 @@ Phase 2 of the Mind Palace v2 plan (portal build at `app.mdntech.org`). See [PLA
 | `app/api/infrastructure/route.ts` | Auth-protected infrastructure status API (all providers in parallel) |
 | `components/command-center/infrastructure/` | ServiceCard, DeploymentList, InfraClient (auto-refresh dashboard) |
 | `public/widget.js` | Embeddable chatbot widget (vanilla JS, Shadow DOM) |
-| `app/api/chat/[chatbotId]/message/route.ts` | Streaming chat API (Claude Haiku 4.5 + SSE) |
-| `app/api/chat/[chatbotId]/config/route.ts` | Public chatbot config endpoint |
+| `app/api/chat/[chatbotId]/message/route.ts` | Streaming chat API (Claude Haiku 4.5 + SSE); checks usage limit + increments on success |
+| `app/api/chat/[chatbotId]/config/route.ts` | Public chatbot config endpoint; returns disabled=true if limit exceeded |
 | `lib/chat/prompt.ts` | System prompt builder from KB entries |
 | `lib/chat/cors.ts` | CORS headers utility |
 | `lib/supabase/service.ts` | Service-role Supabase client (bypasses RLS) |
