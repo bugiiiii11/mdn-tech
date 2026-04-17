@@ -39,7 +39,7 @@ export function KBEntryList({ chatbotId, grouped, basePath = '/command-center' }
               return (
                 <Link
                   key={entry.id}
-                  href={`${basePath}/chatbots/${chatbotId}/entries/${entry.id}/edit`}
+                  href={`${basePath}/${chatbotId}/entries/${entry.id}/edit`}
                   className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors group"
                 >
                   <FileText className="w-4 h-4 text-gray-600 flex-shrink-0" />
