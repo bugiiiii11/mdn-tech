@@ -18,6 +18,7 @@
 | 12 | 2026-04-17 | Phase 1 complete + Phase 2 portal scaffold | admin.mdntech.org middleware + clean URLs, Phase 1 cleanup done, migration 004 deployed, customer portal at app.mdntech.org with login/signup/dashboard/ChatKit/settings |
 | 13 | 2026-04-17 | ChatKit customer portal (Priorities 1-3) | Customer CRUD for chatbots + KB, auto-enroll in product, free-tier 50-msg/mo limit with graceful disable, usage meters on dashboard + detail page |
 | 14 | 2026-04-17 | Project data entry + CC schema extension | Portal auth verified, 4 new projects added to CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane), Swarm Resistance infra enriched with dev/prod Supabase + Railway, projects table extended with description + metadata JSONB columns |
+| 15 | 2026-04-17 | Phase 1 complete -- role cleanup + final projects | Phase 1.2: Documented role simplification (admin-only going forward, schema stays flexible); Phase 1.3: Swarm Resistance infra update SQL + MedaShooterNeo project entry; all internal projects now in CC |
 
 ## What Was Done (Session 14) -- Project data entry + CC schema extension
 
@@ -175,7 +176,7 @@
 
 ## What To Do Next
 
-Phase 2 portal build continues. Priorities 1-4 complete; projects now visible in CC. See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+**Phase 1 is now complete.** All internal projects entered in CC, architecture locked, schema stable. Next: Phase 2 finalization (auth hardening + portal polish) and Phase 3 website rebuild (parallel track). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
@@ -183,13 +184,14 @@ Phase 2 portal build continues. Priorities 1-4 complete; projects now visible in
 | 2 | ChatKit auto-enroll | ✅ Complete | Auto-enroll in customer_products on first chatbot |
 | 3 | Free-tier caps (50-msg/mo) | ✅ Complete | Usage meters, widget graceful disable |
 | 4 | Portal auth hardening | ✅ Complete | End-to-end signup → dashboard → create chatbot verified |
-| 5 | CC project data entry | ✅ Complete | 4 new projects in CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane); Swarm Resistance infra enriched |
-| 6 | Phase 1.2 -- role simplification cleanup | Pending | Doc-only; team_members schema stays, only 'admin' role issued |
-| 7 | Phase 1.3 -- remaining project entries | Pending | 6 internal projects still to enter (1 done: Royal Stroje) |
-| 8 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 9 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
-| 10 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
-| 11 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
+| 5 | CC project data entry | ✅ Complete | 4 new projects in CC + Swarm Resistance infra update |
+| 6 | Phase 1.2 -- role simplification cleanup | ✅ Complete | Documented in decisions.md; schema stays flexible, admin-only going forward |
+| 7 | Phase 1.3 -- remaining project entries | ✅ Complete | Swarm Resistance SQL + MedaShooterNeo SQL ready; all 7 internal projects covered |
+| 8 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration later |
+| 9 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 10 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
+| 11 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
+| 12 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
 
 ## Key Files
 

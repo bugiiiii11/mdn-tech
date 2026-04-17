@@ -153,3 +153,26 @@ SET metadata = metadata || jsonb_build_object(
 )
 WHERE name = 'Swarm Resistance dev';
 ```
+
+---
+
+## Insert MedaShooterNeo
+
+```sql
+INSERT INTO projects (
+  name, status, start_date, description,
+  tech_stack, metadata
+) VALUES (
+  'MedaShooterNeo',
+  'paused',
+  '2026-01-01',
+  'Unity-based NFT shooter game. Part of the CryptoMeda gaming ecosystem. NFT heroes and weapons affect gameplay stats. Development paused, balance documentation complete.',
+  ARRAY['Unity', 'C#'],
+  jsonb_build_object(
+    'phase', 'planning',
+    'current_focus', 'Balance docs done, dev paused',
+    'nft_integration', true,
+    'game_type', 'shooter'
+  )
+);
+```

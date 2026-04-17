@@ -91,3 +91,13 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Revisit:** If the portal grows to need its own release cadence or the shared build becomes a bottleneck.
 
 ---
+
+## 2026-04-17 -- Session 15 -- Phase 1.2 -- Role simplification cleanup
+
+**Decision:** The `team_members.role` column will only ever issue `'admin'` going forward. The schema values `'engineer'` and `'viewer'` remain in the enum for backwards compatibility but will not be assigned to new team members.
+
+**Why:** Decision D3 locked a 2-row, founders-only `team_members` table. The only operationally necessary role is `'admin'`. The schema was never updated to reflect this, leaving vestigial enum values. Rather than run a migration to tighten the constraint, document the intent: no code assigns engineer/viewer, and no new team member will receive those roles. If a future migration is needed, this decision log makes the rationale clear.
+
+**Alternatives:** Add a CHECK constraint to enum only 'admin' (schema change, but more explicit); continue with unused enum values (status quo, but creates confusion).
+
+---
