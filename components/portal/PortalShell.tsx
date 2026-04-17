@@ -16,7 +16,7 @@ const navItems = [
   { href: '/portal/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/portal/chatkit', label: 'ChatKit', icon: Bot },
   { href: '/portal/signakit', label: 'SignaKit', icon: Shield, badge: 'Soon' },
-  { href: '/portal/tradekit', label: 'TradeKit', icon: BarChart3, badge: 'Soon' },
+  { href: '/portal/toolkit', label: 'ToolKit', icon: BarChart3 },
   { href: '/portal/settings', label: 'Settings', icon: Settings },
 ]
 
