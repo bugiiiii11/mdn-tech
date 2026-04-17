@@ -101,3 +101,15 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Alternatives:** Add a CHECK constraint to enum only 'admin' (schema change, but more explicit); continue with unused enum values (status quo, but creates confusion).
 
 ---
+
+## 2026-04-17 -- Session 19 -- Middleware role checks via metadata, not DB queries
+
+**Decision:** Middleware role-type checks (`lib/supabase/middleware.ts`) use `user.user_metadata.account_type` JWT claim instead of querying `team_members` or `customers` tables for every request.
+
+**Why:** Middleware runs on every request. A DB query for every request adds latency and load. JWT metadata (`account_type` is set at signup via `handle_new_user()` trigger) is already in the session and requires no extra round-trip. Portal signups set `account_type: 'customer'` in metadata; non-customer paths (admins) leave it unset or empty, making the distinction fast to check.
+
+**Alternatives:** DB queries in middleware (reliable but high latency/cost; would need caching); separate middleware service with cached role state (over-engineered at current scale).
+
+**Constraints:** If a customer role ever changes post-signup (e.g., promoting a user from customer to admin), the JWT metadata won't auto-update until the next session refresh. For the current Supabase Auth + portal model, this is fine: customers don't get promoted to admins. If this changes, revisit with a refresh trigger.
+
+---
