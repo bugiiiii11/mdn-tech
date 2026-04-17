@@ -113,3 +113,19 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Constraints:** If a customer role ever changes post-signup (e.g., promoting a user from customer to admin), the JWT metadata won't auto-update until the next session refresh. For the current Supabase Auth + portal model, this is fine: customers don't get promoted to admins. If this changes, revisit with a refresh trigger.
 
 ---
+
+## 2026-04-18 -- Session 20 -- ToolKit replaces TradeKit as customer portal product
+
+**Decision:** TradeKit (BTC perpetual futures trading bot) moves to admin-only dashboard. Customer portal gets ToolKit instead: a free developer tools hub with Claude Code skills + MCP integrations + future custom apps.
+
+**Why:** ToolKit niche aligns with existing portal products (ChatKit for no-code AI, SignaKit for auth). Developers are the primary customer segment. TradeKit required significant additional testing + compliance work; ToolKit delivers immediate value (10 curated, verified skills) and builds community through an open, discoverable library. Freemium model (browse free, premium skills later) lowers customer friction vs. requiring product subscriptions.
+
+**Alternatives:** Launch TradeKit publicly (ties portal to crypto, needs regulatory audit, longer iteration cycle); defer both and focus only on ChatKit (misses developer positioning opportunity); build entire custom skill gallery from scratch (reinventing existing ecosystem).
+
+**Product positioning:** "From idea to production-ready systems — faster, smarter, secure." Three-product portal: ChatKit (no-code AI), SignaKit (auth + identity), ToolKit (dev tools). Vertical for small teams building production software.
+
+**Freemium model:** Free tier: all Claude Code skills + basic integration guides. Premium tier (future): advanced skills, custom apps, expert setup guides. Pricing TBD; benchmark against Nate Herk's AI Automation Society ($99/month for templates + community).
+
+**Phase schedule:** ToolKit Tier 1 (Prompt templates + integration recipes) ships next session. Phase 4 (auth provider consolidation: Supabase → SignaKit) proceeds independently; by then, portal has established demand velocity for SignaKit positioning.
+
+---

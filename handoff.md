@@ -23,6 +23,20 @@
 | 17 | 2026-04-17 | Build stabilization + runtime fixes | Resolved lint errors (escaping, deps), TypeScript type fixes, moved feedback loading to client-side (RLS compliance), fixed CORS path routing |
 | 18 | 2026-04-17 | Portal diagnostics + conversations feature removal | Fixed KB entry link paths (removed /chatbots/ segment), graceful Supabase null handling (.maybeSingle()), removed mixed lock files, disabled interactive conversations viewer in favor of export-only |
 | 19 | 2026-04-17 | Phase 2 finalization -- auth hardening | Middleware restructured for role-type checks before routing; login pages reject wrong-portal users; portal pages guard on customer existence; migration 006 sources is_admin() function, fixes handle_new_user() role default, restricts team_members RLS |
+| 20 | 2026-04-18 | ToolKit replaces TradeKit in customer portal | Migration 006 applied to Supabase, Phase 2 auth isolation tested; built ToolKit section (10 Claude Code skills + 3 MCP integrations); skipped website rebuild pending product clarity |
+
+## What Was Done (Session 20) -- ToolKit replaces TradeKit in customer portal
+Date: 2026-04-18
+
+1. **Applied migration 006 to Supabase** -- Deployed auth hardening schema: sourced `is_admin()` function, fixed `handle_new_user()` trigger role default, restricted `team_members` SELECT RLS to admins only. Optional part 4 (inline admin check refactoring) deferred to Phase 3. Verified via test screenshots: customer → admin host rejects with "unauthorized", admin → portal host rejects with "This login is for customers only".
+
+2. **Strategic product pivot: ToolKit replaces TradeKit** -- Decided to move TradeKit to admin-only (internal testing), launch ToolKit as customer product instead. Rationale: ToolKit niche aligns with ChatKit (no-code AI) + SignaKit (auth) for developers. Messaging: "From idea to production-ready systems — faster, smarter, secure." Freemium model: free tier for skill discovery + premium for advanced skills/custom apps.
+
+3. **ToolKit section built** -- New customer portal product at `/portal/toolkit` with 10 featured Claude Code skills + 3 MCP integrations. Skills: wrap, start, CMO, test, security-review (M.D.N Tech owned) + ui-ux-pro-max, seo-audit, frontend-design, simplify, claude-api (verified third-party). MCPs: Supabase, TradingView, Unity with setup guides. Gallery cards show category, description, use cases, copy-to-clipboard buttons. Files: `lib/portal/toolkit-skills.ts` (data), `app/portal/toolkit/page.tsx` (server page), `components/portal/toolkit/ToolKitContent.tsx` (client gallery), `components/portal/PortalShell.tsx` (nav update). Committed: `f867328`.
+
+4. **Updated portal navigation** -- Replaced TradeKit → ToolKit in sidebar. Portal products now: Dashboard → ChatKit → SignaKit (Coming Soon) → ToolKit → Settings. Visually consistent with existing portal dark theme + glassmorphism cards.
+
+5. **Next session priorities locked** -- ToolKit needs: prompt templates + integration recipes (Tier 1 content, ships fast). Then SignaKit section (auth product portal UI). Website rebuild deferred until product wording is finalized.
 
 ## What Was Done (Session 19) -- Phase 2 finalization -- auth hardening
 Date: 2026-04-17
@@ -261,16 +275,16 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Phase 2 auth hardening complete. Portal auth isolation locked in. Next: Apply migration 006 to Supabase, then Phase 3 website rebuild.** See [PLAN.md](PLAN.md) for strategic context.
+**Phase 2 complete. ToolKit launched as strategic replacement for TradeKit. Portal now has 3 products: ChatKit, SignaKit (coming), ToolKit. Next: ToolKit Tier 1 content, then SignaKit section.** See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | Apply migration 006 to Supabase | Pending | Run `supabase/migrations/006_auth_hardening.sql` in Supabase SQL Editor to source-control is_admin() + fix RLS |
-| 2 | Test Phase 2 auth isolation | Pending | Cross-portal redirect tests: customer to admin host, admin to portal host; wrong-portal login rejection |
-| 3 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; high priority, can run in parallel with Phase 4 planning |
-| 4 | Phase 4 planning -- SignaKit migration | Pending | Plan auth provider migration from Supabase Auth → SignaKit (currently portal auth is Supabase only) |
-| 5 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
-| 6 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
+| 1 | ToolKit Tier 1 content (skills → templates) | In Progress | Add 3-5 prompt templates (founder, engineer, researcher) + integration recipes (Claude Code + Supabase, Railway, Vercel). Ships free tier. |
+| 2 | SignaKit section in portal | Pending | Auth product UI: status badge, features list, OAuth dashboard preview, "Get Started" CTA. Placeholder or beta depending on SignaKit readiness. |
+| 3 | Portal authentication: Supabase → SignaKit | Pending | Migrate portal auth from Supabase Auth to SignaKit. Unlocks Phase 4 auth provider consolidation. |
+| 4 | Website rebuild (deferred) | Deferred | Skip until product wording finalizes. ToolKit positioning + pricing page can inform landing page copy. |
+| 5 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column). Low priority, nice-to-have. |
+| 6 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations after website rebuild scope clarifies. |
 
 ## Key Files
 
@@ -293,7 +307,10 @@ Date: 2026-04-17
 | `components/portal/chatbots/PortalKBEntryForm.tsx` | Portal KB entry form (redirects to /portal paths) |
 | `components/portal/chatbots/DeleteChatbotButton.tsx` | Delete with confirmation |
 | `components/portal/UsageMeter.tsx` | Free-tier usage progress bar + warnings |
-| `components/portal/PortalShell.tsx` | Portal sidebar with product nav |
+| `components/portal/PortalShell.tsx` | Portal sidebar with product nav (Dashboard, ChatKit, SignaKit, ToolKit, Settings) |
+| `app/portal/toolkit/page.tsx` | ToolKit product page: featured skills gallery + MCP integrations |
+| `components/portal/toolkit/ToolKitContent.tsx` | Client component: skill cards with copy buttons, MCP guides, CTA section |
+| `lib/portal/toolkit-skills.ts` | ToolKit data: 10 featured Claude Code skills + 3 MCP integrations with metadata |
 | `components/portal/analytics/ConversationViewer.tsx` | Conversation cards with message feedback buttons (correct/incorrect/helpful/not_helpful) |
 | `components/portal/analytics/TrendChart.tsx` | 7-day message trend chart (CSS bars) |
 | `components/portal/analytics/KeywordsBar.tsx` | Top keywords horizontal bar chart |
