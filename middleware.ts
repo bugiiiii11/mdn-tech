@@ -7,7 +7,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/command-center/:path*',
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match all paths except static assets.
+     * This is needed because admin.mdntech.org routes don't have
+     * the /command-center prefix, so we can't filter by path alone.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)',
   ],
 }
