@@ -16,9 +16,8 @@ export async function updateSession(request: NextRequest) {
   const host = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
 
-  // --- Host branching ---
+  // --- External redirects (old URLs on wrong hosts) ---
 
-  // 1. Redirect old /command-center/* URLs on marketing site to admin subdomain
   if (!isAdminHost(host) && pathname.startsWith('/command-center')) {
     const newPath = pathname.replace(/^\/command-center/, '') || '/'
     const url = new URL(`https://${ADMIN_HOST}${newPath}`)
@@ -26,34 +25,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // 2. On admin host, strip /command-center prefix from URLs (redirect to clean path)
-  if (isAdminHost(host) && pathname.startsWith('/command-center')) {
-    const cleanPath = pathname.replace(/^\/command-center/, '') || '/'
-    const url = new URL(`https://${ADMIN_HOST}${cleanPath}`)
-    url.search = request.nextUrl.search
-    return NextResponse.redirect(url)
-  }
-
-  // 3. On admin host, rewrite clean paths to /command-center/* internally
-  if (isAdminHost(host)) {
-    // Public chat API passthrough
-    if (pathname.startsWith('/api/chat/')) {
-      return NextResponse.next()
-    }
-
-    // Map admin root to dashboard
-    const internalPath = pathname === '/'
-      ? '/command-center/dashboard'
-      : `/command-center${pathname}`
-
-    const url = request.nextUrl.clone()
-    url.pathname = internalPath
-    return NextResponse.rewrite(url)
-  }
-
-  // --- Portal host branching (app.mdntech.org) ---
-
-  // Redirect /portal/* on marketing site to portal subdomain
   if (!isPortalHost(host) && !isAdminHost(host) && pathname.startsWith('/portal')) {
     const newPath = pathname.replace(/^\/portal/, '') || '/'
     const url = new URL(`https://${PORTAL_HOST}${newPath}`)
@@ -61,7 +32,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // On portal host, strip /portal prefix (clean URLs)
+  // --- Clean URL redirects (strip prefixes on matching hosts) ---
+
+  if (isAdminHost(host) && pathname.startsWith('/command-center')) {
+    const cleanPath = pathname.replace(/^\/command-center/, '') || '/'
+    const url = new URL(`https://${ADMIN_HOST}${cleanPath}`)
+    url.search = request.nextUrl.search
+    return NextResponse.redirect(url)
+  }
+
   if (isPortalHost(host) && pathname.startsWith('/portal')) {
     const cleanPath = pathname.replace(/^\/portal/, '') || '/'
     const url = new URL(`https://${PORTAL_HOST}${cleanPath}`)
@@ -69,27 +48,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // On portal host, rewrite clean paths to /portal/* internally
-  if (isPortalHost(host)) {
-    if (pathname.startsWith('/api/')) {
-      return NextResponse.next()
-    }
-
-    const internalPath = pathname === '/'
-      ? '/portal/dashboard'
-      : `/portal${pathname}`
-
-    const url = request.nextUrl.clone()
-    url.pathname = internalPath
-    return NextResponse.rewrite(url)
-  }
-
-  // --- Public route passthrough ---
-  if (pathname.startsWith('/api/chat/')) {
-    return NextResponse.next()
-  }
-
-  // --- Supabase session refresh ---
+  // --- Session refresh (BEFORE auth checks so role-type checks can access user metadata) ---
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -117,45 +76,103 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // --- Admin host: auth + role checks ---
+  if (isAdminHost(host)) {
+    const accountType = user?.user_metadata?.account_type
+
+    // Customer trying to access admin portal → redirect to admin login
+    if (user && accountType === 'customer') {
+      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/login?error=unauthorized`))
+    }
+
+    // Require login for protected paths
+    if (pathname !== '/login' && !user) {
+      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/login`))
+    }
+
+    // Redirect logged-in users away from login page
+    if (pathname === '/login' && user) {
+      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/`))
+    }
+
+    // Public chat API passthrough
+    if (pathname.startsWith('/api/chat/')) {
+      return NextResponse.next()
+    }
+
+    // Rewrite clean paths to /command-center/* internally
+    const internalPath = pathname === '/'
+      ? '/command-center/dashboard'
+      : `/command-center${pathname}`
+    const url = request.nextUrl.clone()
+    url.pathname = internalPath
+    return NextResponse.rewrite(url)
+  }
+
+  // --- Portal host: auth + role checks ---
+  if (isPortalHost(host)) {
+    const accountType = user?.user_metadata?.account_type
+
+    // Admin trying to access portal → redirect to portal login
+    if (user && accountType !== 'customer') {
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login?error=unauthorized`))
+    }
+
+    // Require login for protected paths (except login and signup)
+    if (pathname !== '/login' && pathname !== '/signup' && !user) {
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login`))
+    }
+
+    // Redirect logged-in users away from login page
+    if (pathname === '/login' && user) {
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/`))
+    }
+
+    // API passthrough
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.next()
+    }
+
+    // Rewrite clean paths to /portal/* internally
+    const internalPath = pathname === '/'
+      ? '/portal/dashboard'
+      : `/portal${pathname}`
+    const url = request.nextUrl.clone()
+    url.pathname = internalPath
+    return NextResponse.rewrite(url)
+  }
+
+  // --- Marketing host: existing auth guard logic ---
+
+  if (pathname.startsWith('/api/chat/')) {
+    return NextResponse.next()
+  }
+
   const isCommandCenter = pathname.startsWith('/command-center')
   const isCCLogin = pathname === '/command-center/login'
   const isPortal = pathname.startsWith('/portal')
   const isPortalLogin = pathname === '/portal/login'
   const isPortalSignup = pathname === '/portal/signup'
 
-  // --- CC auth redirects ---
   if (isCommandCenter && !isCCLogin && !user) {
-    if (isAdminHost(host)) {
-      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/login`))
-    }
     const url = request.nextUrl.clone()
     url.pathname = '/command-center/login'
     return NextResponse.redirect(url)
   }
 
   if (isCCLogin && user) {
-    if (isAdminHost(host)) {
-      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/`))
-    }
     const url = request.nextUrl.clone()
     url.pathname = '/command-center/dashboard'
     return NextResponse.redirect(url)
   }
 
-  // --- Portal auth redirects ---
   if (isPortal && !isPortalLogin && !isPortalSignup && !user) {
-    if (isPortalHost(host)) {
-      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login`))
-    }
     const url = request.nextUrl.clone()
     url.pathname = '/portal/login'
     return NextResponse.redirect(url)
   }
 
   if (isPortalLogin && user) {
-    if (isPortalHost(host)) {
-      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/`))
-    }
     const url = request.nextUrl.clone()
     url.pathname = '/portal/dashboard'
     return NextResponse.redirect(url)

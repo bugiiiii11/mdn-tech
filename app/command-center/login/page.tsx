@@ -25,6 +25,18 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
+      // Verify user is an admin (not a customer)
+      const { data: { user } } = await supabase.auth.getUser()
+      const accountType = user?.user_metadata?.account_type
+
+      if (accountType === 'customer') {
+        // Wrong portal — sign out and show error
+        await supabase.auth.signOut()
+        setError('Customers use app.mdntech.org to access the portal.')
+        setLoading(false)
+        return
+      }
+
       router.push('/command-center/dashboard')
     }
   }
@@ -38,7 +50,7 @@ export default function LoginPage() {
     setError(null)
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/command-center/dashboard` },
+      options: { emailRedirectTo: `${window.location.origin}/` },
     })
     if (error) {
       setError(error.message)

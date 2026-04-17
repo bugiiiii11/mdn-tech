@@ -13,7 +13,10 @@ export default async function PortalSettingsPage() {
     .from('customers')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
+
+  // Ensure user is a customer (not an admin accessing this portal)
+  if (!customer) redirect('/portal/login')
 
   return (
     <PortalShell>

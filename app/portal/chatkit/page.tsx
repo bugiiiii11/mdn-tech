@@ -10,6 +10,15 @@ export default async function ChatKitPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
+  // Verify user is a customer
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!customer) redirect('/portal/login')
+
   // Fetch customer's chatbots
   const { data: chatbots } = await supabase
     .from('chatbots')

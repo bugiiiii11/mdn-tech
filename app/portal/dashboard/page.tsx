@@ -25,6 +25,9 @@ export default async function PortalDashboard() {
     .eq('id', user.id)
     .maybeSingle()
 
+  // Ensure user is a customer (not an admin accessing this portal)
+  if (!customer) redirect('/portal/login')
+
   // Fetch customer's chatbots
   const { data: chatbots } = await supabase
     .from('chatbots')

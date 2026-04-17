@@ -23,6 +23,18 @@ export default function PortalLoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
+      // Verify user is a customer (not an admin)
+      const { data: { user } } = await supabase.auth.getUser()
+      const accountType = user?.user_metadata?.account_type
+
+      if (accountType !== 'customer') {
+        // Wrong portal — sign out and show error
+        await supabase.auth.signOut()
+        setError('This login is for customers only. Admins use admin.mdntech.org.')
+        setLoading(false)
+        return
+      }
+
       router.push('/portal/dashboard')
     }
   }

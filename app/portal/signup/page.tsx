@@ -29,7 +29,7 @@ export default function PortalSignupPage() {
           company,
           signup_source: 'direct',
         },
-        emailRedirectTo: `${window.location.origin}/portal/dashboard`,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     })
 
