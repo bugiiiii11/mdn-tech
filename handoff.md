@@ -22,6 +22,22 @@
 | 16 | 2026-04-17 | Portal analytics + Swarm Resistance display | Chatbot analytics dashboard (metrics, trends, keywords), conversation viewer with message tagging, export to markdown, fixed project duplicates, dev/prod infra display in CC |
 | 17 | 2026-04-17 | Build stabilization + runtime fixes | Resolved lint errors (escaping, deps), TypeScript type fixes, moved feedback loading to client-side (RLS compliance), fixed CORS path routing |
 | 18 | 2026-04-17 | Portal diagnostics + conversations feature removal | Fixed KB entry link paths (removed /chatbots/ segment), graceful Supabase null handling (.maybeSingle()), removed mixed lock files, disabled interactive conversations viewer in favor of export-only |
+| 19 | 2026-04-17 | Phase 2 finalization -- auth hardening | Middleware restructured for role-type checks before routing; login pages reject wrong-portal users; portal pages guard on customer existence; migration 006 sources is_admin() function, fixes handle_new_user() role default, restricts team_members RLS |
+
+## What Was Done (Session 19) -- Phase 2 finalization -- auth hardening
+Date: 2026-04-17
+
+1. **Middleware restructure** -- `lib/supabase/middleware.ts` now performs session refresh BEFORE URL routing (was unreachable for subdomains before). Added role-type checks using `user.user_metadata.account_type`: customers trying to access admin host redirect to admin login with error=unauthorized; admins trying to access portal redirect to portal login with error=unauthorized. Files: `lib/supabase/middleware.ts`. Committed: `d0be6bb`.
+
+2. **Login page account-type verification** -- Portal login (`app/portal/login/page.tsx`) rejects non-customer accounts post-auth, signs out + shows error "This login is for customers only". CC login (`app/command-center/login/page.tsx`) rejects customer accounts post-auth, signs out + shows error "Customers use app.mdntech.org". Both use `user.user_metadata.account_type` check after successful `signInWithPassword()`. Committed: `d0be6bb`.
+
+3. **Portal page customer guards** -- Added `if (!customer) redirect(...)` guards to `app/portal/dashboard/page.tsx`, `app/portal/settings/page.tsx`, `app/portal/chatkit/page.tsx` to reject admins accessing portal pages. Changed settings `.single()` to `.maybeSingle()` for graceful null handling. Made `app/portal/layout.tsx` async with defensive session check. Files: dashboard, settings, chatkit, layout. Committed: `d0be6bb`.
+
+4. **Migration 006 -- auth hardening schema** -- Created `supabase/migrations/006_auth_hardening.sql` to source-control three critical fixes: (a) `create or replace function public.is_admin()` — function was referenced by 10+ RLS policies but never defined in migrations; (b) Fixed `handle_new_user()` trigger to use `coalesce(new.raw_user_meta_data->>'role', 'admin')` instead of hardcoded 'admin' for team signups; (c) Fixed `team_members` SELECT RLS from permissive `using (true)` to `using (is_admin())` so customers cannot enumerate staff. Migration is safe to run (CREATE OR REPLACE is idempotent). Committed: `d0be6bb`.
+
+5. **Email callback URL fixes** -- Fixed double-prefix bug on subdomain email redirects: Portal signup emailRedirectTo changed from `/portal/dashboard` to `/dashboard` (middleware rewrites clean paths to `/portal/*`); CC login magic link emailRedirectTo changed from `/command-center/dashboard` to `/` (admin host root redirects to dashboard). Files: `app/portal/signup/page.tsx`, `app/command-center/login/page.tsx`. Committed: `d0be6bb`.
+
+**Critical auth isolation gap fixed:** Customers could previously reach `/command-center` and admins could reach `/portal` by navigating after login. Middleware now rejects cross-portal access before URL routing. Page-level guards provide second layer of defense.
 
 ## What Was Done (Session 18) -- Portal diagnostics + conversations feature removal
 Date: 2026-04-17
@@ -245,15 +261,15 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Portal dashboard stable and working. Analytics + export feature fully functional. Next: Phase 2 hardening + Phase 3 website rebuild (parallel tracks).** See [PLAN.md](PLAN.md) for strategic context.
+**Phase 2 auth hardening complete. Portal auth isolation locked in. Next: Apply migration 006 to Supabase, then Phase 3 website rebuild.** See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration; review RLS on new tables |
-| 2 | Test Swarm Resistance display | Pending | Visit `/command-center/projects/{swarm-id}`, verify Dev/Prod/Auth blocks show metadata |
-| 3 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 4 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
-| 5 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
+| 1 | Apply migration 006 to Supabase | Pending | Run `supabase/migrations/006_auth_hardening.sql` in Supabase SQL Editor to source-control is_admin() + fix RLS |
+| 2 | Test Phase 2 auth isolation | Pending | Cross-portal redirect tests: customer to admin host, admin to portal host; wrong-portal login rejection |
+| 3 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; high priority, can run in parallel with Phase 4 planning |
+| 4 | Phase 4 planning -- SignaKit migration | Pending | Plan auth provider migration from Supabase Auth → SignaKit (currently portal auth is Supabase only) |
+| 5 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
 | 6 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
 
 ## Key Files
