@@ -17,6 +17,29 @@
 | 11 | 2026-04-16 | Plan lock v2 + Phase 1.1a domain | Reconciled repo plan with Mind Palace draft, locked architectural decisions D1-D6, added PLAN.md pointer, froze old DEVELOPMENT-PLAN.md, configured Supabase MCP, added admin.mdntech.org domain + DNS |
 | 12 | 2026-04-17 | Phase 1 complete + Phase 2 portal scaffold | admin.mdntech.org middleware + clean URLs, Phase 1 cleanup done, migration 004 deployed, customer portal at app.mdntech.org with login/signup/dashboard/ChatKit/settings |
 | 13 | 2026-04-17 | ChatKit customer portal (Priorities 1-3) | Customer CRUD for chatbots + KB, auto-enroll in product, free-tier 50-msg/mo limit with graceful disable, usage meters on dashboard + detail page |
+| 14 | 2026-04-17 | Project data entry + CC schema extension | Portal auth verified, 4 new projects added to CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane), Swarm Resistance infra enriched with dev/prod Supabase + Railway, projects table extended with description + metadata JSONB columns |
+
+## What Was Done (Session 14) -- Project data entry + CC schema extension
+
+1. **Portal auth hardening verified** — Created test customer account ("Zane AI") via app.mdntech.org signup flow; created chatbot through customer portal; confirmed signup → login → dashboard → create chatbot flow is fully functional end-to-end. ✅
+
+2. **4 new projects inserted into CC database:**
+   - **MDN-Tech** — Internal company portal + Command Center (status: development, start: 2026-03-21, Supabase: ijfgwzacaabzeknlpaff)
+   - **SignaKit (AuthVault)** — Web3Auth replacement, SaaS product for app.mdntech.org (status: development, start: 2026-03-25, Supabase: hldkdiibvsdtgxnqaaxq, Railway: authvaultbackend-production.up.railway.app)
+   - **TradeKit** — BTC perpetual futures trading bot, SaaS product for app.mdntech.org (status: development, start: 2026-03-01, Supabase: gseztkzguxasfwqnztuo, bankroll: $500.26 USDC)
+   - **Good Hair by Zane** — Hair salon website, deployed client project (status: deployed, start: 2026-03-28, Vercel hosted, SEO score 62/100)
+
+3. **Swarm Resistance infrastructure enriched with dev/prod details** — Updated existing "Swarm Resistance dev" project metadata to include:
+   - Dev Supabase: upeefkqhaxlhqcvoizve, Railway: swarm-resistance-backend-dev-production.up.railway.app
+   - Prod Supabase: yjwminnwcijgfqrwjkfn, Railway: swarm-resistance-backend-production.up.railway.app
+   - Auth service reference: SignaKit (Supabase hldkdiibvsdtgxnqaaxq, Railway authvaultbackend-production.up.railway.app)
+   - Enables CC to monitor health of both dev and prod infrastructure simultaneously.
+
+4. **Projects table schema extended** — Added two new columns:
+   - `description text` — project overview (for all projects)
+   - `metadata jsonb` — flexible storage for phase, current_focus, infrastructure details, product info, etc. (structured for future Mind Palace ↔ CC sync)
+
+5. **SQL reference document created** — [PROJECTS_INSERT.md](PROJECTS_INSERT.md) contains reusable SQL templates for adding new projects, updating infrastructure details, etc. Committed: `4578ad9`.
 
 ## What Was Done (Session 13) -- ChatKit customer portal (Priorities 1-3)
 
@@ -152,18 +175,21 @@
 
 ## What To Do Next
 
-Phase 2 portal build continues. Priorities 1-3 (ChatKit customer CRUD + free-tier caps) complete. See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+Phase 2 portal build continues. Priorities 1-4 complete; projects now visible in CC. See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
 | 1 | ChatKit customer CRUD | ✅ Complete | Customer-owned chatbots, KB mgmt, delete, RLS filtering |
-| 2 | ChatKit new chatbot flow | ✅ Complete | Auto-enroll in customer_products |
-| 3 | Free-tier caps via product_usage | ✅ Complete | 50-msg/mo limit, widget graceful disable, usage meters |
-| 4 | Portal auth hardening | Pending | Ensure admin/portal separation; test signup → email confirm → dashboard flow end-to-end |
-| 5 | Phase 1.2 -- role simplification cleanup | Pending | Doc-only; team_members schema stays, only 'admin' role issued |
-| 6 | Phase 1.3 -- enter 6 remaining internal projects into CC | Pending | Royal Stroje done; list in Mind Palace project frontmatter |
-| 7 | Phase 3 -- website rebuild (parallel track to portal) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 8 | SEO action plan implementation | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations (unchanged from prior sessions) |
+| 2 | ChatKit auto-enroll | ✅ Complete | Auto-enroll in customer_products on first chatbot |
+| 3 | Free-tier caps (50-msg/mo) | ✅ Complete | Usage meters, widget graceful disable |
+| 4 | Portal auth hardening | ✅ Complete | End-to-end signup → dashboard → create chatbot verified |
+| 5 | CC project data entry | ✅ Complete | 4 new projects in CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane); Swarm Resistance infra enriched |
+| 6 | Phase 1.2 -- role simplification cleanup | Pending | Doc-only; team_members schema stays, only 'admin' role issued |
+| 7 | Phase 1.3 -- remaining project entries | Pending | 6 internal projects still to enter (1 done: Royal Stroje) |
+| 8 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 9 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
+| 10 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
+| 11 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
 
 ## Key Files
 
