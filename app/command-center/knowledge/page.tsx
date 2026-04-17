@@ -34,7 +34,9 @@ function getKnowledgeDocs(): DocMeta[] {
           title: data.title ?? file.replace('.md', ''),
           category: data.category ?? 'doc',
           tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-          updated: data.updated ? String(data.updated) : '',
+          updated: data.updated
+            ? new Date(data.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '',
         })
       }
     }
