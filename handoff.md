@@ -19,6 +19,51 @@
 | 13 | 2026-04-17 | ChatKit customer portal (Priorities 1-3) | Customer CRUD for chatbots + KB, auto-enroll in product, free-tier 50-msg/mo limit with graceful disable, usage meters on dashboard + detail page |
 | 14 | 2026-04-17 | Project data entry + CC schema extension | Portal auth verified, 4 new projects added to CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane), Swarm Resistance infra enriched with dev/prod Supabase + Railway, projects table extended with description + metadata JSONB columns |
 | 15 | 2026-04-17 | Phase 1 complete -- role cleanup + final projects | Phase 1.2: Documented role simplification (admin-only going forward, schema stays flexible); Phase 1.3: Swarm Resistance infra update SQL + MedaShooterNeo project entry; all internal projects now in CC |
+| 16 | 2026-04-17 | Portal analytics + Swarm Resistance display | Chatbot analytics dashboard (metrics, trends, keywords), conversation viewer with message tagging, export to markdown, fixed project duplicates, dev/prod infra display in CC |
+
+## What Was Done (Session 16) -- Portal analytics + Swarm Resistance display
+
+1. **Fixed duplicate projects** — Removed duplicate entries in projects table (caused by double SQL execution). Result: 7 unique projects, 0 duplicates. Used ROW_NUMBER() window function cleanup query in `cleanup-duplicates.sql`.
+
+2. **Portal dashboard redesign** — Replaced product cards grid (ChatKit/SignaKit/TradeKit) with analytics section:
+   - 4 metric cards: Total Messages, Conversations, Fallback Rate (%), Avg Messages/Conversation
+   - 7-day message trend chart (CSS bars, no external dependencies)
+   - Top 10 keywords asked about (horizontal bar chart)
+   - Action buttons: View Conversations, Export as Markdown, Upgrade to Pro
+   - Files: `app/portal/dashboard/page.tsx`. Committed: `b0555a6`.
+
+3. **Conversation viewer page** — New `/portal/chatkit/[id]/conversations` page:
+   - Expandable conversation cards (visitor ID, date, message count)
+   - Per-message feedback buttons: Correct / Incorrect / Helpful / Not helpful
+   - Fallback message highlighting (amber border for "I don't know" responses)
+   - Filters: All / Fallback Only / Untagged messages
+   - Files: `app/portal/chatkit/[id]/conversations/page.tsx`, `components/portal/analytics/ConversationViewer.tsx`. Committed: `b0555a6`.
+
+4. **Analytics library** — Created `lib/portal/analytics.ts` with core functions:
+   - `getChatbotAnalytics()` — calculate metrics (total messages, conversations, fallback rate, avg)
+   - `getMessagesTrend()` — 7-day daily message counts
+   - `getTopKeywords()` — tokenize user messages, filter 100+ stopwords, count frequency
+   - `getConversationsWithMessages()` — paginated load with filter support
+   - `exportConversationsMarkdown()` — full export with date/time per message
+   - Fallback detection via string-match against chatbot's configured `fallback_message`
+
+5. **Chart components** — Pure CSS/SVG, no external dependencies:
+   - `TrendChart.tsx` — 7-bar vertical chart with hover labels
+   - `KeywordsBar.tsx` — horizontal bar chart with gradient fills
+   - Files: `components/portal/analytics/{TrendChart,KeywordsBar}.tsx`. Committed: `b0555a6`.
+
+6. **Database migration & API routes**:
+   - Migration 005: `message_feedback` table (id, message_id FK, chatbot_id FK, customer_id FK, rating ENUM, created_at, UNIQUE constraint). RLS: customers rate messages for their own bots.
+   - Export API: `GET /api/portal/chatbot/[chatbotId]/export` → markdown file download with full conversation history
+   - Feedback API: `POST /api/portal/feedback/[messageId]` → save/update message rating (correct/incorrect/helpful/not_helpful)
+   - Files: `supabase/migrations/005_message_feedback.sql`, `app/api/portal/chatbot/[chatbotId]/export/route.ts`, `app/api/portal/feedback/[messageId]/route.ts`. Committed: `b0555a6`.
+
+7. **Swarm Resistance dev/prod display** — Updated `ProjectTabs.tsx` to render `metadata.infrastructure` from database:
+   - Shows Dev Environment block (Supabase ref + Railway backend)
+   - Shows Prod Environment block (Supabase ref + Railway backend)
+   - Shows Auth Service block (SignaKit details for Swarm Resistance)
+   - Seamlessly integrates with existing flat infrastructure columns
+   - Files: `components/command-center/projects/ProjectTabs.tsx`. Committed: `b0555a6`.
 
 ## What Was Done (Session 14) -- Project data entry + CC schema extension
 
@@ -176,22 +221,18 @@
 
 ## What To Do Next
 
-**Phase 1 is now complete.** All internal projects entered in CC, architecture locked, schema stable. Next: Phase 2 finalization (auth hardening + portal polish) and Phase 3 website rebuild (parallel track). See [PLAN.md](PLAN.md) and [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) for strategic context.
+**Phase 1 complete.** Portal dashboard now has analytics (metrics, trends, keywords, export). Next: deploy migration 005, then Phase 2 hardening + Phase 3 website rebuild (parallel). See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | ChatKit customer CRUD | ✅ Complete | Customer-owned chatbots, KB mgmt, delete, RLS filtering |
-| 2 | ChatKit auto-enroll | ✅ Complete | Auto-enroll in customer_products on first chatbot |
-| 3 | Free-tier caps (50-msg/mo) | ✅ Complete | Usage meters, widget graceful disable |
-| 4 | Portal auth hardening | ✅ Complete | End-to-end signup → dashboard → create chatbot verified |
-| 5 | CC project data entry | ✅ Complete | 4 new projects in CC + Swarm Resistance infra update |
-| 6 | Phase 1.2 -- role simplification cleanup | ✅ Complete | Documented in decisions.md; schema stays flexible, admin-only going forward |
-| 7 | Phase 1.3 -- remaining project entries | ✅ Complete | Swarm Resistance SQL + MedaShooterNeo SQL ready; all 7 internal projects covered |
-| 8 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration later |
-| 9 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 10 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
-| 11 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
-| 12 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
+| 1 | Deploy migration 005 | Pending | Run in Supabase SQL Editor: message_feedback table for message tagging |
+| 2 | Test portal analytics | Pending | Visit `/dashboard` (metrics visible), `/chatkit/[id]/conversations` (viewer works), export .md file |
+| 3 | Test Swarm Resistance display | Pending | Visit `/command-center/projects/{swarm-id}`, verify Dev/Prod/Auth blocks show metadata |
+| 4 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration; review RLS on new tables |
+| 5 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 6 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
+| 7 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
+| 8 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
 
 ## Key Files
 
@@ -201,7 +242,7 @@
 | `app/(marketing)/layout.tsx` | Marketing layout with StarsCanvas, Navbar, Footer |
 | `app/command-center/layout.tsx` | CC layout: dark bg, Sidebar + main content |
 | `app/portal/layout.tsx` | Portal layout (customer-facing) |
-| `app/portal/dashboard/page.tsx` | Portal dashboard with product cards |
+| `app/portal/dashboard/page.tsx` | Portal analytics dashboard: metrics cards, trend chart, keywords, actions |
 | `app/portal/login/page.tsx` | Portal login |
 | `app/portal/signup/page.tsx` | Portal signup (sets account_type: customer) |
 | `app/portal/chatkit/page.tsx` | ChatKit listing with stats (customer's own chatbots) |
@@ -209,11 +250,19 @@
 | `app/portal/chatkit/[id]/page.tsx` | Chatbot detail: KB + widget config + embed snippet + usage meter |
 | `app/portal/chatkit/[id]/edit/page.tsx` | Edit chatbot |
 | `app/portal/chatkit/[id]/entries/{new,[entryId]/edit}/page.tsx` | KB entry create/edit |
+| `app/portal/chatkit/[id]/conversations/page.tsx` | Conversation viewer: expandable cards, message feedback, filters |
 | `components/portal/chatbots/PortalChatbotForm.tsx` | Portal-specific form (no projects field, auto-enroll) |
 | `components/portal/chatbots/PortalKBEntryForm.tsx` | Portal KB entry form (redirects to /portal paths) |
 | `components/portal/chatbots/DeleteChatbotButton.tsx` | Delete with confirmation |
 | `components/portal/UsageMeter.tsx` | Free-tier usage progress bar + warnings |
 | `components/portal/PortalShell.tsx` | Portal sidebar with product nav |
+| `components/portal/analytics/ConversationViewer.tsx` | Conversation cards with message feedback buttons (correct/incorrect/helpful/not_helpful) |
+| `components/portal/analytics/TrendChart.tsx` | 7-day message trend chart (CSS bars) |
+| `components/portal/analytics/KeywordsBar.tsx` | Top keywords horizontal bar chart |
+| `lib/portal/analytics.ts` | Analytics functions: getChatbotAnalytics, getMessagesTrend, getTopKeywords, exportConversationsMarkdown |
+| `app/api/portal/chatbot/[chatbotId]/export/route.ts` | Export conversations as markdown file download |
+| `app/api/portal/feedback/[messageId]/route.ts` | Save/update message feedback (rating) |
+| `supabase/migrations/005_message_feedback.sql` | Message feedback table: message_id, chatbot_id, customer_id, rating, RLS |
 | `lib/chat/usage.ts` | Usage tracking: checkUsageLimit, incrementUsage, free-tier limits |
 | `middleware.ts` | Session guard + host-branching for admin/app/marketing |
 | `lib/supabase/client.ts` | Supabase browser client |
