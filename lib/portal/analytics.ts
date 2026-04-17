@@ -219,7 +219,8 @@ export async function getConversationsWithMessages(
   fallbackMessage: string,
   filter: 'all' | 'fallback' | 'untagged' = 'all'
 ) {
-  let query = supabase
+  // Fetch conversations with messages
+  const { data: conversations } = await supabase
     .from('chat_conversations')
     .select(
       `
@@ -228,17 +229,43 @@ export async function getConversationsWithMessages(
       source_url,
       started_at,
       message_count,
-      chat_messages(id, role, content, created_at, message_feedback(id, rating))
+      chat_messages(id, role, content, created_at)
     `
     )
     .eq('chatbot_id', chatbotId)
     .order('started_at', { ascending: false });
 
-  const { data: conversations } = await query;
-
   if (!conversations) return [];
 
-  return conversations.filter((conv) => {
+  // Fetch feedback for all messages in these conversations
+  const messageIds = conversations.flatMap(conv =>
+    (conv.chat_messages as any[])?.map(msg => msg.id) || []
+  );
+
+  let feedbackMap = new Map<string, any>();
+  if (messageIds.length > 0) {
+    const { data: feedbacks } = await supabase
+      .from('message_feedback')
+      .select('id, message_id, rating')
+      .in('message_id', messageIds);
+
+    if (feedbacks) {
+      feedbacks.forEach(f => {
+        feedbackMap.set(f.message_id, f);
+      });
+    }
+  }
+
+  // Attach feedback to messages and filter
+  const enrichedConversations = conversations.map(conv => ({
+    ...conv,
+    chat_messages: (conv.chat_messages as any[])?.map(msg => ({
+      ...msg,
+      message_feedback: feedbackMap.get(msg.id) ? [feedbackMap.get(msg.id)] : null,
+    })) || [],
+  }));
+
+  return enrichedConversations.filter((conv) => {
     const messages = conv.chat_messages as any[];
     if (!messages) return true;
 
@@ -252,7 +279,7 @@ export async function getConversationsWithMessages(
 
     if (filter === 'untagged') {
       return messages.some((msg) => {
-        const feedback = msg.message_feedback as any[] | null;
+        const feedback = msg.message_feedback;
         const hasRating = feedback && feedback.length > 0;
         return !hasRating;
       });

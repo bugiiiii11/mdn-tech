@@ -40,30 +40,34 @@ export default async function PortalDashboard() {
 
   // If customer has chatbots, aggregate analytics
   if (chatbots && chatbots.length > 0) {
-    const allAnalytics = await Promise.all(
-      chatbots.map(bot => {
-        const fallbackMsg = (bot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
-        return getChatbotAnalytics(supabase, bot.id, fallbackMsg)
-      })
-    )
+    try {
+      const allAnalytics = await Promise.all(
+        chatbots.map(bot => {
+          const fallbackMsg = (bot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
+          return getChatbotAnalytics(supabase, bot.id, fallbackMsg)
+        })
+      )
 
-    analytics = {
-      totalMessages: allAnalytics.reduce((sum, a) => sum + a.totalMessages, 0),
-      totalConversations: allAnalytics.reduce((sum, a) => sum + a.totalConversations, 0),
-      avgMessagesPerConv: allAnalytics.length > 0
-        ? Math.round((allAnalytics.reduce((sum, a) => sum + a.avgMessagesPerConv, 0) / allAnalytics.length) * 10) / 10
-        : 0,
-      fallbackCount: allAnalytics.reduce((sum, a) => sum + a.fallbackCount, 0),
-      fallbackRate: allAnalytics.length > 0
-        ? Math.round((allAnalytics.reduce((sum, a) => sum + a.fallbackRate, 0) / allAnalytics.length) * 10) / 10
-        : 0,
+      analytics = {
+        totalMessages: allAnalytics.reduce((sum, a) => sum + a.totalMessages, 0),
+        totalConversations: allAnalytics.reduce((sum, a) => sum + a.totalConversations, 0),
+        avgMessagesPerConv: allAnalytics.length > 0
+          ? Math.round((allAnalytics.reduce((sum, a) => sum + a.avgMessagesPerConv, 0) / allAnalytics.length) * 10) / 10
+          : 0,
+        fallbackCount: allAnalytics.reduce((sum, a) => sum + a.fallbackCount, 0),
+        fallbackRate: allAnalytics.length > 0
+          ? Math.round((allAnalytics.reduce((sum, a) => sum + a.fallbackRate, 0) / allAnalytics.length) * 10) / 10
+          : 0,
+      }
+
+      // Get trend for first chatbot (most recent)
+      const primaryBot = chatbots[0]
+      const primaryFallback = (primaryBot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
+      trend = await getMessagesTrend(supabase, primaryBot.id, 7)
+      keywords = await getTopKeywords(supabase, primaryBot.id, 10)
+    } catch (error) {
+      console.error('Dashboard analytics error:', error)
     }
-
-    // Get trend for first chatbot (most recent)
-    const primaryBot = chatbots[0]
-    const primaryFallback = (primaryBot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
-    trend = await getMessagesTrend(supabase, primaryBot.id, 7)
-    keywords = await getTopKeywords(supabase, primaryBot.id, 10)
   }
 
   const hasConversations = analytics.totalConversations > 0
