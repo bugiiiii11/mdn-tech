@@ -40,7 +40,7 @@ export function UsageMeter({ customerId, product }: { customerId: string; produc
     }
 
     fetchUsage()
-  }, [customerId, product, supabase])
+  }, [customerId, product, supabase, limits])
 
   const percentage = Math.round((used / limit) * 100)
   const isLimitReached = used >= limit

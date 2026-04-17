@@ -101,7 +101,7 @@ export default async function PortalDashboard() {
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Fallback Rate</p>
             <p className="text-3xl font-bold text-white">{analytics.fallbackRate}%</p>
-            <p className="text-xs text-gray-500 mt-2">{analytics.fallbackCount} didn't-know responses</p>
+            <p className="text-xs text-gray-500 mt-2">{analytics.fallbackCount} didn&apos;t-know responses</p>
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
