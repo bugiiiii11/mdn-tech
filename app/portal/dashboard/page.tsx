@@ -23,7 +23,7 @@ export default async function PortalDashboard() {
     .from('customers')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
 
   // Fetch customer's chatbots
   const { data: chatbots } = await supabase

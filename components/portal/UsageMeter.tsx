@@ -32,7 +32,7 @@ export function UsageMeter({ customerId, product }: { customerId: string; produc
         .eq('metric', 'messages')
         .gte('period_start', startStr)
         .lte('period_end', endStr)
-        .single()
+        .maybeSingle()
 
       setUsed(Math.floor(data?.value ?? 0))
       setLimit(limits[product])
