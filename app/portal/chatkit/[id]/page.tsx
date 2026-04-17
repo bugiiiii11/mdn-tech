@@ -10,6 +10,7 @@ import { KBExportButton } from '@/components/command-center/chatbots/KBExportBut
 import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
 import { EmbedSnippet } from '@/components/command-center/chatbots/EmbedSnippet'
 import { DeleteChatbotButton } from '@/components/portal/chatbots/DeleteChatbotButton'
+import { UsageMeter } from '@/components/portal/UsageMeter'
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -93,6 +94,9 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
             <p className="text-2xl font-semibold text-white mt-1">{msgCount ?? 0}</p>
           </div>
         </div>
+
+        {/* Usage Meter */}
+        <UsageMeter customerId={userId} product="chatkit" />
 
         {/* Deploy */}
         {chatbot.status === 'active' && (

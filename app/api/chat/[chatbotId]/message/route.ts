@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { corsHeaders, corsResponse } from '@/lib/chat/cors'
 import { buildSystemPrompt } from '@/lib/chat/prompt'
 import { checkRateLimit } from '@/lib/chat/rate-limit'
+import { checkUsageLimit, incrementUsage } from '@/lib/chat/usage'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -51,7 +52,7 @@ export async function POST(
 
   // Fetch chatbot + KB entries in parallel
   const [chatbotResult, kbResult] = await Promise.all([
-    supabase.from('chatbots').select('id, name, client_name, status, widget_config')
+    supabase.from('chatbots').select('id, name, client_name, status, widget_config, owner_id')
       .eq('id', chatbotId).single(),
     supabase.from('chatbot_kb_entries').select('title, content, category')
       .eq('chatbot_id', chatbotId).order('sort_order').order('category'),
@@ -66,6 +67,17 @@ export async function POST(
 
   const chatbot = chatbotResult.data
   const kbEntries = kbResult.data ?? []
+
+  // Check usage limit for customer-owned chatbots
+  if (chatbot.owner_id) {
+    const { allowed } = await checkUsageLimit(chatbot.owner_id, 'chatkit')
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Message limit reached. Please upgrade your plan.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  }
 
   // Get or create conversation
   let convId = conversationId
@@ -165,6 +177,11 @@ export async function POST(
             })
             .eq('id', convId),
         ])
+
+        // Increment usage if customer-owned (fire and forget)
+        if (chatbot.owner_id) {
+          incrementUsage(chatbot.owner_id, 'chatkit', 'messages', 1)
+        }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error'
         controller.enqueue(encoder.encode(

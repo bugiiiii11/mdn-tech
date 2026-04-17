@@ -105,6 +105,8 @@
 
   // Create widget
   function init(config) {
+    // Don't render if disabled (e.g., free-tier limit reached)
+    if (config.disabled) return;
     CONFIG = config;
     var color = config.primaryColor || '#7c3aed';
     var borderColor = color;

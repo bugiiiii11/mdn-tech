@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { Bot, Shield, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
+import { UsageMeter } from '@/components/portal/UsageMeter'
 
 const products = [
   {
@@ -92,6 +93,14 @@ export default async function PortalDashboard() {
             )
           })}
         </div>
+
+        {/* ChatKit Usage */}
+        {customerProducts?.find(cp => cp.product === 'chatkit') && (
+          <div>
+            <h2 className="text-sm font-medium text-gray-400 mb-3">ChatKit Free Tier</h2>
+            <UsageMeter customerId={user.id} product="chatkit" />
+          </div>
+        )}
 
         {/* Quick stats */}
         {customerProducts && customerProducts.length > 0 && (

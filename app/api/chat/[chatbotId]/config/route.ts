@@ -1,5 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { corsHeaders, corsResponse } from '@/lib/chat/cors'
+import { checkUsageLimit } from '@/lib/chat/usage'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -17,7 +18,7 @@ export async function GET(
 
   const { data: chatbot, error } = await supabase
     .from('chatbots')
-    .select('name, client_name, status, widget_config')
+    .select('name, client_name, status, widget_config, owner_id')
     .eq('id', chatbotId)
     .single()
 
@@ -30,11 +31,19 @@ export async function GET(
 
   const config = (chatbot.widget_config ?? {}) as Record<string, unknown>
 
+  // Check usage limit if customer-owned
+  let disabled = false
+  if (chatbot.owner_id) {
+    const { allowed } = await checkUsageLimit(chatbot.owner_id, 'chatkit')
+    disabled = !allowed
+  }
+
   return NextResponse.json({
     name: chatbot.name,
     clientName: chatbot.client_name,
     greeting: config.greeting || `Hi! I'm ${chatbot.name}. How can I help you?`,
     primaryColor: config.primary_color || '#7c3aed',
     position: config.position || 'bottom-right',
+    disabled,
   }, { headers: corsHeaders })
 }
