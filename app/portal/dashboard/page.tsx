@@ -125,7 +125,6 @@ export default async function PortalDashboard() {
 
         {!hasConversations && (
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
-            <MessageSquare size={32} className="mx-auto text-gray-600 mb-3" />
             <p className="text-gray-400">No conversations yet</p>
             <p className="text-sm text-gray-500 mt-1">Deploy a chatbot to start seeing analytics</p>
           </div>
