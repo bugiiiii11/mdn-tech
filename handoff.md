@@ -20,6 +20,18 @@
 | 14 | 2026-04-17 | Project data entry + CC schema extension | Portal auth verified, 4 new projects added to CC (MDN-Tech, SignaKit, TradeKit, Good Hair by Zane), Swarm Resistance infra enriched with dev/prod Supabase + Railway, projects table extended with description + metadata JSONB columns |
 | 15 | 2026-04-17 | Phase 1 complete -- role cleanup + final projects | Phase 1.2: Documented role simplification (admin-only going forward, schema stays flexible); Phase 1.3: Swarm Resistance infra update SQL + MedaShooterNeo project entry; all internal projects now in CC |
 | 16 | 2026-04-17 | Portal analytics + Swarm Resistance display | Chatbot analytics dashboard (metrics, trends, keywords), conversation viewer with message tagging, export to markdown, fixed project duplicates, dev/prod infra display in CC |
+| 17 | 2026-04-17 | Build stabilization + runtime fixes | Resolved lint errors (escaping, deps), TypeScript type fixes, moved feedback loading to client-side (RLS compliance), fixed CORS path routing |
+
+## What Was Done (Session 17) -- Build stabilization + runtime fixes
+Date: 2026-04-17
+
+1. **Build linting errors resolved** -- Fixed unescaped apostrophe in dashboard text (react/no-unescaped-entities) and missing `limits` useEffect dependency. Files: `app/portal/dashboard/page.tsx`, `components/portal/UsageMeter.tsx`. Committed: `a541f02`.
+
+2. **TypeScript type fixes** -- Added explicit type annotations for word processing in analytics (word parameter type, words array type). Fixed "Parameter implicitly has 'any' type" errors. Files: `lib/portal/analytics.ts`. Committed: `70b6460`.
+
+3. **Conversations page 500 error fixed** -- Moved message feedback loading from server-side (RLS complexity) to client-side via new POST `/api/portal/feedback/load` endpoint. Server now only fetches conversations/messages (simplified). Feedback loads asynchronously on client with proper `customer_id` filtering for RLS. Files: `lib/portal/analytics.ts`, `components/portal/analytics/ConversationViewer.tsx`, `app/api/portal/feedback/load/route.ts`. Committed: `f7a9175`, `7f79292`.
+
+4. **CORS redirect errors fixed** -- Made `KBEntryList` component context-aware with `basePath` parameter. Portal now passes `basePath="/portal/chatkit"` instead of reusing hardcoded admin paths. Prevents cross-origin preflight failures. Files: `components/command-center/chatbots/KBEntryList.tsx`, `app/portal/chatkit/[id]/page.tsx`. Committed: `7143cd4`.
 
 ## What Was Done (Session 16) -- Portal analytics + Swarm Resistance display
 
@@ -221,12 +233,12 @@
 
 ## What To Do Next
 
-**Phase 1 complete.** Portal dashboard now has analytics (metrics, trends, keywords, export). Next: deploy migration 005, then Phase 2 hardening + Phase 3 website rebuild (parallel). See [PLAN.md](PLAN.md) for strategic context.
+**Build stable. Portal analytics dashboard works (export tested). Next: fix View Conversations 404 route issue, then Phase 2 hardening + Phase 3 website rebuild (parallel).** See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | Deploy migration 005 | Pending | Run in Supabase SQL Editor: message_feedback table for message tagging |
-| 2 | Test portal analytics | Pending | Visit `/dashboard` (metrics visible), `/chatkit/[id]/conversations` (viewer works), export .md file |
+| 1 | Fix View Conversations 404 error | BLOCKER | `/chatkit/chatbots/...` paths returning 404. Need to verify route structure and middleware routing |
+| 2 | Test portal analytics | In progress | `/dashboard` works (metrics, trends, keywords visible); export .md works; conversations page loads but has routing issue |
 | 3 | Test Swarm Resistance display | Pending | Visit `/command-center/projects/{swarm-id}`, verify Dev/Prod/Auth blocks show metadata |
 | 4 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration; review RLS on new tables |
 | 5 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
