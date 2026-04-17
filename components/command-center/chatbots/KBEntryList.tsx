@@ -16,7 +16,7 @@ const categoryColor: Record<string, string> = {
   other:    'bg-gray-500/10 text-gray-400 border-gray-500/20',
 }
 
-export function KBEntryList({ chatbotId, grouped }: { chatbotId: string; grouped: Record<string, any[]> }) {
+export function KBEntryList({ chatbotId, grouped, basePath = '/command-center' }: { chatbotId: string; grouped: Record<string, any[]>; basePath?: string }) {
   const categoryOrder = ['about', 'tone', 'products', 'pricing', 'faq', 'policies', 'support', 'general', 'other']
   const sorted = [
     ...categoryOrder.filter(c => grouped[c]),
@@ -39,7 +39,7 @@ export function KBEntryList({ chatbotId, grouped }: { chatbotId: string; grouped
               return (
                 <Link
                   key={entry.id}
-                  href={`/command-center/chatbots/${chatbotId}/entries/${entry.id}/edit`}
+                  href={`${basePath}/chatbots/${chatbotId}/entries/${entry.id}/edit`}
                   className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors group"
                 >
                   <FileText className="w-4 h-4 text-gray-600 flex-shrink-0" />

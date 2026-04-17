@@ -130,7 +130,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
               </Link>
             </div>
           ) : (
-            <KBEntryList chatbotId={chatbot.id} grouped={grouped} />
+            <KBEntryList chatbotId={chatbot.id} grouped={grouped} basePath="/portal/chatkit" />
           )}
         </div>
       </div>
