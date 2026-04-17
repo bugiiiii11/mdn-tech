@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { MessageSquare, Download, Zap } from 'lucide-react'
+import { Download, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { TrendChart } from '@/components/portal/analytics/TrendChart'
 import { KeywordsBar } from '@/components/portal/analytics/KeywordsBar'
@@ -134,13 +134,6 @@ export default async function PortalDashboard() {
         {/* Actions */}
         {primaryChatbotId && hasConversations && (
           <div className="flex gap-3">
-            <Link
-              href={`/portal/chatkit/${primaryChatbotId}/conversations`}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-gray-700 transition-colors"
-            >
-              <MessageSquare size={16} />
-              View Conversations
-            </Link>
             <a
               href={`/api/portal/chatbot/${primaryChatbotId}/export`}
               className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-gray-700 transition-colors"
