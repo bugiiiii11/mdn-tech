@@ -21,6 +21,18 @@
 | 15 | 2026-04-17 | Phase 1 complete -- role cleanup + final projects | Phase 1.2: Documented role simplification (admin-only going forward, schema stays flexible); Phase 1.3: Swarm Resistance infra update SQL + MedaShooterNeo project entry; all internal projects now in CC |
 | 16 | 2026-04-17 | Portal analytics + Swarm Resistance display | Chatbot analytics dashboard (metrics, trends, keywords), conversation viewer with message tagging, export to markdown, fixed project duplicates, dev/prod infra display in CC |
 | 17 | 2026-04-17 | Build stabilization + runtime fixes | Resolved lint errors (escaping, deps), TypeScript type fixes, moved feedback loading to client-side (RLS compliance), fixed CORS path routing |
+| 18 | 2026-04-17 | Portal diagnostics + conversations feature removal | Fixed KB entry link paths (removed /chatbots/ segment), graceful Supabase null handling (.maybeSingle()), removed mixed lock files, disabled interactive conversations viewer in favor of export-only |
+
+## What Was Done (Session 18) -- Portal diagnostics + conversations feature removal
+Date: 2026-04-17
+
+1. **KB entry link path fix** -- Removed extra `/chatbots/` segment in KBEntryList path construction. Component was adding `/chatbots/` even when basePath already pointed to chatbot collection. Portal passes `basePath="/portal/chatkit"`, creating incorrect `/portal/chatkit/chatbots/{id}` paths. Now uses `${basePath}/${chatbotId}/entries/{entryId}/edit`. Files: `components/command-center/chatbots/KBEntryList.tsx`. Committed: `48d5d53`.
+
+2. **Graceful null handling for product usage** -- Changed UsageMeter product_usage query from `.single()` to `.maybeSingle()` to handle new customers with no usage records (was throwing 406 Supabase error). Similarly changed dashboard customer query to `.maybeSingle()`. Files: `components/portal/UsageMeter.tsx`, `app/portal/dashboard/page.tsx`. Committed: `7a954c3`.
+
+3. **Build configuration cleanup** -- Removed `package-lock.json` to eliminate "mixed package managers" warning. Project uses yarn.lock, not npm. Removed unused `MessageSquare` icon import causing build failure. Committed: `092e7cc`.
+
+4. **Removed interactive conversations viewer** -- Disabled "View Conversations" button from portal dashboard; kept "Export as Markdown" which works reliably. The interactive viewer had cascading issues (KB link bugs, RLS complexity on feedback queries, Supabase null handling). Export-only approach provides same data in more portable format. Files: `app/portal/dashboard/page.tsx`. Committed: `140da8b`.
 
 ## What Was Done (Session 17) -- Build stabilization + runtime fixes
 Date: 2026-04-17
@@ -233,18 +245,16 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Build stable. Portal analytics dashboard works (export tested). Next: fix View Conversations 404 route issue, then Phase 2 hardening + Phase 3 website rebuild (parallel).** See [PLAN.md](PLAN.md) for strategic context.
+**Portal dashboard stable and working. Analytics + export feature fully functional. Next: Phase 2 hardening + Phase 3 website rebuild (parallel tracks).** See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | Fix View Conversations 404 error | BLOCKER | `/chatkit/chatbots/...` paths returning 404. Need to verify route structure and middleware routing |
-| 2 | Test portal analytics | In progress | `/dashboard` works (metrics, trends, keywords visible); export .md works; conversations page loads but has routing issue |
-| 3 | Test Swarm Resistance display | Pending | Visit `/command-center/projects/{swarm-id}`, verify Dev/Prod/Auth blocks show metadata |
-| 4 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration; review RLS on new tables |
-| 5 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
-| 6 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
-| 7 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
-| 8 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
+| 1 | Phase 2 finalization -- auth hardening | Pending | Confirm admin/portal isolation; SignaKit integration; review RLS on new tables |
+| 2 | Test Swarm Resistance display | Pending | Visit `/command-center/projects/{swarm-id}`, verify Dev/Prod/Auth blocks show metadata |
+| 3 | Phase 3 -- website rebuild (parallel track) | Pending | Per `command-center/mdntech-website-rebuild.md`; launch with portal |
+| 4 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column) |
+| 5 | Infrastructure health monitoring | Pending | Query Supabase + Railway endpoints to detect downtime |
+| 6 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations |
 
 ## Key Files
 
