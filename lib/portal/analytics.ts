@@ -150,12 +150,12 @@ export async function getTopKeywords(
   const wordCount = new Map<string, number>();
 
   userMessages?.forEach((msg) => {
-    const words = msg.content
+    const words: string[] = msg.content
       .toLowerCase()
       .split(/[\s\p{P}]+/u)
       .filter((word: string) => word.length > 2 && !STOPWORDS.has(word));
 
-    words.forEach((word) => {
+    words.forEach((word: string) => {
       wordCount.set(word, (wordCount.get(word) || 0) + 1);
     });
   });
