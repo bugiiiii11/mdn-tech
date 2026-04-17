@@ -104,6 +104,53 @@ export function ProjectTabs({ project, milestones, communications, members, curr
               {project.railway_project_id && <InfoRow label="Railway ID" value={project.railway_project_id} />}
               {project.vercel_project_id && <InfoRow label="Vercel ID" value={project.vercel_project_id} />}
             </div>
+
+            {/* Dev/Prod infrastructure from metadata */}
+            {project.metadata?.infrastructure && (
+              <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+                {project.metadata.infrastructure.dev && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Dev Environment</p>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                      {project.metadata.infrastructure.dev.supabase_ref && (
+                        <InfoRow label="Supabase" value={project.metadata.infrastructure.dev.supabase_ref} />
+                      )}
+                      {project.metadata.infrastructure.dev.railway_backend && (
+                        <InfoRow label="Railway" value={project.metadata.infrastructure.dev.railway_backend} />
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {project.metadata.infrastructure.prod && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Prod Environment</p>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                      {project.metadata.infrastructure.prod.supabase_ref && (
+                        <InfoRow label="Supabase" value={project.metadata.infrastructure.prod.supabase_ref} />
+                      )}
+                      {project.metadata.infrastructure.prod.railway_backend && (
+                        <InfoRow label="Railway" value={project.metadata.infrastructure.prod.railway_backend} />
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {project.metadata.infrastructure.auth_service && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Auth Service</p>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+                      {project.metadata.infrastructure.auth_service.name && (
+                        <InfoRow label="Service" value={project.metadata.infrastructure.auth_service.name} />
+                      )}
+                      {project.metadata.infrastructure.auth_service.supabase_ref && (
+                        <InfoRow label="Supabase" value={project.metadata.infrastructure.auth_service.supabase_ref} />
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

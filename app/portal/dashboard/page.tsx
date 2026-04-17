@@ -3,36 +3,15 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { Bot, Shield, BarChart3 } from 'lucide-react'
+import { MessageSquare, Download, Zap } from 'lucide-react'
 import Link from 'next/link'
-import { UsageMeter } from '@/components/portal/UsageMeter'
-
-const products = [
-  {
-    name: 'ChatKit',
-    description: 'AI-powered chatbots for your website',
-    icon: Bot,
-    href: '/portal/chatkit',
-    color: 'from-purple-500 to-pink-500',
-    status: 'active' as const,
-  },
-  {
-    name: 'SignaKit',
-    description: 'Authentication & user management',
-    icon: Shield,
-    href: '/portal/signakit',
-    color: 'from-cyan-500 to-blue-500',
-    status: 'coming_soon' as const,
-  },
-  {
-    name: 'TradeKit',
-    description: 'Trading signals & analytics',
-    icon: BarChart3,
-    href: '/portal/tradekit',
-    color: 'from-green-500 to-emerald-500',
-    status: 'coming_soon' as const,
-  },
-]
+import { TrendChart } from '@/components/portal/analytics/TrendChart'
+import { KeywordsBar } from '@/components/portal/analytics/KeywordsBar'
+import {
+  getChatbotAnalytics,
+  getMessagesTrend,
+  getTopKeywords,
+} from '@/lib/portal/analytics'
 
 export default async function PortalDashboard() {
   const supabase = await createClient()
@@ -46,97 +25,143 @@ export default async function PortalDashboard() {
     .eq('id', user.id)
     .single()
 
-  // Fetch active products
-  const { data: customerProducts } = await supabase
-    .from('customer_products')
-    .select('*')
-    .eq('customer_id', user.id)
+  // Fetch customer's chatbots
+  const { data: chatbots } = await supabase
+    .from('chatbots')
+    .select('id, name, widget_config')
+    .eq('owner_id', user.id)
 
   const firstName = customer?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'there'
 
+  let analytics = { totalMessages: 0, totalConversations: 0, avgMessagesPerConv: 0, fallbackCount: 0, fallbackRate: 0 }
+  let trend: any[] = []
+  let keywords: any[] = []
+  let totalChatbots = chatbots?.length || 0
+
+  // If customer has chatbots, aggregate analytics
+  if (chatbots && chatbots.length > 0) {
+    const allAnalytics = await Promise.all(
+      chatbots.map(bot => {
+        const fallbackMsg = (bot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
+        return getChatbotAnalytics(supabase, bot.id, fallbackMsg)
+      })
+    )
+
+    analytics = {
+      totalMessages: allAnalytics.reduce((sum, a) => sum + a.totalMessages, 0),
+      totalConversations: allAnalytics.reduce((sum, a) => sum + a.totalConversations, 0),
+      avgMessagesPerConv: allAnalytics.length > 0
+        ? Math.round((allAnalytics.reduce((sum, a) => sum + a.avgMessagesPerConv, 0) / allAnalytics.length) * 10) / 10
+        : 0,
+      fallbackCount: allAnalytics.reduce((sum, a) => sum + a.fallbackCount, 0),
+      fallbackRate: allAnalytics.length > 0
+        ? Math.round((allAnalytics.reduce((sum, a) => sum + a.fallbackRate, 0) / allAnalytics.length) * 10) / 10
+        : 0,
+    }
+
+    // Get trend for first chatbot (most recent)
+    const primaryBot = chatbots[0]
+    const primaryFallback = (primaryBot.widget_config as any)?.fallback_message || 'I\'m not sure about that'
+    trend = await getMessagesTrend(supabase, primaryBot.id, 7)
+    keywords = await getTopKeywords(supabase, primaryBot.id, 10)
+  }
+
+  const hasConversations = analytics.totalConversations > 0
+  const primaryChatbotId = chatbots?.[0]?.id
+
   return (
     <PortalShell>
-      <div className="p-6 space-y-6">
-        <div>
-          <h1 className="text-xl font-semibold text-white">Welcome, {firstName}</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Manage your products and services</p>
-        </div>
-
-        {/* Product cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {products.map(product => {
-            const enrolled = customerProducts?.find(cp => cp.product === product.name.toLowerCase().replace('kit', 'kit'))
-            return (
-              <Link
-                key={product.name}
-                href={product.href}
-                className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 hover:border-purple-500/20 transition-colors group"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${product.color} flex items-center justify-center`}>
-                    <product.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors">
-                      {product.name}
-                    </h3>
-                    {product.status === 'coming_soon' && (
-                      <span className="text-[10px] text-gray-500">Coming soon</span>
-                    )}
-                    {enrolled && (
-                      <span className="text-[10px] text-green-400">{enrolled.plan} plan</span>
-                    )}
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500">{product.description}</p>
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* ChatKit Usage */}
-        {customerProducts?.find(cp => cp.product === 'chatkit') && (
+      <div className="p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">ChatKit Free Tier</h2>
-            <UsageMeter customerId={user.id} product="chatkit" />
+            <h1 className="text-2xl font-semibold text-white">ChatBot Analytics</h1>
+            <p className="text-gray-400 text-sm mt-0.5">Welcome back, {firstName}</p>
+          </div>
+          <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+            <Zap size={16} />
+            Upgrade to Pro
+          </button>
+        </div>
+
+        {/* Metrics cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Total Messages</p>
+            <p className="text-3xl font-bold text-white">{analytics.totalMessages}</p>
+            <p className="text-xs text-gray-500 mt-2">across all chatbots</p>
+          </div>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Conversations</p>
+            <p className="text-3xl font-bold text-white">{analytics.totalConversations}</p>
+            <p className="text-xs text-gray-500 mt-2">unique visitors</p>
+          </div>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Fallback Rate</p>
+            <p className="text-3xl font-bold text-white">{analytics.fallbackRate}%</p>
+            <p className="text-xs text-gray-500 mt-2">{analytics.fallbackCount} didn't-know responses</p>
+          </div>
+
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Avg Messages</p>
+            <p className="text-3xl font-bold text-white">{analytics.avgMessagesPerConv}</p>
+            <p className="text-xs text-gray-500 mt-2">per conversation</p>
+          </div>
+        </div>
+
+        {/* Charts */}
+        {hasConversations && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <TrendChart data={trend} title="Messages over 7 days" />
+            <KeywordsBar keywords={keywords} title="Top keywords asked about" />
           </div>
         )}
 
-        {/* Quick stats */}
-        {customerProducts && customerProducts.length > 0 && (
+        {!hasConversations && (
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+            <MessageSquare size={32} className="mx-auto text-gray-600 mb-3" />
+            <p className="text-gray-400">No conversations yet</p>
+            <p className="text-sm text-gray-500 mt-1">Deploy a chatbot to start seeing analytics</p>
+          </div>
+        )}
+
+        {/* Actions */}
+        {primaryChatbotId && hasConversations && (
+          <div className="flex gap-3">
+            <Link
+              href={`/portal/chatkit/${primaryChatbotId}/conversations`}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-gray-700 transition-colors"
+            >
+              <MessageSquare size={16} />
+              View Conversations
+            </Link>
+            <a
+              href={`/api/portal/chatbot/${primaryChatbotId}/export`}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg border border-gray-700 transition-colors"
+            >
+              <Download size={16} />
+              Export as Markdown
+            </a>
+          </div>
+        )}
+
+        {/* Chatbots */}
+        {totalChatbots > 0 && (
           <div>
-            <h2 className="text-sm font-medium text-gray-400 mb-3">Active Products</h2>
-            <div className="bg-[#0d0d20] border border-white/5 rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/5 text-left text-gray-500">
-                    <th className="px-4 py-3 font-medium">Product</th>
-                    <th className="px-4 py-3 font-medium">Plan</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Since</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {customerProducts.map(cp => (
-                    <tr key={cp.id} className="border-b border-white/5 last:border-0">
-                      <td className="px-4 py-3 text-white capitalize">{cp.product}</td>
-                      <td className="px-4 py-3 text-gray-400 capitalize">{cp.plan}</td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          cp.status === 'active'
-                            ? 'bg-green-500/10 text-green-400'
-                            : 'bg-gray-500/10 text-gray-400'
-                        }`}>
-                          {cp.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500">
-                        {new Date(cp.started_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <h2 className="text-sm font-medium text-gray-400 mb-3">Your Chatbots ({totalChatbots})</h2>
+            <div className="space-y-2">
+              {chatbots?.map(bot => (
+                <Link
+                  key={bot.id}
+                  href={`/portal/chatkit/${bot.id}`}
+                  className="block p-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-700 transition-colors"
+                >
+                  <p className="font-medium text-white">{bot.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">View settings & KB entries →</p>
+                </Link>
+              ))}
             </div>
           </div>
         )}
