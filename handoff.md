@@ -25,6 +25,46 @@
 | 19 | 2026-04-17 | Phase 2 finalization -- auth hardening | Middleware restructured for role-type checks before routing; login pages reject wrong-portal users; portal pages guard on customer existence; migration 006 sources is_admin() function, fixes handle_new_user() role default, restricts team_members RLS |
 | 20 | 2026-04-18 | ToolKit replaces TradeKit in customer portal | Migration 006 applied to Supabase, Phase 2 auth isolation tested; built ToolKit section (10 Claude Code skills + 3 MCP integrations); skipped website rebuild pending product clarity |
 | 21 | 2026-04-28 | Strategic pivot to ToolKit-first + portal redesign brief locked | ToolKit promoted to flagship ahead of ChatKit; portal redesign scoped (split shell -- marketing-style vs app-style); top bar replaces sidebar; Dashboard removed; ToolKit goes public; HANDOFF_PAGE_SPEC adopted; 6 decisions logged |
+| 22 | 2026-04-28 | Phase A shipped -- portal shell + ToolKit/Handoff page | New top bar replaces sidebar, marketing/app shell variants, public-route middleware for /portal/toolkit, default landing → /toolkit, full Handoff page (Hero + WhatIsIt + OS-aware InstallBlock + SkillCards + PlanKitTeaser + ThirdPartySkills + FAQ), Reveal animation wrapper, source URLs corrected, Marketing Skills card added |
+
+## What Was Done (Session 22) -- Phase A shipped: portal shell + ToolKit/Handoff page
+
+Date: 2026-04-28
+
+1. **New portal top bar** -- Replaces sidebar with sticky/fixed top bar containing 4 nav items (ToolKit · ChatKit · Settings · Home → mdntech.org) plus auth-aware right action (Login button when logged out; Account dropdown with Sign out + Marketing site link when logged in). Mobile hamburger pattern matches marketing site. Files: `components/portal/PortalTopBar.tsx`. Top bar uses `position: fixed` + main `pt-[65px]` so it stays pinned during scroll.
+
+2. **PortalShell variant system** -- Rewrote `components/portal/PortalShell.tsx` as async server component accepting `variant?: 'marketing' | 'app'` (default `'app'`). Marketing variant renders ambient `StarsCanvas` background; app variant is plain dark `#0a0a1a`. Existing pages (dashboard, chatkit, settings, signakit, tradekit) keep their `<PortalShell>` calls and pick up the default app variant -- no per-page changes needed for Phase A.
+
+3. **Blackhole removed from portal** -- Decision refined from Session 21: blackhole video stays on marketing landing page only; portal marketing variant gets stars-only ambience. `components/portal/PortalBackground.tsx` now renders only `StarsCanvas` (dynamic-imported with `ssr:false` to avoid Three.js SSR issues).
+
+4. **Public-route middleware change** -- `/portal/toolkit/*` is now publicly accessible (no auth wall) so the install page works as the canonical destination linked from social posts. Added `isPublicPortalPath()` helper covering `/`, `/login`, `/signup`, `/toolkit/*`. Localhost detection added (`isLocalDev()`) to skip the production host redirect during dev so `localhost:3001/portal/*` doesn't bounce to `app.mdntech.org`. Files: `lib/supabase/middleware.ts`.
+
+5. **Default landing changed to ToolKit** -- Post-login redirect on portal host: `/login → /toolkit` (was `/dashboard`). Signup `emailRedirectTo: '/toolkit'`. Login form push: `/portal/toolkit`. Marketing-host fallback redirect also updated. Dashboard route still exists pending Phase B deletion.
+
+6. **Login + Signup full marketing shell** -- Both pages converted from client components to server pages wrapping `<PortalShell variant="marketing">` with extracted `LoginForm` / `SignupForm` client components in `components/portal/auth/`. Stars background + cinematic hero treatment matches marketing-style entry. Login form reads `?error=unauthorized` query and surfaces it inline.
+
+7. **ToolKit page rebuilt around HANDOFF_PAGE_SPEC** -- `app/portal/toolkit/page.tsx` is now a server component with no auth guards (public). Composes 7 sections in `components/portal/handoff/`:
+   - `HandoffHero` -- gradient headline, eyebrow, dual CTAs (Install scroll + GitHub external)
+   - `WhatIsIt` -- 3-column problem→solution grid (Clock / FileText / AlertTriangle icons)
+   - `InstallBlock` -- OS-aware default tab via `navigator.platform` detection, `<CodeBlock>` with copy-to-clipboard + 2s `Copied ✓` callout, manual fallback `<details>`, verify step, uninstall one-liner. PowerShell + bash command sets included.
+   - `SkillCards` -- 2×2 grid of `/start`, `/wrap`, `/save`, `/doc-update` with example snippets and `View source →` links to `github.com/bugiiiii11/handoff/blob/main/skills/<name>/SKILL.md`
+   - `PlanKitTeaser` -- coming-soon paid tier card with GitHub watch + waitlist mailto
+   - `ThirdPartySkills` -- curated 5-card grid (UI/UX Pro Max, SEO Audit, Marketing Skills, Frontend Design, Claude API)
+   - `FAQ` -- 5 `<details>` accordions with chevron indicator
+
+8. **Reveal animation wrapper** -- `components/portal/handoff/Reveal.tsx` is a client wrapper using framer-motion `whileInView` + `viewport={{ once: true, margin: '-80px' }}` + fade-up `{ y: 30, opacity: 0 } → { y: 0, opacity: 1 }` over 0.6s `easeOut`. Same vibe as marketing's `slideInFromTop` / process-card variants. Sections wrap their content with `<Reveal>` and `<Reveal delay={0.05 + i * 0.08}>` for staggered card grids.
+
+9. **Section dividers removed** -- All `border-t border-white/5` between sections removed for cleaner flow. Internal card hairlines (between problem/solution, meta/source) stay -- they're decorative, not section dividers.
+
+10. **Third-party skill source URLs corrected** -- Original `installationUrl` values pointed at non-existent `github.com/anthropics/claude-code/skills/<name>` paths. Fixed to canonical sources: `frontend-design` and `claude-api` → `github.com/anthropics/skills/tree/main/skills/<name>`; `ui-ux-pro-max` → `github.com/nextlevelbuilder/ui-ux-pro-max-skill`; `seo-audit` → `github.com/AgriciDaniel/claude-seo`. Author labels updated for honesty (Anthropic vs nextlevelbuilder vs AgriciDaniel vs Corey Haines). Section heading changed from "Anthropic skills we use" → "Skills we use".
+
+11. **Marketing Skills card added** -- New entry in `lib/portal/toolkit-skills.ts` for Corey Haines' marketing skill collection at `github.com/coreyhaines31/marketingskills`. Category: marketing.
+
+12. **Simplify card removed** -- No verifiable canonical source after web search; entry deleted from `toolkit-skills.ts` rather than render with a guessed URL.
+
+13. **Old ToolKitContent.tsx deleted** -- The previous client gallery component was fully replaced by the new section components. Layout simplified to remove duplicate background color.
+
+**Committed: `3661cca`. Pushed to main → Vercel auto-deploys to `app.mdntech.org`.** Build passes (38 routes), lint clean. Browser-tested in incognito at localhost:3001/portal/toolkit, /portal/login, /portal/signup -- all sections render, OS detection works (Windows pre-selected), copy-to-clipboard shows `Copied ✓`, mobile hamburger works, Account dropdown signs out correctly, source links resolve.
 
 ## What Was Done (Session 21) -- Strategic pivot to ToolKit-first + portal redesign brief locked
 Date: 2026-04-28
@@ -303,13 +343,13 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Strategic pivot (Session 21): ToolKit becomes the flagship acquisition product ahead of ChatKit. Portal redesign + ToolKit/Handoff page rebuild ships first. ChatKit monetization (pricing/voice/auto-learning per Session 20 plan) resumes after Phase C.** See [decisions.md](decisions.md) Session 21 entries and [command-center/HANDOFF_PAGE_SPEC.md](command-center/HANDOFF_PAGE_SPEC.md) for full context.
+**Phase A shipped (Session 22).** Portal top bar replaces sidebar, ToolKit/Handoff page is live and publicly accessible at `app.mdntech.org/toolkit` (deploying via Vercel from commit `3661cca`). Phase B (ChatKit restyle + analytics inline + dashboard route deletion) is next. ChatKit monetization (pricing/voice/auto-learning per Session 20 plan) resumes after Phase C. See [decisions.md](decisions.md) Session 21 entries and [command-center/HANDOFF_PAGE_SPEC.md](command-center/HANDOFF_PAGE_SPEC.md) for full context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | Phase A -- Portal shell + ToolKit/Handoff page | Pending | Brief UI/UX Pro Max with the locked spec. Build: top bar (4 items: ToolKit · ChatKit · Settings · Home + auth-aware right button), `<PortalShell variant="marketing"\|"app">` with stars + blackhole hero on marketing variant, plain dark on app variant, same fonts (Inter / Space Grotesk / JetBrains Mono) and palette across both. Login/Signup pages full marketing shell. Public-route middleware change so `/portal/toolkit/*` works without auth (logged-out → "Login" right button, logged-in → "Home"). ToolKit page rebuilt per HANDOFF_PAGE_SPEC: HandoffHero + WhatIsIt + InstallBlock (OS-aware default tab, copy-to-clipboard with `Copied ✓` 2s callout, manual fallback `<details>`, verify step, uninstall one-liner) + SkillCards (Handoff bundled card + Anthropic third-party cards visible; M.D.N-only auxiliary cards filtered) + PlanKitTeaser + FAQ. Default landing after login → `/portal/toolkit`. |
-| 2 | Phase B -- ChatKit pages restyled + analytics inline + empty states | Pending | App-shell variant on `/portal/chatkit/*` and all sub-pages (`[id]`, `[id]/edit`, `[id]/conversations`, `[id]/entries/{new,[entryId]/edit}`). Move `/portal/dashboard` analytics (metrics cards, TrendChart, KeywordsBar, conversation export) inline into `/portal/chatkit/[id]`. Empty states: chatbot list ("Create your first chatbot"), KB entries ("Add your first KB entry"), analytics ("No conversations yet"). Delete `app/portal/dashboard/` route. |
-| 3 | Phase C -- Settings restyle + marketing top-bar swap + Tools link | Pending | App-shell on `/portal/settings`. Marketing site `components/main/navbar.tsx` (and Header equivalents): swap "Start Project" button for auth-aware Login/Portal button. Add a small Tools link/card pointing to `/portal/toolkit` either in the navbar or homepage Project section. Preconnect tags + cache-control on blackhole video for cross-origin smoothness between mdntech.org ↔ app.mdntech.org. |
+| 1 | Phase B -- ChatKit pages restyled + analytics inline + empty states | Pending | App-shell variant on `/portal/chatkit/*` and all sub-pages (`[id]`, `[id]/edit`, `[id]/conversations`, `[id]/entries/{new,[entryId]/edit}`). Move `/portal/dashboard` analytics (metrics cards, TrendChart, KeywordsBar, conversation export) inline into `/portal/chatkit/[id]`. Empty states: chatbot list ("Create your first chatbot"), KB entries ("Add your first KB entry"), analytics ("No conversations yet"). Delete `app/portal/dashboard/` route once analytics moved. |
+| 2 | Phase C -- Settings restyle + marketing top-bar swap + Tools link | Pending | App-shell on `/portal/settings`. Marketing site `components/main/navbar.tsx` (and Header equivalents): swap "Start Project" button for auth-aware Login/Portal button. Add a small Tools link/card pointing to `/portal/toolkit` either in the navbar or homepage Project section. Preconnect tags + cache-control on blackhole video for cross-origin smoothness between mdntech.org ↔ app.mdntech.org. |
+| 3 | Production smoke test on `app.mdntech.org` | Pending | After Vercel deploy lands: verify (a) `/toolkit` renders public for logged-out visitors, (b) login → `/toolkit` redirect, (c) signup confirmation email link goes to `/toolkit`, (d) admin → portal cross-host rejection still works. |
 | 4 | ChatKit Pricing + Stripe billing | Deferred (resumes after Phase C) | Per Session 20 plan. Migration 007 (stripe fields, plan enum), `/pricing` on marketing, `/portal/upgrade` in portal, caps 50/2000/10000/unlimited. Stripe account creation pending on user side; UI + schema can proceed in parallel. |
 | 5 | ChatKit Auto-Learning MVP | Deferred (resumes after Pricing) | Flag UI in conversation viewer + Sunday cron + Claude analysis + weekly report at `/portal/chatkit/[id]/learning`. Uses existing `message_feedback` table. ~5 hours. |
 | 6 | ChatKit Voice via Cartesia Sonic-3 | Deferred (resumes after Auto-Learning) | Cartesia SDK in widget + API, voice toggle per chatbot, mic + audio playback, streaming TTS. $10/mo Pro add-on. ~6 hours. |
@@ -339,10 +379,21 @@ Date: 2026-04-17
 | `components/portal/chatbots/PortalKBEntryForm.tsx` | Portal KB entry form (redirects to /portal paths) |
 | `components/portal/chatbots/DeleteChatbotButton.tsx` | Delete with confirmation |
 | `components/portal/UsageMeter.tsx` | Free-tier usage progress bar + warnings |
-| `components/portal/PortalShell.tsx` | Portal sidebar with product nav (Dashboard, ChatKit, SignaKit, ToolKit, Settings) |
-| `app/portal/toolkit/page.tsx` | ToolKit product page: featured skills gallery + MCP integrations |
-| `components/portal/toolkit/ToolKitContent.tsx` | Client component: skill cards with copy buttons, MCP guides, CTA section |
-| `lib/portal/toolkit-skills.ts` | ToolKit data: 10 featured Claude Code skills + 3 MCP integrations with metadata |
+| `components/portal/PortalShell.tsx` | Async server shell with `variant?: 'marketing' \| 'app'`; renders top bar + ambient background on marketing variant |
+| `components/portal/PortalTopBar.tsx` | Fixed top bar: 4 nav items (ToolKit, ChatKit, Settings, Home) + auth-aware Login/Account dropdown + mobile hamburger |
+| `components/portal/PortalBackground.tsx` | Marketing-variant ambient: dynamic-imported StarsCanvas (no blackhole on portal) |
+| `components/portal/auth/{LoginForm,SignupForm}.tsx` | Extracted client auth forms (used by server pages wrapped in marketing shell) |
+| `app/portal/toolkit/page.tsx` | ToolKit/Handoff page (public, no auth): composes Hero + WhatIsIt + InstallBlock + SkillCards + PlanKitTeaser + ThirdPartySkills + FAQ |
+| `components/portal/handoff/HandoffHero.tsx` | Gradient headline, dual CTAs, trust strip |
+| `components/portal/handoff/WhatIsIt.tsx` | 3-column problem→solution grid |
+| `components/portal/handoff/InstallBlock.tsx` | OS-aware (`navigator.platform`) tab default, copy-to-clipboard, manual fallback `<details>`, verify, uninstall |
+| `components/portal/handoff/CodeBlock.tsx` | Reusable code block with copy button + `Copied ✓` callout |
+| `components/portal/handoff/SkillCards.tsx` | 2×2 grid of /start, /wrap, /save, /doc-update with example snippets and View source links |
+| `components/portal/handoff/PlanKitTeaser.tsx` | Coming-soon paid tier card + waitlist mailto |
+| `components/portal/handoff/ThirdPartySkills.tsx` | Curated 5-card grid of community + Anthropic skills |
+| `components/portal/handoff/FAQ.tsx` | 5 `<details>` accordions with chevron indicator |
+| `components/portal/handoff/Reveal.tsx` | framer-motion `whileInView` fade-up wrapper, staggered via delay prop |
+| `lib/portal/toolkit-skills.ts` | ToolKit data: M.D.N skills (filtered) + 5 visible third-party cards with verified source URLs |
 | `components/portal/analytics/ConversationViewer.tsx` | Conversation cards with message feedback buttons (correct/incorrect/helpful/not_helpful) |
 | `components/portal/analytics/TrendChart.tsx` | 7-day message trend chart (CSS bars) |
 | `components/portal/analytics/KeywordsBar.tsx` | Top keywords horizontal bar chart |
