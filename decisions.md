@@ -177,3 +177,67 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Revisit:** If Stripe account setup blocks more than 1 session, switch to features-first and add Stripe at end.
 
 ---
+
+## 2026-04-28 -- Session 21 -- Strategic pivot: ToolKit becomes flagship, ChatKit pricing deferred
+
+**Decision:** ToolKit moves ahead of ChatKit as the primary acquisition product. ChatKit pricing/Stripe/voice/auto-learning work (Session 20 build sequence) is deferred behind a portal redesign + ToolKit/Handoff page rebuild. New build order: (1) Portal shell redesign + Login/Signup + ToolKit page rebuilt around Handoff, (2) ChatKit pages restyled + analytics moved inline, (3) Settings restyle + marketing-site top-bar swap, then ChatKit pricing/voice/auto-learning resume per Session 20 plan.
+
+**Why:** Handoff (4 free MIT-licensed Claude Code skills: `/start`, `/wrap`, `/save`, `/doc-update`) is a low-cost, high-distribution acquisition surface — it ships free, lives on social (dev.to/Reddit/X), and onboards Claude Code developers (the exact audience that buys ChatKit/SignaKit later). ChatKit monetization without a funnel feeds an empty pipe. ToolKit-first builds the funnel; ChatKit pricing harvests it. PlanKit (paid product family member) teases the upgrade path on the same page.
+
+**Alternatives:** Continue with Session 20 sequence (revenue first, but no acquisition funnel = slow growth); ship Handoff as a separate marketing page only (loses portal nav cohesion + the "free product → paid product" hub story); collapse ToolKit and Handoff into one (forces premature naming lock — keeping ToolKit as the section lets PlanKit + future tools live there without rename).
+
+**Revisit:** If ToolKit/Handoff drives <50 portal signups in 30 days post-launch, recheck whether the funnel hypothesis holds before continuing to defer ChatKit monetization.
+
+---
+
+## 2026-04-28 -- Session 21 -- Top bar replaces sidebar; portal IA flattened
+
+**Decision:** Portal sidebar removed in favor of a top bar with 4 items: ToolKit · ChatKit · Settings · Home (Home = link back to mdntech.org). Logged-out top-right button = "Login"; logged-in = "Portal" (on marketing) / "Home" (on portal).
+
+**Why:** With only 3 functional sections, a sidebar wastes ~240px of horizontal space and signals more depth than exists. Top bar matches the marketing site's pattern (consistency across the two surfaces) and is the SaaS norm for flat IA (Vercel, Linear, Stripe). Mobile uses a hamburger like the marketing site.
+
+**Alternatives:** Keep sidebar + add top bar (over-chromed, fights for attention); replace with command palette only (too sparse, hides nav from new users).
+
+---
+
+## 2026-04-28 -- Session 21 -- Dashboard removed; default landing = ToolKit
+
+**Decision:** The standalone `/portal/dashboard` page is removed. Chatbot analytics (metrics cards, 7-day trend, top keywords, conversation export) move inline into `/portal/chatkit/[id]`. After login, customers land on `/portal/toolkit`.
+
+**Why:** Dashboard was a weak abstraction — its content (chatbot analytics) belongs to the chatbot, not the portal. Logged-in users landing on ToolKit aligns with the new acquisition strategy: their first impression after signup is the free tools they came for, with the ChatKit/Settings sections one click away. Removes the "what does Dashboard show now that we have one customer with one bot?" empty-state problem.
+
+**Alternatives:** Keep Dashboard as a "Welcome / What's New" hub (added surface area without clear value at current scale); land on ChatKit (premature monetization framing for first-time visitors).
+
+---
+
+## 2026-04-28 -- Session 21 -- Public route exception for ToolKit
+
+**Decision:** `/portal/toolkit/*` becomes publicly accessible (no auth required). `/portal/chatkit/*` and `/portal/settings/*` remain auth-gated. Middleware updated to allow the toolkit path through without a session redirect.
+
+**Why:** ToolKit is the install destination linked from social posts (dev.to/Reddit/X) per HANDOFF_PAGE_SPEC. Forcing signup before installing free MIT skills kills the funnel — the goal is friction-free distribution. Logged-out visitors who like the install flow then convert to signup for ChatKit/PlanKit later. Auth wall stays where it matters (customer data and billing).
+
+**Alternatives:** Keep the page behind login (kills distribution); host the install page on the marketing site at `mdntech.org/handoff` (splits the Handoff narrative across two domains, breaks the spec's "page is the canonical install destination" goal).
+
+**Constraints:** Middleware must distinguish `/portal/toolkit` (public) from `/portal/chatkit` (gated) before the existing portal-host check redirects to login. Public toolkit visitors see the same shell but with "Login" in the top-right; logged-in users see "Home."
+
+---
+
+## 2026-04-28 -- Session 21 -- Visual treatment split: marketing-style vs app-style surfaces
+
+**Decision:** Portal pages use two visual shell variants. Marketing-style (stars background + blackhole hero + cinematic) on `/portal/toolkit`, `/portal/login`, `/portal/signup`, and any "coming soon" placeholders. App-style (plain deep dark, no video, no stars) on `/portal/chatkit/*` and `/portal/settings`. Both share the same top bar, fonts (Inter / Space Grotesk / JetBrains Mono), color palette (cyan/purple gradient), button styles, and accent treatments.
+
+**Why:** Audience is Claude Code users — developers who spend hours in tools like Vercel, Linear, Stripe, Supabase, GitHub, none of which decorate working surfaces. Animated 3D backgrounds behind data add visual fatigue, performance cost, and "Web3 hype" connotations devs distrust. But the marketing site's cinematic style *is* correct for marketing surfaces (ToolKit is one). Split treatment gives the "wow" entry plus crisp work tools, with brand layer (top bar / type / color) tying them together — the pattern best dual-surface SaaS uses (e.g., Vercel marketing → dashboard).
+
+**Alternatives:** Uniform marketing style everywhere (consistent but worse work-surface UX, slower data pages); uniform SaaS-clean everywhere (loses brand distinctiveness on first impression / login); keep current minimal portal (fails the "feels weak" feedback that prompted this redesign).
+
+---
+
+## 2026-04-28 -- Session 21 -- ToolKit MVP content scope
+
+**Decision:** ToolKit MVP shows: (1) Handoff card (the 4 free skills bundled as one product, replaces individual `/start` and `/wrap` cards), (2) PlanKit teaser card ("coming soon — paid"), (3) all third-party Anthropic Skills cards (UI/UX Pro Max, SEO Audit, Frontend Design, Simplify, Claude API). Hidden for MVP: M.D.N Tech-only auxiliary cards (CMO, Test, Security Review) — they remain in the codebase but filtered out of the visible gallery.
+
+**Why:** Handoff is the marketing hook (open source, MIT, installable in one line) and warrants its own bundled card with the install flow per HANDOFF_PAGE_SPEC. The auxiliary M.D.N Tech skills (CMO, Test, Security Review) are internal-flavored and don't help the developer-acquisition story. The Anthropic third-party cards stay because they're recognizable, signal taste, and position M.D.N Tech as a curator. PlanKit teaser positions the paid upgrade path on the same page. ToolKit name is preserved (not renamed to "Handoff") so PlanKit + future tools have a stable home.
+
+**Alternatives:** Show all 10 skills (dilutes Handoff focus and confuses the install CTA); rename ToolKit to Handoff in MVP (forces another rename when PlanKit ships); drop the third-party Anthropic cards (loses curation signal).
+
+---

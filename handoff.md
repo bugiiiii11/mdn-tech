@@ -24,6 +24,32 @@
 | 18 | 2026-04-17 | Portal diagnostics + conversations feature removal | Fixed KB entry link paths (removed /chatbots/ segment), graceful Supabase null handling (.maybeSingle()), removed mixed lock files, disabled interactive conversations viewer in favor of export-only |
 | 19 | 2026-04-17 | Phase 2 finalization -- auth hardening | Middleware restructured for role-type checks before routing; login pages reject wrong-portal users; portal pages guard on customer existence; migration 006 sources is_admin() function, fixes handle_new_user() role default, restricts team_members RLS |
 | 20 | 2026-04-18 | ToolKit replaces TradeKit in customer portal | Migration 006 applied to Supabase, Phase 2 auth isolation tested; built ToolKit section (10 Claude Code skills + 3 MCP integrations); skipped website rebuild pending product clarity |
+| 21 | 2026-04-28 | Strategic pivot to ToolKit-first + portal redesign brief locked | ToolKit promoted to flagship ahead of ChatKit; portal redesign scoped (split shell -- marketing-style vs app-style); top bar replaces sidebar; Dashboard removed; ToolKit goes public; HANDOFF_PAGE_SPEC adopted; 6 decisions logged |
+
+## What Was Done (Session 21) -- Strategic pivot to ToolKit-first + portal redesign brief locked
+Date: 2026-04-28
+
+Discussion / planning session. No code changes. All outputs are decisions and a build brief for the next implementation session.
+
+1. **Strategic pivot -- ToolKit becomes flagship** -- Promoted ToolKit ahead of ChatKit as the primary acquisition product. ChatKit pricing/voice/auto-learning sequence (Session 20 plan) deferred behind a portal redesign and ToolKit/Handoff page rebuild. Rationale: Handoff (4 free MIT-licensed Claude Code skills) is a low-cost, high-distribution acquisition surface targeting Claude Code developers -- the exact audience that buys ChatKit/SignaKit later. ChatKit monetization without a funnel feeds an empty pipe.
+
+2. **Portal redesign brief locked** -- Two visual shell variants. Marketing-style (stars + blackhole + cinematic) on `/portal/toolkit`, `/portal/login`, `/portal/signup`. App-style (plain deep dark, no video, no stars) on `/portal/chatkit/*`, `/portal/settings`. Same top bar / fonts / palette / button styles tie them together. Rationale: audience is developers; tools they trust (Vercel, Linear, Stripe, Supabase, GitHub) don't decorate working surfaces -- but marketing-style is correct for marketing surfaces. Split treatment gives "wow" entry + crisp work tools.
+
+3. **IA flattened: top bar replaces sidebar** -- Portal sidebar removed. Top bar with 4 items: ToolKit · ChatKit · Settings · Home (Home links back to mdntech.org). Logged-out top-right = "Login"; logged-in on marketing = "Portal"; logged-in on portal = "Home". Mobile uses hamburger pattern matching marketing site.
+
+4. **Dashboard removed; default landing = ToolKit** -- Standalone `/portal/dashboard` page goes away. Chatbot analytics (metrics, 7-day trend, keywords, export) move inline into `/portal/chatkit/[id]`. After login, customers land on `/portal/toolkit` -- their first impression is the free tools they came for.
+
+5. **Public-route exception for ToolKit** -- `/portal/toolkit/*` becomes publicly accessible (no auth wall). `/portal/chatkit/*` and `/portal/settings/*` stay gated. Middleware change required to distinguish these paths before the existing portal-host login redirect. Rationale: ToolKit is the install destination linked from social posts; signup-before-install kills the funnel.
+
+6. **ToolKit MVP content scoped** -- Visible cards: (a) Handoff -- one bundled card replacing individual `/start` and `/wrap` cards, links to install flow per spec; (b) PlanKit teaser -- "coming soon · paid"; (c) third-party Anthropic Skills -- UI/UX Pro Max, SEO Audit, Frontend Design, Simplify, Claude API. Hidden for MVP: M.D.N Tech-only auxiliaries (CMO, Test, Security Review) -- they stay in `lib/portal/toolkit-skills.ts` data but are filtered out of the visible gallery. ToolKit name preserved so PlanKit + future tools have a stable home.
+
+7. **Build phasing locked** -- Phase A: portal shell (top bar + marketing/app shell variants) + Login/Signup full-shell + public-route middleware change + ToolKit page rebuilt around Handoff (hero, OS-aware install block, skill cards, PlanKit teaser, FAQ). Phase B: ChatKit pages restyled (app shell) + analytics moved inline + empty states + delete `/portal/dashboard` route. Phase C: Settings restyle + marketing site top-bar swap (Login/Portal) + homepage Tools link/card pointing to ToolKit.
+
+8. **HANDOFF_PAGE_SPEC adopted** -- Build brief at [command-center/HANDOFF_PAGE_SPEC.md](command-center/HANDOFF_PAGE_SPEC.md). Spec was written for a Vite/React/react-router-dom stack; portal implementation will adapt sections (`<HandoffHero />`, `<WhatIsIt />`, `<InstallBlock />`, `<SkillCards />`, `<PlanKitTeaser />`, `<FAQ />`) to Next.js 15 App Router. Install block UX (OS-aware default tab via `navigator.platform`, copy-to-clipboard, manual fallback `<details>`, verify step, uninstall one-liner) is the most important section per spec -- treated as primary feature.
+
+9. **Decisions logged** -- 6 entries appended to [decisions.md](decisions.md): (a) strategic pivot to ToolKit-first; (b) top bar replaces sidebar; (c) Dashboard removed; (d) public-route exception for ToolKit; (e) visual treatment split (marketing vs app shells); (f) ToolKit MVP content scope.
+
+10. **No code changes** -- Working tree was clean at session start; `HANDOFF_PAGE_SPEC.md` moved from repo root to `command-center/` to match existing brief locations.
 
 ## What Was Done (Session 20) -- ToolKit replaces TradeKit in customer portal
 Date: 2026-04-18
@@ -277,19 +303,20 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Strategic pivot: complete ChatKit (pricing, voice, auto-learning) before continuing ToolKit. ChatKit becomes the flagship monetized product. ToolKit and SignaKit follow.** See [PLAN.md](PLAN.md) for strategic context.
+**Strategic pivot (Session 21): ToolKit becomes the flagship acquisition product ahead of ChatKit. Portal redesign + ToolKit/Handoff page rebuild ships first. ChatKit monetization (pricing/voice/auto-learning per Session 20 plan) resumes after Phase C.** See [decisions.md](decisions.md) Session 21 entries and [command-center/HANDOFF_PAGE_SPEC.md](command-center/HANDOFF_PAGE_SPEC.md) for full context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | ChatKit Pricing + Stripe billing | Pending (user setup) | Migration 007 (stripe fields, plan enum: free/pro/max/enterprise), `/pricing` page on marketing site, `/portal/upgrade` page, updated usage caps (50/2000/10000/unlimited). User must create Stripe account + share API keys before checkout/webhooks can be wired. UI + schema can proceed in parallel. |
-| 2 | ChatKit Auto-Learning MVP | Pending | Flag UI in conversation viewer, weekly Sunday cron, Claude analysis of flagged messages, weekly report at `/portal/chatkit/[id]/learning`, optional email digest. Uses existing `message_feedback` table. ~5 hours. |
-| 3 | ChatKit Voice via Cartesia Sonic-3 | Pending | Cartesia SDK in widget + API, voice toggle per chatbot (Max tier or Pro add-on), microphone button + audio playback, streaming TTS. Add-on billing $10/mo for Pro. ~6 hours. |
-| 4 | ToolKit Tier 1 content | Deferred | Resume after ChatKit complete. Add prompt templates + integration recipes. Ships free tier. |
-| 5 | SignaKit section in portal | Pending | Auth product UI: status badge, features list, OAuth dashboard preview. Lower priority until ChatKit monetization works. |
-| 6 | Portal authentication: Supabase → SignaKit | Pending | Migrate portal auth from Supabase Auth to SignaKit. Unlocks Phase 4 auth provider consolidation. |
-| 7 | Website rebuild (deferred) | Deferred | Skip until ChatKit pricing/positioning informs landing page copy. |
-| 8 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column). Low priority. |
-| 9 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` after website rebuild scope clarifies. |
+| 1 | Phase A -- Portal shell + ToolKit/Handoff page | Pending | Brief UI/UX Pro Max with the locked spec. Build: top bar (4 items: ToolKit · ChatKit · Settings · Home + auth-aware right button), `<PortalShell variant="marketing"\|"app">` with stars + blackhole hero on marketing variant, plain dark on app variant, same fonts (Inter / Space Grotesk / JetBrains Mono) and palette across both. Login/Signup pages full marketing shell. Public-route middleware change so `/portal/toolkit/*` works without auth (logged-out → "Login" right button, logged-in → "Home"). ToolKit page rebuilt per HANDOFF_PAGE_SPEC: HandoffHero + WhatIsIt + InstallBlock (OS-aware default tab, copy-to-clipboard with `Copied ✓` 2s callout, manual fallback `<details>`, verify step, uninstall one-liner) + SkillCards (Handoff bundled card + Anthropic third-party cards visible; M.D.N-only auxiliary cards filtered) + PlanKitTeaser + FAQ. Default landing after login → `/portal/toolkit`. |
+| 2 | Phase B -- ChatKit pages restyled + analytics inline + empty states | Pending | App-shell variant on `/portal/chatkit/*` and all sub-pages (`[id]`, `[id]/edit`, `[id]/conversations`, `[id]/entries/{new,[entryId]/edit}`). Move `/portal/dashboard` analytics (metrics cards, TrendChart, KeywordsBar, conversation export) inline into `/portal/chatkit/[id]`. Empty states: chatbot list ("Create your first chatbot"), KB entries ("Add your first KB entry"), analytics ("No conversations yet"). Delete `app/portal/dashboard/` route. |
+| 3 | Phase C -- Settings restyle + marketing top-bar swap + Tools link | Pending | App-shell on `/portal/settings`. Marketing site `components/main/navbar.tsx` (and Header equivalents): swap "Start Project" button for auth-aware Login/Portal button. Add a small Tools link/card pointing to `/portal/toolkit` either in the navbar or homepage Project section. Preconnect tags + cache-control on blackhole video for cross-origin smoothness between mdntech.org ↔ app.mdntech.org. |
+| 4 | ChatKit Pricing + Stripe billing | Deferred (resumes after Phase C) | Per Session 20 plan. Migration 007 (stripe fields, plan enum), `/pricing` on marketing, `/portal/upgrade` in portal, caps 50/2000/10000/unlimited. Stripe account creation pending on user side; UI + schema can proceed in parallel. |
+| 5 | ChatKit Auto-Learning MVP | Deferred (resumes after Pricing) | Flag UI in conversation viewer + Sunday cron + Claude analysis + weekly report at `/portal/chatkit/[id]/learning`. Uses existing `message_feedback` table. ~5 hours. |
+| 6 | ChatKit Voice via Cartesia Sonic-3 | Deferred (resumes after Auto-Learning) | Cartesia SDK in widget + API, voice toggle per chatbot, mic + audio playback, streaming TTS. $10/mo Pro add-on. ~6 hours. |
+| 7 | SignaKit section in portal | Hidden (MVP) | Removed from portal nav per Session 21 redesign. Reactivate when SignaKit launches as a real product post-ChatKit-monetization. |
+| 8 | Portal authentication: Supabase → SignaKit | Pending | Migrate portal auth from Supabase Auth to SignaKit. Unlocks Phase 4 auth provider consolidation. |
+| 9 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column). Low priority. |
+| 10 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` after Phase C completes. |
 
 ## Key Files
 
@@ -354,5 +381,6 @@ Date: 2026-04-17
 | [PLAN.md](PLAN.md) | Plan pointer -- Mind Palace is authoritative; this is the repo stub |
 | [command-center/MIND-PALACE-BRIEFING.md](command-center/MIND-PALACE-BRIEFING.md) | Architectural decisions briefing (D1-D6 locked 2026-04-16), migration 004 spec, phase sequencing |
 | [command-center/mdntech-website-rebuild.md](command-center/mdntech-website-rebuild.md) | Website rebuild spec (input to Phase 3) |
+| [command-center/HANDOFF_PAGE_SPEC.md](command-center/HANDOFF_PAGE_SPEC.md) | Handoff page build brief (Session 21): IA, install block UX, skill cards, PlanKit teaser, FAQ. Stack-agnostic; adapt section components to Next.js 15. |
 | [.mcp.json](.mcp.json) | Supabase MCP server config (hosted OAuth, scoped to project `ijfgwzacaabzeknlpaff`) |
 | [decisions.md](decisions.md) | Decision log -- locked architectural decisions with reasoning |
