@@ -30,25 +30,22 @@ export default async function PortalSettingsPage() {
   ]
 
   return (
-    <PortalShell>
-      <div className="p-6 space-y-4 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center">
-              <UserCircle2 className="w-5 h-5 text-purple-400" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-white">Settings</h1>
-              <p className="text-gray-400 text-sm mt-0.5">Manage your account</p>
-            </div>
-          </div>
-        </div>
+    <PortalShell variant="marketing">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
+        <header className="mb-8">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan-400/80 mb-2">
+            Settings
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+            Account
+          </h1>
+          <p className="text-gray-400 text-sm mt-2 max-w-xl">
+            The basics on file for your M.D.N Tech account. Need to change
+            something? Drop us a line and we&apos;ll sort it.
+          </p>
+        </header>
 
-        {/* Account card */}
-        <section className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-4 max-w-2xl">
-          <h2 className="text-sm font-medium text-white">Account</h2>
-
+        <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-5 backdrop-blur-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {fields.map(({ label, value, icon: Icon }) => (
               <div key={label} className="bg-[#0a0a14] border border-white/5 rounded-lg p-3">
