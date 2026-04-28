@@ -65,6 +65,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://app.mdntech.org" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://app.mdntech.org" />
+        <link rel="preconnect" href="https://mdntech.org" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://mdntech.org" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
