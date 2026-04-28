@@ -12,20 +12,37 @@ function isPortalHost(host: string): boolean {
   return host === PORTAL_HOST || host.startsWith(`${PORTAL_HOST}:`)
 }
 
+function isLocalDev(host: string): boolean {
+  return host.startsWith('localhost') || host.startsWith('127.0.0.1')
+}
+
+// Public portal paths (no auth required). ToolKit is the install destination
+// linked from social posts; signup-before-install would kill the funnel.
+function isPublicPortalPath(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/toolkit' ||
+    pathname.startsWith('/toolkit/')
+  )
+}
+
 export async function updateSession(request: NextRequest) {
   const host = request.headers.get('host') || ''
   const { pathname } = request.nextUrl
 
-  // --- External redirects (old URLs on wrong hosts) ---
+  // --- External redirects (old URLs on wrong hosts; skipped on localhost so
+  // dev can hit /portal/* and /command-center/* without bouncing to prod). ---
 
-  if (!isAdminHost(host) && pathname.startsWith('/command-center')) {
+  if (!isLocalDev(host) && !isAdminHost(host) && pathname.startsWith('/command-center')) {
     const newPath = pathname.replace(/^\/command-center/, '') || '/'
     const url = new URL(`https://${ADMIN_HOST}${newPath}`)
     url.search = request.nextUrl.search
     return NextResponse.redirect(url, 301)
   }
 
-  if (!isPortalHost(host) && !isAdminHost(host) && pathname.startsWith('/portal')) {
+  if (!isLocalDev(host) && !isPortalHost(host) && !isAdminHost(host) && pathname.startsWith('/portal')) {
     const newPath = pathname.replace(/^\/portal/, '') || '/'
     const url = new URL(`https://${PORTAL_HOST}${newPath}`)
     url.search = request.nextUrl.search
@@ -118,14 +135,14 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login?error=unauthorized`))
     }
 
-    // Require login for protected paths (except login and signup)
-    if (pathname !== '/login' && pathname !== '/signup' && !user) {
+    // Require login for non-public paths
+    if (!isPublicPortalPath(pathname) && !user) {
       return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login`))
     }
 
-    // Redirect logged-in users away from login page
+    // Redirect logged-in users away from login page → ToolKit (new default landing)
     if (pathname === '/login' && user) {
-      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/`))
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/toolkit`))
     }
 
     // API passthrough
@@ -133,9 +150,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // Rewrite clean paths to /portal/* internally
+    // Rewrite clean paths to /portal/* internally. Default landing → /toolkit.
     const internalPath = pathname === '/'
-      ? '/portal/dashboard'
+      ? '/portal/toolkit'
       : `/portal${pathname}`
     const url = request.nextUrl.clone()
     url.pathname = internalPath
@@ -153,6 +170,7 @@ export async function updateSession(request: NextRequest) {
   const isPortal = pathname.startsWith('/portal')
   const isPortalLogin = pathname === '/portal/login'
   const isPortalSignup = pathname === '/portal/signup'
+  const isPortalToolkit = pathname === '/portal/toolkit' || pathname.startsWith('/portal/toolkit/')
 
   if (isCommandCenter && !isCCLogin && !user) {
     const url = request.nextUrl.clone()
@@ -166,7 +184,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isPortal && !isPortalLogin && !isPortalSignup && !user) {
+  if (isPortal && !isPortalLogin && !isPortalSignup && !isPortalToolkit && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/portal/login'
     return NextResponse.redirect(url)
@@ -174,7 +192,7 @@ export async function updateSession(request: NextRequest) {
 
   if (isPortalLogin && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/portal/dashboard'
+    url.pathname = '/portal/toolkit'
     return NextResponse.redirect(url)
   }
 
