@@ -150,9 +150,12 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // Rewrite clean paths to /portal/* internally. Default landing → /chatkit.
+    // Rewrite clean paths to /portal/* internally. Default landing → /toolkit
+    // (public, no auth required) so first-time visitors at app.mdntech.org see
+    // the install page. Post-auth landing (login push, signup redirect, /login
+    // redirect for logged-in users) still goes to /chatkit per Session 23.
     const internalPath = pathname === '/'
-      ? '/portal/chatkit'
+      ? '/portal/toolkit'
       : `/portal${pathname}`
     const url = request.nextUrl.clone()
     url.pathname = internalPath
