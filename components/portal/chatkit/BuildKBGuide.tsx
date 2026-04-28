@@ -1,7 +1,6 @@
 import { CodeBlock } from '@/components/portal/handoff/CodeBlock'
 import { Reveal } from '@/components/portal/handoff/Reveal'
 import { BookOpen, Sparkles, Upload, ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 
 const KB_PROMPT = `Hey Claude Code — please scan this entire project (code, docs, README, marketing copy, anything user-facing) and generate a single knowledge-base.md file for a chatbot that will answer visitor questions on the website.
 
@@ -30,13 +29,35 @@ export function BuildKBGuide({ collapsed = false }: Props) {
             Install Claude Code
           </h3>
           <p className="text-sm text-gray-400 mt-1.5 leading-relaxed">
-            Get the M.D.N skills with a one-line installer.{' '}
-            <Link
-              href="/portal/toolkit#install"
-              className="text-purple-300 hover:text-purple-200 underline-offset-2 hover:underline"
+            Easiest path: open{' '}
+            <span className="text-white font-medium">VS Code</span>, go to{' '}
+            <span className="text-white font-medium">Extensions</span>, search{' '}
+            <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
+              Claude Code
+            </code>{' '}
+            and install. Sign in with your Anthropic account when prompted.
+          </p>
+          <p className="text-sm text-gray-400 mt-3 mb-3 leading-relaxed">
+            Prefer the terminal? Run this, then{' '}
+            <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
+              claude
+            </code>{' '}
+            in your project folder.
+          </p>
+          <CodeBlock
+            code="npm install -g @anthropic-ai/claude-code"
+            language="bash"
+            label="Terminal"
+          />
+          <p className="text-xs text-gray-500 mt-3">
+            <a
+              href="https://docs.claude.com/en/docs/claude-code"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hover:text-gray-300 underline-offset-2 hover:underline"
             >
-              See the full install guide →
-            </Link>
+              Official Claude Code docs →
+            </a>
           </p>
         </div>
       </div>
