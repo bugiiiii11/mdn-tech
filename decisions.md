@@ -263,3 +263,35 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Implementation:** 6 references to `/toolkit`/`/portal/toolkit` swapped to `/chatkit`/`/portal/chatkit` in `lib/supabase/middleware.ts` (3), `components/portal/auth/{LoginForm,SignupForm}.tsx` (2), and `app/portal/page.tsx` (1). The public-route exception for `/portal/toolkit/*` from Session 21 still stands — anonymous visitors continue to see ToolKit at `app.mdntech.org/toolkit` without auth, so the funnel hypothesis (Session 21) is unaffected.
 
 ---
+
+## 2026-04-29 -- Session 24 -- Portal-host bare URL lands on ToolKit (separates auth-flow landing from cold-entry landing)
+
+**Decision:** Refines Session 23, doesn't reverse it. The portal-host root rewrite (`app.mdntech.org/` with no path) now resolves to `/portal/toolkit` instead of `/portal/chatkit`. Post-auth landing — login form push, signup `emailRedirectTo`, `/login`-redirect-for-logged-in-user — still goes to `/chatkit`. Two distinct entry surfaces, two distinct landings:
+
+- **Cold entry** (someone types `app.mdntech.org` or clicks a link to the bare host) → ToolKit, public, no login wall.
+- **Authenticated flow** (login form, post-signup confirmation, `/login` while already logged in) → ChatKit, the working surface.
+
+**Why:** Session 23 collapsed both surfaces onto ChatKit because "logged-in users want the working surface". That's still true for the auth flow, but it punishes anonymous traffic — anyone hitting the bare URL gets bounced through `/login` because `/portal/chatkit` requires auth. For social-driven traffic (the entire ToolKit acquisition funnel), the bare URL is the canonical entry, and it should land on the public install page, not a login wall. User reasoned: "this way we can bring the users directly to the toolkit page without login." Splitting "cold entry" from "auth flow" preserves Session 23's muscle-memory argument (logged-in customers still land on their work) without taxing the marketing funnel.
+
+**Alternatives:** Keep both on ChatKit (rejected — bare-URL visitors get a login wall, defeating ToolKit-as-acquisition); send both to ToolKit (rejected — re-introduces the Session 23 "log in and re-traverse to ChatKit" problem); auth-aware bare-URL rewrite (logged-in → ChatKit, logged-out → ToolKit, rejected as over-engineered for a marginal benefit — logged-in users hitting the bare URL by typing it is rare, and they can click ChatKit in nav).
+
+**Implementation:** 2 references in `lib/supabase/middleware.ts` line 154-156 (portal-host root rewrite `/portal/chatkit` → `/portal/toolkit`) and `app/portal/page.tsx` (simplified to always redirect to `/portal/toolkit`, dropping the auth check). The public-path allowlist already covered `/toolkit/*` so no auth-guard changes needed.
+
+---
+
+## 2026-04-29 -- Session 24 -- Resend chosen as transactional email provider (will replace built-in Supabase SMTP)
+
+**Decision:** Migrate transactional email (currently confirmation, eventually password reset + magic links) from Supabase's built-in email service to **Resend**. Sender will be `noreply@mdntech.org` with display name "M.D.N Tech". Custom Supabase SMTP, configured via dashboard, no code change required. Implementation deferred to a follow-up session (DNS access + Resend signup are user-side); the branded HTML template shipped Session 24 works the same regardless of which SMTP delivers it.
+
+**Why:** Built-in Supabase email has hard rate limits (~3-4/hour free, ~30/hour paid), ships from `noreply@mail.app.supabase.io` (spammy-looking), has no DKIM/SPF on our domain, and no analytics. Once ToolKit drives social signups in batches (a Twitter post going viral, a YouTube mention), built-in service silently drops verification emails and the funnel breaks invisibly. Need to migrate before that surface exists. Among providers evaluated:
+
+- **Resend** — chosen. $0 free tier covers 3000 emails/month (enough for early growth), $20/mo for 50k. Modern API, dev-friendly DX, well-known founder (Zeno Rocha). 5-minute DKIM/SPF setup. Plays cleanly with Supabase SMTP.
+- **Postmark** — premium deliverability, $15/mo for 10k emails. Battle-tested for transactional but no free tier and overkill at current volume.
+- **AWS SES** — cheapest at scale ($0.10/1k) but more setup (sandbox approval, IAM, DKIM via Route53). Better fit when sending >100k/month.
+- **SendGrid** — popular but bigger company, more friction, less developer-focused than Resend.
+
+**Why now:** Session 24 shipped the branded HTML template + auth/callback PKCE handler, so the email body and post-click flow are production-quality. The remaining gap is delivery infrastructure. Without Resend, scaling signups will hit the rate limit cliff before they hit any other limit.
+
+**Alternatives:** Stay on built-in Supabase email (rejected — rate limits are a delivery cliff, not a soft warning); self-host Postfix/Sendmail (rejected — no time, no expertise advantage, deliverability nightmare); skip transactional email entirely and require admin-approved signups (rejected — kills the self-serve funnel).
+
+---
