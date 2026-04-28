@@ -251,3 +251,15 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Alternatives:** Keep blackhole on `/portal/toolkit` only (rejected — inconsistent treatment between toolkit and login/signup, both of which are marketing-style entries); drop stars too (rejected — leaves the marketing variant indistinguishable from the app variant, defeating the split); keep both on all portal pages including app-variant (rejected by Session 21 decision — fights with data density on chatkit/settings).
 
 ---
+
+## 2026-04-28 -- Session 23 -- Post-auth landing reversed: ChatKit, not ToolKit (overrides Session 21)
+
+**Decision:** After successful login, customers land on `/portal/chatkit` (not `/portal/toolkit`). Same destination for the portal-host root rewrite (`app.mdntech.org/` → `/portal/chatkit`), the signup email confirmation link (`emailRedirectTo: '/chatkit'`), and any "already logged in hitting /login" redirects. ToolKit remains the public, no-auth marketing surface linked from social posts. Reverses the Session 21 decision "Default landing = ToolKit".
+
+**Why:** Session 21's reasoning was "first impression = the free tools they came for", framing ToolKit as the acquisition hook for logged-in visitors. In practice that's backwards: ToolKit's job is to convert *anonymous* visitors (it's publicly accessible — no signup needed to install Handoff). By the time a customer has logged in, they've already crossed the conversion line and want the working surface they pay for (or will pay for) — ChatKit. Landing them on ToolKit makes them re-traverse to ChatKit on every session and breaks the muscle-memory pattern of "log in → see my work" used by every SaaS they trust (Linear, Vercel, Stripe). User flagged this directly: "after successful login the page should stay on the chatkit page".
+
+**Alternatives:** Keep ToolKit landing per Session 21 (rejected — the "first impression" argument applies to anonymous visits, which already see ToolKit publicly); land on a unified Dashboard (rejected by Session 21 decision — Dashboard was deleted because its content belongs to chatbots not the portal); per-customer remembered-last-page (over-engineered for current scale).
+
+**Implementation:** 6 references to `/toolkit`/`/portal/toolkit` swapped to `/chatkit`/`/portal/chatkit` in `lib/supabase/middleware.ts` (3), `components/portal/auth/{LoginForm,SignupForm}.tsx` (2), and `app/portal/page.tsx` (1). The public-route exception for `/portal/toolkit/*` from Session 21 still stands — anonymous visitors continue to see ToolKit at `app.mdntech.org/toolkit` without auth, so the funnel hypothesis (Session 21) is unaffected.
+
+---
