@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity } from 'lucide-react'
+import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft } from 'lucide-react'
 import { KBEntryList } from '@/components/command-center/chatbots/KBEntryList'
 import { KBExportButton } from '@/components/command-center/chatbots/KBExportButton'
 import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
@@ -77,7 +77,13 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
     <PortalShell>
       <div className="p-6 space-y-4 max-w-6xl mx-auto">
         {/* Back */}
-        <Link href="/portal/chatkit" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">← ChatKit</Link>
+        <Link
+          href="/portal/chatkit"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 border border-white/10 hover:border-white/20 hover:text-white rounded-lg transition-colors w-fit"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+          ChatKit
+        </Link>
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 flex-wrap">

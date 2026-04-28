@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { PortalKBEntryForm } from '@/components/portal/chatbots/PortalKBEntryForm'
 
@@ -32,8 +34,14 @@ export default async function EditEntryPage({ params }: { params: Promise<{ id: 
   return (
     <PortalShell>
       <div className="p-6">
-        <a href={`/portal/chatkit/${chatbot.id}`} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">← {chatbot.name}</a>
-        <h1 className="text-xl font-semibold text-white mt-2 mb-6">Edit KB entry</h1>
+        <Link
+          href={`/portal/chatkit/${chatbot.id}`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 border border-white/10 hover:border-white/20 hover:text-white rounded-lg transition-colors w-fit"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+          {chatbot.name}
+        </Link>
+        <h1 className="text-xl font-semibold text-white mt-4 mb-6">Edit KB entry</h1>
         <PortalKBEntryForm chatbotId={chatbot.id} entry={entry} />
       </div>
     </PortalShell>

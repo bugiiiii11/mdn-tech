@@ -81,11 +81,15 @@ export function PortalChatbotForm({ chatbot, userId }: { chatbot?: any; userId: 
         <button
           type="submit"
           disabled={saving}
-          className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-sm font-medium text-white disabled:opacity-50 hover:opacity-90 transition-opacity"
+          className="button-primary px-5 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving...' : chatbot ? 'Save changes' : 'Create chatbot'}
         </button>
-        <button type="button" onClick={() => router.back()} className="px-5 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-5 py-2 text-sm text-gray-300 border border-white/10 hover:border-white/20 hover:text-white rounded-lg transition-colors"
+        >
           Cancel
         </button>
       </div>
