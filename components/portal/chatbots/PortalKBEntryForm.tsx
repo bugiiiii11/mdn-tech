@@ -52,7 +52,7 @@ export function PortalKBEntryForm({ chatbotId, entry }: { chatbotId: string; ent
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-4">
+      <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-gray-400 mb-1">Title *</label>
@@ -100,7 +100,7 @@ This section can contain product details, FAQs, tone guidelines, policies, etc.
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-sm font-medium text-white disabled:opacity-50 hover:opacity-90 transition-opacity"
+            className="button-primary px-5 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition-colors"
           >
             {saving ? 'Saving...' : entry ? 'Save changes' : 'Add to knowledge base'}
           </button>

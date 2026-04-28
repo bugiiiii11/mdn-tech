@@ -24,7 +24,6 @@ export default async function ConversationsPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
-  // Fetch chatbot to verify ownership
   const { data: chatbot } = await supabase
     .from('chatbots')
     .select('id, name, widget_config, owner_id')
@@ -53,25 +52,29 @@ export default async function ConversationsPage({
   ]
 
   return (
-    <PortalShell>
-      <div className="p-6 space-y-6">
-        {/* Header */}
+    <PortalShell variant="marketing">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-10 space-y-8">
         <div>
           <Link
             href={`/portal/chatkit/${chatbot.id}`}
-            className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 border border-white/10 hover:border-white/20 hover:text-white rounded-lg transition-colors w-fit mb-6"
           >
-            <ChevronLeft size={14} />
-            Back to {chatbot.name}
+            <ChevronLeft className="w-3.5 h-3.5" />
+            {chatbot.name}
           </Link>
-          <h1 className="text-xl font-semibold text-white">{chatbot.name} — Conversations</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Review all conversations and rate message quality to improve your knowledge base
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-cyan-400/80 mb-2">
+            {chatbot.name}
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+            Conversations
+          </h1>
+          <p className="text-gray-400 text-sm mt-2 max-w-xl">
+            Review every conversation and rate message quality to improve your
+            knowledge base.
           </p>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 border-b border-white/5">
+        <div className="flex gap-2 border-b border-white/[0.06]">
           {filterTabs.map(({ key, label }) => {
             const isActive = filter === key
             const href = key === 'all'
@@ -93,10 +96,9 @@ export default async function ConversationsPage({
           })}
         </div>
 
-        {/* Conversations list */}
         <div className="space-y-3">
           {conversations.length === 0 ? (
-            <div className="bg-[#0d0d20] border border-white/5 rounded-xl px-5 py-10 text-center">
+            <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl px-5 py-10 text-center backdrop-blur-sm">
               <p className="text-gray-400 text-sm">No conversations found for this filter</p>
             </div>
           ) : (

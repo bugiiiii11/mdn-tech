@@ -47,7 +47,7 @@ export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; con
   }
 
   return (
-    <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-4">
+    <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
       <h3 className="text-sm font-medium text-white">Widget Settings</h3>
 
       <div>

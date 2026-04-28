@@ -47,7 +47,7 @@ export function UsageMeter({ customerId, product }: { customerId: string; produc
   const isWarning = used >= limit * 0.75 && !isLimitReached
 
   return (
-    <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4 space-y-3">
+    <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-4 space-y-3 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {isLimitReached && <AlertCircle className="w-4 h-4 text-red-400" />}

@@ -14,7 +14,7 @@ export function EmbedSnippet({ chatbotId }: { chatbotId: string }) {
   }
 
   return (
-    <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-3">
+    <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-3 backdrop-blur-sm">
       <h3 className="text-sm font-medium text-white">Deploy</h3>
       <p className="text-xs text-gray-400">
         Add this script tag to your client&apos;s website, just before the closing <code className="text-gray-300">&lt;/body&gt;</code> tag.

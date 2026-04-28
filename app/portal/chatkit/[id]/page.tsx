@@ -74,8 +74,8 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <PortalShell>
-      <div className="p-6 space-y-4 max-w-6xl mx-auto">
+    <PortalShell variant="marketing">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-10 space-y-6">
         {/* Back */}
         <Link
           href="/portal/chatkit"
@@ -120,7 +120,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         {chatbot.description && <p className="text-gray-400 text-sm">{chatbot.description}</p>}
 
         {/* Activity overview: stat tiles + smart charts + actions */}
-        <section className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-5">
+        <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-5 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-white">Activity</h2>
             {hasConversations && (
@@ -206,7 +206,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         <WidgetConfigForm chatbotId={chatbot.id} config={chatbot.widget_config ?? {}} />
 
         {/* Knowledge Base */}
-        <section className="bg-[#0d0d20] border border-white/5 rounded-xl p-5 space-y-4">
+        <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-sm font-medium text-white">Knowledge Base</h2>
