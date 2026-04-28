@@ -129,3 +129,51 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Phase schedule:** ToolKit Tier 1 (Prompt templates + integration recipes) ships next session. Phase 4 (auth provider consolidation: Supabase → SignaKit) proceeds independently; by then, portal has established demand velocity for SignaKit positioning.
 
 ---
+
+## 2026-04-18 -- Session 20 -- ChatKit pricing tiers locked
+
+**Decision:** ChatKit launches with 4 tiers — Free ($0/50msg/mo), Pro ($29/2000msg/mo), Max ($79/10000msg/mo), Enterprise (custom). Free tier serves as the trial (no separate trial period). Voice add-on is $10/mo for Pro, included in Max.
+
+**Why:** Industry benchmark from Intercom Fin ($29-132/seat + $0.99/resolution), Drift ($2,500/mo enterprise-only), and FastBots ($29-299/mo) confirmed sweet spots at $29 and $79. Token cost per message at ~$0.005 (Claude Haiku 4.5) leaves margins of 72% (Pro) and 49% (Max), accounting for voice overhead. 50 free messages = sufficient for prospect evaluation per Session 11 economics review. Free-tier-as-trial avoids Stripe trial complexity and standard 14-day card-required friction.
+
+**Alternatives:** Per-resolution pricing like Intercom (more complex billing, harder to forecast); 14-day card-required trial (industry standard but adds friction); single $49 tier (simpler but limits Enterprise upsell).
+
+**Revisit:** After 100 paying customers, evaluate whether Pro→Max conversion needs adjustment. May need a 5,000-message intermediate tier if Max cap feels too high.
+
+---
+
+## 2026-04-18 -- Session 20 -- Voice provider: Cartesia Sonic-3
+
+**Decision:** Use Cartesia Sonic-3 for ChatKit voice synthesis (TTS). Bundled in Max tier, $10/mo add-on for Pro tier. Free tier remains text-only.
+
+**Why:** Cartesia's 90ms time-to-first-audio is ~4x faster than ElevenLabs (~300ms) — critical for real-time chatbot UX. State-space model architecture provides quality competitive with ElevenLabs at $4/mo Pro pricing (5x cheaper). Inworld AI was a close second (#1 TTS leaderboard) but Cartesia's lower latency wins for chatbot use case. Multilingual support is "growing" — sufficient for MVP English-only launch with expansion path.
+
+**Alternatives:** ElevenLabs (premium quality, but expensive at scale and higher latency); Inworld AI (top quality, model-agnostic router, but slightly higher latency); Azure Neural TTS (140+ languages, best for Enterprise multilingual, but no real-time UX advantage); Fish Audio (#1 TTS-Arena, 80% cheaper than ElevenLabs, but less real-time tooling); Chatterbox open-source (free self-host, MIT license, but operational burden).
+
+**Revisit:** When adding multilingual support beyond English (likely Q3 2026). May need Azure Neural TTS as fallback for Enterprise tier with 140+ language requirements.
+
+---
+
+## 2026-04-18 -- Session 20 -- Auto-learning MVP: Flag + Weekly Report
+
+**Decision:** ChatKit auto-learning launches as Flag + Weekly Report pattern. Owners flag bad messages from conversation viewer; Sunday cron job aggregates flagged messages per chatbot; Claude analyzes them with KB context; generates weekly report with KB suggestions. No automatic application — owner reviews and approves manually.
+
+**Why:** Existing `message_feedback` table (migration 005) already has correct/incorrect/helpful/not_helpful ratings + RLS for customer-scoped writes. Building flag UI and weekly aggregation on top is ~5 hours vs. ~12 hours for full one-click-apply or auto-fine-tuning. Manual review preserves quality control and avoids prompt drift from low-signal flags. Pattern matches RLHF fundamentals (HITL feedback loop) without ML pipeline complexity.
+
+**Alternatives:** Full RLHF with auto-prompt-tuning (premature; needs more conversation volume to be statistically meaningful); One-click apply (better UX but doubles build time and adds approval flow complexity); No auto-learning, manual analytics only (loses key differentiator vs. Intercom/Drift).
+
+**Revisit:** Phase 2 of auto-learning (one-click apply) once 10+ paying customers have submitted >100 flagged messages. Auto-fine-tuning gated on Pro+ usage data quality.
+
+---
+
+## 2026-04-18 -- Session 20 -- Build sequence: Pricing first, features second
+
+**Decision:** Build ChatKit improvements in this order: (1) Pricing page + Stripe billing + plan tiers, (2) Auto-learning MVP, (3) Voice via Cartesia. Build pricing UI + schema in parallel with user creating Stripe account.
+
+**Why:** Monetization unlocks revenue runway and validates demand before features burn build budget. UI + schema work doesn't block on Stripe account, so parallel execution is feasible. Auto-learning second (vs. voice) because it leverages existing `message_feedback` infrastructure with ~5 hour build vs. voice's ~6 hours + new dependency on Cartesia integration. Voice last because it's the most complex (real-time audio + WebSockets) and benefits from established billing infrastructure to gate access.
+
+**Alternatives:** Features first (faster to demo but no revenue capture); Pricing + voice first (skips auto-learning differentiation); All three parallel tracks (fragments focus, slows each track).
+
+**Revisit:** If Stripe account setup blocks more than 1 session, switch to features-first and add Stripe at end.
+
+---

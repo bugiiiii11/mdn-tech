@@ -38,6 +38,8 @@ Date: 2026-04-18
 
 5. **Next session priorities locked** -- ToolKit needs: prompt templates + integration recipes (Tier 1 content, ships fast). Then SignaKit section (auth product portal UI). Website rebuild deferred until product wording is finalized.
 
+6. **ChatKit improvement plan scoped** -- Strategic shift: complete ChatKit before continuing ToolKit. Three improvement areas planned with build sequence: (a) **Pricing tiers** -- Free $0/50msg, Pro $29/2000msg, Max $79/10000msg, Enterprise custom. Margins 49-72%. Free tier is the trial (no separate trial period). (b) **Voice** -- Cartesia Sonic-3 selected (90ms latency, $4/mo Pro, growing multilingual). Bundled in Max tier, $10/mo add-on for Pro. Free tier stays text-only. (c) **Auto-learning MVP** -- Flag + Weekly Report pattern: owners flag wrong messages, Sunday cron sends to Claude for analysis, generates weekly report with KB suggestions. Uses existing `message_feedback` table. ~5 hours build. **Build order:** Pricing + Stripe first (~10 hours), then Auto-learning (~5 hours), then Voice (~6 hours). Pricing page lives on both marketing site (`/pricing`) and portal (`/portal/upgrade`). Stripe account creation pending on user side; UI + schema work can proceed in parallel.
+
 ## What Was Done (Session 19) -- Phase 2 finalization -- auth hardening
 Date: 2026-04-17
 
@@ -275,16 +277,19 @@ Date: 2026-04-17
 
 ## What To Do Next
 
-**Phase 2 complete. ToolKit launched as strategic replacement for TradeKit. Portal now has 3 products: ChatKit, SignaKit (coming), ToolKit. Next: ToolKit Tier 1 content, then SignaKit section.** See [PLAN.md](PLAN.md) for strategic context.
+**Strategic pivot: complete ChatKit (pricing, voice, auto-learning) before continuing ToolKit. ChatKit becomes the flagship monetized product. ToolKit and SignaKit follow.** See [PLAN.md](PLAN.md) for strategic context.
 
 | Priority | Task | Status | Notes |
 |----------|------|--------|-------|
-| 1 | ToolKit Tier 1 content (skills → templates) | In Progress | Add 3-5 prompt templates (founder, engineer, researcher) + integration recipes (Claude Code + Supabase, Railway, Vercel). Ships free tier. |
-| 2 | SignaKit section in portal | Pending | Auth product UI: status badge, features list, OAuth dashboard preview, "Get Started" CTA. Placeholder or beta depending on SignaKit readiness. |
-| 3 | Portal authentication: Supabase → SignaKit | Pending | Migrate portal auth from Supabase Auth to SignaKit. Unlocks Phase 4 auth provider consolidation. |
-| 4 | Website rebuild (deferred) | Deferred | Skip until product wording finalizes. ToolKit positioning + pricing page can inform landing page copy. |
-| 5 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column). Low priority, nice-to-have. |
-| 6 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` recommendations after website rebuild scope clarifies. |
+| 1 | ChatKit Pricing + Stripe billing | Pending (user setup) | Migration 007 (stripe fields, plan enum: free/pro/max/enterprise), `/pricing` page on marketing site, `/portal/upgrade` page, updated usage caps (50/2000/10000/unlimited). User must create Stripe account + share API keys before checkout/webhooks can be wired. UI + schema can proceed in parallel. |
+| 2 | ChatKit Auto-Learning MVP | Pending | Flag UI in conversation viewer, weekly Sunday cron, Claude analysis of flagged messages, weekly report at `/portal/chatkit/[id]/learning`, optional email digest. Uses existing `message_feedback` table. ~5 hours. |
+| 3 | ChatKit Voice via Cartesia Sonic-3 | Pending | Cartesia SDK in widget + API, voice toggle per chatbot (Max tier or Pro add-on), microphone button + audio playback, streaming TTS. Add-on billing $10/mo for Pro. ~6 hours. |
+| 4 | ToolKit Tier 1 content | Deferred | Resume after ChatKit complete. Add prompt templates + integration recipes. Ships free tier. |
+| 5 | SignaKit section in portal | Pending | Auth product UI: status badge, features list, OAuth dashboard preview. Lower priority until ChatKit monetization works. |
+| 6 | Portal authentication: Supabase → SignaKit | Pending | Migrate portal auth from Supabase Auth to SignaKit. Unlocks Phase 4 auth provider consolidation. |
+| 7 | Website rebuild (deferred) | Deferred | Skip until ChatKit pricing/positioning informs landing page copy. |
+| 8 | Mind Palace ↔ CC sync bridge | Pending | Script to keep project metadata in sync (frontmatter ↔ CC metadata column). Low priority. |
+| 9 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md` after website rebuild scope clarifies. |
 
 ## Key Files
 
