@@ -29,7 +29,7 @@ export function SignupForm() {
           company,
           signup_source: 'direct',
         },
-        emailRedirectTo: `${window.location.origin}/chatkit`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/chatkit`,
       },
     })
 

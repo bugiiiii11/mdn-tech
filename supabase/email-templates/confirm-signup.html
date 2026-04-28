@@ -1,0 +1,169 @@
+<!--
+  M.D.N Tech — "Confirm signup" email template.
+
+  Paste the contents of this file into Supabase Dashboard:
+    Authentication → Email Templates → Confirm signup → "Message body"
+
+  Subject line (set in the same screen):
+    Confirm your M.D.N Tech account
+
+  Supabase template variables used:
+    {{ .ConfirmationURL }}  full confirm-and-redirect URL (token + redirect_to)
+    {{ .Email }}            recipient email
+    {{ .SiteURL }}          configured site URL (https://app.mdntech.org)
+
+  Notes:
+  - Email-safe HTML: tables for layout, inline styles, no external CSS or JS.
+  - Background uses M.D.N dark theme; button uses the same purple gradient as
+    the marketing CTA (button-primary).
+  - Some clients (Outlook desktop) strip background-image on buttons; the
+    button has a solid fallback colour underneath.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="supported-color-schemes" content="dark light" />
+    <title>Confirm your M.D.N Tech account</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#030014; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color:#e5e7eb;">
+    <!-- Preheader (hidden, shown as preview text in inbox) -->
+    <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
+      One click to activate your account — free ToolKit access and 50 free ChatKit messages waiting.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#030014; padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <!-- Card -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; background-color:#0a0a14; border:1px solid rgba(255,255,255,0.06); border-radius:16px; overflow:hidden;">
+            <!-- Header / brand bar -->
+            <tr>
+              <td style="padding:32px 32px 0 32px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="vertical-align:middle;">
+                      <span style="display:inline-block; width:32px; height:32px; line-height:32px; text-align:center; border-radius:8px; background:linear-gradient(135deg, rgba(168,85,247,0.25), rgba(34,211,238,0.25)); color:#ffffff; font-weight:700; font-size:14px; letter-spacing:-0.5px;">M</span>
+                    </td>
+                    <td style="padding-left:10px; vertical-align:middle;">
+                      <span style="font-size:15px; font-weight:600; color:#ffffff; letter-spacing:-0.2px;">M.D.N Tech</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Eyebrow -->
+            <tr>
+              <td style="padding:28px 32px 0 32px;">
+                <p style="margin:0; font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#22d3ee;">
+                  Welcome
+                </p>
+              </td>
+            </tr>
+
+            <!-- Headline -->
+            <tr>
+              <td style="padding:8px 32px 0 32px;">
+                <h1 style="margin:0; font-size:26px; line-height:1.2; font-weight:700; color:#ffffff; letter-spacing:-0.5px;">
+                  Confirm your account
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Body copy -->
+            <tr>
+              <td style="padding:16px 32px 0 32px;">
+                <p style="margin:0; font-size:15px; line-height:1.6; color:#9ca3af;">
+                  Tap the button below to confirm <strong style="color:#e5e7eb; font-weight:500;">{{ .Email }}</strong> and land directly in your portal — no second login required.
+                </p>
+              </td>
+            </tr>
+
+            <!-- CTA button -->
+            <tr>
+              <td style="padding:28px 32px 0 32px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-radius:10px; background-color:#7042f8;" bgcolor="#7042f8">
+                      <a href="{{ .ConfirmationURL }}"
+                         style="display:inline-block; padding:13px 28px; font-size:15px; font-weight:600; line-height:1; color:#ffffff; text-decoration:none; border-radius:10px; background-image:linear-gradient(135deg, #7042f8 0%, #a855f7 50%, #22d3ee 100%); box-shadow:0 6px 20px rgba(112,66,248,0.35);">
+                        Confirm and sign in →
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- What's inside -->
+            <tr>
+              <td style="padding:32px 32px 0 32px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0d0d20; border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+                  <tr>
+                    <td style="padding:18px 20px;">
+                      <p style="margin:0 0 10px 0; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#9ca3af;">
+                        What's inside
+                      </p>
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="padding:6px 0; font-size:14px; color:#e5e7eb;">
+                            <span style="color:#22d3ee;">✓</span>&nbsp;&nbsp;Free ToolKit — 4 Claude Code skills, MIT licensed
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:6px 0; font-size:14px; color:#e5e7eb;">
+                            <span style="color:#22d3ee;">✓</span>&nbsp;&nbsp;ChatKit — 50 free messages / month, no card required
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:6px 0; font-size:14px; color:#e5e7eb;">
+                            <span style="color:#22d3ee;">✓</span>&nbsp;&nbsp;Knowledge base + 1 line of code = your chatbot
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Fallback link -->
+            <tr>
+              <td style="padding:28px 32px 0 32px;">
+                <p style="margin:0; font-size:12px; line-height:1.6; color:#6b7280;">
+                  Button not working? Paste this link into your browser:
+                </p>
+                <p style="margin:6px 0 0 0; font-size:12px; line-height:1.5; word-break:break-all;">
+                  <a href="{{ .ConfirmationURL }}" style="color:#a78bfa; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding:32px 32px 32px 32px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-top:1px solid rgba(255,255,255,0.06); padding-top:20px;">
+                      <p style="margin:0; font-size:12px; line-height:1.6; color:#6b7280;">
+                        Didn't sign up? You can safely ignore this email — no account will be created without confirmation.
+                      </p>
+                      <p style="margin:14px 0 0 0; font-size:12px; line-height:1.6; color:#6b7280;">
+                        M.D.N Tech FZE · Al Shmookh Business Center, One UAQ, Umm Al Quwain, U.A.E.<br />
+                        <a href="{{ .SiteURL }}" style="color:#9ca3af; text-decoration:none;">app.mdntech.org</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

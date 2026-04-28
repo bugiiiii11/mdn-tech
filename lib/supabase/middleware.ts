@@ -18,13 +18,16 @@ function isLocalDev(host: string): boolean {
 
 // Public portal paths (no auth required). ToolKit is the install destination
 // linked from social posts; signup-before-install would kill the funnel.
+// /auth/callback handles the post-email-confirm code exchange — must be
+// accessible before the session exists.
 function isPublicPortalPath(pathname: string): boolean {
   return (
     pathname === '/' ||
     pathname === '/login' ||
     pathname === '/signup' ||
     pathname === '/toolkit' ||
-    pathname.startsWith('/toolkit/')
+    pathname.startsWith('/toolkit/') ||
+    pathname.startsWith('/auth/')
   )
 }
 
@@ -174,6 +177,7 @@ export async function updateSession(request: NextRequest) {
   const isPortalLogin = pathname === '/portal/login'
   const isPortalSignup = pathname === '/portal/signup'
   const isPortalToolkit = pathname === '/portal/toolkit' || pathname.startsWith('/portal/toolkit/')
+  const isPortalAuthCallback = pathname.startsWith('/portal/auth/')
 
   if (isCommandCenter && !isCCLogin && !user) {
     const url = request.nextUrl.clone()
@@ -187,7 +191,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isPortal && !isPortalLogin && !isPortalSignup && !isPortalToolkit && !user) {
+  if (isPortal && !isPortalLogin && !isPortalSignup && !isPortalToolkit && !isPortalAuthCallback && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/portal/login'
     return NextResponse.redirect(url)
