@@ -241,3 +241,13 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Alternatives:** Show all 10 skills (dilutes Handoff focus and confuses the install CTA); rename ToolKit to Handoff in MVP (forces another rename when PlanKit ships); drop the third-party Anthropic cards (loses curation signal).
 
 ---
+
+## 2026-04-28 -- Session 22 -- Blackhole video stays on marketing landing only; portal uses stars-only ambient
+
+**Decision:** Refines Session 21's "marketing-style vs app-style surfaces" split. The blackhole `.webm` hero stays exclusively on the marketing landing page (`mdntech.org`). Portal marketing-variant surfaces (`/portal/toolkit`, `/portal/login`, `/portal/signup`) get a stars-only ambient — `StarsCanvas` with no blackhole layer. App-variant surfaces (`/portal/chatkit/*`, `/portal/settings`, etc.) remain plain dark with no ambient.
+
+**Why:** The developer audience visiting the install destination still wants brand continuity, but the blackhole's visual weight competes with the install block — which is the most important element on the page per HANDOFF_PAGE_SPEC. Stars alone preserve the cinematic identity (same canvas, same particle system as marketing) while keeping the working surface focused. Removing the blackhole also cuts ~1MB of video weight from the portal critical path and avoids the cross-origin video flash between `mdntech.org` and `app.mdntech.org`.
+
+**Alternatives:** Keep blackhole on `/portal/toolkit` only (rejected — inconsistent treatment between toolkit and login/signup, both of which are marketing-style entries); drop stars too (rejected — leaves the marketing variant indistinguishable from the app variant, defeating the split); keep both on all portal pages including app-variant (rejected by Session 21 decision — fights with data density on chatkit/settings).
+
+---
