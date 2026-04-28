@@ -295,3 +295,28 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Alternatives:** Stay on built-in Supabase email (rejected — rate limits are a delivery cliff, not a soft warning); self-host Postfix/Sendmail (rejected — no time, no expertise advantage, deliverability nightmare); skip transactional email entirely and require admin-approved signups (rejected — kills the self-serve funnel).
 
 ---
+
+## 2026-04-29 -- Session 25 -- ChatKit empty-state plan expanded into a full portal-wide design pass
+
+**Decision:** Session 24's locked priority 1 was scoped narrowly as "ChatKit empty-state marketing landing (when customer has no chatbots) -- hybrid shell, marketing variant on empty state, default app shell when chatbots exist." Session 25 explicitly expanded this scope by user direction to: (a) marketing shell on every state of `/portal/chatkit`, not just empty, (b) the same marketing shell + eyebrow/H1 header + translucent backdrop-blur cards on all five other ChatKit subpages (`new`, `[id]`, `[id]/edit`, KB-entry-new, KB-entry-edit, conversations), and (c) `/portal/settings` as the closing surface so every authenticated portal page now shares one visual language.
+
+**Why:** The narrow empty-state plan from Session 24 was an MVP-first instinct -- ship the activation surface, leave the rest. Once the empty-state hero shipped (commit `5eebe93`), the user looked at it next to the still-flat populated state, the form pages, and Settings, and the inconsistency was loud. The cost of expanding scope inside the same design language was small (6 page edits + 3 component touch-ups, mostly copy-paste of the same shell/eyebrow/card pattern); the cost of leaving five surfaces in the old style would have been ongoing visual debt every time the user opened the app. User explicitly green-lit the broader scope ("please use this design style for all other chatkit pages") rather than each page being a separate decision.
+
+**Implementation:** Four commits, all on main:
+- `5eebe93` -- `/portal/chatkit` redesign + `ChatKitHero` + `BuildKBGuide`
+- `dbe81a4` -- BuildKBGuide step 1 corrected to install Claude Code itself (was pointing at the M.D.N skills installer); CodeBlock copy button moved into label header strip when label is set
+- `2ff0b41` -- Marketing shell + translucent cards on the other 5 ChatKit pages; last gradient pink/purple submit button (`PortalKBEntryForm`) replaced with `button-primary`; UsageMeter / EmbedSnippet / WidgetConfigForm cards converted to translucent so the chatbot detail page no longer alternates opaque/translucent surfaces
+- `3d51ca9` -- `/portal/settings` adopts the same shell + header pattern + translucent card
+
+**Alternatives considered:**
+- **Stay narrow per Session 24 plan** -- rejected because it would have left visual inconsistency between `/chatkit` (new) and the chatbot detail / form pages (old), making the populated state look like a different product.
+- **Defer to a Phase D refactor session** -- rejected because the changes were mechanical pattern-replication, not architectural; bundling them avoided the cost of re-loading the design context next session.
+- **Build a `<PortalShellMarketing>` layout wrapper that all chatkit pages opt into automatically** -- rejected as premature; six call-sites is below the threshold where a layout wrapper saves enough boilerplate to justify the indirection. Revisit if a 7th surface needs the same treatment.
+
+**Side effects:**
+- Refactor of `CodeBlock`'s copy-button placement now applies to `/toolkit`'s `InstallBlock` too -- automatic improvement on the toolkit page.
+- `EmbedSnippet` and `WidgetConfigForm` are also rendered on the command-center side. Translucent backgrounds there sit on the dark sidebar surface (no stars to bleed through) so the visual change is barely perceptible; no regression but worth noting if command-center gets a future restyle.
+
+**Followup:** Queue a `/build-kb` Claude Code skill that surfaces the BuildKBGuide step-2 prompt as a proper installable skill (option C from the Session 25 scoping discussion). This keeps the in-app prompt as the fastest path while letting power users install the skill once and run it across many projects.
+
+---
