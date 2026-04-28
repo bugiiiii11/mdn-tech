@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
+import { PortalShell } from '@/components/portal/PortalShell'
 import { ConversationViewer } from '@/components/portal/analytics/ConversationViewer'
 import { getConversationsWithMessages } from '@/lib/portal/analytics'
 
@@ -31,14 +32,13 @@ export default async function ConversationsPage({
     .single()
 
   if (!chatbot || chatbot.owner_id !== user.id) {
-    redirect('/portal/dashboard')
+    redirect('/portal/chatkit')
   }
 
   const fallbackMessage =
     (chatbot.widget_config as any)?.fallback_message ||
     "I'm not sure about that. Please contact us directly for more details."
 
-  // Fetch conversations with filtering
   const conversations = await getConversationsWithMessages(
     supabase,
     chatbotId,
@@ -46,48 +46,49 @@ export default async function ConversationsPage({
     filter as 'all' | 'fallback' | 'untagged'
   )
 
+  const filterTabs: { key: 'all' | 'fallback' | 'untagged'; label: string }[] = [
+    { key: 'all', label: 'All conversations' },
+    { key: 'fallback', label: 'With fallback messages' },
+    { key: 'untagged', label: 'Untagged messages' },
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <PortalShell>
+      <div className="p-6 space-y-6">
         {/* Header */}
         <div>
           <Link
-            href="/portal/dashboard"
-            className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300 mb-4"
+            href={`/portal/chatkit/${chatbot.id}`}
+            className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors mb-3"
           >
-            <ChevronLeft size={16} />
-            Back to dashboard
+            <ChevronLeft size={14} />
+            Back to {chatbot.name}
           </Link>
-          <h1 className="text-2xl font-semibold text-white">{chatbot.name} — Conversations</h1>
+          <h1 className="text-xl font-semibold text-white">{chatbot.name} — Conversations</h1>
           <p className="text-gray-400 text-sm mt-1">
             Review all conversations and rate message quality to improve your knowledge base
           </p>
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2 border-b border-gray-800">
-          {(['all', 'fallback', 'untagged'] as const).map(filterOption => {
-            const filterLabel = {
-              all: 'All conversations',
-              fallback: 'With fallback messages',
-              untagged: 'Untagged messages',
-            }[filterOption]
-
+        <div className="flex gap-2 border-b border-white/5">
+          {filterTabs.map(({ key, label }) => {
+            const isActive = filter === key
+            const href = key === 'all'
+              ? `/portal/chatkit/${chatbot.id}/conversations`
+              : `/portal/chatkit/${chatbot.id}/conversations?filter=${key}`
             return (
-              <button
-                key={filterOption}
-                onClick={() => {
-                  const params = new URLSearchParams(filterOption === 'all' ? '' : `filter=${filterOption}`)
-                  window.location.search = params.toString()
-                }}
+              <Link
+                key={key}
+                href={href}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  filter === filterOption
+                  isActive
                     ? 'text-white border-purple-500'
-                    : 'text-gray-500 border-transparent hover:text-gray-400'
+                    : 'text-gray-500 border-transparent hover:text-gray-300'
                 }`}
               >
-                {filterLabel}
-              </button>
+                {label}
+              </Link>
             )
           })}
         </div>
@@ -95,8 +96,8 @@ export default async function ConversationsPage({
         {/* Conversations list */}
         <div className="space-y-3">
           {conversations.length === 0 ? (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
-              <p className="text-gray-400">No conversations found for this filter</p>
+            <div className="bg-[#0d0d20] border border-white/5 rounded-xl px-5 py-10 text-center">
+              <p className="text-gray-400 text-sm">No conversations found for this filter</p>
             </div>
           ) : (
             <ConversationViewer
@@ -107,6 +108,6 @@ export default async function ConversationsPage({
           )}
         </div>
       </div>
-    </div>
+    </PortalShell>
   )
 }

@@ -42,7 +42,7 @@ export function LoginForm() {
       return
     }
 
-    router.push('/portal/toolkit')
+    router.push('/portal/chatkit')
     router.refresh()
   }
 
@@ -87,7 +87,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-lg py-2.5 text-sm font-medium text-white disabled:opacity-50 hover:opacity-90 transition-opacity"
+        className="w-full button-primary rounded-lg py-2.5 text-sm font-medium text-white disabled:opacity-50 transition-colors"
       >
         {loading ? 'Signing in…' : 'Sign in'}
       </button>

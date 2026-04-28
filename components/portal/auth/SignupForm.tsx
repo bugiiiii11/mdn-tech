@@ -29,7 +29,7 @@ export function SignupForm() {
           company,
           signup_source: 'direct',
         },
-        emailRedirectTo: `${window.location.origin}/toolkit`,
+        emailRedirectTo: `${window.location.origin}/chatkit`,
       },
     })
 
@@ -129,7 +129,7 @@ export function SignupForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-lg py-2.5 text-sm font-medium text-white disabled:opacity-50 hover:opacity-90 transition-opacity"
+        className="w-full button-primary rounded-lg py-2.5 text-sm font-medium text-white disabled:opacity-50 transition-colors"
       >
         {loading ? 'Creating account…' : 'Create account'}
       </button>

@@ -105,7 +105,7 @@ export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; con
       <button
         onClick={handleSave}
         disabled={saving}
-        className="px-4 py-2 rounded-lg text-xs font-medium text-white bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:opacity-90 disabled:opacity-50 transition-opacity"
+        className="button-primary px-4 py-2 rounded-lg text-xs font-medium text-white disabled:opacity-50 transition-colors"
       >
         {saving ? 'Saving...' : saved ? 'Saved!' : 'Save widget settings'}
       </button>

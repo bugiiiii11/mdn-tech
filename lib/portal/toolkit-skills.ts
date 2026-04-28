@@ -136,6 +136,18 @@ export const toolkitSkills: ToolkitSkill[] = [
       'Complete toolkit for building with Claude API. Includes prompt caching optimization, tool use patterns, model version migration, and streaming setup.',
     useCases: ['API integration', 'AI applications', 'Model optimization'],
   },
+  {
+    id: 'karpathy-claude-md',
+    name: 'Karpathy Guidelines',
+    category: 'safety',
+    description: 'CLAUDE.md guidelines derived from Andrej Karpathy\'s observations on LLM coding pitfalls.',
+    author: 'forrestchang',
+    verified: true,
+    installationUrl: 'https://github.com/forrestchang/andrej-karpathy-skills',
+    details:
+      'A single CLAUDE.md file with four principles — Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution — that directly counter the common LLM failure modes Karpathy flagged: wrong assumptions, bloated abstractions, dead-code accumulation, and orthogonal edits.',
+    useCases: ['Reduce overcomplication', 'Prevent dead code', 'Clearer goal scoping'],
+  },
 ]
 
 export const toolkitMCPs: ToolkitMCP[] = [

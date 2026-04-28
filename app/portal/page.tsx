@@ -8,7 +8,7 @@ export default async function PortalRoot() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
-    redirect('/portal/dashboard')
+    redirect('/portal/chatkit')
   }
 
   redirect('/portal/login')

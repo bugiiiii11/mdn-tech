@@ -140,9 +140,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/login`))
     }
 
-    // Redirect logged-in users away from login page → ToolKit (new default landing)
+    // Redirect logged-in users away from login page → ChatKit (default working surface)
     if (pathname === '/login' && user) {
-      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/toolkit`))
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/chatkit`))
     }
 
     // API passthrough
@@ -150,9 +150,9 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // Rewrite clean paths to /portal/* internally. Default landing → /toolkit.
+    // Rewrite clean paths to /portal/* internally. Default landing → /chatkit.
     const internalPath = pathname === '/'
-      ? '/portal/toolkit'
+      ? '/portal/chatkit'
       : `/portal${pathname}`
     const url = request.nextUrl.clone()
     url.pathname = internalPath
@@ -192,7 +192,7 @@ export async function updateSession(request: NextRequest) {
 
   if (isPortalLogin && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/portal/toolkit'
+    url.pathname = '/portal/chatkit'
     return NextResponse.redirect(url)
   }
 

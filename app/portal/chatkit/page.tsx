@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { PortalShell } from '@/components/portal/PortalShell'
 import Link from 'next/link'
+import { Plus } from 'lucide-react'
 
 export default async function ChatKitPage() {
   const supabase = await createClient()
@@ -52,9 +53,10 @@ export default async function ChatKitPage() {
           </div>
           <Link
             href="/portal/chatkit/new"
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1.5 button-primary text-white text-sm px-4 py-2 rounded-lg transition-colors"
           >
-            + New chatbot
+            <Plus className="w-4 h-4" />
+            New chatbot
           </Link>
         </div>
 

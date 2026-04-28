@@ -1,4 +1,4 @@
-import { Clock, FileText, AlertTriangle } from 'lucide-react'
+import { Clock, FileText, RefreshCw } from 'lucide-react'
 import { Reveal } from './Reveal'
 
 const items = [
@@ -17,11 +17,11 @@ const items = [
       'Writes a session summary, commits, and pushes — every time. Documentation stays current automatically.',
   },
   {
-    icon: AlertTriangle,
-    problem: '"Context window dies mid-task."',
-    skill: '/save',
+    icon: RefreshCw,
+    problem: '"Docs go stale the moment I move on."',
+    skill: '/doc-update',
     solution:
-      'Dumps an emergency snapshot you can resume from in a fresh session. No work lost.',
+      'Refreshes handoff and project docs from the latest session work — no manual writing required.',
   },
 ]
 
