@@ -3,7 +3,6 @@ import { Cedarville_Cursive, Inter } from "next/font/google";
 import { Footer } from "@/components/main/footer";
 import { Navbar } from "@/components/main/navbar";
 import { StarsCanvas } from "@/components/main/star-background";
-import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -14,13 +13,7 @@ const cedarvilleCursive = Cedarville_Cursive({
   display: "swap",
 });
 
-export default async function MarketingLayout({ children }: PropsWithChildren) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isLoggedIn = !!user;
-
+export default function MarketingLayout({ children }: PropsWithChildren) {
   return (
     <div
       className={cn(
@@ -30,7 +23,7 @@ export default async function MarketingLayout({ children }: PropsWithChildren) {
       )}
     >
       <StarsCanvas />
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
       {children}
       <Footer />
     </div>

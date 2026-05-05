@@ -270,10 +270,6 @@ export const NAV_LINKS = [
     link: "/#process",
   },
   {
-    title: "Tools",
-    link: "/portal/toolkit",
-  },
-  {
     title: "Team",
     link: "/#team",
   },

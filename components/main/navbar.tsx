@@ -5,15 +5,8 @@ import Link from "next/link";
 
 import { NAV_LINKS, SOCIALS } from "@/constants";
 
-interface NavbarProps {
-  isLoggedIn?: boolean;
-}
-
-export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
+export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const ctaLabel = isLoggedIn ? "Portal" : "Login";
-  const ctaHref = isLoggedIn ? "/portal/chatkit" : "/portal/login";
 
   return (
     <div className="w-full h-[65px] fixed top-0 left-0 right-0 shadow-lg shadow-[#2A0E61]/50 bg-[#03001427] backdrop-blur-md z-50">
@@ -35,8 +28,8 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
         </Link>
 
         {/* Web Navbar */}
-        <div className="hidden md:flex w-[560px] h-full flex-row items-center justify-between">
-          <div className="flex items-center justify-between w-full h-auto border border-[rgba(112,66,248,0.38)] bg-[rgba(3,0,20,0.37)] mr-[15px] px-[20px] py-[10px] rounded-full text-gray-200">
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-[500px] h-full flex-row items-center justify-between">
+          <div className="flex items-center justify-between w-full h-auto border border-[rgba(112,66,248,0.38)] bg-[rgba(3,0,20,0.37)] px-[20px] py-[10px] rounded-full text-gray-200">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.title}
@@ -48,13 +41,6 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
             ))}
           </div>
         </div>
-
-        <Link
-          href={ctaHref}
-          className="py-2 hidden md:flex px-4 button-primary text-center text-white cursor-pointer rounded-lg max-w-[200px]"
-        >
-          {ctaLabel}
-        </Link>
 
         {/* Hamburger Menu */}
         <button
@@ -134,17 +120,6 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
                 </Link>
               ))}
             </div>
-
-            {/* CTA Button */}
-            <Link
-              href={ctaHref}
-              className="mt-6 w-full block"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <div className="w-full py-3 px-6 button-primary text-center text-white rounded-lg font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200">
-                {ctaLabel}
-              </div>
-            </Link>
           </div>
         </div>
       )}
