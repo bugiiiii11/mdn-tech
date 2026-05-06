@@ -320,3 +320,15 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Followup:** Queue a `/build-kb` Claude Code skill that surfaces the BuildKBGuide step-2 prompt as a proper installable skill (option C from the Session 25 scoping discussion). This keeps the in-app prompt as the fastest path while letting power users install the skill once and run it across many projects.
 
 ---
+
+## 2026-05-06 -- Session 26 -- Hide marketing Login CTA until portal is publicly ready (pauses Session 24)
+
+**Decision:** Remove the auth-aware Login/Portal CTA from the marketing site's top-right nav slot. `Tools` link also removed from `NAV_LINKS`. The nav pill is recentered via `absolute left-1/2 -translate-x-1/2` so it stays visually centered with the right slot empty. To re-enable later: restore the desktop + mobile CTA JSX, the `isLoggedIn` prop wiring on `<Navbar>`, and the `getUser()` fetch in `(marketing)/layout.tsx`. Pauses, but does not reverse, the Session 24 decision that introduced the auth-aware Login/Portal CTA.
+
+**Why:** The portal isn't publicly ready yet -- there's no public ChatKit pricing surface, no public-facing onboarding for cold visitors hitting `mdntech.org`, and the only post-signup state customers reach is the BuildKBGuide / chatbot creation flow that's still bedding in. Surfacing a Login CTA on every marketing visit invites cold-traffic confusion ("log in to what?") and creates a support load we don't have capacity for. Better to ship the marketing site looking like a portfolio + service page until ChatKit billing + a real onboarding sequence are live, then re-enable the CTA in one move when the portal narrative is ready.
+
+**Alternatives:** Keep the auth-aware CTA per Session 24 (rejected -- premature for cold marketing traffic before portal-public readiness); replace `Login` text with a subtler "Sign in" link inside the nav pill itself (rejected -- still adds the same support-load problem with less visual weight); add a "Coming soon" gating overlay on `/portal` (rejected -- over-engineered for a problem solvable by hiding the entry point).
+
+**Revisit:** When ChatKit pricing ships and the portal has a self-serve onboarding sequence customers can be sent to from cold traffic. Tracked as priority 5 in `handoff.md` "What To Do Next".
+
+---
