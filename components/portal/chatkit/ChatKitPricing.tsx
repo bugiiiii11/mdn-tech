@@ -8,7 +8,7 @@ export function ChatKitPricing() {
           Pricing
         </p>
         <h2 className="text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 leading-tight">
-          Pay once. Use forever.
+          Buy credits. No subscriptions.
         </h2>
         <p className="text-gray-400 text-sm md:text-base mt-3">
           No subscriptions. No surprise bills. Try every chatbot for free, then buy credits when you&apos;re ready —

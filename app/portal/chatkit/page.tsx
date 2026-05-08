@@ -24,22 +24,23 @@ export default async function ChatKitPage() {
 
   const { data: chatbots } = await supabase
     .from('chatbots')
-    .select('id, name, status, created_at, widget_config')
+    .select('id, name, status, created_at, widget_config, messages_used')
     .eq('owner_id', user.id)
     .order('created_at', { ascending: false })
 
+  // Conversations table is only used here to count chats — message totals come
+  // from chatbots.messages_used (assistant replies = credits) so the listing
+  // matches the detail-page Activity tile and the credit counter.
   const chatbotIds = chatbots?.map(b => b.id) || []
   const { data: conversations } = chatbotIds.length > 0
     ? await supabase
         .from('chat_conversations')
-        .select('chatbot_id, message_count')
+        .select('chatbot_id')
         .in('chatbot_id', chatbotIds)
     : { data: [] }
 
-  const statsByBot = (conversations || []).reduce((acc: Record<string, { conversations: number; messages: number }>, conv) => {
-    if (!acc[conv.chatbot_id]) acc[conv.chatbot_id] = { conversations: 0, messages: 0 }
-    acc[conv.chatbot_id].conversations++
-    acc[conv.chatbot_id].messages += conv.message_count || 0
+  const conversationCountByBot = (conversations || []).reduce<Record<string, number>>((acc, conv) => {
+    acc[conv.chatbot_id] = (acc[conv.chatbot_id] || 0) + 1
     return acc
   }, {})
 
@@ -79,7 +80,8 @@ export default async function ChatKitPage() {
                   </thead>
                   <tbody>
                     {chatbots.map(bot => {
-                      const stats = statsByBot[bot.id] || { conversations: 0, messages: 0 }
+                      const conversationsCount = conversationCountByBot[bot.id] || 0
+                      const messagesCount = bot.messages_used ?? 0
                       return (
                         <tr key={bot.id} className="border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition-colors">
                           <td className="px-5 py-4">
@@ -98,8 +100,8 @@ export default async function ChatKitPage() {
                               {bot.status}
                             </span>
                           </td>
-                          <td className="px-5 py-4 text-gray-400">{stats.conversations}</td>
-                          <td className="px-5 py-4 text-gray-400">{stats.messages}</td>
+                          <td className="px-5 py-4 text-gray-400">{conversationsCount}</td>
+                          <td className="px-5 py-4 text-gray-400">{messagesCount}</td>
                           <td className="px-5 py-4 text-gray-500">
                             {new Date(bot.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </td>

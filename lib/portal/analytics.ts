@@ -55,34 +55,37 @@ export async function getChatbotAnalytics(
   chatbotId: string,
   fallbackMessage: string
 ): Promise<ChatbotAnalytics> {
-  // Get conversation stats
+  // Conversations (visitor-initiated chats)
   const { data: conversations } = await supabase
     .from('chat_conversations')
-    .select('id, message_count')
+    .select('id')
     .eq('chatbot_id', chatbotId);
 
   const totalConversations = conversations?.length || 0;
-  const totalMessages = conversations?.reduce((sum, c) => sum + c.message_count, 0) || 0;
-  const avgMessagesPerConv = totalConversations > 0 ? totalMessages / totalConversations : 0;
 
-  // Count fallback messages (where bot's response contains the fallback message)
+  // Messages = assistant replies only — matches the credit counter (one credit
+  // per chatbot reply). Counting visitor messages too would double the number
+  // and confuse customers comparing Activity vs. Pro credits.
   const { data: assistantMessages } = await supabase
     .from('chat_messages')
     .select('id, content')
     .eq('chatbot_id', chatbotId)
     .eq('role', 'assistant');
 
+  const totalAssistantMessages = assistantMessages?.length || 0;
+  const avgMessagesPerConv =
+    totalConversations > 0 ? totalAssistantMessages / totalConversations : 0;
+
   const fallbackMessages = assistantMessages?.filter((msg) =>
     msg.content.toLowerCase().includes(fallbackMessage.toLowerCase())
   ) || [];
 
   const fallbackCount = fallbackMessages.length;
-  const totalAssistantMessages = assistantMessages?.length || 0;
   const fallbackRate =
     totalAssistantMessages > 0 ? (fallbackCount / totalAssistantMessages) * 100 : 0;
 
   return {
-    totalMessages,
+    totalMessages: totalAssistantMessages,
     totalConversations,
     avgMessagesPerConv: Math.round(avgMessagesPerConv * 10) / 10,
     fallbackCount,
@@ -98,10 +101,13 @@ export async function getMessagesTrend(
   chatbotId: string,
   days: number = 7
 ): Promise<MessageTrendPoint[]> {
+  // Assistant replies only — keeps the trend chart consistent with the
+  // Messages tile + Pro credits counter (all credit-equivalent units).
   const { data: messages } = await supabase
     .from('chat_messages')
     .select('created_at')
     .eq('chatbot_id', chatbotId)
+    .eq('role', 'assistant')
     .gte('created_at', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString());
 
   const trendMap = new Map<string, number>();
