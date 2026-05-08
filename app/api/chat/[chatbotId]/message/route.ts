@@ -3,7 +3,11 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { corsHeaders, corsResponse } from '@/lib/chat/cors'
 import { buildSystemPrompt } from '@/lib/chat/prompt'
 import { checkRateLimit } from '@/lib/chat/rate-limit'
-import { checkUsageLimit, incrementUsage } from '@/lib/chat/usage'
+import { checkChatbotUsage, incrementChatbotUsage } from '@/lib/chat/usage'
+
+const MAX_KB_ENTRIES = 5
+const MAX_KB_ENTRY_CHARS = 2000
+const CHATBOT_MAX_OUTPUT_TOKENS = 300
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -66,18 +70,28 @@ export async function POST(
   }
 
   const chatbot = chatbotResult.data
-  const kbEntries = kbResult.data ?? []
+  const allKbEntries = kbResult.data ?? []
 
-  // Check usage limit for customer-owned chatbots
+  // Per-chatbot lifetime usage check (only customer-owned bots are metered)
   if (chatbot.owner_id) {
-    const { allowed } = await checkUsageLimit(chatbot.owner_id, 'chatkit')
+    const { allowed } = await checkChatbotUsage(chatbotId)
     if (!allowed) {
-      return new Response(JSON.stringify({ error: 'Message limit reached. Please upgrade your plan.' }), {
+      return new Response(JSON.stringify({ error: 'Message limit reached. The site owner needs to buy more credits.' }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
   }
+
+  // Cap KB context: top-N by sort_order, each truncated to MAX_KB_ENTRY_CHARS,
+  // so input tokens stay bounded regardless of how big the customer's KB grows.
+  const kbEntries = allKbEntries.slice(0, MAX_KB_ENTRIES).map((e) => ({
+    title: e.title,
+    category: e.category,
+    content: e.content.length > MAX_KB_ENTRY_CHARS
+      ? e.content.slice(0, MAX_KB_ENTRY_CHARS) + '\n\n[…truncated]'
+      : e.content,
+  }))
 
   // Get or create conversation
   let convId = conversationId
@@ -138,7 +152,7 @@ export async function POST(
       try {
         const response = anthropic.messages.stream({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 512,
+          max_tokens: CHATBOT_MAX_OUTPUT_TOKENS,
           system: systemPrompt,
           messages,
         })
@@ -178,9 +192,9 @@ export async function POST(
             .eq('id', convId),
         ])
 
-        // Increment usage if customer-owned (fire and forget)
+        // Increment per-chatbot usage (fire and forget) — only for customer-owned bots
         if (chatbot.owner_id) {
-          incrementUsage(chatbot.owner_id, 'chatkit', 'messages', 1)
+          incrementChatbotUsage(chatbotId)
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error'

@@ -1,85 +1,131 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Sparkles } from 'lucide-react'
 
-export function UsageMeter({ customerId, product }: { customerId: string; product: 'chatkit' | 'signakit' | 'tradekit' }) {
+const FREE_TRIAL_MESSAGES = 50
+
+type UsageState = {
+  used: number
+  total_limit: number
+  remaining: number
+  plan: 'trial' | 'pro'
+  credits_purchased: number
+}
+
+export function UsageMeter({ chatbotId }: { chatbotId: string }) {
   const supabase = createClient()
-  const [used, setUsed] = useState(0)
-  const [limit, setLimit] = useState(50)
-  const [loading, setLoading] = useState(true)
+  const [state, setState] = useState<UsageState | null>(null)
 
   useEffect(() => {
-    const limits: Record<string, number> = {
-      chatkit: 50,
-      signakit: 100,
-      tradekit: 100,
-    }
-
     async function fetchUsage() {
-      const now = new Date()
-      const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      const startStr = periodStart.toISOString().split('T')[0]
-      const endStr = periodEnd.toISOString().split('T')[0]
-
       const { data } = await supabase
-        .from('product_usage')
-        .select('value')
-        .eq('customer_id', customerId)
-        .eq('product', product)
-        .eq('metric', 'messages')
-        .gte('period_start', startStr)
-        .lte('period_end', endStr)
+        .from('chatbots')
+        .select('messages_used, credits_purchased, plan')
+        .eq('id', chatbotId)
         .maybeSingle()
 
-      setUsed(Math.floor(data?.value ?? 0))
-      setLimit(limits[product])
-      setLoading(false)
+      if (!data) return
+      const credits = data.credits_purchased ?? 0
+      const used = data.messages_used ?? 0
+      const total_limit = FREE_TRIAL_MESSAGES + credits
+      setState({
+        used,
+        total_limit,
+        remaining: Math.max(0, total_limit - used),
+        plan: (data.plan ?? 'trial') as 'trial' | 'pro',
+        credits_purchased: credits,
+      })
     }
-
     fetchUsage()
-  }, [customerId, product, supabase])
+  }, [chatbotId, supabase])
 
-  const percentage = Math.round((used / limit) * 100)
-  const isLimitReached = used >= limit
-  const isWarning = used >= limit * 0.75 && !isLimitReached
+  if (!state) {
+    return (
+      <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-4 backdrop-blur-sm">
+        <div className="h-2 bg-gray-800 rounded-full animate-pulse" />
+      </div>
+    )
+  }
+
+  const { used, total_limit, remaining, plan, credits_purchased } = state
+  const percentage = total_limit > 0 ? Math.round((used / total_limit) * 100) : 0
+  const isLimitReached = used >= total_limit
+  const isWarning = remaining <= 5 && !isLimitReached
+
+  const isTrial = plan === 'trial' && credits_purchased === 0
+  const label = isTrial ? 'Free trial' : 'Pro credits'
 
   return (
     <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-4 space-y-3 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isLimitReached && <AlertCircle className="w-4 h-4 text-red-400" />}
-          <h3 className="text-sm font-medium text-white">Message Usage</h3>
+          {isLimitReached ? (
+            <AlertCircle className="w-4 h-4 text-red-400" />
+          ) : isWarning ? (
+            <AlertCircle className="w-4 h-4 text-yellow-400" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4 text-green-400" />
+          )}
+          <h3 className="text-sm font-medium text-white">{label}</h3>
         </div>
-        {!loading && <span className="text-xs text-gray-400">{used} / {limit}</span>}
+        <span className="text-xs text-gray-400">
+          {used.toLocaleString()} / {total_limit.toLocaleString()} messages
+        </span>
       </div>
 
-      {!loading ? (
-        <>
-          <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-            <div
-              className={`h-full transition-all ${
-                isLimitReached ? 'bg-red-500' : isWarning ? 'bg-yellow-500' : 'bg-green-500'
-              }`}
-              style={{ width: `${Math.min(percentage, 100)}%` }}
-            />
-          </div>
+      <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+        <div
+          className={`h-full transition-all ${
+            isLimitReached ? 'bg-red-500' : isWarning ? 'bg-yellow-500' : 'bg-green-500'
+          }`}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+      </div>
 
-          {isLimitReached && (
-            <p className="text-xs text-red-400">
-              Limit reached. Upgrade your plan to continue using this chatbot.
-            </p>
-          )}
-          {isWarning && (
-            <p className="text-xs text-yellow-400">
-              You&apos;re approaching your message limit. Consider upgrading to continue without limits.
-            </p>
-          )}
-        </>
-      ) : (
-        <div className="h-2 bg-gray-800 rounded-full animate-pulse" />
+      {isLimitReached && (
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <p className="text-xs text-red-300">
+            Limit reached. Your chatbot is paused on visitor sites.
+          </p>
+          <Link
+            href={`/portal/chatkit/${chatbotId}/upgrade`}
+            className="inline-flex items-center gap-1.5 button-primary text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap"
+          >
+            <Sparkles className="w-3 h-3" />
+            Buy credits
+          </Link>
+        </div>
+      )}
+      {isWarning && (
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <p className="text-xs text-yellow-300">
+            Only {remaining} {remaining === 1 ? 'message' : 'messages'} left.
+          </p>
+          <Link
+            href={`/portal/chatkit/${chatbotId}/upgrade`}
+            className="text-xs text-purple-300 hover:text-purple-200 transition-colors whitespace-nowrap"
+          >
+            Buy credits →
+          </Link>
+        </div>
+      )}
+      {!isLimitReached && !isWarning && (
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <p className="text-xs text-gray-500">
+            {isTrial
+              ? 'Free trial — credits never expire after upgrade.'
+              : 'Pro credits never expire.'}
+          </p>
+          <Link
+            href={`/portal/chatkit/${chatbotId}/upgrade`}
+            className="text-xs text-gray-400 hover:text-purple-300 transition-colors whitespace-nowrap"
+          >
+            Buy more →
+          </Link>
+        </div>
       )}
     </div>
   )

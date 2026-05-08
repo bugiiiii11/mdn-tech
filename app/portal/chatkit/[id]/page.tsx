@@ -195,7 +195,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         </section>
 
         {/* Usage quota (compact, sits with overview metrics) */}
-        <UsageMeter customerId={userId} product="chatkit" />
+        <UsageMeter chatbotId={chatbot.id} />
 
         {/* Deploy */}
         {chatbot.status === 'active' && (

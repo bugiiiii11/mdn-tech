@@ -1,78 +1,54 @@
 import { createServiceClient } from '@/lib/supabase/service'
 
-const FREE_TIER_LIMITS: Record<string, number> = {
-  chatkit: 50, // 50 messages per month
-  signakit: 100,
-  tradekit: 100,
+export const FREE_TRIAL_MESSAGES = 50
+export const PRO_PACK_CREDITS = 1000
+export const PRO_PACK_PRICE_CENTS = 1900
+
+export type ChatbotUsage = {
+  allowed: boolean
+  used: number
+  total_limit: number
+  remaining: number
+  plan: 'trial' | 'pro'
+  credits_purchased: number
+  warning: string | null
 }
 
-function getCurrentPeriod() {
-  const now = new Date()
-  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  return { periodStart, periodEnd }
-}
-
-function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0]
-}
-
-export async function checkUsageLimit(customerId: string, product: 'chatkit' | 'signakit' | 'tradekit'): Promise<{ allowed: boolean; used: number; limit: number }> {
+export async function checkChatbotUsage(chatbotId: string): Promise<ChatbotUsage> {
   const supabase = createServiceClient()
-  const limit = FREE_TIER_LIMITS[product]
-  const { periodStart, periodEnd } = getCurrentPeriod()
+  const { data } = await supabase
+    .from('chatbots')
+    .select('messages_used, credits_purchased, plan')
+    .eq('id', chatbotId)
+    .maybeSingle()
 
-  const { data: usage } = await supabase
-    .from('product_usage')
-    .select('value')
-    .eq('customer_id', customerId)
-    .eq('product', product)
-    .eq('metric', 'messages')
-    .gte('period_start', formatDate(periodStart))
-    .lte('period_end', formatDate(periodEnd))
-    .single()
+  const used = data?.messages_used ?? 0
+  const credits = data?.credits_purchased ?? 0
+  const plan = (data?.plan ?? 'trial') as 'trial' | 'pro'
+  const total_limit = FREE_TRIAL_MESSAGES + credits
+  const remaining = Math.max(0, total_limit - used)
 
-  const used = usage?.value ?? 0
-  return { allowed: used < limit, used: Math.floor(used), limit }
-}
+  let warning: string | null = null
+  if (used >= total_limit) {
+    warning = plan === 'trial'
+      ? 'Free trial limit reached. Buy a Pro pack to keep your chatbot live.'
+      : 'Credits depleted. Buy another pack to keep your chatbot live.'
+  } else if (remaining <= 5) {
+    warning = `Only ${remaining} message${remaining === 1 ? '' : 's'} left.`
+  }
 
-export async function incrementUsage(customerId: string, product: string, metric: string, increment: number = 1): Promise<void> {
-  const supabase = createServiceClient()
-  const { periodStart, periodEnd } = getCurrentPeriod()
-
-  // Try to update existing usage row
-  const { data: existing, error: selectError } = await supabase
-    .from('product_usage')
-    .select('id, value')
-    .eq('customer_id', customerId)
-    .eq('product', product)
-    .eq('metric', metric)
-    .gte('period_start', formatDate(periodStart))
-    .lte('period_end', formatDate(periodEnd))
-    .single()
-
-  if (existing) {
-    // Update existing row
-    await supabase
-      .from('product_usage')
-      .update({ value: existing.value + increment })
-      .eq('id', existing.id)
-  } else {
-    // Insert new row
-    await supabase.from('product_usage').insert({
-      customer_id: customerId,
-      product,
-      metric,
-      value: increment,
-      period_start: formatDate(periodStart),
-      period_end: formatDate(periodEnd),
-    })
+  return {
+    allowed: used < total_limit,
+    used,
+    total_limit,
+    remaining,
+    plan,
+    credits_purchased: credits,
+    warning,
   }
 }
 
-export function getUsageWarning(used: number, limit: number): string | null {
-  const percentage = (used / limit) * 100
-  if (percentage >= 90) return 'You\'ve used 90% of your free message limit'
-  if (percentage >= 75) return 'You\'ve used 75% of your free message limit'
-  return null
+export async function incrementChatbotUsage(chatbotId: string): Promise<void> {
+  const supabase = createServiceClient()
+  await supabase.rpc('increment_chatbot_messages', { chatbot_id_input: chatbotId })
 }

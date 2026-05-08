@@ -1,6 +1,6 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { corsHeaders, corsResponse } from '@/lib/chat/cors'
-import { checkUsageLimit } from '@/lib/chat/usage'
+import { checkChatbotUsage } from '@/lib/chat/usage'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -31,10 +31,10 @@ export async function GET(
 
   const config = (chatbot.widget_config ?? {}) as Record<string, unknown>
 
-  // Check usage limit if customer-owned
+  // Pause widget when chatbot has hit its message cap (customer-owned only)
   let disabled = false
   if (chatbot.owner_id) {
-    const { allowed } = await checkUsageLimit(chatbot.owner_id, 'chatkit')
+    const { allowed } = await checkChatbotUsage(chatbotId)
     disabled = !allowed
   }
 
