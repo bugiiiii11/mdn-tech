@@ -172,7 +172,9 @@ export async function POST(
         ))
         controller.close()
 
-        // Save assistant message and update conversation (fire and forget)
+        // Persist assistant message + conversation update + per-chatbot usage
+        // increment together. All three are awaited so Vercel doesn't terminate
+        // the lambda before the credit counter ticks.
         const latencyMs = Date.now() - startTime
         await Promise.all([
           supabase.from('chat_messages').insert({
@@ -190,12 +192,8 @@ export async function POST(
               last_message_at: new Date().toISOString(),
             })
             .eq('id', convId),
+          chatbot.owner_id ? incrementChatbotUsage(chatbotId) : Promise.resolve(),
         ])
-
-        // Increment per-chatbot usage (fire and forget) — only for customer-owned bots
-        if (chatbot.owner_id) {
-          incrementChatbotUsage(chatbotId)
-        }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error'
         controller.enqueue(encoder.encode(

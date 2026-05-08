@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { ChatKitHero } from '@/components/portal/chatkit/ChatKitHero'
 import { BuildKBGuide } from '@/components/portal/chatkit/BuildKBGuide'
+import { ChatKitPricing } from '@/components/portal/chatkit/ChatKitPricing'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
@@ -113,6 +114,8 @@ export default async function ChatKitPage() {
             <BuildKBGuide collapsed />
           </>
         )}
+
+        <ChatKitPricing />
       </div>
     </PortalShell>
   )
