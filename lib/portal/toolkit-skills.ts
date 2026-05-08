@@ -77,6 +77,18 @@ export const toolkitSkills: ToolkitSkill[] = [
     useCases: ['Safe git operations', 'Change validation', 'Destructive operation prevention'],
   },
   {
+    id: 'build-kb',
+    name: 'Build KB',
+    category: 'marketing',
+    description: 'Scan your project and generate a chatbot-ready knowledge-base.md in one shot.',
+    author: 'M.D.N Tech',
+    verified: true,
+    installationUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/build-kb/SKILL.md',
+    details:
+      'Reads the user-facing content in your repo (README, marketing pages, docs, pricing, support) and organizes it into eight chatbot-friendly sections: General, About, Products, FAQ, Policies, Tone, Pricing, Support. Skips categories that lack source content -- never invents. Output is one knowledge-base.md ready to paste into ChatKit (or any chatbot) as KB entries.',
+    useCases: ['Chatbot knowledge base', 'Content audit', 'ChatKit onboarding'],
+  },
+  {
     id: 'ui-ux-pro-max',
     name: 'UI/UX Pro Max',
     category: 'design',

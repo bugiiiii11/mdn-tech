@@ -77,6 +77,20 @@ export function BuildKBGuide({ collapsed = false }: Props) {
             read everything.
           </p>
           <CodeBlock code={KB_PROMPT} language="markdown" label="Prompt" />
+          <p className="text-xs text-gray-500 mt-3 leading-relaxed">
+            Already installed the{' '}
+            <a
+              href="/portal/toolkit"
+              className="font-mono text-purple-300 hover:text-purple-200 underline-offset-2 hover:underline"
+            >
+              /build-kb
+            </a>{' '}
+            skill? Just type{' '}
+            <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
+              /build-kb
+            </code>{' '}
+            in Claude Code -- it runs this prompt for you.
+          </p>
         </div>
       </div>
 
