@@ -36,7 +36,7 @@ export function BuyCreditsButton({ chatbotId }: { chatbotId: string }) {
         className="w-full button-primary text-white text-sm py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-        {loading ? 'Processing…' : 'Buy 1,000 credits — $19'}
+        {loading ? 'Processing…' : 'Buy 500 credits — $29'}
       </button>
       {error && <p className="text-xs text-red-400 text-center">{error}</p>}
     </div>

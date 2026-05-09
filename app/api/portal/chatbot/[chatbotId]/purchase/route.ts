@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { PRO_PACK_CREDITS, PRO_PACK_PRICE_CENTS } from '@/lib/chat/usage'
+import { STARTER_PACK_CREDITS, STARTER_PACK_PRICE_CENTS } from '@/lib/chat/usage'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,8 +30,8 @@ export async function POST(
   const { error: insertErr } = await service.from('chatbot_purchases').insert({
     chatbot_id: chatbotId,
     customer_id: user.id,
-    amount_cents: PRO_PACK_PRICE_CENTS,
-    credits_added: PRO_PACK_CREDITS,
+    amount_cents: STARTER_PACK_PRICE_CENTS,
+    credits_added: STARTER_PACK_CREDITS,
     status: 'mock',
   })
 
@@ -42,8 +42,7 @@ export async function POST(
   const { error: updateErr } = await service
     .from('chatbots')
     .update({
-      credits_purchased: (chatbot.credits_purchased ?? 0) + PRO_PACK_CREDITS,
-      plan: 'pro',
+      credits_purchased: (chatbot.credits_purchased ?? 0) + STARTER_PACK_CREDITS,
     })
     .eq('id', chatbotId)
 
@@ -51,5 +50,5 @@ export async function POST(
     return NextResponse.json({ error: updateErr.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, credits_added: PRO_PACK_CREDITS })
+  return NextResponse.json({ ok: true, credits_added: STARTER_PACK_CREDITS })
 }

@@ -11,6 +11,7 @@ import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetCon
 import { EmbedSnippet } from '@/components/command-center/chatbots/EmbedSnippet'
 import { DeleteChatbotButton } from '@/components/portal/chatbots/DeleteChatbotButton'
 import { UsageMeter } from '@/components/portal/UsageMeter'
+import { checkChatbotUsage } from '@/lib/chat/usage'
 import { TrendChart } from '@/components/portal/analytics/TrendChart'
 import { KeywordsBar } from '@/components/portal/analytics/KeywordsBar'
 import {
@@ -40,11 +41,12 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
     (chatbot.widget_config as any)?.fallback_message ||
     "I'm not sure about that. Please contact us directly for more details."
 
-  const [{ data: entries }, analytics, trend, keywords] = await Promise.all([
+  const [{ data: entries }, analytics, trend, keywords, usage] = await Promise.all([
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
     getChatbotAnalytics(supabase, id, fallbackMsg),
     getMessagesTrend(supabase, id, 7),
     getTopKeywords(supabase, id, 8),
+    checkChatbotUsage(id),
   ])
 
   const grouped = (entries ?? []).reduce((acc: Record<string, any[]>, e) => {
@@ -195,7 +197,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         </section>
 
         {/* Usage quota (compact, sits with overview metrics) */}
-        <UsageMeter chatbotId={chatbot.id} />
+        <UsageMeter chatbotId={chatbot.id} usage={usage} />
 
         {/* Deploy */}
         {chatbot.status === 'active' && (
