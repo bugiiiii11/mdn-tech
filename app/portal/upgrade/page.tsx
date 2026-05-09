@@ -158,7 +158,7 @@ export default async function UpgradePage() {
                         href="/portal/chatkit"
                         className="block w-full text-center text-sm py-2.5 rounded-xl border border-white/15 text-gray-200 hover:border-white/30 hover:text-white transition-colors"
                       >
-                        Buy from a chatbot
+                        Buy credits
                       </Link>
                     )}
                     {isPaid && isCurrent && !isCanceled && (

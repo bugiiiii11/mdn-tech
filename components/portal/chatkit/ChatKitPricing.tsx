@@ -11,9 +11,6 @@ export function ChatKitPricing() {
       iconBg: 'bg-cyan-500/10',
       borderColor: 'border-white/[0.08]',
       eyebrowColor: 'text-cyan-200',
-      ctaHref: '/portal/signup',
-      ctaLabel: 'Start free',
-      ctaPrimary: false,
       footer: 'Already included with every signup.',
     },
     {
@@ -23,9 +20,6 @@ export function ChatKitPricing() {
       iconBg: 'bg-purple-500/10',
       borderColor: 'border-white/[0.08]',
       eyebrowColor: 'text-purple-200',
-      ctaHref: '/portal/upgrade',
-      ctaLabel: 'Buy Starter',
-      ctaPrimary: false,
       footer: 'Top up a single chatbot — no recurring billing.',
     },
     {
@@ -35,9 +29,6 @@ export function ChatKitPricing() {
       iconBg: 'bg-purple-500/15',
       borderColor: 'border-purple-400/30',
       eyebrowColor: 'text-purple-200',
-      ctaHref: '/portal/upgrade',
-      ctaLabel: 'Subscribe to Pro',
-      ctaPrimary: true,
       footer: 'Best for growing sites with steady traffic.',
       badge: 'Popular',
     },
@@ -48,9 +39,6 @@ export function ChatKitPricing() {
       iconBg: 'bg-amber-500/15',
       borderColor: 'border-amber-400/30',
       eyebrowColor: 'text-amber-200',
-      ctaHref: '/portal/upgrade',
-      ctaLabel: 'Subscribe to Max',
-      ctaPrimary: false,
       footer: 'For teams managing multiple brands or high-volume support.',
     },
   ]
@@ -70,7 +58,7 @@ export function ChatKitPricing() {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
-        {tiers.map(({ plan, icon: Icon, iconColor, iconBg, borderColor, eyebrowColor, ctaHref, ctaLabel, ctaPrimary, footer, badge }) => (
+        {tiers.map(({ plan, icon: Icon, iconColor, iconBg, borderColor, eyebrowColor, footer, badge }) => (
           <div
             key={plan.id}
             className={`bg-[#0d0d20]/80 border ${borderColor} rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden flex flex-col`}
@@ -116,22 +104,20 @@ export function ChatKitPricing() {
                 ))}
               </ul>
 
-              <div className="space-y-2 pt-1">
-                <Link
-                  href={ctaHref}
-                  className={`block w-full text-center text-sm py-2.5 rounded-xl ${
-                    ctaPrimary
-                      ? 'button-primary text-white'
-                      : 'border border-white/15 text-gray-200 hover:border-white/30 hover:text-white transition-colors'
-                  }`}
-                >
-                  {ctaLabel}
-                </Link>
-                <p className="text-[11px] text-gray-500 text-center leading-snug">{footer}</p>
-              </div>
+              <p className="text-[11px] text-gray-500 leading-snug pt-1">{footer}</p>
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="flex justify-center">
+        <Link
+          href="/portal/upgrade"
+          className="inline-flex items-center gap-2 button-primary text-white text-sm px-6 py-3 rounded-xl"
+        >
+          <Sparkles className="w-4 h-4" />
+          Manage plan
+        </Link>
       </div>
 
       <div className="max-w-3xl mx-auto bg-[#0d0d20]/60 border border-white/[0.06] rounded-2xl p-6 backdrop-blur-sm">

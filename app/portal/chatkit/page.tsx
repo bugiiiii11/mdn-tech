@@ -7,7 +7,7 @@ import { ChatKitHero } from '@/components/portal/chatkit/ChatKitHero'
 import { BuildKBGuide } from '@/components/portal/chatkit/BuildKBGuide'
 import { ChatKitPricing } from '@/components/portal/chatkit/ChatKitPricing'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Bot } from 'lucide-react'
 
 export default async function ChatKitPage() {
   const supabase = await createClient()
@@ -55,61 +55,63 @@ export default async function ChatKitPage() {
           <BuildKBGuide />
         ) : (
           <>
-            <section>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">Your chatbots</h2>
-                <Link
-                  href="/portal/chatkit/new"
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  New
-                </Link>
-              </div>
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold text-white">Your chatbots</h2>
 
-              <div className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl overflow-hidden backdrop-blur-sm">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/[0.06] text-left text-gray-500">
-                      <th className="px-5 py-3 font-medium">Name</th>
-                      <th className="px-5 py-3 font-medium">Status</th>
-                      <th className="px-5 py-3 font-medium">Conversations</th>
-                      <th className="px-5 py-3 font-medium">Messages</th>
-                      <th className="px-5 py-3 font-medium">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chatbots.map(bot => {
-                      const conversationsCount = conversationCountByBot[bot.id] || 0
-                      const messagesCount = bot.messages_used ?? 0
-                      return (
-                        <tr key={bot.id} className="border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition-colors">
-                          <td className="px-5 py-4">
-                            <Link href={`/portal/chatkit/${bot.id}`} className="text-white hover:text-purple-300 transition-colors font-medium">
+              <div className="space-y-2">
+                {chatbots.map(bot => {
+                  const conversationsCount = conversationCountByBot[bot.id] || 0
+                  const messagesCount = bot.messages_used ?? 0
+                  const statusClass =
+                    bot.status === 'active'
+                      ? 'bg-green-500/10 text-green-400'
+                      : bot.status === 'draft'
+                        ? 'bg-yellow-500/10 text-yellow-400'
+                        : 'bg-gray-500/10 text-gray-400'
+                  return (
+                    <Link
+                      key={bot.id}
+                      href={`/portal/chatkit/${bot.id}`}
+                      className="group block bg-[#0d0d20]/80 border border-white/[0.08] hover:border-purple-400/40 hover:bg-[#0d0d20] rounded-xl backdrop-blur-sm transition-all"
+                    >
+                      <div className="flex items-center justify-between gap-4 px-5 py-4 flex-wrap">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                            <Bot className="w-4 h-4 text-purple-300" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-medium text-white group-hover:text-purple-200 transition-colors truncate">
                               {bot.name}
-                            </Link>
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              bot.status === 'active'
-                                ? 'bg-green-500/10 text-green-400'
-                                : bot.status === 'draft'
-                                ? 'bg-yellow-500/10 text-yellow-400'
-                                : 'bg-gray-500/10 text-gray-400'
-                            }`}>
-                              {bot.status}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-gray-400">{conversationsCount}</td>
-                          <td className="px-5 py-4 text-gray-400">{messagesCount}</td>
-                          <td className="px-5 py-4 text-gray-500">
-                            {new Date(bot.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-full ${statusClass}`}>
+                                {bot.status}
+                              </span>
+                              <span className="text-[11px] text-gray-500">
+                                Created {new Date(bot.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-6 text-right">
+                          <div>
+                            <div className="text-sm font-semibold text-white">{conversationsCount}</div>
+                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">
+                              {conversationsCount === 1 ? 'Conv' : 'Convs'}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-white">{messagesCount}</div>
+                            <div className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">
+                              Messages
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
             </section>
 
