@@ -332,3 +332,51 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Revisit:** When ChatKit pricing ships and the portal has a self-serve onboarding sequence customers can be sent to from cold traffic. Tracked as priority 5 in `handoff.md` "What To Do Next".
 
 ---
+
+## 2026-05-10 -- Session 28 -- ChatKit pricing: 4-tier mixed PAYG + subscription model
+
+**Decision:** Free $0 (1 chatbot, 30 lifetime trial messages) / Starter $29 PAYG (500 credits per chatbot, lifetime, no expiry) / Pro $99/mo (2 chatbots, 5,000 messages/month account-wide) / Max $299/mo (3 chatbots, 25,000 messages/month account-wide). Free trial + Starter pack are per-chatbot; Pro + Max are per-account subscriptions with chatbot-count caps as the upgrade lever. Chatbot creation server-side gated by plan limit. Effective per-chatbot tier = `customer.subscription_status active ? customer.subscription_plan : (chatbot.credits_purchased > 0 ? 'starter' : 'free')`.
+
+**Why:** Iterated through three models in one session. Started with the inherited Session 13 monthly per-customer 50-msg/mo cap, pivoted to per-chatbot lifetime ($19 / 1000 credits prepaid) to eliminate "what if card fails" Stripe risk, then pivoted again because $19 / 1000 earns too little against the value delivered (KB skill + embed + DB management included free). Pure subscription was rejected as too steep for low-traffic single-chatbot users ($99 entry); pure PAYG leaves money on the table for steady-traffic customers. Mixed model serves both: PAYG for casual users, subs for serious ones with a clear graduation path. Per-chatbot vs per-account framing: subs are account-scoped because B2B SaaS norm is per-workspace billing (per-chatbot would multiply costs and feel weird); chatbot-count cap per plan (1/1/2/3) is the multi-brand upgrade lever without forcing renegotiation.
+
+**Alternatives:** Single $19 credit pack (too cheap given service value); pure subscription with no PAYG (loses occasional-use customers who'd churn out of $99/mo); $179 mid-tier between Pro and Max (rejected for simplicity at MVP); per-chatbot subs (rejected -- $99 × 2 chatbots = $198 vs $99 account-wide on Pro = better retention); 5-tier ladder (over-engineered).
+
+**Revisit:** After 1-2 paid customers run for a full cycle. Watch margin compression -- if real Haiku 4.5 cost-per-message exceeds the assumed ~$0.005 (e.g., bigger system prompts than expected), tighten KB top-N cap, raise prices, or lower Max ceiling. All adjustable in `lib/portal/plans.ts`. Also re-evaluate whether $179 mid-tier should appear -- depends on observed graduation patterns from Starter.
+
+---
+
+## 2026-05-10 -- Session 28 -- "Unlimited" rejected for Max tier; 25K hard cap chosen
+
+**Decision:** Max tier is "25,000 messages/month" with a hard cap, not "unlimited". Customers who need more are routed to a sales conversation, not given automatic ceiling lifts.
+
+**Why:** Margin math is unforgiving. At ~$0.005 cost per Haiku 4.5 reply, 50K msgs/mo = $250 cost vs $299 revenue = 16% margin if a customer maxes out. 25K = $125 cost = 58% margin, much healthier and survives cost-per-message creep up to ~$0.012 before going negative. "Unlimited" SaaS only works at enterprise pricing where the deal includes a usage SLA -- below that it's a one-customer-kills-the-quarter risk. Setting a clear cap also gives a concrete reason for sales conversations on the upper end (which is where customer success usually starts anyway).
+
+**Alternatives:** 50K cap (margin too thin at full utilization -- one runaway chatbot scraper or popular site eats the year); true "unlimited" (negative margin risk -- 100K messages monthly = $500 cost vs $299 revenue); enterprise-only above 25K with no Max tier (rejected -- loses mid-market who don't want sales calls); usage-based overage ($X per message above cap, like AWS) (rejected for MVP simplicity -- adds invoicing complexity, harder to communicate).
+
+**Revisit:** When the first Max customer is approaching 25K. Either upsize the cap based on actual cost data, or productize a 50K+ tier as Enterprise.
+
+---
+
+## 2026-05-10 -- Session 28 -- Cost guards: 300-token output cap + KB top-5 × 2000 chars
+
+**Decision:** Hard cap on Claude API output at `max_tokens: 300` (~225 words). KB context limited to top 5 entries by sort_order, each truncated to 2000 chars max (~10K chars / ~2.5K tokens worst case). Both enforced in `app/api/chat/[chatbotId]/message/route.ts`.
+
+**Why:** Without these the per-message cost is unbounded and pricing math falls apart. Customer with a 50K-char KB and a chatty chatbot could push a single message to 50K input + 1K output = ~$0.06 vs the ~$0.005 the pricing assumes -- 12× margin compression instantly. Caps make cost deterministic regardless of how big the customer's KB grows. 300 tokens is enough for "2-3 short sentences" answers (the prompt rule already), so the cap doesn't degrade quality. Top-5 KB by sort_order means customers control what's prioritized via the existing `sort_order` field.
+
+**Alternatives:** No caps and trust customers to keep KBs small (rejected -- customer behavior unpredictable); soft caps with overage upsell (more complex; encourages bloated KBs); semantic search over KB to pick most-relevant top-N instead of sort_order (proper RAG, deferred -- not worth the embedding-DB complexity for SMB scale yet); larger output cap like 500 tokens (rejected -- chatbot answers should be terse anyway, longer answers correlate with hallucination risk).
+
+**Revisit:** If/when semantic search over KB becomes worth it (probably when a customer hits the 5-entry limit and complains). Output cap is unlikely to need raising -- shorter chatbot answers are usually better.
+
+---
+
+## 2026-05-10 -- Session 28 -- Mock Stripe; real integration deferred until merchant account active
+
+**Decision:** Subscription create/cancel/upgrade flows operate directly on Supabase columns. `POST /api/portal/subscription` flips `customer.subscription_plan` + sets period dates + inserts a `subscription_events` row. `POST /api/portal/chatbot/[id]/purchase` adds 500 to `chatbot.credits_purchased`. No Stripe Checkout, no webhooks, no real card charge. Schema (migration 008) already has `stripe_customer_id` + `stripe_subscription_id` columns ready as nullable for future wiring.
+
+**Why:** Stripe merchant account isn't yet activated and waiting on it would block all pricing UX work indefinitely. Mock unblocks end-to-end UX testing and iteration -- the upgrade flow, cancel flow, plan-gated chatbot creation, UsageMeter tier display all need real DB state to validate, and writing real DB state via mock buttons gets us 90% of the way to production-ready code. Replacing the mock POST/DELETE handlers with Stripe Checkout Session creation + webhook event handlers is a bounded ~4-hour follow-up session once the account is live -- the calling code (BuyCreditsButton, SubscribeButton, etc.) doesn't change.
+
+**Alternatives:** Block all pricing work until Stripe account exists (delays product several weeks); use Stripe test mode end-to-end now (still requires account setup + adds dev-tunnel webhook complexity for what's effectively the same UX); use a third-party billing layer like Lemon Squeezy / Paddle (premature for one customer; locks us into their fee structure); manual Stripe payment links instead of API integration (works but gives up self-serve subscription management which is the whole point).
+
+**Revisit:** Immediately when Stripe merchant account activates. Also worth re-evaluating if mock state ever leaks to a real customer -- right now there's no protection against a savvy customer hitting the mock endpoint directly to grant themselves free credits, but the portal isn't publicly indexed and only intentional-customers are getting access.
+
+---
