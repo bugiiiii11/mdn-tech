@@ -380,3 +380,29 @@ Context: Two planning drafts (repo 2026-03-21 and Mind Palace 2026-04-16) had dr
 **Revisit:** Immediately when Stripe merchant account activates. Also worth re-evaluating if mock state ever leaks to a real customer -- right now there's no protection against a savvy customer hitting the mock endpoint directly to grant themselves free credits, but the portal isn't publicly indexed and only intentional-customers are getting access.
 
 ---
+
+## 2026-06-08 -- Session 29 -- SK landing as light i18n + canonical domain aligned to mdntech.org
+
+Context: Three live SK client sites footer-link to `mdntech.org` (EN home), wasting SK lead-gen/SEO. Built a Slovak agency landing at `/sk` (Part A of the Mind Palace SK brief). Two decisions locked.
+
+### D-S29.1 -- Canonical domain mdntech.com -> mdntech.org (repo-wide)
+
+**Decision:** Standardize the entire site on `https://mdntech.org`. Updated `config/index.ts` (metadataBase/canonical/OG), `app/layout.tsx` (Organization + WebSite JSON-LD), `app/sitemap.ts`, `app/robots.ts` (sitemap host), blog/terms/privacy canonicals + body refs, and `public/llms.txt`. `/sk` canonical + hreflang cluster (sk/en/x-default) built on `.org`. `package.json` GitHub repo URLs left on `.com` (they are the literal repo name, not SEO-relevant).
+
+**Why:** The repo declared canonical on `mdntech.com` everywhere, but Vercel deploys to `mdntech.org` and the brand (email, socials, deploy target) is `.org` -- `.com` was stale. A split canonical/hreflang cluster (EN claiming `.com`, SK pointing EN->`.org`) would not validate and would split ranking signals. User confirmed `.org` is the live domain and delegated the SEO-best decision.
+
+**Alternatives:** Build `/sk` on `.org` but leave EN on `.com` (rejected -- inconsistent hreflang cluster); keep everything on `.com` and override the brief (rejected -- contradicts the live deploy domain and brand).
+
+**Revisit / follow-up:** If `mdntech.com` is still live/indexed separately, set up a domain-level `301 .com -> .org` at the registrar/Vercel (out of repo). Confirm in Search Console after deploy.
+
+### D-S29.2 -- Light i18n for /sk (no framework, element-level lang, shared chrome)
+
+**Decision:** One static route `app/(marketing)/sk/page.tsx` with dedicated SK section components under `components/sk/` (reusing the design system, not refactoring the hardcoded EN sections). No next-intl / `[locale]` routing. `lang="sk"` set element-level on the page wrapper (root `<html lang="en">` is shared and untouched). Navbar + footer made locale-aware via `usePathname()` (SK chrome on `/sk*`, EN path guarded/unchanged). Product/SaaS (ChatKit, Toolkit, /pricing) stays English -- only the agency funnel is localized.
+
+**Why:** The brief mandated light i18n. A real i18n framework or splitting root layouts (to get `<html lang="sk">`) would touch marketing/command-center/portal and is disproportionate for one page. Google relies on hreflang + visible content for language targeting; `<html lang>` is a minor signal, so element-level `lang="sk"` + reciprocal hreflang + Slovak content is sufficient. Building SK-specific components keeps the live EN page at zero regression risk.
+
+**Alternatives:** next-intl with `[locale]` segments (premature -- only one page localized); refactor EN section components to be prop-driven and reuse them (regression risk on the live EN page, and SK structure/messaging differs anyway -- value ladder, Pre koho, Realizacie); multiple root layouts for a true `<html lang="sk">` (invasive across all route groups for a minor SEO signal).
+
+**Revisit:** When localizing the whole site (Czech/Polish etc.) -- then adopt next-intl and a true per-locale `<html lang>`.
+
+---

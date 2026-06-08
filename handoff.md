@@ -32,6 +32,27 @@
 | 26 | 2026-05-06 | Marketing nav cleanup + Resend SMTP live + 4 branded auth email templates | Tools removed from NAV_LINKS, Login CTA hidden until portal is publicly ready (nav pill recentered with absolute positioning, `MarketingLayout` reverted to sync); Resend domain verified at Hostinger DNS (DKIM + SPF + MX, pre-existing DMARC kept), sending API key wired into Supabase Auth SMTP, live signup test confirms branded confirm-signup arrives from `noreply@mdntech.org`; reset-password / magic-link / email-change / reauthentication HTML templates written, version-controlled in `supabase/email-templates/`, and pasted into Supabase dashboard (flows not yet wired in portal UI -- branding is pre-emptive) |
 | 27 | 2026-05-08 | /build-kb skill ships -- portal card + ChatKit shortcut + handoff repo mirror | New `.claude/skills/build-kb/SKILL.md` formalises the BuildKBGuide step-2 prompt as an installable Claude Code slash command; generates 8-section `knowledge-base.md` with **exhaustive Products section** (every parameter the website shows per product); surfaces as a card in `/portal/toolkit` "Skills we use in production" gallery via new `toolkit-skills.ts` entry; `BuildKBGuide` step 2 gets a one-line shortcut hint linking to /portal/toolkit; generic public version mirrored to `bugiiiii11/handoff` so the toolkit Source link resolves |
 | 28 | 2026-05-10 | ChatKit pricing pivot -- 4-tier model (Free / Starter / Pro / Max) shipped end-to-end | Three-step pricing iteration in one session: started with $19 / 1000-credit Pro pack (Migration 007), then mid-session refined to $29 / 500 + inline /pricing on /chatkit + counter-increment race fix + headline retitled "Buy credits. No subscriptions.", then full pivot to 4-tier mixed PAYG + subscription (Migration 008): Free $0 (1 chatbot, 30 trial msgs) / Starter $29 PAYG (500 credits/chatbot, lifetime) / Pro $99/mo (2 chatbots, 5K msgs/mo) / Max $299/mo (3 chatbots, 25K msgs/mo). lib/portal/plans.ts becomes single source of truth; lib/chat/usage.ts cap-check branches per-chatbot-lifetime vs account-wide-monthly based on subscription state; cost guards (300 output tokens + KB top-5 × 2000 chars) cap per-message cost ~$0.005. Mock subscription flow (subscribe / upgrade / downgrade / cancel / reactivate) end-to-end tested. Chatbot creation gated by plan's chatbot limit. UI polish pass: 4-card pricing block on /chatkit reduced to single "Manage plan" CTA + table → card-row chatbot list. Real Stripe deferred until merchant account activates |
+| 29 | 2026-06-08 | SK agency landing `mdntech.org/sk` + canonical domain aligned to .org | Built Slovak agency landing at `/sk` (7 outcome-led sections, unified value ladder, 3 live client screenshots via Playwright), reciprocal hreflang sk/en/x-default + ProfessionalService JSON-LD + Slovak meta/OG, locale-aware navbar/footer, aligned canonical domain `mdntech.com -> mdntech.org` repo-wide. Part A of the Mind Palace SK brief; Part B (client-repo footer links) deferred |
+
+## What Was Done (Session 29) -- SK agency landing mdntech.org/sk + canonical domain aligned to .org
+
+Date: 2026-06-08
+
+Built Part A of the Mind Palace SK brief (`MindPalace/Projects/MDN-Tech/SK-LANDING-BRIEF.md`): a Slovak agency landing at `mdntech.org/sk` so the footer backlinks from our 3 live SK client sites land on a localized, indexable page instead of the EN worldwide home. Committed `089780d`, pushed to main -> Vercel auto-deploys.
+
+1. **SK landing route + 7 sections** -- New static route `app/(marketing)/sk/page.tsx` composing 7 outcome-led Slovak sections under `components/sk/`: SkHero ("Postavime a posunieme tvoj biznis online." + CTA "Nezavazna konzultacia zdarma" / "Pozri realizacie"), SkForWhom (Zacinas? / Uz podnikas? -> one value ladder), SkValueLadder (4 pillars in order: Biznis analyza *zdarma* -> Web *od 1 000 EUR* -> SEO *od 500 EUR* -> Automatizacia/systemy *od 3 000 EUR, cena na mieru*), SkWhyUs (6 advantages), SkPortfolio (3 client cards w/ screenshots), SkProcess (4 steps), SkContact (SK NAP + EmailJS form). All copy centralized in `constants/sk.ts`. Tone is outcome-led (owner's language) vs the EN site's feature-led; no ChatKit/Toolkit/pricing self-serve and no social-media service mention (per brief). Reuses the existing design system (button-primary, gradient headings, card surfaces, lib/motion + whileInView) rather than refactoring the hardcoded EN sections.
+
+2. **SEO wiring** -- Reciprocal hreflang sk/en/x-default on both `/sk` and EN home (`app/(marketing)/page.tsx`), self canonical `mdntech.org/sk`, element-level `lang="sk"`, ProfessionalService JSON-LD (areaServed Slovensko, telephone, email, serviceType), Slovak title/description/keywords + OG `sk_SK`, `/sk` added to `app/sitemap.ts` with `alternates.languages`. All verified present in the prerendered `sk.html`. Light-i18n approach (single route, no next-intl, element-level lang) logged as decision D-S29.2.
+
+3. **Canonical domain aligned mdntech.com -> mdntech.org (repo-wide)** -- The repo declared canonical on `.com` everywhere but the live domain is `.org` (`.com` was stale). Swapped in `config/index.ts`, `app/layout.tsx` (both JSON-LD schemas + availableLanguage Slovak), `app/sitemap.ts`, `app/robots.ts` (sitemap host), blog/terms/privacy canonicals + body refs, and `public/llms.txt`. `package.json` GitHub repo URLs left as-is (literal repo name, not SEO). Logged as decision D-S29.1. Follow-up: domain-level `301 .com -> .org` at the registrar if `.com` is still live/indexed.
+
+4. **Locale-aware shared chrome** -- `components/main/navbar.tsx` + `footer.tsx` branch on `usePathname()`: SK nav labels + `/sk#` anchors + logo->/sk and SK footer copy (no UAE address) on `/sk*`; EN path guarded and unchanged (zero regression).
+
+5. **Realizacie screenshots** -- Captured above-the-fold screenshots of kurenieturiec.sk, royalstroje.sk, goodhairbyzane.com via Playwright driving the locally-installed Chrome (`channel: 'chrome'` -- the Chromium download was blocked by local TLS interception/SSL inspection). Saved to `public/portfolio/*.jpg` (next/image serves webp/avif). Reusable script `scripts/capture-portfolio.mjs`; `playwright` added as a devDep (in `yarn.lock` -- removed the stray npm `package-lock.json` to keep a single lockfile). SK contact NAP: call +421904904091, WhatsApp +971582283256, contact@mdntech.org, areaServed Slovensko.
+
+6. **Verified** -- `next build` green (39 routes, `/sk` static 8.8 kB), `tsc` + lint clean, smoke-tested desktop + mobile (all 7 sections render, screenshots load, responsive). A localhost connection-refused the user hit was a dead/premature dev process (nothing listening on 3000), not a code bug -- a fresh `npm run dev` started cleanly on first try.
+
+**Part B is NOT in this repo** -- footer attribution links live in separate repos `melicharek`, `RoyalStroje`, `zane_kadernictvo`; repoint each to `https://mdntech.org/sk` with varied anchor text (per brief) at next touch of that repo.
 
 ## What Was Done (Session 28) -- ChatKit pricing pivot: 4-tier model shipped end-to-end
 
@@ -483,6 +504,8 @@ Date: 2026-04-17
 
 ## What To Do Next
 
+**Session 29 shipped the SK agency landing at `mdntech.org/sk`** (Part A of the Mind Palace SK brief) -- live, indexable, full hreflang/JSON-LD SEO, canonical domain aligned to `.org` repo-wide. Remaining SK work is Part B (footer-link repoints in 3 separate client repos) + the domain-level `301 .com -> .org` -- see priority 15.
+
 **Session 28 closed priority 1 (ChatKit Pricing) end-to-end** with a 4-tier mixed PAYG + subscription model: Free / Starter $29 / Pro $99/mo / Max $299/mo. Mock checkout for both Starter pack and subs verified working (subscribe / upgrade / downgrade / cancel / reactivate). Real Stripe integration is the only remaining piece; everything else (schema, UI, cap-checking, plan gates) is live. **Next focus: priority 1 -- real Stripe Checkout + webhooks (when merchant account activates).**
 
 | Priority | Task | Status | Notes |
@@ -501,6 +524,7 @@ Date: 2026-04-17
 | 12 | SEO action plan | Pending | Follow `seo-audit/ACTION-PLAN.md`. |
 | 13 | Add "Bonus skill" section to handoff README | Pending (low) | Handoff README is "four core skills" framed; positioning `build-kb` requires either an "Extras" / "Companion skills" section or a careful re-framing. No urgency -- toolkit card already discovers it. |
 | 14 | Delete `.next-stale-1777403470/` (local only) | Pending | Renamed in Session 23 to recover dev server; safety hook blocks `rm -rf .*`. Now in `.gitignore`. Delete manually with `rmdir /s /q .next-stale-1777403470` (Windows) or via Explorer. |
+| 15 | SK landing Part B + domain 301 | Pending (separate repos / registrar) | (a) Repoint footer attribution in `melicharek` -> "Web vytvoril MDN Tech", `RoyalStroje` -> "Tvorba webu: MDN Tech", `zane_kadernictvo` -> "Realizacia MDN Tech", all linking `https://mdntech.org/sk`, followed, varied anchors -- do at next touch of each repo. (b) `mdntech.sk` purchase + `301 -> /sk` (Martin/SK-NIC). (c) If `mdntech.com` is still live/indexed, set domain-level `301 .com -> .org` at registrar/Vercel and verify the canonical/hreflang cluster in Search Console post-deploy. |
 
 ## Key Files
 
@@ -508,6 +532,11 @@ Date: 2026-04-17
 |------|---------|
 | `app/layout.tsx` | Root layout (minimal -- html/body only) |
 | `app/(marketing)/layout.tsx` | Marketing layout with StarsCanvas, Navbar, Footer |
+| `app/(marketing)/sk/page.tsx` | **SK agency landing** (Part A, Session 29): static route, Slovak metadata + reciprocal hreflang sk/en/x-default + ProfessionalService JSON-LD + element-level `lang="sk"`; composes the 7 `components/sk/*` sections |
+| `components/sk/*` | SK landing sections: SkHero, SkForWhom, SkValueLadder, SkWhyUs, SkPortfolio (3 client screenshots), SkProcess, SkContact (EmailJS + SK NAP). Reuse the design system; all copy from `constants/sk.ts` |
+| `constants/sk.ts` | Single source of truth for `/sk` copy + data (SK_SITE/SEO, SK_NAP, SK_NAV_LINKS, SK_HERO, value ladder, why-us, portfolio, process, pricing) |
+| `components/main/{navbar,footer}.tsx` | Marketing nav + footer, now **locale-aware** via `usePathname()` -- SK chrome on `/sk*`, EN path unchanged |
+| `scripts/capture-portfolio.mjs` | Dev-only Playwright (system Chrome `channel`) screenshot capture of the 3 client sites -> `public/portfolio/*.jpg`. Run `node scripts/capture-portfolio.mjs` |
 | `app/command-center/layout.tsx` | CC layout: dark bg, Sidebar + main content |
 | `app/portal/layout.tsx` | Portal layout (customer-facing) |
 | `app/portal/dashboard/page.tsx` | Portal analytics dashboard: metrics cards, trend chart, keywords, actions |
