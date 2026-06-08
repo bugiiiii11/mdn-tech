@@ -37,6 +37,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://mdntech.com/sitemap.xml",
+    sitemap: "https://mdntech.org/sitemap.xml",
   };
 }

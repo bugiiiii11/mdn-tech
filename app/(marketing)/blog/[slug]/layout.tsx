@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     alternates: {
-      canonical: `https://mdntech.com/blog/${post.id}`,
+      canonical: `https://mdntech.org/blog/${post.id}`,
     },
   };
 }

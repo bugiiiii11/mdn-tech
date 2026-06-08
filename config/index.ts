@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const siteUrl = "https://mdntech.com";
+const siteUrl = "https://mdntech.org";
 
 export const siteConfig: Metadata = {
   metadataBase: new URL(siteUrl),

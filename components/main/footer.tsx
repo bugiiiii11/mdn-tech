@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo } from "react-icons/rx";
 
 export const Footer = () => {
@@ -10,6 +11,39 @@ export const Footer = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const pathname = usePathname();
+  const isSk = pathname?.startsWith("/sk") ?? false;
+
+  const t = isSk
+    ? {
+        logoHref: "/sk#domov",
+        description:
+          "Web, SEO, biznis analýza a automatizácia procesov pre slovenské firmy — moderné digitálne riešenia od jedného partnera.",
+        pages: "Stránky",
+        terms: "Obchodné podmienky",
+        privacy: "Ochrana súkromia",
+        blog: "Blog",
+        stayUpdated: "Zostaň v obraze",
+        newsletterDesc: "Prihlás sa na odber noviniek.",
+        emailPlaceholder: "Zadaj svoj email",
+        subscribe: "Odoberať",
+        bottomLine: "M.D.N Tech — digitálny partner pre slovenské firmy · Pôsobíme po celom Slovensku",
+      }
+    : {
+        logoHref: "/#home",
+        description:
+          "Full-stack AI engineers building production-ready systems with the latest AI models, autonomous agents, and modern engineering practices.",
+        pages: "Pages",
+        terms: "Terms & Conditions",
+        privacy: "Privacy Policy",
+        blog: "Blog",
+        stayUpdated: "Stay Updated",
+        newsletterDesc: "Subscribe to our newsletter for the latest updates.",
+        emailPlaceholder: "Enter your email",
+        subscribe: "Subscribe",
+        bottomLine:
+          "Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813",
+      };
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,35 +113,35 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-6">
             {/* Brand + description */}
             <div className="max-w-[280px]">
-              <Link href="/#home" className="inline-flex items-center gap-2.5 mb-3">
+              <Link href={t.logoHref} className="inline-flex items-center gap-2.5 mb-3">
                 <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Full-stack AI engineers building production-ready systems with the latest AI models, autonomous agents, and modern engineering practices.
+                {t.description}
               </p>
             </div>
 
             {/* Pages */}
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">Pages</h4>
+              <h4 className="text-white text-sm font-medium mb-3">{t.pages}</h4>
               <nav className="flex flex-col gap-2">
                 <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                  Terms & Conditions
+                  {t.terms}
                 </Link>
                 <Link href="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                  Privacy Policy
+                  {t.privacy}
                 </Link>
                 <Link href="/blog" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                  Blog
+                  {t.blog}
                 </Link>
               </nav>
             </div>
 
             {/* Newsletter + Socials */}
             <div className="max-w-[280px]">
-              <h4 className="text-white text-sm font-medium mb-1">Stay Updated</h4>
-              <p className="text-gray-500 text-sm mb-3">Subscribe to our newsletter for the latest updates.</p>
+              <h4 className="text-white text-sm font-medium mb-1">{t.stayUpdated}</h4>
+              <p className="text-gray-500 text-sm mb-3">{t.newsletterDesc}</p>
               <form onSubmit={handleSubscribe} className="flex gap-2 mb-2">
                 <input
                   type="email"
@@ -115,7 +149,7 @@ export const Footer = () => {
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder={t.emailPlaceholder}
                   required
                   autoComplete="email"
                   disabled={isSubmitting}
@@ -126,7 +160,7 @@ export const Footer = () => {
                   disabled={isSubmitting}
                   className="shrink-0 px-4 py-2 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? "..." : "Subscribe"}
+                  {isSubmitting ? "..." : t.subscribe}
                 </button>
               </form>
               {status !== "idle" && (
@@ -154,7 +188,7 @@ export const Footer = () => {
           {/* Bottom line */}
           <div className="pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500">
             <p className="leading-relaxed">
-              Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813
+              {t.bottomLine}
             </p>
             <p>© 2026 M.D.N TECH</p>
           </div>

@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { getAllPosts } from "@/data/blog-posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://mdntech.com";
+  const baseUrl = "https://mdntech.org";
 
   const posts = getAllPosts();
 
@@ -18,10 +18,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
+  const languageAlternates = {
+    languages: {
+      sk: `${baseUrl}/sk`,
+      en: baseUrl,
+      "x-default": baseUrl,
+    },
+  };
+
   return [
     {
       url: baseUrl,
       lastModified: new Date("2026-03-13"),
+      alternates: languageAlternates,
+    },
+    {
+      url: `${baseUrl}/sk`,
+      lastModified: new Date("2026-06-08"),
+      alternates: languageAlternates,
     },
     {
       url: `${baseUrl}/blog`,

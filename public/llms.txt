@@ -6,7 +6,7 @@ M.D.N Tech FZE is a UAE-based technology agency specializing in AI systems, Web3
 ## Company Details
 - Legal Name: M.D.N Tech FZE
 - Location: UAQ Free Trade Zone, Umm Al Quwain, United Arab Emirates
-- Website: https://mdntech.com
+- Website: https://mdntech.org
 - Contact: contact@mdntech.org
 
 ## Services

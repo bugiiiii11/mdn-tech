@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://mdntech.com/terms",
+    canonical: "https://mdntech.org/terms",
   },
 };
 

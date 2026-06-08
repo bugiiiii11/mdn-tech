@@ -13,8 +13,8 @@ const organizationSchema = {
   "@type": "Organization",
   name: "M.D.N Tech FZE",
   alternateName: "M.D.N Tech",
-  url: "https://mdntech.com",
-  logo: "https://mdntech.com/logo.png",
+  url: "https://mdntech.org",
+  logo: "https://mdntech.org/logo.png",
   description:
     "UAE-based tech agency specializing in AI systems, Web3 solutions, and full-stack development with global delivery.",
   foundingDate: "2024-01-01",
@@ -30,7 +30,7 @@ const organizationSchema = {
     email: "contact@mdntech.org",
     telephone: "+971582283256",
     contactType: "sales",
-    availableLanguage: "English",
+    availableLanguage: ["English", "Slovak"],
   },
   sameAs: [
     "https://www.instagram.com/mdntechorg/",
@@ -51,10 +51,10 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "M.D.N Tech",
-  url: "https://mdntech.com",
+  url: "https://mdntech.org",
   description:
     "Ship production-ready AI systems, Web3 solutions, and full-stack applications faster.",
-  inLanguage: "en",
+  inLanguage: ["en", "sk"],
   publisher: {
     "@type": "Organization",
     name: "M.D.N Tech FZE",

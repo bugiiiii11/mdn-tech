@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://mdntech.com/privacy",
+    canonical: "https://mdntech.org/privacy",
   },
 };
 
