@@ -62,7 +62,7 @@ export const SK_HERO = {
   titleLine1: "Expandujte",
   titleLine2: "svoj biznis online.",
   subtitle:
-    "Web · SEO · biznis analýza · automatizácia — digitálne riešenia pre slovenské firmy od jedného partnera.",
+    "Web · SEO · biznis analýza · automatizácia — digitálne riešenia pre slovenských podnikateľov.",
   ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "#kontakt" },
   ctaSecondary: { label: "Pozrite realizácie", href: "#realizacie" },
 } as const;
@@ -132,25 +132,25 @@ export const SK_WHY_US = [
     icon: "clock",
     title: "Rekordný čas dodania",
     description:
-      "Web aj klientsky portál do jedného mesiaca, expresný web do týždňa — pri kompletnom zadaní a materiáloch, vždy v požadovanej kvalite.",
+      "Webová stránka aj administrátorský portál do jedného mesiaca je naším štandardom, expresný web do týždňa — pri kompletných podkladoch a bez kompromisov v kvalite.",
   },
   {
     icon: "gift",
     title: "Bezplatná biznis analýza",
     description:
-      "Pridaná hodnota navyše ku webu, ktorá odhalí, kde vám vieme pomôcť ešte. Žiadny freelancer vám to nedá.",
+      "Ku každému webu pridávame biznis analýzu, ktorá odhalí ďalšie príležitosti na elimináciu slabých stránok arast vášho podnikania.",
   },
   {
     icon: "layers",
     title: "Všetko z jednej ruky",
     description:
-      "Analýza, technická dokumentácia, tvorba webu, branding, textácie, SEO, automatizácia procesov — pokryjeme všetko na mieru.",
+      "Analýza, technická dokumentácia, tvorba webu, branding, texty, SEO aj automatizácia procesov — všetko na mieru od jedného partnera.",
   },
   {
     icon: "cpu",
     title: "AI = rýchlejšie a modernejšie",
     description:
-      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodáme špičkový výsledok za rozumnú cenu a extrémne rýchlo.",
+      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodávame špičkový výsledok za rozumnú cenu a výrazne rýchlejšie ako klasická IT firma.",
   },
   {
     icon: "check",
@@ -162,7 +162,7 @@ export const SK_WHY_US = [
     icon: "users",
     title: "Skúsený tím",
     description:
-      "Naši programátori majú skúsenosti s tvorbou webov, aplikácií, portálov, AI systémov aj blockchainu. Pod palcom máme aj metodiku projektového manažmentu, dôraz na dizajn a využívanie najnovších technológií.",
+      "Naši programátori majú skúsenosti s tvorbou aplikácií, portálov, AI systémov aj blockchainu. K tomu prepracovaný projektový manažment, dôraz na dizajn a prácu s najnovšími technológiami.",
   },
 ] as const;
 
@@ -184,7 +184,7 @@ export const SK_PORTFOLIO = [
     href: "https://royalstroje.sk",
     image: "/portfolio/royalstroje.jpg",
     description:
-      "Web pre požičovňu náradia a stavebnej techniky v Senci — s admin portálom, automatizáciou procesov a prístupom k databáze.",
+      "Web pre požičovňu náradia a stavebnej techniky v Senci — s automatizáciou procesov a prístupom k databáze cez admin portál.",
     tags: ["Web", "Lokálne SEO", "Command Center"],
   },
   {
@@ -193,7 +193,7 @@ export const SK_PORTFOLIO = [
     href: "https://goodhairbyzane.com",
     image: "/portfolio/goodhairbyzane.jpg",
     description:
-      "Web pre kadernícky salón špecializovaný na predlžovanie vlasov — elegantný, rýchly a plný atmosféry.",
+      "Web pre kadernícky salón špecializovaný na predlžovanie vlasov a regeneračné kúry — elegantný, rýchly a plný atmosféry.",
     tags: ["Web", "SEO", "Dizajn na mieru"],
   },
 ] as const;
