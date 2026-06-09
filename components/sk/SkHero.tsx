@@ -22,10 +22,18 @@ export const SkHero = () => {
         <source src="/videos/blackhole.webm" type="video/webm" />
       </video>
 
+      {/*
+        Mobile min-h is 685px (vs the EN hero's 650px) on purpose: the blackhole
+        video is sized by `h-full` off this container, so to land it at the same
+        vertical position as the EN home its container must be the same height.
+        The leaner SK copy bottoms out at the 650px floor, while the EN hero's
+        extra paragraph runs ~658–712px on mobile (~685px at 390px) — so 685px
+        matches EN. Desktop keeps 650px (EN parity there is unchanged).
+      */}
       <motion.div
         initial="hidden"
         animate="visible"
-        className="flex flex-col min-h-[650px] pb-20 items-center justify-center px-3 md:px-20 mt-40 md:pb-0 w-full max-w-full z-[20]"
+        className="flex flex-col min-h-[685px] md:min-h-[650px] pb-20 items-center justify-center px-3 md:px-20 mt-40 md:pb-0 w-full max-w-full z-[20]"
       >
         <div className="h-full w-full flex flex-col items-center gap-6 justify-center m-auto">
           {/* Headline */}

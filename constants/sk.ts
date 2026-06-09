@@ -92,7 +92,7 @@ export const SK_VALUE_LADDER = [
     step: "01",
     title: "Biznis analýza (AI)",
     description:
-      "Najprv pochopíme váš biznis a nájdeme páky rastu. Odhalíme, kde vám vieme pomôcť ešte — admin systém, chatbot, automatizácia.",
+      "Najprv pochopíme váš biznis, prescanujeme konkurenciu a nájdeme páky rastu. Odhalíme, kde vám vieme pomôcť — admin portál, chatbot, automatizácia procesov.",
     price: "Zdarma k webu",
     highlight: true,
   },
@@ -101,7 +101,7 @@ export const SK_VALUE_LADDER = [
     step: "02",
     title: "Web na mieru",
     description:
-      "Profesionálny a rýchly web, ktorý vám nosí zákazníkov z Googlu. Dôkaz sú naše živé weby, nie mockupy.",
+      "Profesionálny a rýchly web, ktorý zviditeľňuje vašu značku a nosí zákazníkov z Googlu.",
     price: "od 1 000 €",
     highlight: false,
   },
@@ -110,7 +110,7 @@ export const SK_VALUE_LADDER = [
     step: "03",
     title: "SEO + viditeľnosť",
     description:
-      "Aby vás zákazníci našli skôr ako konkurenciu. Lokálne Google leady, Google Moja Firma, technické a obsahové SEO.",
+      "Aby vás zákazníci našli skôr ako konkurenciu. Lokálne Google leady, vyhľadávanie cez AI, technické a obsahové SEO.",
     price: "od 500 €",
     highlight: false,
   },
@@ -119,7 +119,7 @@ export const SK_VALUE_LADDER = [
     step: "04",
     title: "Automatizácia a systémy na mieru",
     description:
-      "Rezervačný a objednávkový systém, klientsky portál, databázy, chatbot 24/7, automatické notifikácie — operatíva, ktorá beží za vás.",
+      "Objednávkový systém, tvorba faktúr, databázy, chatbot 24/7, automatické notifikácie, klientský, či admin portál — operatíva, ktorá beží za vás.",
     price: "od 3 000 € · cena na mieru",
     highlight: false,
   },
@@ -144,19 +144,19 @@ export const SK_WHY_US = [
     icon: "layers",
     title: "Všetko z jednej ruky",
     description:
-      "Web, SEO, analýza aj automatizácia u jedného dodávateľa — nie tri rôzne firmy, ktoré sa medzi sebou nedohodnú.",
+      "Analýza, technická dokumentácia, tvorba webu, branding, textácie, SEO, automatizácia procesov — pokryjeme všetko na mieru.",
   },
   {
     icon: "cpu",
     title: "AI = rýchlejšie a modernejšie",
     description:
-      "Pracujeme s najnovšími AI nástrojmi, takže dodáme špičkový výsledok za rozumnú cenu — oproti klasickej agentúre rýchlejšie.",
+      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodáme špičkový výsledok za rozumnú cenu a extrémne rýchlo.",
   },
   {
     icon: "check",
     title: "Reálne výsledky",
     description:
-      "Máme za sebou tri živé weby pre slovenské firmy. Nie ukážky a sľuby, ale fungujúce projekty, ktoré si viete pozrieť.",
+      "Máme bohaté skúsenosti s tvorbou webových stránok a informačných systémov pre slovenské firmy — fungujúce projekty, ktoré si viete pozrieť.",
   },
   {
     icon: "users",
