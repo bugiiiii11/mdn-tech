@@ -13,7 +13,7 @@ export const SK_SITE = {
   // so it is intentionally omitted here to avoid a doubled suffix in <title>.
   title: "Tvorba webu, SEO a automatizácia pre slovenské firmy",
   description:
-    "Postavíme a posunieme tvoj biznis online. Web, SEO, biznis analýza a automatizácia procesov pre slovenské firmy — moderné digitálne riešenia od jedného partnera. Web do týždňa, bezplatná biznis analýza.",
+    "Expandujte svoj biznis online. Web, SEO, biznis analýza a automatizácia procesov pre slovenské firmy — moderné digitálne riešenia od jedného partnera. Web do týždňa, bezplatná biznis analýza.",
   keywords: [
     "tvorba webu Slovensko",
     "tvorba web stránok",
@@ -59,20 +59,12 @@ export const SK_NAV_LINKS = [
 // --- Hero ----------------------------------------------------------------
 
 export const SK_HERO = {
-  eyebrow: "Digitálny partner pre slovenské firmy",
-  titleLine1: "Postavíme a posunieme",
-  titleLine2: "tvoj biznis online.",
+  titleLine1: "Expandujte",
+  titleLine2: "svoj biznis online.",
   subtitle:
-    "Web · SEO · biznis analýza · automatizácia procesov — moderné digitálne riešenia pre slovenské firmy, od jedného partnera.",
-  description:
-    "Chceš posunúť svoj biznis na vyššiu úroveň? Najprv pochopíme, ako funguješ, a potom postavíme riešenie, ktoré ti reálne nosí zákazníkov a šetrí čas.",
-  trustBadges: [
-    "Web do týždňa",
-    "Klientsky portál do mesiaca",
-    "3 živé weby, nie mockupy",
-  ],
+    "Web · SEO · biznis analýza · automatizácia — digitálne riešenia pre slovenské firmy od jedného partnera.",
   ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "#kontakt" },
-  ctaSecondary: { label: "Pozri realizácie", href: "#realizacie" },
+  ctaSecondary: { label: "Pozrite realizácie", href: "#realizacie" },
 } as const;
 
 // --- Pre koho ------------------------------------------------------------
@@ -80,20 +72,17 @@ export const SK_HERO = {
 export const SK_FOR_WHOM = [
   {
     icon: "rocket",
-    title: "Začínaš?",
+    title: "Začínate?",
     description:
-      "Postavíme ti kompletný digitálny základ: profesionálny web, vizuálnu identitu, chatbota a základnú viditeľnosť na Googli. Pevný štart, na ktorom sa dá rásť.",
+      "Postavíme vám kompletný digitálny základ: profesionálny web, vizuálnu identitu, chatbota a základnú viditeľnosť na Googli. Pevný štart, na ktorom sa dá rásť.",
   },
   {
     icon: "trending",
-    title: "Už podnikáš?",
+    title: "Už podnikáte?",
     description:
-      "Posunieme ťa vyššie: biznis analýza odhalí páky rastu, SEO ťa dostane pred konkurenciu a automatizácia procesov ti šetrí čas aj náklady.",
+      "Posunieme vás vyššie: biznis analýza odhalí páky rastu, SEO vás dostane pred konkurenciu a automatizácia procesov vám šetrí čas aj náklady.",
   },
 ] as const;
-
-export const SK_FOR_WHOM_NOTE =
-  "Jeden rebrík služieb — líši sa len to, kde nastúpiš. Vždy ideme smerom nahor.";
 
 // --- Čo robíme — value ladder -------------------------------------------
 
@@ -103,8 +92,8 @@ export const SK_VALUE_LADDER = [
     step: "01",
     title: "Biznis analýza (AI)",
     description:
-      "Najprv pochopíme tvoj biznis a nájdeme páky rastu. Odhalíme, kde ti vieme pomôcť ešte — admin systém, chatbot, automatizácia.",
-    price: "Zdarma ku webu",
+      "Najprv pochopíme váš biznis a nájdeme páky rastu. Odhalíme, kde vám vieme pomôcť ešte — admin systém, chatbot, automatizácia.",
+    price: "Zdarma k webu",
     highlight: true,
   },
   {
@@ -112,7 +101,7 @@ export const SK_VALUE_LADDER = [
     step: "02",
     title: "Web na mieru",
     description:
-      "Profesionálny a rýchly web, ktorý ti nosí zákazníkov z Googlu. Dôkaz sú naše živé weby, nie mockupy.",
+      "Profesionálny a rýchly web, ktorý vám nosí zákazníkov z Googlu. Dôkaz sú naše živé weby, nie mockupy.",
     price: "od 1 000 €",
     highlight: false,
   },
@@ -121,7 +110,7 @@ export const SK_VALUE_LADDER = [
     step: "03",
     title: "SEO + viditeľnosť",
     description:
-      "Aby ťa zákazníci našli skôr ako konkurenciu. Lokálne Google leady, Google Moja Firma, technické a obsahové SEO.",
+      "Aby vás zákazníci našli skôr ako konkurenciu. Lokálne Google leady, Google Moja Firma, technické a obsahové SEO.",
     price: "od 500 €",
     highlight: false,
   },
@@ -130,7 +119,7 @@ export const SK_VALUE_LADDER = [
     step: "04",
     title: "Automatizácia a systémy na mieru",
     description:
-      "Rezervačný a objednávkový systém, klientsky portál, databázy, chatbot 24/7, automatické notifikácie — operatíva, ktorá beží za teba.",
+      "Rezervačný a objednávkový systém, klientsky portál, databázy, chatbot 24/7, automatické notifikácie — operatíva, ktorá beží za vás.",
     price: "od 3 000 € · cena na mieru",
     highlight: false,
   },
@@ -149,7 +138,7 @@ export const SK_WHY_US = [
     icon: "gift",
     title: "Bezplatná biznis analýza",
     description:
-      "Pridaná hodnota navyše ku webu, ktorá odhalí, kde ti vieme pomôcť ešte. Žiadny freelancer ti to nedá.",
+      "Pridaná hodnota navyše ku webu, ktorá odhalí, kde vám vieme pomôcť ešte. Žiadny freelancer vám to nedá.",
   },
   {
     icon: "layers",
@@ -167,7 +156,7 @@ export const SK_WHY_US = [
     icon: "check",
     title: "Reálne výsledky",
     description:
-      "Máme za sebou tri živé weby pre slovenské firmy. Nie ukážky a sľuby, ale fungujúce projekty, ktoré si vieš pozrieť.",
+      "Máme za sebou tri živé weby pre slovenské firmy. Nie ukážky a sľuby, ale fungujúce projekty, ktoré si viete pozrieť.",
   },
   {
     icon: "users",
@@ -195,8 +184,8 @@ export const SK_PORTFOLIO = [
     href: "https://royalstroje.sk",
     image: "/portfolio/royalstroje.jpg",
     description:
-      "Web pre požičovňu náradia a stavebnej techniky v Senci — moderný vzhľad a jasná cesta k dopytu.",
-    tags: ["Web", "Lokálne SEO", "Katalóg"],
+      "Web pre požičovňu náradia a stavebnej techniky v Senci — s admin portálom, automatizáciou procesov a prístupom k databáze.",
+    tags: ["Web", "Lokálne SEO", "Command Center"],
   },
   {
     name: "Good Hair by Zane",
@@ -217,14 +206,14 @@ export const SK_PROCESS = [
     step: "01",
     title: "Nezáväzná konzultácia",
     description:
-      "Krátky rozhovor o tvojich cieľoch a o tom, čo potrebuješ. Bez záväzkov a bez tlaku.",
+      "Krátky rozhovor o vašich cieľoch a o tom, čo potrebujete. Bez záväzkov a bez tlaku.",
   },
   {
     icon: "search",
     step: "02",
     title: "Biznis analýza",
     description:
-      "Pochopíme tvoj biznis, nájdeme páky rastu a navrhneme riešenie na mieru s jasnou cenou.",
+      "Pochopíme váš biznis, nájdeme páky rastu a navrhneme riešenie na mieru s jasnou cenou.",
   },
   {
     icon: "code",
@@ -238,7 +227,7 @@ export const SK_PROCESS = [
     step: "04",
     title: "Rast a podpora",
     description:
-      "SEO, vylepšenia a podpora po spustení podľa potreby — aby projekt rástol spolu s tebou.",
+      "SEO, vylepšenia a podpora po spustení podľa potreby — aby projekt rástol spolu s vami.",
   },
 ] as const;
 
@@ -246,7 +235,7 @@ export const SK_PROCESS = [
 
 export const SK_PRICING = {
   items: [
-    { service: "Biznis analýza", price: "zdarma ku webu" },
+    { service: "Biznis analýza", price: "zdarma k webu" },
     { service: "Web / landing (vrátane analýzy)", price: "od 1 000 €" },
     { service: "SEO", price: "od 500 €" },
     { service: "Systém / automatizácia / portál na mieru", price: "od 3 000 €" },

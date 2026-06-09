@@ -168,20 +168,22 @@ export const Footer = () => {
                   {message}
                 </p>
               )}
-              <div className="flex items-center gap-1">
-                {socials.map(({ name, icon: Icon, link }) => (
-                  <Link
-                    key={name}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-gray-500 hover:text-purple-400 hover:bg-white/5 transition-colors"
-                    aria-label={name}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </Link>
-                ))}
-              </div>
+              {!isSk && (
+                <div className="flex items-center gap-1">
+                  {socials.map(({ name, icon: Icon, link }) => (
+                    <Link
+                      key={name}
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg text-gray-500 hover:text-purple-400 hover:bg-white/5 transition-colors"
+                      aria-label={name}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

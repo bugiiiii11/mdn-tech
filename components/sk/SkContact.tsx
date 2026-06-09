@@ -50,11 +50,11 @@ export const SkContact = () => {
       if (error?.status === 429 || error?.text?.includes("limit")) {
         setSubmitStatus("limit");
         setErrorMessage(
-          `Mesačný limit dosiahnutý. Napíš nám priamo na ${SK_NAP.email}`
+          `Mesačný limit dosiahnutý. Napíšte nám priamo na ${SK_NAP.email}`
         );
       } else {
         setSubmitStatus("error");
-        setErrorMessage("Správu sa nepodarilo odoslať. Skús to znova.");
+        setErrorMessage("Správu sa nepodarilo odoslať. Skúste to znova.");
       }
       setTimeout(() => setSubmitStatus("idle"), 8000);
     } finally {
@@ -65,7 +65,7 @@ export const SkContact = () => {
   const contactInfo = [
     {
       icon: FiPhone,
-      label: "Zavolaj",
+      label: "Zavolajte",
       value: SK_NAP.phoneDisplay,
       link: SK_NAP.phoneHref,
     },
@@ -98,7 +98,7 @@ export const SkContact = () => {
         }}
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-6 text-center"
       >
-        Povedz nám o svojom projekte
+        Povedzte nám o svojom projekte
       </motion.h2>
 
       <motion.p
@@ -115,8 +115,8 @@ export const SkContact = () => {
         }}
         className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-12 text-center"
       >
-        Nezáväzná konzultácia zdarma. Napíš nám alebo zavolaj — ozveme sa ti a
-        spolu nájdeme najlepšie riešenie pre tvoj biznis.
+        Nezáväzná konzultácia zdarma. Napíšte nám alebo zavolajte — ozveme sa
+        vám a spolu nájdeme najlepšie riešenie pre váš biznis.
       </motion.p>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -130,11 +130,11 @@ export const SkContact = () => {
         >
           <div>
             <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
-              Postavíme a posunieme tvoj biznis online
+              Expandujte svoj biznis online
             </h3>
             <p className="text-gray-400 mb-2 leading-relaxed text-sm md:text-base">
-              Či už začínaš, alebo už podnikáš — ak potrebuješ partnera, ktorý
-              myslí biznisovo a dodáva rýchlo, ozvi sa. Žiadne zdĺhavé procesy,
+              Či už začínate, alebo už podnikáte — ak potrebujete partnera, ktorý
+              myslí biznisovo a dodáva rýchlo, ozvite sa. Žiadne zdĺhavé procesy,
               len priamy rozhovor s ľuďmi, ktorí to postavia.
             </p>
             <p className="text-sm text-gray-500">
@@ -198,7 +198,7 @@ export const SkContact = () => {
                   required
                   autoComplete="name"
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
-                  placeholder="Tvoje meno"
+                  placeholder="Vaše meno"
                 />
               </div>
 
@@ -218,7 +218,7 @@ export const SkContact = () => {
                   required
                   autoComplete="email"
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
-                  placeholder="tvoj.email@priklad.sk"
+                  placeholder="vas.email@priklad.sk"
                 />
               </div>
 
@@ -257,7 +257,7 @@ export const SkContact = () => {
                   autoComplete="off"
                   rows={5}
                   className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300 resize-none"
-                  placeholder="Napíš nám, čo potrebuješ..."
+                  placeholder="Napíšte nám, čo potrebujete..."
                 />
               </div>
 
@@ -281,7 +281,7 @@ export const SkContact = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 rounded-lg bg-green-500/20 border border-green-500/50 text-green-400 text-sm text-center"
                 >
-                  Ďakujeme! Čoskoro sa ti ozveme.
+                  Ďakujeme! Čoskoro sa vám ozveme.
                 </motion.div>
               )}
 

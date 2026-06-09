@@ -95,7 +95,7 @@ export const SkPortfolio = () => {
         transition={{ duration: 0.5, delay: 0.15 }}
         className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-10 text-center"
       >
-        Tri živé weby pre slovenské firmy. Reálne projekty, ktoré si vieš
+        Tri živé weby pre slovenské firmy. Reálne projekty, ktoré si viete
         pozrieť — nie ukážky.
       </motion.p>
 

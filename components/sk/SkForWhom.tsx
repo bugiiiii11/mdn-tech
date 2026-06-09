@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import type { IconType } from "react-icons";
-import { FiTrendingUp, FiArrowDown } from "react-icons/fi";
+import { FiTrendingUp } from "react-icons/fi";
 import { FaRocket } from "react-icons/fa";
-import { SK_FOR_WHOM, SK_FOR_WHOM_NOTE } from "@/constants/sk";
+import { SK_FOR_WHOM } from "@/constants/sk";
 
 const ICONS: Record<string, IconType> = {
   rocket: FaRocket,
@@ -55,17 +55,6 @@ export const SkForWhom = () => {
           );
         })}
       </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mt-8 inline-flex items-center gap-2 text-sm md:text-base text-gray-400 text-center"
-      >
-        <FiArrowDown className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-        {SK_FOR_WHOM_NOTE}
-      </motion.p>
     </section>
   );
 };

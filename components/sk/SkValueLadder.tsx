@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { IconType } from "react-icons";
 import { FiSearch, FiGlobe, FiTrendingUp, FiZap } from "react-icons/fi";
-import { SK_VALUE_LADDER, SK_PRICING } from "@/constants/sk";
+import { SK_VALUE_LADDER } from "@/constants/sk";
 
 const ICONS: Record<string, IconType> = {
   search: FiSearch,
@@ -38,8 +38,8 @@ export const SkValueLadder = () => {
         transition={{ duration: 0.5, delay: 0.15 }}
         className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-10 text-center"
       >
-        Jeden rebrík od základov až po systémy na mieru. Začni tam, kde si — a
-        rastieme spolu o stupeň vyššie.
+        Jeden rebrík od základov až po systémy na mieru. Začnite tam, kde ste —
+        a rastieme spolu o stupeň vyššie.
       </motion.p>
 
       <div className="w-full max-w-4xl flex flex-col gap-4">
@@ -94,22 +94,6 @@ export const SkValueLadder = () => {
           );
         })}
       </div>
-
-      {/* Pricing note */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-full max-w-4xl mt-8 p-5 rounded-xl border border-white/10 bg-white/[0.03] text-center"
-      >
-        <p className="text-sm md:text-base text-gray-300">
-          Cena na mieru po dohode — sumy vyššie sú len orientačné minimá.
-        </p>
-        <p className="text-xs md:text-sm text-gray-500 mt-1">
-          {SK_PRICING.note}
-        </p>
-      </motion.div>
     </section>
   );
 };
