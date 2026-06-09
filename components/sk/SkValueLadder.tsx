@@ -38,8 +38,8 @@ export const SkValueLadder = () => {
         transition={{ duration: 0.5, delay: 0.15 }}
         className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-10 text-center"
       >
-        Jeden rebrík od základov až po systémy na mieru. Začnite tam, kde ste —
-        a rastieme spolu o stupeň vyššie.
+        Od základov až po systémy na mieru — všetko pod jednou strechou.
+        Začnite tam, kde ste, a rastieme spolu o stupeň vyššie.
       </motion.p>
 
       <div className="w-full max-w-4xl flex flex-col gap-4">

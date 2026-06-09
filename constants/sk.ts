@@ -156,13 +156,13 @@ export const SK_WHY_US = [
     icon: "check",
     title: "Reálne výsledky",
     description:
-      "Máme bohaté skúsenosti s tvorbou webových stránok a informačných systémov pre slovenské firmy — fungujúce projekty, ktoré si viete pozrieť.",
+      "Živé weby, ktoré sme vytvorili pre slovenských podnikateľov. Reálne referencie, ktoré si viete pozrieť — nie ukážky a sľuby.",
   },
   {
     icon: "users",
-    title: "Senior tím + lokálny SK partner",
+    title: "Skúsený tím",
     description:
-      "10+ rokov skúseností a partner, ktorý rozumie slovenskému trhu, Google Moja Firma aj SK SEO.",
+      "Naši programátori majú skúsenosti s tvorbou webov, aplikácií, portálov, AI systémov aj blockchainu. Pod palcom máme aj metodiku projektového manažmentu, dôraz na dizajn a využívanie najnovších technológií.",
   },
 ] as const;
 
