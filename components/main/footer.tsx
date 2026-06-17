@@ -2,15 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo } from "react-icons/rx";
 
 export const Footer = () => {
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
   const pathname = usePathname();
   const isSk = pathname?.startsWith("/sk") ?? false;
 
@@ -23,67 +18,19 @@ export const Footer = () => {
         terms: "Obchodné podmienky",
         privacy: "Ochrana súkromia",
         blog: "Blog",
-        stayUpdated: "Zostaň v obraze",
-        newsletterDesc: "Prihlás sa na odber noviniek.",
-        emailPlaceholder: "Zadaj svoj email",
-        subscribe: "Odoberať",
         bottomLine: "M.D.N Tech — digitálny partner pre slovenské firmy · Pôsobíme po celom Slovensku",
       }
     : {
         logoHref: "/#home",
         description:
-          "Full-stack AI engineers building production-ready systems with the latest AI models, autonomous agents, and modern engineering practices.",
+          "Web, Apps, SEO, business analysis and process automation for global companies — modern digital solutions from one partner.",
         pages: "Pages",
         terms: "Terms & Conditions",
         privacy: "Privacy Policy",
         blog: "Blog",
-        stayUpdated: "Stay Updated",
-        newsletterDesc: "Subscribe to our newsletter for the latest updates.",
-        emailPlaceholder: "Enter your email",
-        subscribe: "Subscribe",
         bottomLine:
           "Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813",
       };
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setStatus("idle");
-    setMessage("");
-
-    try {
-      const response = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setStatus("error");
-        setMessage(data.error || "Failed to subscribe");
-      } else {
-        setStatus("success");
-        setMessage(data.message || "Successfully subscribed!");
-        setEmail("");
-      }
-
-      setTimeout(() => {
-        setStatus("idle");
-        setMessage("");
-      }, 4000);
-    } catch (error) {
-      setStatus("error");
-      setMessage("Network error. Please try again.");
-      setTimeout(() => {
-        setStatus("idle");
-        setMessage("");
-      }, 4000);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const socials = [
     { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
@@ -138,38 +85,34 @@ export const Footer = () => {
               </nav>
             </div>
 
-            {/* Newsletter + Socials */}
-            <div className="max-w-[280px]">
-              <h4 className="text-white text-sm font-medium mb-1">{t.stayUpdated}</h4>
-              <p className="text-gray-500 text-sm mb-3">{t.newsletterDesc}</p>
-              <form onSubmit={handleSubscribe} className="flex gap-2 mb-2">
-                <input
-                  type="email"
-                  id="newsletter-email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.emailPlaceholder}
-                  required
-                  autoComplete="email"
-                  disabled={isSubmitting}
-                  className="flex-1 min-w-0 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-purple-500/40 disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="shrink-0 px-4 py-2 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "..." : t.subscribe}
-                </button>
-              </form>
-              {status !== "idle" && (
-                <p className={`text-xs mb-2 ${status === "success" ? "text-green-400" : "text-red-400"}`}>
-                  {message}
-                </p>
-              )}
-              {!isSk && (
-                <div className="flex items-center gap-1">
+            {/* Newsletter + Socials (EN) / Contact (SK) */}
+            {isSk ? (
+              <div className="max-w-[280px]">
+                <h4 className="text-white text-sm font-medium mb-3">Kontakt</h4>
+                <div className="flex flex-col gap-2">
+                  <a href="tel:+421904904091" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
+                    0904 904 091
+                  </a>
+                  <a href="mailto:contact@mdntech.org" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
+                    contact@mdntech.org
+                  </a>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    Recká cesta 182,<br />925 26 Senec-Boldog
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-[280px]">
+                <h4 className="text-white text-sm font-medium mb-3">Contact</h4>
+                <div className="flex flex-col gap-2">
+                  <a href="tel:+971582283256" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
+                    +971 58 228 3256
+                  </a>
+                  <a href="mailto:contact@mdntech.org" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
+                    contact@mdntech.org
+                  </a>
+                </div>
+                <div className="flex items-center gap-1 mt-4">
                   {socials.map(({ name, icon: Icon, link }) => (
                     <Link
                       key={name}
@@ -183,8 +126,8 @@ export const Footer = () => {
                     </Link>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Bottom line */}
