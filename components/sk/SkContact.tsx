@@ -71,7 +71,7 @@ export const SkContact = () => {
     },
     {
       icon: FaWhatsapp,
-      label: "WhatsApp",
+      label: "Napíšte na WhatsApp",
       value: SK_NAP.whatsappDisplay,
       link: SK_NAP.whatsappHref,
     },

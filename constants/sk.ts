@@ -74,13 +74,13 @@ export const SK_FOR_WHOM = [
     icon: "rocket",
     title: "Začínate?",
     description:
-      "Postavíme vám kompletný digitálny základ: profesionálny web, vizuálnu identitu, chatbota a základnú viditeľnosť na Googli. Pevný štart, na ktorom sa dá rásť.",
+      "Postavíme vám kompletný digitálny základ: profesionálny web, vizuálnu identitu a základnú viditeľnosť na Googli. Pevný štart pre váš biznis.",
   },
   {
     icon: "trending",
     title: "Už podnikáte?",
     description:
-      "Posunieme vás vyššie: biznis analýza odhalí páky rastu, SEO vás dostane pred konkurenciu a automatizácia procesov vám šetrí čas aj náklady.",
+      "Posunieme vás vyššie: biznis analýza odhalí páky rastu, SEO vás dostane pred konkurenciu a automatizácia procesov vám ušetrí čas aj náklady.",
   },
 ] as const;
 
@@ -92,7 +92,7 @@ export const SK_VALUE_LADDER = [
     step: "01",
     title: "Biznis analýza (AI)",
     description:
-      "Najprv pochopíme váš biznis, prescanujeme konkurenciu a nájdeme páky rastu. Odhalíme, kde vám vieme pomôcť — admin portál, chatbot, automatizácia procesov.",
+      "Najprv pochopíme váš biznis, prescanujeme konkurenciu a nájdeme možnosti rastu. Odhalíme, čo váš biznis potrebuje — webová stránka, mobilná aplikácia, admin portál, či CRM systém.",
     price: "Zdarma k webu",
     highlight: true,
   },
@@ -101,7 +101,7 @@ export const SK_VALUE_LADDER = [
     step: "02",
     title: "Web na mieru",
     description:
-      "Profesionálny a rýchly web, ktorý zviditeľňuje vašu značku a nosí zákazníkov z Googlu.",
+      "Profesionálny a rýchly web, ktorý zviditeľňuje vašu značku a prináša nových zákazníkov.",
     price: "od 1 000 €",
     highlight: false,
   },
@@ -119,7 +119,7 @@ export const SK_VALUE_LADDER = [
     step: "04",
     title: "Automatizácia a systémy na mieru",
     description:
-      "Objednávkový systém, tvorba faktúr, databázy, chatbot 24/7, automatické notifikácie, klientský, či admin portál — operatíva, ktorá beží za vás.",
+      "Objednávkový systém, tvorba faktúr, databázy, chatbot 24/7, automatické notifikácie, klientský, či admin portál — operatíva, ktorá šetrí čas a peniaze.",
     price: "od 3 000 € · cena na mieru",
     highlight: false,
   },
@@ -132,37 +132,37 @@ export const SK_WHY_US = [
     icon: "clock",
     title: "Rekordný čas dodania",
     description:
-      "Webová stránka aj administrátorský portál do jedného mesiaca je naším štandardom, expresný web do týždňa — pri kompletných podkladoch a bez kompromisov v kvalite.",
+      "Webovú stránku dodávame zvyčajne do jedného týždňa, komplexné systémy do jedného mesiaca. Expresný čas dodania bez kompromisov v kvalite je naším štandardom.",
   },
   {
     icon: "gift",
     title: "Bezplatná biznis analýza",
     description:
-      "Ku každému webu pridávame biznis analýzu, ktorá odhalí ďalšie príležitosti na elimináciu slabých stránok a rast vášho podnikania.",
+      "Ku každému webu pridávame biznis analýzu, ktorá odhalí príležitosti rastu vášho podnikaniana a eliminuje slabé stránky.",
   },
   {
     icon: "layers",
     title: "Všetko z jednej ruky",
     description:
-      "Analýza, technická dokumentácia, tvorba webu, branding, texty, SEO aj automatizácia procesov — všetko na mieru od jedného partnera.",
+      "Dôkladná analýza, technická dokumentácia, tvorba webu, branding, texty, SEO, automatizácia procesov — všetko na mieru od jedného partnera.",
   },
   {
     icon: "cpu",
     title: "AI = rýchlejšie a modernejšie",
     description:
-      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodávame špičkový výsledok za rozumnú cenu a výrazne rýchlejšie ako klasická IT firma.",
+      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodávame špičkový výsledok za rozumnú cenu a výrazne rýchlejšie ako konkurenčné IT firmy.",
   },
   {
     icon: "check",
     title: "Reálne výsledky",
     description:
-      "Živé weby, ktoré sme vytvorili pre slovenských podnikateľov. Reálne referencie, ktoré si viete pozrieť — nie ukážky a sľuby.",
+      "Živé weby, ktoré sme vytvorili pre slovenských podnikateľov. Reálne referencie, ktoré si viete pozrieť.",
   },
   {
     icon: "users",
     title: "Skúsený tím",
     description:
-      "Naši programátori majú skúsenosti s tvorbou aplikácií, portálov, AI systémov aj blockchainu. K tomu prepracovaný projektový manažment, dôraz na dizajn a prácu s najnovšími technológiami.",
+      "Naši programátori majú dlhoročné skúsenosti s tvorbou komplexných aplikácií, portálov, AI systémov, či blockchainu. Kladieme dôraz na projektový manažment a prácu s najnovšími technológiami.",
   },
 ] as const;
 
@@ -206,14 +206,14 @@ export const SK_PROCESS = [
     step: "01",
     title: "Nezáväzná konzultácia",
     description:
-      "Krátky rozhovor o vašich cieľoch a o tom, čo potrebujete. Bez záväzkov a bez tlaku.",
+      "Krátky rozhovor o vašich cieľoch a potrebách. Na základe toho navrhneme optimálne riešenie a cenovú ponuku.",
   },
   {
     icon: "search",
     step: "02",
     title: "Biznis analýza",
     description:
-      "Pochopíme váš biznis, nájdeme páky rastu a navrhneme riešenie na mieru s jasnou cenou.",
+      "Pochopíme váš biznis, nájdeme možnosti rastu a navrhneme riešenie na mieru s jasnou cenou.",
   },
   {
     icon: "code",
@@ -227,7 +227,7 @@ export const SK_PROCESS = [
     step: "04",
     title: "Rast a podpora",
     description:
-      "SEO, vylepšenia a podpora po spustení podľa potreby — aby projekt rástol spolu s vami.",
+      "SEO, vylepšenia funkcií a podpora po spustení podľa potreby — aby váš biznis rástol a prosperoval.",
   },
 ] as const;
 

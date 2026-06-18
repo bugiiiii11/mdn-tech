@@ -47,8 +47,7 @@ export const SkWhyUs = () => {
         transition={{ duration: 0.5, delay: 0.15 }}
         className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-10 text-center"
       >
-        Digitálny partner poháňaný AI, ktorý rozumie biznisu a dodáva v
-        rekordnom čase.
+        Sme technologický nadšenci, ktorí využívajú AI a moderné technológie na digitálnu transformáciu vášho biznisu.
       </motion.p>
 
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

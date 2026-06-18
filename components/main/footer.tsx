@@ -18,7 +18,7 @@ export const Footer = () => {
         terms: "Obchodné podmienky",
         privacy: "Ochrana súkromia",
         blog: "Blog",
-        bottomLine: "M.D.N Tech — digitálny partner pre slovenské firmy · Pôsobíme po celom Slovensku",
+        bottomLine: "M.D.N Tech — Váš digitálny partner",
       }
     : {
         logoHref: "/#home",
