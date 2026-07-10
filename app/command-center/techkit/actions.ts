@@ -112,7 +112,16 @@ export async function checkEndpointNow(endpointId: string) {
         signal: AbortSignal.timeout(20_000),
       }
     )
-    const json = await res.json()
+    // The Supabase gateway can return an HTML error page (504 / 546 worker limit)
+    // instead of JSON — guard the parse so the user sees a clean status, not
+    // "Unexpected token '<'".
+    const text = await res.text()
+    let json: { error?: string; results?: Array<{ status: string; latency_ms: number | null }> } = {}
+    try {
+      json = JSON.parse(text)
+    } catch {
+      return { error: `poller returned HTTP ${res.status} (non-JSON response)` }
+    }
     if (!res.ok) return { error: json.error ?? `poller returned ${res.status}` }
     revalidatePath('/command-center/techkit')
     revalidatePath('/command-center/techkit/endpoints')

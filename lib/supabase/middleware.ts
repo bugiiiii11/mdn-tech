@@ -115,8 +115,10 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/`))
     }
 
-    // Public chat API passthrough
-    if (pathname.startsWith('/api/chat/')) {
+    // API passthrough — API routes live at /api/* (not under /command-center),
+    // so they must NOT get the /command-center rewrite below or they 404.
+    // Chat is public; the rest do their own auth (e.g. /api/infrastructure).
+    if (pathname.startsWith('/api/')) {
       return NextResponse.next()
     }
 

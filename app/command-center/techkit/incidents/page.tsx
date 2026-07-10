@@ -20,9 +20,12 @@ export default async function IncidentsPage({
   const { status } = await searchParams
   const filter = FILTERS.includes(status as (typeof FILTERS)[number]) ? status! : 'all'
 
+  // FK hints are required: alert_events reaches monitored_endpoints via two
+  // relationships (endpoint_id forward + open_alert_id reverse), which makes a
+  // bare monitored_endpoints(name) embed ambiguous (PostgREST 300 Multiple Choices).
   let query = supabase
     .from('alert_events')
-    .select('id, severity, title, message, status, notified_channels, opened_at, acknowledged_at, resolved_at, monitored_endpoints(name), projects(name)')
+    .select('id, severity, title, message, status, notified_channels, opened_at, acknowledged_at, resolved_at, monitored_endpoints!alert_events_endpoint_id_fkey(name), projects!alert_events_project_id_fkey(name)')
     .order('opened_at', { ascending: false })
     .limit(100)
   if (filter !== 'all') query = query.eq('status', filter)
