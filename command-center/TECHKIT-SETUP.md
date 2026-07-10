@@ -1,5 +1,17 @@
 # TechKit go-live runbook (Session A → A4/A8 manual steps)
 
+> ✅ **COMPLETED 2026-07-10 (Session 34) — monitoring is LIVE, A8 kill test passed.**
+> Executed mostly via the Supabase Management API (`SUPABASE_MANAGEMENT_API_KEY`) rather than
+> SQL editor + CLI: migrations 009+010 applied remotely, `techkit-poller` deployed through the
+> multipart deploy endpoint (no CLI install), secrets set via `/v1/projects/{ref}/secrets`.
+> Deviations/learnings: (a) the SQL query endpoint can double-execute at the HTTP layer — after
+> any error, audit actual DB state, don't trust the response; (b) local `curl.exe` fails on this
+> machine's TLS interception — use `Invoke-RestMethod`/.NET `HttpClient`; (c) the Telegram chat id
+> must come from `getUpdates` *after messaging the bot* (the bot's own id gives 403); (d) the 4
+> mdntech.org endpoints needed a post-seed `project_id` link fix (`ilike '%mdn%tech%'` can't match
+> the dotted `M.D.N Tech` name). Alert recipient: `contact@mdntech.org`.
+> Kept below for reference + the **Known issues** section, which is still open for Session B.
+
 Everything code-side is committed; these are the manual steps to turn monitoring on.
 Order matters. Companion doc: `TECHKIT-BRIEF.md` (§12 secrets table, §13 exit criteria).
 
