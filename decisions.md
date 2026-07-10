@@ -406,3 +406,31 @@ Context: Three live SK client sites footer-link to `mdntech.org` (EN home), wast
 **Revisit:** When localizing the whole site (Czech/Polish etc.) -- then adopt next-intl and a true per-locale `<html lang>`.
 
 ---
+
+## 2026-07-10 -- Session 33 -- TechKit Session A implementation decisions
+
+Context: First execution session of `command-center/TECHKIT-BRIEF.md`. The brief's locked decisions T1-T8 governed; three implementation-level decisions were made where the brief left room.
+
+### D-S33.1 -- "Check now" requires CRON_SECRET in Vercel env (small deviation from brief §12)
+
+**Decision:** The endpoints page's "Check now" button calls the `techkit-poller` Edge Function from a Next.js server action authenticated with `CRON_SECRET`, so that secret must also live in the Vercel env (the brief said Next.js needs *no new secrets*). Until it's set, the action returns a friendly error and everything else works.
+
+**Why:** The poller only accepts `Bearer <CRON_SECRET>`; duplicating the HTTP-check + state-machine logic inside Next.js to avoid the secret would create the exact two-implementations drift T8 forbids.
+
+**Alternatives:** Accepting the Supabase service-role JWT as an alternative bearer on the poller (more auth surface for no gain); client-side direct fetch to the target URL (CORS + no state machine).
+
+### D-S33.2 -- Degraded/down share one failure counter; manual resolve unblocks the state machine
+
+**Decision:** `consecutive_failures` counts any non-up check; the threshold is 2 for down (critical) and 3 for degraded (warning), evaluated against the *current* check's status. Manually resolving an incident in CC also clears `monitored_endpoints.open_alert_id` so the poller can open a fresh incident on the next failure instead of being wedged.
+
+**Why:** Two separate counters add columns + complexity for a distinction that rarely matters at 5-min cadence; brief §6.1 semantics are preserved. The manual-resolve rule prevents a stuck state machine when an admin closes an incident that the poller still considers open.
+
+**Alternatives:** Separate degraded/down counters (over-engineering for MVP); forbidding manual resolve of downtime incidents (worse ops UX).
+
+### D-S33.3 -- Seed only confirmed URLs; Swarm Resistance seeded inactive from DB evidence
+
+**Decision:** The ⚠️ roster rows without a confirmed URL (ChatKit widget API, Rahadu) are NOT seeded -- add via the endpoints CRUD once confirmed. Swarm Resistance IS seeded (inactive) because `projects.production_url` already holds `https://www.swarmresistance.tech/`, answering brief open question 1; Martin flips it active.
+
+**Why:** Placeholder URLs in `monitored_endpoints` would be junk data the poller might accidentally check; the CRUD UI exists precisely for late additions.
+
+---
