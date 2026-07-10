@@ -29,20 +29,20 @@ async function gql<T>(query: string, variables?: Record<string, unknown>): Promi
   return json.data as T
 }
 
+// Workspace tokens cannot query account-level `me`; the top-level `projects`
+// query works for both workspace and account tokens.
 const PROJECTS_QUERY = `
   query {
-    me {
-      projects {
-        edges {
-          node {
-            id
-            name
-            services {
-              edges {
-                node {
-                  id
-                  name
-                }
+    projects {
+      edges {
+        node {
+          id
+          name
+          services {
+            edges {
+              node {
+                id
+                name
               }
             }
           }
@@ -75,20 +75,18 @@ const DEPLOYMENTS_QUERY = `
 `
 
 interface ProjectsResult {
-  me: {
-    projects: {
-      edges: Array<{
-        node: {
-          id: string
-          name: string
-          services: {
-            edges: Array<{
-              node: { id: string; name: string }
-            }>
-          }
+  projects: {
+    edges: Array<{
+      node: {
+        id: string
+        name: string
+        services: {
+          edges: Array<{
+            node: { id: string; name: string }
+          }>
         }
-      }>
-    }
+      }
+    }>
   }
 }
 
@@ -122,7 +120,7 @@ export async function fetchRailwayHealth(): Promise<RailwayHealth> {
 
   try {
     const projectsData = await gql<ProjectsResult>(PROJECTS_QUERY)
-    const projectEdges = projectsData.me.projects.edges
+    const projectEdges = projectsData.projects.edges
 
     const services: RailwayService[] = []
     for (const pEdge of projectEdges) {
