@@ -1,0 +1,8 @@
+# Supabase CLI config — only used for Edge Function deploys (schema is applied
+# manually in the SQL editor, repo convention).
+project_id = "ijfgwzacaabzeknlpaff"
+
+# Both TechKit functions authenticate themselves (CRON_SECRET / webhook signatures),
+# so Supabase JWT verification is off (TECHKIT-BRIEF §5).
+[functions.techkit-poller]
+verify_jwt = false

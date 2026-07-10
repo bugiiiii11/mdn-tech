@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard,
@@ -20,7 +21,7 @@ const navItems = [
   { href: '/command-center/projects', label: 'Projects', icon: FolderKanban },
   { href: '/command-center/team', label: 'Team', icon: Users },
   { href: '/command-center/communications', label: 'Communications', icon: MessageSquare },
-  { href: '/command-center/infrastructure', label: 'Infrastructure', icon: Activity },
+  { href: '/command-center/techkit', label: 'TechKit', icon: Activity },
   { href: '/command-center/knowledge', label: 'Knowledge', icon: BookOpen },
   { href: '/command-center/chatbots', label: 'Chatbots', icon: Bot },
   { href: '/command-center/settings', label: 'Settings', icon: Settings },
@@ -30,6 +31,25 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [openIncidents, setOpenIncidents] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    async function loadCount() {
+      const { count, error } = await supabase
+        .from('alert_events')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['open', 'acknowledged'])
+      if (!cancelled && !error) setOpenIncidents(count ?? 0)
+    }
+    loadCount()
+    const timer = setInterval(loadCount, 60_000)
+    return () => {
+      cancelled = true
+      clearInterval(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -62,6 +82,11 @@ export function Sidebar() {
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
               {label}
+              {label === 'TechKit' && openIncidents > 0 && (
+                <span className="ml-auto rounded-full bg-red-500/20 px-1.5 py-0.5 text-[10px] font-medium text-red-300">
+                  {openIncidents}
+                </span>
+              )}
             </Link>
           )
         })}
