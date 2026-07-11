@@ -126,3 +126,43 @@ Everything else in CC works without it.
 **Deferred (documented, not blocking):** Railway per-service CPU/mem (plan-dependent usage API) and
 Vercel Web Analytics (no stable public fetch API on current plan) — CrUX covers vitals, the deploy
 feed covers activity. Revisit if the Vercel plan changes (brief §15 Q2).
+
+---
+
+# TechKit Session C go-live (2026-07-12)
+
+> ✅ **Costs backend LIVE** (poller v10 with `task=costs`, migration 014 applied + audited, daily cron
+> 06:15 UTC active, smoke-tested idempotent). ⚠️ **One Martin step open:** the Anthropic collector needs
+> `ANTHROPIC_ADMIN_API_KEY` (see below) — until then the task writes only the static-config rows and the
+> Costs page shows the empty-state explaining exactly this.
+
+**What was done (self-serve, Management API — same pattern as A/B):**
+1. **`techkit-poller` redeployed** (multipart, now 4 file parts: `techkit-poller/index.ts` +
+   `_shared/{supabase,notify,providers}.ts`). New `task=costs`: Anthropic Admin-API daily cost report
+   (31-day self-healing upsert window) + static-config monthly rows (Supabase/Vercel free tiers, $0 —
+   bump `STATIC_MONTHLY_COSTS` in the poller if a plan is upgraded) + `scope='cost'` alert-rule engine.
+2. **Migration `014_techkit_costs.sql` applied + audited** — (a) `infra_costs` unique constraint recreated
+   as **`UNIQUE NULLS NOT DISTINCT`** (the 009 inline UNIQUE treated NULL project_ids as distinct, so
+   account-level rows would have duplicated on every daily run instead of upserting); (b) seeded cost rules
+   "Anthropic daily cost > $5" (warning, 12h cooldown) + "Total MTD cost > $100" (warning, 24h cooldown) —
+   `metric_name` selects the aggregation (`daily_cost` = yesterday UTC, `mtd_cost` = current month);
+   (c) cron `techkit-costs` (`15 6 * * *`). **All 6 TechKit crons active.**
+3. **Smoke green:** wrong bearer → 401; `task=costs` ×2 → both `rows_upserted:2`, table holds exactly 2 rows
+   (idempotency proven), 0 false alerts, Anthropic degrades with a clear "key not set" note.
+4. **CC Costs page** at `/command-center/techkit/costs` (new Costs tab): MTD tiles + per-provider breakdown
+   bar, daily Claude-spend bars, 6-month trend, manual-entry form (`source='manual'` — use for Railway plan
+   fees, domains, one-offs), cost-rule list. Renders once `main` deploys.
+
+**⚠️ Open step — [Martin] create the Anthropic Admin API key:**
+
+| Step | How |
+|---|---|
+| 1. Create key | Anthropic Console (platform.claude.com) → **Settings → Organization → Admin keys** → create key (`sk-ant-admin…`). The standard `ANTHROPIC_API_KEY` is **rejected** by the cost endpoints. Requires an org (not an individual account). |
+| 2. Store it | Paste into `.env.local` as `ANTHROPIC_ADMIN_API_KEY=…` (gitignored, never in chat). |
+| 3. Push to edge secrets | Management API `POST /v1/projects/ijfgwzacaabzeknlpaff/secrets` with `[{"name":"ANTHROPIC_ADMIN_API_KEY","value":"…"}]` — or ask Claude next session ("push the admin key to edge secrets"). |
+| 4. Verify | Invoke the poller with `{"task":"costs"}` (CRON_SECRET bearer) → `notes.anthropic.days` ≈ 31 and the Costs page's "Claude spend — daily" section fills with the backfilled month. Or just wait for the next 06:15 UTC run. |
+
+**Deferred (documented, not blocking):** Railway cost API (workspace-token + plan-dependent `estimatedUsage`
+shape — unverified; Railway's flat plan fee is a one-line manual entry on the Costs page instead) and Vercel
+usage API (not available on Hobby). Per brief §9 the dashboard renders usefully with Anthropic + static-config
++ manual rows alone.

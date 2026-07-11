@@ -10,6 +10,7 @@ import {
   fetchVercelMetrics,
   fetchVercelDeployments,
   fetchCruxMetrics,
+  fetchAnthropicCosts,
   type ProviderMetric,
 } from '../_shared/providers.ts'
 
@@ -70,8 +71,9 @@ Deno.serve(async (req) => {
       case 'stats':
         return json(await runStats())
       case 'costs':
+        return json(await runCosts())
       case 'digest':
-        return json({ error: `task "${body.task}" not implemented yet (Sessions C-D)` }, 501)
+        return json({ error: `task "${body.task}" not implemented yet (Session D)` }, 501)
       default:
         return json({ error: `unknown task "${body.task ?? ''}"` }, 400)
     }
@@ -547,6 +549,154 @@ async function evaluateMetricRules(
     })
     if (insErr) {
       console.error('metric alert insert failed:', insErr.message)
+      continue
+    }
+    await supabase.from('alert_rules').update({ last_fired_at: new Date().toISOString() }).eq('id', rule.id)
+    fired++
+  }
+  return fired
+}
+
+// ---------------------------------------------------------------- task=costs
+
+// Flat monthly plan prices written as `static-config` rows (§9 fallback) so the
+// cost dashboard renders per-provider even where no billing API exists. Both are
+// on free tiers today — bump here if a plan is upgraded. Railway is intentionally
+// absent: its plan price varies and the usage API is plan-dependent — enter it
+// via the manual form on the Costs page instead.
+const STATIC_MONTHLY_COSTS: Record<string, number> = {
+  supabase: 0,
+  vercel: 0,
+}
+
+async function runCosts() {
+  const supabase = serviceClient()
+  const notes: Record<string, unknown> = {}
+  const rows: Array<Record<string, unknown>> = []
+
+  // 1. Anthropic daily spend (Admin API — closes repo priority 8). Re-fetches a
+  // 31-day window and upserts, so late-arriving data and missed crons self-heal.
+  try {
+    const buckets = await fetchAnthropicCosts()
+    if (buckets.length === 0 && !Deno.env.get('ANTHROPIC_ADMIN_API_KEY')) {
+      notes.anthropic = 'skipped — ANTHROPIC_ADMIN_API_KEY not set (create an Admin key in the Anthropic Console)'
+    } else {
+      for (const b of buckets) {
+        rows.push({
+          project_id: null,
+          provider: 'anthropic',
+          cost_amount: b.amountUsd,
+          currency: 'USD',
+          period_start: b.day,
+          period_end: b.day,
+          source: 'api',
+        })
+      }
+      notes.anthropic = { days: buckets.length }
+    }
+  } catch (err) {
+    notes.anthropic_error = err instanceof Error ? err.message : String(err)
+  }
+
+  // 2. Static-config flat plan rows for the current calendar month.
+  const now = new Date()
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+  const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0))
+  for (const [provider, amount] of Object.entries(STATIC_MONTHLY_COSTS)) {
+    rows.push({
+      project_id: null,
+      provider,
+      cost_amount: amount,
+      currency: 'USD',
+      period_start: monthStart.toISOString().slice(0, 10),
+      period_end: monthEnd.toISOString().slice(0, 10),
+      source: 'static-config',
+    })
+  }
+
+  // Upsert needs the NULLS NOT DISTINCT unique constraint from migration 014 —
+  // account-level rows carry project_id null, which plain UNIQUE treats as distinct.
+  let upserted = 0
+  if (rows.length > 0) {
+    const { error } = await supabase
+      .from('infra_costs')
+      .upsert(rows, { onConflict: 'provider,project_id,period_start,period_end' })
+    if (error) notes.upsert_error = error.message
+    else upserted = rows.length
+  }
+
+  const fired = await evaluateCostRules(supabase)
+  return { ok: true, task: 'costs', rows_upserted: upserted, alerts_fired: fired, notes }
+}
+
+// §6.2 scope='cost' rules. rule.metric_name picks the aggregation:
+//   daily_cost — sum of per-day rows (period_start = period_end = yesterday UTC)
+//   mtd_cost   — sum of all rows whose period starts in the current month
+// rule.provider null = across all providers. Cooldown-guarded like metric rules.
+async function evaluateCostRules(supabase: ReturnType<typeof serviceClient>): Promise<number> {
+  const { data: rules, error } = await supabase
+    .from('alert_rules')
+    .select('*')
+    .eq('scope', 'cost')
+    .eq('is_active', true)
+  if (error || !rules?.length) return 0
+
+  const monthStartStr = new Date().toISOString().slice(0, 8) + '01'
+  const yesterdayStr = new Date(Date.now() - 86400_000).toISOString().slice(0, 10)
+  const { data: costRows } = await supabase
+    .from('infra_costs')
+    .select('provider, cost_amount, period_start, period_end')
+    .gte('period_start', monthStartStr < yesterdayStr ? monthStartStr : yesterdayStr)
+  const costs = (costRows ?? []) as Array<{
+    provider: string
+    cost_amount: number
+    period_start: string
+    period_end: string
+  }>
+
+  let fired = 0
+  for (const rule of rules as Array<Record<string, unknown>>) {
+    const provider = rule.provider as string | null
+    const kind = rule.metric_name as string | null
+    let value: number
+    let label: string
+    if (kind === 'daily_cost') {
+      value = costs
+        .filter((c) => c.period_start === yesterdayStr && c.period_end === yesterdayStr && (!provider || c.provider === provider))
+        .reduce((a, c) => a + Number(c.cost_amount), 0)
+      label = `${provider ?? 'all providers'} on ${yesterdayStr}`
+    } else if (kind === 'mtd_cost') {
+      value = costs
+        .filter((c) => c.period_start >= monthStartStr && (!provider || c.provider === provider))
+        .reduce((a, c) => a + Number(c.cost_amount), 0)
+      label = `${provider ?? 'all providers'} month-to-date`
+    } else {
+      continue
+    }
+
+    const condition = (rule.condition as string) ?? 'gt'
+    const threshold = Number(rule.threshold)
+    const breached = condition === 'lt' ? value < threshold : value > threshold
+    if (!breached) continue
+
+    const cooldownMs = (Number(rule.cooldown_minutes) || 240) * 60_000
+    if (rule.last_fired_at && Date.now() - new Date(rule.last_fired_at as string).getTime() < cooldownMs) continue
+
+    const severity = ((rule.severity as string) ?? 'warning') as Severity
+    const title = `${rule.name}`
+    const message = `${label}: $${value.toFixed(2)} (${condition === 'lt' ? '<' : '>'} $${threshold.toFixed(2)})`
+
+    const notified = await deliverAlert({ severity, title, message })
+    const { error: insErr } = await supabase.from('alert_events').insert({
+      rule_id: rule.id,
+      severity,
+      title,
+      message,
+      status: 'open',
+      notified_channels: notified,
+    })
+    if (insErr) {
+      console.error('cost alert insert failed:', insErr.message)
       continue
     }
     await supabase.from('alert_rules').update({ last_fired_at: new Date().toISOString() }).eq('id', rule.id)

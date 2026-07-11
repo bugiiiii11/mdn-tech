@@ -224,6 +224,64 @@ function mapVercelState(state: string): string {
   }
 }
 
+// ---------------------------------------------------------------- Anthropic (costs)
+
+// Daily org-level Claude spend via the Admin API cost report (TECHKIT-BRIEF §9).
+// Requires an ADMIN key (sk-ant-admin…) created in the Anthropic Console —
+// the standard ANTHROPIC_API_KEY is rejected with 401/403 on these endpoints.
+// `amount` comes back as a decimal string in CENTS ("123.45" = $1.23).
+export interface AnthropicCostBucket {
+  day: string // YYYY-MM-DD (bucket start, UTC)
+  amountUsd: number
+}
+
+export async function fetchAnthropicCosts(days = 31): Promise<AnthropicCostBucket[]> {
+  const key = Deno.env.get('ANTHROPIC_ADMIN_API_KEY')
+  if (!key) return [] // caller reports "skipped — key not set"
+
+  const start = new Date(Date.now() - days * 86400_000)
+  start.setUTCHours(0, 0, 0, 0)
+
+  const byDay = new Map<string, number>() // day → cents
+  let page: string | null = null
+  for (let i = 0; i < 5; i++) {
+    const params = new URLSearchParams({
+      starting_at: start.toISOString(),
+      bucket_width: '1d',
+      limit: '31',
+    })
+    if (page) params.set('page', page)
+    const res = await fetch(`https://api.anthropic.com/v1/organizations/cost_report?${params}`, {
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'User-Agent': 'MDN-TechKit-Monitor/1.0 (+https://mdntech.org)',
+      },
+      signal: timeout(),
+    })
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(`admin key rejected (${res.status}) — cost_report needs an Admin API key (sk-ant-admin…), not the standard key`)
+    }
+    if (!res.ok) throw new Error(`anthropic cost_report ${res.status}`)
+    const json = (await res.json()) as {
+      data: Array<{ starting_at: string; results: Array<{ amount: string }> }>
+      has_more: boolean
+      next_page: string | null
+    }
+    for (const bucket of json.data) {
+      const day = bucket.starting_at.slice(0, 10)
+      const cents = bucket.results.reduce((a, r) => a + (Number(r.amount) || 0), 0)
+      byDay.set(day, (byDay.get(day) ?? 0) + cents)
+    }
+    if (!json.has_more || !json.next_page) break
+    page = json.next_page
+  }
+
+  return [...byDay.entries()]
+    .map(([day, cents]) => ({ day, amountUsd: Math.round(cents) / 100 }))
+    .sort((a, b) => a.day.localeCompare(b.day))
+}
+
 // ---------------------------------------------------------------- CrUX (stats)
 
 // Core Web Vitals p75 per origin — works for ALL sites (no site-side install).

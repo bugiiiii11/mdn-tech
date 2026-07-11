@@ -93,6 +93,50 @@ export async function toggleEndpoint(id: string, isActive: boolean) {
   return { ok: true }
 }
 
+export interface ManualCostInput {
+  provider: string
+  project_id: string | null
+  cost_amount: number
+  period_start: string
+  period_end: string
+}
+
+export async function addManualCost(input: ManualCostInput) {
+  const { supabase } = await requireUser()
+  const provider = input.provider.trim().toLowerCase()
+  if (!provider) return { error: 'Provider is required' }
+  if (!Number.isFinite(input.cost_amount) || input.cost_amount < 0) return { error: 'Amount must be a non-negative number' }
+  if (!input.period_start || !input.period_end || input.period_end < input.period_start) {
+    return { error: 'Period end must be on or after period start' }
+  }
+  const { error } = await supabase.from('infra_costs').insert({
+    provider,
+    project_id: input.project_id || null,
+    cost_amount: Math.round(input.cost_amount * 100) / 100,
+    currency: 'USD',
+    period_start: input.period_start,
+    period_end: input.period_end,
+    source: 'manual',
+  })
+  if (error) {
+    return {
+      error: error.message.includes('duplicate')
+        ? 'A cost row for this provider/project/period already exists — delete it first to replace it.'
+        : error.message,
+    }
+  }
+  revalidatePath('/command-center/techkit/costs')
+  return { ok: true }
+}
+
+export async function deleteCost(id: string) {
+  const { supabase } = await requireUser()
+  const { error } = await supabase.from('infra_costs').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/command-center/techkit/costs')
+  return { ok: true }
+}
+
 // "Check now" — invokes the poller for one endpoint. Needs CRON_SECRET in the
 // Next.js (Vercel) env; degrades to a friendly error until it's set.
 export async function checkEndpointNow(endpointId: string) {

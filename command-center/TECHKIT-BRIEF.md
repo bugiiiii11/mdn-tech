@@ -462,7 +462,7 @@ Provider-level monitoring covers everything linked via `projects.{supabase_proje
 | `RESEND_API_KEY` | alert emails | new — create in Resend (domain already verified) |
 | `TELEGRAM_BOT_TOKEN` | alerts bot | new — @BotFather |
 | `TELEGRAM_ALERT_CHAT_ID` | target chat | new — Martin's chat id |
-| `ANTHROPIC_ADMIN_API_KEY` | cost reports | new — Anthropic Console (Admin key) |
+| `ANTHROPIC_ADMIN_API_KEY` | cost reports | ⚠️ still needed — Anthropic Console → Settings → Organization → Admin keys (Session C shipped without it; collector degrades until set) |
 | `ANTHROPIC_API_KEY` | digest generation | exists — copy |
 | `CRUX_API_KEY` | web vitals | new — free GCP key |
 | `ALERT_EMAIL_TO` | recipient(s) | new |
@@ -495,12 +495,12 @@ Next.js (Vercel env) needs **no new secrets** — CC reads Postgres through exis
 
 **Exit criteria:** provider health has 7-day history; production deploys appear in CC within a minute; stats page shows vitals + DB size + ChatKit token/latency rollups.
 
-### Session C — Costs
-- [ ] **C1** Anthropic Admin API key + `task=costs` collector; Railway/Vercel collectors best-effort; static-config fallback rows for Supabase/Vercel.
-- [ ] **C2** `techkit/costs` page + manual-entry form.
-- [ ] **C3** Default cost alert rules (daily Anthropic > $5 warning; MTD total > $100 warning — tune with Martin).
+### Session C — Costs ✅ SHIPPED + LIVE 2026-07-12 (Session 39) — one Martin step open
+- [x] **C1** `task=costs` collector live (poller v10): Anthropic Admin-API daily cost report (31-day self-healing upsert window) + static-config rows for Supabase/Vercel ($0 free tiers, `STATIC_MONTHLY_COSTS` map in the poller). Railway cost API deferred (workspace-token/plan-dependent shape unverified — flat plan fee goes in via the manual form). ⚠️ **`ANTHROPIC_ADMIN_API_KEY` not yet created** — collector degrades gracefully until Martin makes one (see TECHKIT-SETUP.md Session C).
+- [x] **C2** `techkit/costs` page + Costs tab: MTD tiles, per-provider breakdown, daily Claude-spend bars, 6-month trend, manual-entry form, cost-rule list.
+- [x] **C3** Default cost rules seeded via migration 014 (Anthropic daily > $5 warning / total MTD > $100 warning; `metric_name` = `daily_cost`|`mtd_cost` selects the aggregation). Also in 014: `infra_costs` unique constraint recreated `NULLS NOT DISTINCT` (account-level upserts would otherwise duplicate) + `techkit-costs` cron (15 6 * * *).
 
-**Exit criteria:** MTD spend per provider visible; Claude spend tracked daily (repo priority 8 → closed).
+**Exit criteria:** MTD spend per provider visible ✅; Claude spend tracked daily — pipeline live, data starts when the Admin key lands (repo priority 8 closes then).
 
 ### Session D — AI digest + polish
 - [ ] **D1** `task=digest` (§10) + `techkit/digests` page + Monday cron.
