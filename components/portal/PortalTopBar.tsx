@@ -6,25 +6,28 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const navItems = [
-  { href: '/portal/toolkit', label: 'ToolKit' },
-  { href: '/portal/chatkit', label: 'ChatKit' },
-  { href: '/portal/settings', label: 'Settings' },
-]
-
 const MARKETING_HOME = 'https://mdntech.org'
 
 interface Props {
   user: { id: string; email?: string | null } | null
+  showMarketkit?: boolean
 }
 
-export function PortalTopBar({ user }: Props) {
+export function PortalTopBar({ user, showMarketkit = false }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const supabase = createClient()
   const isLoggedIn = !!user
+
+  // MarketKit slots between ChatKit and Settings, only when enrolled (BRIEF §2.2).
+  const navItems = [
+    { href: '/portal/toolkit', label: 'ToolKit' },
+    { href: '/portal/chatkit', label: 'ChatKit' },
+    ...(showMarketkit ? [{ href: '/portal/marketkit', label: 'MarketKit' }] : []),
+    { href: '/portal/settings', label: 'Settings' },
+  ]
 
   async function handleSignOut() {
     await supabase.auth.signOut()
