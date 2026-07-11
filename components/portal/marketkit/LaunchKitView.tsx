@@ -49,7 +49,8 @@ export function LaunchKitView({
 }) {
   function exportMd() {
     const md = toMarkdown(projectName, strategy, content)
-    const blob = new Blob([md], { type: 'text/markdown' })
+    // UTF-8 BOM so Windows editors detect the encoding (em-dashes/€/emoji mojibake as ANSI otherwise)
+    const blob = new Blob(['\uFEFF' + md], { type: 'text/markdown;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

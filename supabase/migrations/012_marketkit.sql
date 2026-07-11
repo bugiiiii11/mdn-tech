@@ -253,14 +253,17 @@ insert into storage.buckets (id, name, public)
 values ('marketkit-assets', 'marketkit-assets', false)
 on conflict (id) do nothing;
 
--- Object access follows project ownership. foldername(name) = ['mk', '{project_id}'].
+-- Object access follows project ownership. foldername(objects.name) = ['mk', '{project_id}'].
+-- NB: the outer column MUST be qualified as objects.name — a bare `name` inside the
+-- exists() subquery resolves to mk_projects.name (correlated-subquery column capture),
+-- which silently breaks every policy (found live in Session 37, fixed via ALTER POLICY).
 create policy "mk assets owner select"
   on storage.objects for select to authenticated
   using (
     bucket_id = 'marketkit-assets'
     and exists (
       select 1 from mk_projects p
-      where p.id = ((storage.foldername(name))[2])::uuid
+      where p.id = ((storage.foldername(objects.name))[2])::uuid
         and (p.owner_id = auth.uid() or public.is_admin())
     )
   );
@@ -271,7 +274,7 @@ create policy "mk assets owner insert"
     bucket_id = 'marketkit-assets'
     and exists (
       select 1 from mk_projects p
-      where p.id = ((storage.foldername(name))[2])::uuid
+      where p.id = ((storage.foldername(objects.name))[2])::uuid
         and (p.owner_id = auth.uid() or public.is_admin())
     )
   );
@@ -282,7 +285,7 @@ create policy "mk assets owner delete"
     bucket_id = 'marketkit-assets'
     and exists (
       select 1 from mk_projects p
-      where p.id = ((storage.foldername(name))[2])::uuid
+      where p.id = ((storage.foldername(objects.name))[2])::uuid
         and (p.owner_id = auth.uid() or public.is_admin())
     )
   );
