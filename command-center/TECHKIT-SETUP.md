@@ -89,3 +89,40 @@ Everything else in CC works without it.
   prod Vercel project is `prj_rVes2ZCMkq9SwBdjOKqv5Sym26CX` (`swarm-resistance-frontend`).
 - Melicharek + Royal Works have Vercel projects but no CC `projects` rows (endpoints seeded
   unlinked; add project rows via CC if per-project grouping is wanted).
+
+---
+
+# TechKit Session B go-live (2026-07-11)
+
+> ✅ **Backend LIVE.** Providers (hourly) + stats (every 6h) tasks deployed and smoke-tested green
+> against production. Done entirely via the Management API (same pattern as Session A) — see the
+> `scratchpad` stage scripts referenced in the handoff. **CC Stats page/overview changes render once
+> `main` is pushed → Vercel deploys** (held for coordinated commit — a MarketKit session shared the tree).
+
+**What was done (self-serve, Management API):**
+1. **Edge secrets set** — `SB_MGMT_API_KEY` (NOT `SUPABASE_MANAGEMENT_API_KEY`: Supabase reserves the
+   `SUPABASE_` prefix and rejects it), `RAILWAY_API_TOKEN`, `VERCEL_ACCESS_TOKEN`. `SUPABASE_URL` +
+   `SUPABASE_SERVICE_ROLE_KEY` are auto-injected, no need to set.
+2. **`techkit-poller` redeployed v6** (now bundles `_shared/providers.ts`) + **`techkit-webhook` deployed v1**,
+   both multipart, both `verify_jwt=false`.
+3. **Migration `011_techkit_sessionb.sql` applied** — `techkit_chatkit_rollup()` RPC, `infra_metrics.label`
+   column, seed rule "Supabase DB > 400 MB", and cron `techkit-providers` (`0 * * * *`) + `techkit-stats`
+   (`30 */6 * * *`). All 5 TechKit crons now active.
+4. **Smoke test green:** `providers` → 39 metrics, 0 alerts; `stats` → ChatKit rollup written; webhook GET
+   `{ok:true}`; webhook fail-closes without `VERCEL_WEBHOOK_SECRET`.
+
+**External steps — resolved 2026-07-11:**
+
+| Item | Outcome |
+|---|---|
+| `CRUX_API_KEY` | ✅ **Set + verified.** Key works (google.com/web.dev return data). **All monitored origins currently 404 "insufficient data"** — mdntech.org + the client sites are below CrUX's real-user-traffic threshold. The collector handles 404 as insufficient-data (not an error); the Stats vitals panel shows an empty state and **auto-populates once any origin gains enough traffic**. Nothing to fix. |
+| Vercel deploy feed | ✅ **Via polling, no Pro plan needed.** Vercel *webhooks* are Pro-only, but the deploys *read* API is not — the hourly `providers` task now polls `/v6/deployments?target=production` and upserts into `deploy_events` (first run ingested 40). Failed-prod-deploy alerts fire only on NEW failures within 90 min (no first-run backfill spam). Trade-off vs webhooks: ~hourly latency instead of instant. |
+| `VERCEL_WEBHOOK_SECRET` | ⏸️ **Not set / not needed.** Only required if Vercel is upgraded to Pro and you want instant push-based deploys. `techkit-webhook` stays deployed + dormant for that day. |
+| Railway deploy events | ⏸️ Optional — Railway webhooks are **free**: each project → Settings → Webhooks → `…/techkit-webhook?provider=railway` (optional `&token=` if `RAILWAY_WEBHOOK_TOKEN` set). Not wired yet. |
+
+**Edge secrets now set (Session B):** `SB_MGMT_API_KEY`, `RAILWAY_API_TOKEN`, `VERCEL_ACCESS_TOKEN`, `CRUX_API_KEY`
+(plus Session A's `CRON_SECRET`, `TELEGRAM_*`, `RESEND_API_KEY`, `ALERT_EMAIL_TO`).
+
+**Deferred (documented, not blocking):** Railway per-service CPU/mem (plan-dependent usage API) and
+Vercel Web Analytics (no stable public fetch API on current plan) — CrUX covers vitals, the deploy
+feed covers activity. Revisit if the Vercel plan changes (brief §15 Q2).

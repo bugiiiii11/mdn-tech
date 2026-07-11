@@ -21,7 +21,16 @@ interface EndpointRow {
   is_active: boolean
   current_status: string
   last_checked_at: string | null
+  project_id: string | null
   projects: { name: string } | null
+}
+
+interface DeployRow {
+  project_id: string | null
+  provider: string
+  status: string
+  environment: string | null
+  occurred_at: string
 }
 
 export default async function TechKitOverviewPage() {
@@ -30,10 +39,10 @@ export default async function TechKitOverviewPage() {
   if (!user) redirect('/command-center/login')
 
   const since24h = new Date(Date.now() - 24 * 3600_000).toISOString()
-  const [{ data: endpoints, error: epError }, { data: rollups }, { data: incidents }] = await Promise.all([
+  const [{ data: endpoints, error: epError }, { data: rollups }, { data: incidents }, { data: deploys }] = await Promise.all([
     supabase
       .from('monitored_endpoints')
-      .select('id, name, url, is_active, current_status, last_checked_at, projects(name)')
+      .select('id, name, url, is_active, current_status, last_checked_at, project_id, projects(name)')
       .order('name'),
     supabase
       .from('uptime_rollups_hourly')
@@ -44,6 +53,12 @@ export default async function TechKitOverviewPage() {
       .select('id, severity, title, message, status, opened_at, monitored_endpoints(name)')
       .in('status', ['open', 'acknowledged'])
       .order('opened_at', { ascending: false }),
+    supabase
+      .from('deploy_events')
+      .select('project_id, provider, status, environment, occurred_at')
+      .eq('environment', 'production')
+      .order('occurred_at', { ascending: false })
+      .limit(100),
   ])
 
   // migration 009 not applied yet → tables missing
@@ -62,6 +77,12 @@ export default async function TechKitOverviewPage() {
     const list = rollupsByEndpoint.get(r.endpoint_id) ?? []
     list.push(r)
     rollupsByEndpoint.set(r.endpoint_id, list)
+  }
+
+  // latest production deploy per project (rows arrive newest-first)
+  const lastDeployByProject = new Map<string, DeployRow>()
+  for (const d of (deploys ?? []) as DeployRow[]) {
+    if (d.project_id && !lastDeployByProject.has(d.project_id)) lastDeployByProject.set(d.project_id, d)
   }
 
   const eps = (endpoints ?? []) as unknown as EndpointRow[]
@@ -157,7 +178,13 @@ export default async function TechKitOverviewPage() {
               </thead>
               <tbody>
                 {Array.from(groups.entries()).map(([project, list]) => (
-                  <GroupRows key={project} project={project} list={list} rollups={rollupsByEndpoint} />
+                  <GroupRows
+                    key={project}
+                    project={project}
+                    list={list}
+                    rollups={rollupsByEndpoint}
+                    lastDeploy={list[0]?.project_id ? lastDeployByProject.get(list[0].project_id) : undefined}
+                  />
                 ))}
               </tbody>
             </table>
@@ -166,6 +193,16 @@ export default async function TechKitOverviewPage() {
       </section>
     </TechKitShell>
   )
+}
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.round(diff / 60_000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.round(hrs / 24)}d ago`
 }
 
 function SummaryTile({ tone, value, label }: { tone: 'red' | 'amber' | 'green'; value: string; label: string }) {
@@ -186,16 +223,26 @@ function GroupRows({
   project,
   list,
   rollups,
+  lastDeploy,
 }: {
   project: string
   list: EndpointRow[]
   rollups: Map<string, RollupSlice[]>
+  lastDeploy?: DeployRow
 }) {
   return (
     <>
       <tr className="bg-white/[0.02]">
-        <td colSpan={5} className="px-5 py-1.5 text-[10px] font-mono uppercase tracking-[0.15em] text-gray-500">
-          {project}
+        <td colSpan={5} className="px-5 py-1.5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-gray-500">{project}</span>
+            {lastDeploy && (
+              <span className="flex items-center gap-1.5 text-[10px] text-gray-500" title={new Date(lastDeploy.occurred_at).toLocaleString()}>
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${lastDeploy.status === 'failed' ? 'bg-red-500' : lastDeploy.status === 'succeeded' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                deploy {lastDeploy.status} · {relativeTime(lastDeploy.occurred_at)}
+              </span>
+            )}
+          </div>
         </td>
       </tr>
       {list.map((e) => {

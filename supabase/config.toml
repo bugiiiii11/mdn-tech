@@ -6,3 +6,10 @@ project_id = "ijfgwzacaabzeknlpaff"
 # so Supabase JWT verification is off (TECHKIT-BRIEF §5).
 [functions.techkit-poller]
 verify_jwt = false
+
+[functions.techkit-webhook]
+verify_jwt = false
+
+# marketkit-worker authenticates with CRON_SECRET (MARKETKIT-BRIEF §6).
+[functions.marketkit-worker]
+verify_jwt = false

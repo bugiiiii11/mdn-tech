@@ -4,6 +4,14 @@
 // Deploy: supabase functions deploy techkit-poller --no-verify-jwt
 import { serviceClient } from '../_shared/supabase.ts'
 import { deliverAlert, type Severity } from '../_shared/notify.ts'
+import {
+  fetchSupabaseMetrics,
+  fetchRailwayMetrics,
+  fetchVercelMetrics,
+  fetchVercelDeployments,
+  fetchCruxMetrics,
+  type ProviderMetric,
+} from '../_shared/providers.ts'
 
 const FETCH_TIMEOUT_MS = 10_000
 // slack so a 5-min cron doesn't skip endpoints checked 299s ago
@@ -58,10 +66,12 @@ Deno.serve(async (req) => {
       case 'retention':
         return json(await runRetention())
       case 'providers':
+        return json(await runProviders())
       case 'stats':
+        return json(await runStats())
       case 'costs':
       case 'digest':
-        return json({ error: `task "${body.task}" not implemented yet (Sessions B-D)` }, 501)
+        return json({ error: `task "${body.task}" not implemented yet (Sessions C-D)` }, 501)
       default:
         return json({ error: `unknown task "${body.task ?? ''}"` }, 400)
     }
@@ -297,6 +307,338 @@ async function runRetention() {
   if (e2) console.error('infra_metrics retention failed:', e2.message)
 
   return { ok: true, task: 'retention', errors: [e1?.message, e2?.message].filter(Boolean) }
+}
+
+// ------------------------------------------------------------ task=providers
+
+interface ProjectRow {
+  id: string
+  name: string
+  supabase_project_ref: string | null
+  railway_project_id: string | null
+  vercel_project_id: string | null
+}
+
+async function runProviders() {
+  const supabase = serviceClient()
+  const { data: projects, error: pErr } = await supabase
+    .from('projects')
+    .select('id, name, supabase_project_ref, railway_project_id, vercel_project_id')
+  if (pErr) throw new Error(`projects fetch failed: ${pErr.message}`)
+
+  const rows = projects as ProjectRow[]
+  const supabaseMap = new Map(rows.filter((p) => p.supabase_project_ref).map((p) => [p.supabase_project_ref!, p.id]))
+  const railwayMap = new Map(rows.filter((p) => p.railway_project_id).map((p) => [p.railway_project_id!, p.id]))
+  const vercelMap = new Map(rows.filter((p) => p.vercel_project_id).map((p) => [p.vercel_project_id!, p.id]))
+  const nameById = new Map(rows.map((p) => [p.id, p.name]))
+
+  const collectors: Array<[string, Promise<ProviderMetric[]>]> = [
+    ['supabase', fetchSupabaseMetrics()],
+    ['railway', fetchRailwayMetrics()],
+    ['vercel', fetchVercelMetrics()],
+  ]
+  const settled = await Promise.allSettled(collectors.map(([, p]) => p))
+
+  const batchTime = new Date().toISOString()
+  const metricRows: Array<Record<string, unknown>> = []
+  const errors: string[] = []
+  settled.forEach((s, i) => {
+    const provider = collectors[i][0]
+    if (s.status === 'rejected') {
+      errors.push(`${provider}: ${String(s.reason)}`)
+      return
+    }
+    for (const m of s.value) {
+      const project_id =
+        m.providerProjectId === null
+          ? null
+          : m.provider === 'supabase'
+            ? supabaseMap.get(m.providerProjectId) ?? null
+            : m.provider === 'railway'
+              ? railwayMap.get(m.providerProjectId) ?? null
+              : m.provider === 'vercel'
+                ? vercelMap.get(m.providerProjectId) ?? null
+                : null
+      metricRows.push({
+        project_id,
+        provider: m.provider,
+        metric_name: m.metricName,
+        metric_value: m.value,
+        unit: m.unit,
+        recorded_at: batchTime,
+      })
+    }
+  })
+
+  if (metricRows.length > 0) {
+    const { error: insErr } = await supabase.from('infra_metrics').insert(metricRows)
+    if (insErr) errors.push(`insert: ${insErr.message}`)
+  }
+
+  // Deploy feed via polling (Vercel webhooks are Pro-only; poll the read API instead).
+  const deploy = await ingestVercelDeploys(supabase, vercelMap, nameById, errors)
+
+  const fired = await evaluateMetricRules(supabase, nameById)
+
+  return {
+    ok: true,
+    task: 'providers',
+    metrics_written: metricRows.length,
+    deploys_ingested: deploy.ingested,
+    deploy_alerts: deploy.alerts,
+    alerts_fired: fired,
+    errors,
+  }
+}
+
+// Poll recent production deploys → deploy_events; alert on NEW failures only.
+async function ingestVercelDeploys(
+  supabase: ReturnType<typeof serviceClient>,
+  vercelMap: Map<string, string>,
+  nameById: Map<string, string>,
+  errors: string[]
+): Promise<{ ingested: number; alerts: number }> {
+  let ingested = 0
+  let alerts = 0
+  try {
+    const records = await fetchVercelDeployments()
+    if (records.length === 0) return { ingested, alerts }
+
+    const ids = records.map((r) => r.deployment_id)
+    const { data: existing } = await supabase
+      .from('deploy_events')
+      .select('deployment_id, status')
+      .eq('provider', 'vercel')
+      .in('deployment_id', ids)
+    const existingSet = new Set(
+      ((existing ?? []) as Array<{ deployment_id: string; status: string }>).map((e) => `${e.deployment_id}|${e.status}`)
+    )
+
+    const rows = records.map((r) => ({
+      provider: 'vercel',
+      project_id: r.vercelProjectId ? vercelMap.get(r.vercelProjectId) ?? null : null,
+      provider_project_id: r.vercelProjectId,
+      deployment_id: r.deployment_id,
+      environment: r.environment,
+      status: r.status,
+      actor: r.actor,
+      url: r.url,
+      raw: r.raw,
+      occurred_at: r.occurred_at,
+    }))
+    const { error: upErr } = await supabase
+      .from('deploy_events')
+      .upsert(rows, { onConflict: 'provider,deployment_id,status', ignoreDuplicates: true })
+    if (upErr) {
+      errors.push(`deploy upsert: ${upErr.message}`)
+      return { ingested, alerts }
+    }
+    ingested = rows.length
+
+    // Alert only on NEW failed production deploys from the last 90 min — so the
+    // first poll backfills history silently instead of firing on old failures.
+    const recentMs = 90 * 60_000
+    for (const r of records) {
+      if (
+        r.status === 'failed' &&
+        r.environment === 'production' &&
+        !existingSet.has(`${r.deployment_id}|failed`) &&
+        Date.now() - new Date(r.occurred_at).getTime() < recentMs
+      ) {
+        const pid = r.vercelProjectId ? vercelMap.get(r.vercelProjectId) ?? null : null
+        const label = pid ? nameById.get(pid) ?? 'Vercel project' : 'Vercel project'
+        const title = `Deploy failed: ${label}`
+        const message = [
+          `vercel production deploy ${r.deployment_id} failed`,
+          r.actor ? `by ${r.actor}` : null,
+          r.occurred_at.slice(0, 16).replace('T', ' ') + ' UTC',
+        ]
+          .filter(Boolean)
+          .join('\n')
+        const notified = await deliverAlert({ severity: 'warning', title, message })
+        await supabase.from('alert_events').insert({
+          project_id: pid,
+          severity: 'warning',
+          title,
+          message,
+          status: 'open',
+          notified_channels: notified,
+        })
+        alerts++
+      }
+    }
+  } catch (err) {
+    errors.push(`deploys: ${err instanceof Error ? err.message : String(err)}`)
+  }
+  return { ingested, alerts }
+}
+
+// §6.2 rule-based metric alerts. Latest value per project for the rule's
+// provider+metric_name; fire once per rule (cooldown-guarded) if any breaches.
+async function evaluateMetricRules(
+  supabase: ReturnType<typeof serviceClient>,
+  nameById: Map<string, string>
+): Promise<number> {
+  const { data: rules, error } = await supabase
+    .from('alert_rules')
+    .select('*')
+    .eq('scope', 'metric')
+    .eq('is_active', true)
+  if (error || !rules?.length) return 0
+
+  let fired = 0
+  for (const rule of rules as Array<Record<string, unknown>>) {
+    const provider = rule.provider as string | null
+    const metricName = rule.metric_name as string | null
+    if (!provider || !metricName) continue
+
+    let q = supabase
+      .from('infra_metrics')
+      .select('project_id, metric_value, recorded_at')
+      .eq('provider', provider)
+      .eq('metric_name', metricName)
+      .order('recorded_at', { ascending: false })
+      .limit(60)
+    if (rule.project_id) q = q.eq('project_id', rule.project_id as string)
+    const { data: metrics } = await q
+    if (!metrics?.length) continue
+
+    // latest value per project
+    const latest = new Map<string, number>()
+    for (const m of metrics as Array<{ project_id: string | null; metric_value: number }>) {
+      const key = m.project_id ?? 'account'
+      if (!latest.has(key)) latest.set(key, Number(m.metric_value))
+    }
+
+    const condition = (rule.condition as string) ?? 'gt'
+    const threshold = Number(rule.threshold)
+    const breaches = [...latest.entries()].filter(([, v]) =>
+      condition === 'lt' ? v < threshold : v > threshold
+    )
+    if (breaches.length === 0) continue
+
+    // cooldown guard
+    const cooldownMs = (Number(rule.cooldown_minutes) || 240) * 60_000
+    if (rule.last_fired_at && Date.now() - new Date(rule.last_fired_at as string).getTime() < cooldownMs) continue
+
+    breaches.sort((a, b) => (condition === 'lt' ? a[1] - b[1] : b[1] - a[1]))
+    const [worstKey, worstVal] = breaches[0]
+    const worstProject = worstKey === 'account' ? null : worstKey
+    const projectLabel = worstProject ? nameById.get(worstProject) ?? worstProject : 'account-level'
+    const severity = ((rule.severity as string) ?? 'warning') as Severity
+
+    const title = `${rule.name}`
+    const message = [
+      `${projectLabel}: ${metricName} = ${worstVal} (${condition === 'lt' ? '<' : '>'} ${threshold})`,
+      breaches.length > 1 ? `${breaches.length} projects breaching this rule` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    const notified = await deliverAlert({ severity, title, message })
+    const { error: insErr } = await supabase.from('alert_events').insert({
+      rule_id: rule.id,
+      project_id: worstProject,
+      severity,
+      title,
+      message,
+      status: 'open',
+      notified_channels: notified,
+    })
+    if (insErr) {
+      console.error('metric alert insert failed:', insErr.message)
+      continue
+    }
+    await supabase.from('alert_rules').update({ last_fired_at: new Date().toISOString() }).eq('id', rule.id)
+    fired++
+  }
+  return fired
+}
+
+// ---------------------------------------------------------------- task=stats
+
+async function runStats() {
+  const supabase = serviceClient()
+  const batchTime = new Date().toISOString()
+  const metricRows: Array<Record<string, unknown>> = []
+  const notes: Record<string, unknown> = {}
+
+  // 1. ChatKit cross-project rollup (surfaces the stored-but-hidden chat_messages fields)
+  const since = new Date(Date.now() - 24 * 3600_000).toISOString()
+  try {
+    const { data, error } = await supabase.rpc('techkit_chatkit_rollup', { p_since: since })
+    if (error) throw new Error(error.message)
+    const agg = (Array.isArray(data) ? data[0] : data) as
+      | { messages: number; tokens_in: number; tokens_out: number; avg_latency_ms: number | null; p95_latency_ms: number | null }
+      | undefined
+    if (agg) {
+      const ck = (name: string, value: number | null, unit: string) => {
+        if (value !== null && Number.isFinite(Number(value)))
+          metricRows.push({ project_id: null, provider: 'chatkit', metric_name: name, metric_value: Number(value), unit, recorded_at: batchTime })
+      }
+      ck('messages_24h', Number(agg.messages ?? 0), 'count')
+      ck('tokens_in_24h', Number(agg.tokens_in ?? 0), 'count')
+      ck('tokens_out_24h', Number(agg.tokens_out ?? 0), 'count')
+      ck('avg_latency_ms', agg.avg_latency_ms, 'ms')
+      ck('p95_latency_ms', agg.p95_latency_ms, 'ms')
+      notes.chatkit = { messages_24h: Number(agg.messages ?? 0) }
+    }
+  } catch (err) {
+    notes.chatkit_error = err instanceof Error ? err.message : String(err)
+  }
+
+  // 2. CrUX real-user vitals per distinct origin of an active endpoint
+  const { data: endpoints } = await supabase
+    .from('monitored_endpoints')
+    .select('url, project_id')
+    .eq('is_active', true)
+  const originToProject = new Map<string, string | null>()
+  for (const e of (endpoints ?? []) as Array<{ url: string; project_id: string | null }>) {
+    try {
+      const origin = new URL(e.url).origin
+      if (!originToProject.has(origin)) originToProject.set(origin, e.project_id)
+    } catch {
+      // malformed URL — skip
+    }
+  }
+  const cruxOrigins: string[] = []
+  for (const [origin, projectId] of originToProject) {
+    try {
+      const vitals = await fetchCruxMetrics(origin)
+      if (vitals.length > 0) {
+        cruxOrigins.push(origin)
+        for (const v of vitals) {
+          metricRows.push({
+            project_id: projectId,
+            provider: 'crux',
+            metric_name: v.metricName,
+            metric_value: v.value,
+            unit: v.unit,
+            label: origin, // CrUX is origin-level; label separates origins sharing a project
+            recorded_at: batchTime,
+          })
+        }
+      }
+    } catch (err) {
+      notes.crux_error = err instanceof Error ? err.message : String(err)
+    }
+  }
+  notes.crux_origins = cruxOrigins
+  if (!Deno.env.get('CRUX_API_KEY')) notes.crux = 'skipped — CRUX_API_KEY not set'
+
+  // 3. Railway CPU/mem + Vercel Web Analytics: probed, deferred.
+  // Railway per-service usage metrics vary by plan (MEDIUM confidence, §8) and
+  // Vercel has no stable public fetch API for Web Analytics on our plan — CrUX
+  // covers vitals and the deploy feed (B2) covers activity, so neither is wired.
+  notes.railway_cpu_mem = 'not collected — plan-dependent usage API, deferred'
+  notes.vercel_analytics = 'no public fetch API on current plan — using CrUX for vitals'
+
+  if (metricRows.length > 0) {
+    const { error } = await supabase.from('infra_metrics').insert(metricRows)
+    if (error) notes.insert_error = error.message
+  }
+
+  return { ok: true, task: 'stats', metrics_written: metricRows.length, notes }
 }
 
 // ----------------------------------------------------------------------- util
