@@ -1,11 +1,13 @@
 ---
 title: "MarketKit — Session A go-live runbook"
-status: code-complete-pending-golive
+status: LIVE (executed Session 37, 2026-07-11)
 created: 2026-07-10
 sibling: MARKETKIT-BRIEF.md (execution brief), TECHKIT-SETUP.md (same pattern)
 ---
 
 # MarketKit — Session A go-live runbook
+
+> **EXECUTED Session 37 (2026-07-11).** Steps 1–5 done: migration 012 applied + audited, `ANTHROPIC_API_KEY` in edge secrets, `marketkit-worker` v1 ACTIVE, dogfood `bugiiiii@protonmail.com` enrolled, E2E smoke passed (2 projects scanned, 1 Launch Kit). **Gotcha found live:** the migration's storage policies had a correlated-subquery column-capture bug (bare `name` → `mk_projects.name`) that denied all uploads — fixed via ALTER POLICY, migration file synced (`26ad3b9`). Remaining: step 6 / A7 (asset re-upload → scan v2 → kit v2 + MarketKit-as-project). Kept below for reference / re-runs.
 
 Session 36 shipped all of MarketKit Session A **code** (migration, worker, portal module) and it is **build-verified** (`tsc` + `next lint` + `next build` green). Nothing is live yet — this runbook turns it on. Follow top-to-bottom. Steps that need Martin's hands are flagged **[Martin]**.
 
