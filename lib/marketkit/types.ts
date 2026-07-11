@@ -4,8 +4,10 @@
 export type ProjectCategory = 'saas' | 'consumer_app' | 'game' | 'local_business'
 export type ProjectStatus = 'active' | 'paused' | 'archived'
 export type BudgetTier = 0 | 500 | 2000
-export type JobKind = 'scan' | 'launch_kit' | 'sprint_propose' | 'sprint_review'
+export type JobKind = 'scan' | 'launch_kit' | 'sprint_propose' | 'sprint_review' | 'metrics_screenshot'
 export type JobStatus = 'queued' | 'running' | 'done' | 'error'
+export type ActionStatus = 'proposed' | 'approved' | 'done' | 'skipped'
+export type MetricSource = 'ga4' | 'gsc' | 'dub' | 'screenshot' | 'manual'
 
 export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
   saas: 'SaaS / B2B',
@@ -143,4 +145,55 @@ export interface MkJob {
   created_at: string
   started_at: string | null
   finished_at: string | null
+}
+
+// --- Sprint loop (mk_actions / mk_links, backlog B4) ---
+export interface MkLink {
+  id: string
+  project_id: string
+  dub_id: string | null
+  url: string
+  utm: Record<string, string>
+  clicks: number
+  conversions: number
+  updated_at: string
+}
+
+export interface MkAction {
+  id: string
+  project_id: string
+  strategy_id: string | null
+  week: string | null // Monday of the sprint week (date)
+  title: string
+  channel: string | null
+  effort: 'S' | 'M' | 'L' | null
+  cost_eur: number | null
+  expected_outcome: string | null
+  tracking_link_id: string | null
+  status: ActionStatus
+  actual_outcome: string | null
+  reviewed_at: string | null
+  created_at: string
+}
+
+// --- Metrics (mk_metrics_snapshots, backlog B2) ---
+export interface MkMetricSnapshot {
+  id: number
+  project_id: string
+  source: MetricSource
+  platform: string | null
+  metric: string
+  value: number
+  period_start: string | null
+  period_end: string | null
+  ingested_at: string
+  raw: Record<string, unknown>
+}
+
+// Monday (UTC) of the week containing `d`, as YYYY-MM-DD — matches the worker's
+// week convention for mk_actions.week.
+export function mondayOfWeek(d: Date = new Date()): string {
+  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+  utc.setUTCDate(utc.getUTCDate() - ((utc.getUTCDay() + 6) % 7))
+  return utc.toISOString().slice(0, 10)
 }

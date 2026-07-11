@@ -6,6 +6,8 @@ import { AssetUploader } from './AssetUploader'
 import { JobRunner } from './JobRunner'
 import { FounderQuestions } from './FounderQuestions'
 import { LaunchKitView } from './LaunchKitView'
+import { SprintBoard } from './SprintBoard'
+import { MetricsPanel } from './MetricsPanel'
 import {
   CATEGORY_LABELS,
   BUDGET_LABELS,
@@ -15,11 +17,14 @@ import {
   type MkFounderQuestion,
   type MkStrategy,
   type MkContentItem,
+  type MkAction,
+  type MkLink,
+  type MkMetricSnapshot,
   type BudgetTier,
   type JobStatus,
 } from '@/lib/marketkit/types'
 
-type Tab = 'profile' | 'launch_kit' | 'questions' | 'content' | 'metrics'
+type Tab = 'profile' | 'launch_kit' | 'sprint' | 'questions' | 'content' | 'metrics'
 
 interface JobState {
   id: string
@@ -34,8 +39,14 @@ export function ProjectWorkspace({
   questions,
   strategy,
   content,
+  actions,
+  links,
+  metrics,
   scanJob,
   launchJob,
+  proposeJob,
+  reviewJob,
+  metricsJob,
 }: {
   project: MkProject
   assets: MkAsset[]
@@ -44,17 +55,24 @@ export function ProjectWorkspace({
   questions: MkFounderQuestion[]
   strategy: MkStrategy | null
   content: MkContentItem[]
+  actions: MkAction[]
+  links: MkLink[]
+  metrics: MkMetricSnapshot[]
   scanJob: JobState | null
   launchJob: JobState | null
+  proposeJob: JobState | null
+  reviewJob: JobState | null
+  metricsJob: JobState | null
 }) {
   const [tab, setTab] = useState<Tab>('profile')
 
   const tabs: { key: Tab; label: string; badge?: number }[] = [
     { key: 'profile', label: 'Profile' },
     { key: 'launch_kit', label: 'Launch Kit' },
+    { key: 'sprint', label: 'Sprint', badge: actions.filter((a) => a.status === 'proposed').length },
     { key: 'questions', label: 'Questions', badge: questions.filter((q) => q.status === 'open').length },
     { key: 'content', label: 'Content', badge: content.length },
-    { key: 'metrics', label: 'Metrics' },
+    { key: 'metrics', label: 'Metrics', badge: metrics.length },
   ]
 
   return (
@@ -141,6 +159,20 @@ export function ProjectWorkspace({
         </Card>
       )}
 
+      {tab === 'sprint' && (
+        <Card className="p-5 space-y-5">
+          <h2 className="text-sm font-semibold text-white">Weekly sprint</h2>
+          <SprintBoard
+            projectId={project.id}
+            actions={actions}
+            links={links}
+            hasProfile={!!profile}
+            proposeJob={proposeJob}
+            reviewJob={reviewJob}
+          />
+        </Card>
+      )}
+
       {tab === 'questions' && (
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-white mb-3">Founder questions</h2>
@@ -176,12 +208,14 @@ export function ProjectWorkspace({
       )}
 
       {tab === 'metrics' && (
-        <Card className="p-5">
-          <h2 className="text-sm font-semibold text-white mb-2">Metrics</h2>
-          <p className="text-sm text-gray-500">
-            Metrics ingestion (GA4 / Search Console / short-link clicks / screenshot import) is <span className="text-gray-300">manual for now</span> —
-            it ships in MarketKit Session B. Nothing is tracked automatically yet.
-          </p>
+        <Card className="p-5 space-y-5">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Metrics</h2>
+            <p className="text-[11px] text-gray-500 mt-1">
+              Screenshot import + manual entry. GA4 / Search Console / tracked-link pulls land in a later session.
+            </p>
+          </div>
+          <MetricsPanel projectId={project.id} snapshots={metrics} screenshotJob={metricsJob} />
         </Card>
       )}
     </div>

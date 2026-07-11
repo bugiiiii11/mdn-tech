@@ -55,3 +55,64 @@ export async function deleteProject(projectId: string) {
   revalidatePath('/portal/marketkit')
   return { ok: true }
 }
+
+// --- Sprint loop (B4) ---
+
+const ACTION_TRANSITIONS: Record<string, string[]> = {
+  proposed: ['approved', 'skipped'],
+  approved: ['done', 'skipped'],
+}
+
+export async function setActionStatus(actionId: string, status: 'approved' | 'done' | 'skipped') {
+  const { supabase } = await requireEnrolled()
+  const { data: current, error: readErr } = await supabase
+    .from('mk_actions')
+    .select('status, project_id')
+    .eq('id', actionId)
+    .single()
+  if (readErr) return { error: readErr.message }
+  if (!ACTION_TRANSITIONS[current.status]?.includes(status)) {
+    return { error: `cannot move a ${current.status} action to ${status}` }
+  }
+  const { error } = await supabase.from('mk_actions').update({ status }).eq('id', actionId)
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/marketkit/${current.project_id}`)
+  return { ok: true }
+}
+
+// --- Metrics (B2) ---
+
+export async function addManualMetric(
+  projectId: string,
+  input: { metric: string; value: number; platform?: string; period_end?: string }
+) {
+  const { supabase } = await requireEnrolled()
+  const metric = input.metric
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 60)
+  if (!metric) return { error: 'metric name is required' }
+  if (!Number.isFinite(input.value)) return { error: 'value must be a number' }
+  const periodEnd = input.period_end && /^\d{4}-\d{2}-\d{2}$/.test(input.period_end) ? input.period_end : null
+
+  const { error } = await supabase.from('mk_metrics_snapshots').insert({
+    project_id: projectId,
+    source: 'manual',
+    platform: input.platform?.trim() || null,
+    metric,
+    value: input.value,
+    period_end: periodEnd,
+  })
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/marketkit/${projectId}`)
+  return { ok: true }
+}
+
+export async function deleteMetric(snapshotId: number, projectId: string) {
+  const { supabase } = await requireEnrolled()
+  const { error } = await supabase.from('mk_metrics_snapshots').delete().eq('id', snapshotId)
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/marketkit/${projectId}`)
+  return { ok: true }
+}

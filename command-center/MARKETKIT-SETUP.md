@@ -98,3 +98,38 @@ Run the full flow on **MarketKit** as the project (name "MarketKit", URL = where
 - **Job pattern**: UI `POST /api/portal/marketkit/jobs` → insert `mk_jobs(queued)` → fire `marketkit-worker` (fire-and-forget) → worker marks `running`, does the work in the background (`EdgeRuntime.waitUntil`), writes result + `done`; UI polls the `mk_jobs` row.
 - **Not in Session A** (visible as "manual for now" in the UI, per §10): metrics ingestion (GA4/GSC/Dub/screenshots), the weekly sprint loop, content voice-editing + publishing. Those are Session B/C (BRIEF §7).
 - **Non-blocking open questions** (BRIEF §11): dogfood email (Q5 — resolved at step 2), public surface location (Q1, D1), content-studio IP (Q2, C1), pricing (Q3), X publishing (Q4).
+
+---
+
+# Session B go-live addendum — sprint loop (B4) + screenshot metrics (B2)
+
+Session B adds three worker job kinds (`sprint_propose`, `sprint_review`, `metrics_screenshot`), two cron batch entrypoints (`{"task":"sprint_propose_all"}` / `{"task":"sprint_review_all"}`), the Sprint tab, and the Metrics tab (screenshot import + manual entry). Go-live order matters:
+
+## B-1. Redeploy `marketkit-worker` (v2)
+
+Same multipart endpoint as step 4, now with **4 file parts** — the worker imports the shared notify helpers for the Telegram sprint summaries:
+- `marketkit-worker/index.ts`
+- `marketkit-worker/claude.ts`
+- `_shared/supabase.ts`
+- `_shared/notify.ts`  ← **new — a v2 deploy without it fails at import time**
+
+Smoke: wrong bearer → `401`; right bearer + empty body → `400 job_id required`; right bearer + `{"task":"sprint_propose_all"}` → `202` (and jobs/actions appear — see B-3).
+
+## B-2. Apply migration `013_marketkit_sprint_cron.sql`
+
+Two pg_cron schedules (reuse Vault secret `techkit_cron_secret`): `marketkit-sprint-review` Mon 06:00 UTC, `marketkit-sprint-propose` Mon 07:00 UTC (review first so proposals build on fresh outcomes). Apply **after** B-1 — the crons call entrypoints only v2 understands. Verify: `select jobname, schedule, active from cron.job where jobname like 'marketkit%';`
+
+## B-3. Smoke test
+
+1. `POST …/functions/v1/marketkit-worker` with `{"task":"sprint_propose_all"}` → 202; within ~1–2 min every **active** project with a profile gets 3 `mk_actions(proposed)` for the current week + a Telegram summary. Projects without a profile error cleanly in `mk_jobs.error`.
+2. UI: Sprint tab shows the proposals; Approve/Skip work; "Re-roll this week" replaces proposed (never approved) actions.
+3. Metrics tab: upload an analytics screenshot → rows appear in `mk_metrics_snapshots` (`source='screenshot'`); add one manual metric.
+4. Review path only has data after a week ends: actions approved in week N are reviewed Monday of week N+1 (or via "Review past weeks now").
+
+## Session B notes
+
+- **M9 (tracked links)**: every proposed action gets an `mk_links` row with plain UTM params (`utm_source=<channel>`, `utm_medium=marketkit`, `utm_campaign=sprint-<week>`) on the project URL. Click counts stay 0 until Dub lands (backlog B3).
+- **Sprint week convention**: `mk_actions.week` = Monday (UTC) of the sprint week, computed by the worker; the UI mirrors it via `mondayOfWeek()` in `lib/marketkit/types.ts`.
+- **Pausing a project** (`mk_projects.status = 'paused'`) removes it from the Monday cron batches.
+- **Metrics screenshots** upload to `mk/{project_id}/metrics/…` — same bucket + RLS as scan assets, but **no `mk_project_assets` row**, so the AI scan never reads them. The jobs API pins `storage_path` to the caller's project folder before the service-role worker touches it.
+- **Still not in Session B**: GA4/GSC pulls (needs a Google Cloud service account — next session), Dub tracked-link stats (B3), content voice-editing/publishing (C1).

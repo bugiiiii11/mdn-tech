@@ -26,7 +26,9 @@ function toMarkdown(name: string, s: MkStrategy, content: MkContentItem[]): stri
   }
   if (s.calendar?.length) {
     L.push('## 30-day content calendar', '')
-    for (const d of s.calendar) L.push(`- **Day ${d.day}** · ${d.channel} · ${d.format} — ${d.topic}`)
+    // the model may emit days out of order — sort for display
+    for (const d of [...s.calendar].sort((a, b) => a.day - b.day))
+      L.push(`- **Day ${d.day}** · ${d.channel} · ${d.format} — ${d.topic}`)
     L.push('')
   }
   if (content.length) {
@@ -132,7 +134,7 @@ export function LaunchKitView({
         <section>
           <h3 className="text-sm font-semibold text-white mb-2">30-day content calendar</h3>
           <div className="grid sm:grid-cols-2 gap-1.5">
-            {s.calendar.map((d, i) => (
+            {[...s.calendar].sort((a, b) => a.day - b.day).map((d, i) => (
               <div key={i} className="text-xs text-gray-400 bg-[#0a0a1a] border border-white/[0.05] rounded px-2.5 py-1.5">
                 <span className="text-gray-500 font-mono">D{d.day}</span> · {d.channel} · {d.format} —{' '}
                 <span className="text-gray-300">{d.topic}</span>

@@ -5,7 +5,7 @@ import { invokeMarketkitWorker } from '@/lib/marketkit/jobs'
 
 export const dynamic = 'force-dynamic'
 
-const ALLOWED_KINDS = ['scan', 'launch_kit'] as const
+const ALLOWED_KINDS = ['scan', 'launch_kit', 'sprint_propose', 'sprint_review', 'metrics_screenshot'] as const
 type Kind = (typeof ALLOWED_KINDS)[number]
 
 // POST /api/portal/marketkit/jobs { project_id, kind } → queue an AI job and
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'MarketKit not enabled for this account' }, { status: 403 })
   }
 
-  let body: { project_id?: string; kind?: string }
+  let body: { project_id?: string; kind?: string; input?: Record<string, unknown> }
   try {
     body = await req.json()
   } catch {
@@ -30,6 +30,21 @@ export async function POST(req: Request) {
   const { project_id, kind } = body
   if (!project_id || !ALLOWED_KINDS.includes(kind as Kind)) {
     return NextResponse.json({ error: 'project_id and a valid kind are required' }, { status: 400 })
+  }
+
+  // metrics_screenshot carries the uploaded file's storage path. The worker runs
+  // service-role, so pin the path to this project's metrics folder — a foreign
+  // path must never reach the worker.
+  let input: Record<string, unknown> = {}
+  if (kind === 'metrics_screenshot') {
+    const storagePath = typeof body.input?.storage_path === 'string' ? body.input.storage_path : ''
+    if (!storagePath.startsWith(`mk/${project_id}/metrics/`)) {
+      return NextResponse.json({ error: 'invalid storage_path for this project' }, { status: 400 })
+    }
+    input = {
+      storage_path: storagePath,
+      filename: typeof body.input?.filename === 'string' ? body.input.filename.slice(0, 200) : null,
+    }
   }
 
   // Ownership check (RLS also enforces this, but fail cleanly with 404).
@@ -55,7 +70,7 @@ export async function POST(req: Request) {
 
   const { data: job, error } = await supabase
     .from('mk_jobs')
-    .insert({ project_id, kind, status: 'queued' })
+    .insert({ project_id, kind, status: 'queued', input })
     .select('id')
     .single()
   if (error || !job) {

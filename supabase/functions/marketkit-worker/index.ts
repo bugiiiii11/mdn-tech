@@ -3,8 +3,12 @@
 // CRON_SECRET bearer (same shared secret as techkit-poller). Marks the job
 // running, returns 202 immediately, and finishes the heavy AI work in the
 // background via EdgeRuntime.waitUntil so the caller's fetch can time out safely.
+// Session B adds cron batch entrypoints: { task: "sprint_propose_all" | "sprint_review_all" }
+// iterate every active project, creating + running one mk_jobs row each (audit trail),
+// and send a Telegram summary via the shared notify helpers.
 // Deploy: multipart deploy endpoint (no CLI) — see MARKETKIT-SETUP.md.
 import { serviceClient } from '../_shared/supabase.ts'
+import { sendTelegram } from '../_shared/notify.ts'
 import { callClaudeJSON, type ClaudeImage } from './claude.ts'
 import { encodeBase64 } from 'jsr:@std/encoding/base64'
 
@@ -24,15 +28,24 @@ Deno.serve(async (req) => {
   const secret = Deno.env.get('CRON_SECRET')
   if (!secret || auth !== `Bearer ${secret}`) return json({ error: 'unauthorized' }, 401)
 
-  let body: { job_id?: string } = {}
+  let body: { job_id?: string; task?: string } = {}
   try {
     body = await req.json()
   } catch {
     /* empty */
   }
-  if (!body.job_id) return json({ error: 'job_id required' }, 400)
 
   const supabase = serviceClient()
+
+  // Cron batch entrypoints (migration 013): one job row per active project.
+  if (body.task === 'sprint_propose_all' || body.task === 'sprint_review_all') {
+    const kind = body.task === 'sprint_propose_all' ? 'sprint_propose' : 'sprint_review'
+    EdgeRuntime.waitUntil(runSprintBatch(supabase, kind))
+    return json({ ok: true, task: body.task, status: 'running' }, 202)
+  }
+
+  if (!body.job_id) return json({ error: 'job_id required' }, 400)
+
   const { data: job, error } = await supabase.from('mk_jobs').select('*').eq('id', body.job_id).single()
   if (error || !job) return json({ error: 'job not found' }, 404)
   if (job.status !== 'queued') return json({ error: `job already ${job.status}` }, 409)
@@ -47,7 +60,14 @@ Deno.serve(async (req) => {
   return json({ ok: true, job_id: job.id, status: 'running' }, 202)
 })
 
-async function runJob(supabase: Supabase, job: { id: string; kind: string; project_id: string | null }) {
+interface JobRow {
+  id: string
+  kind: string
+  project_id: string | null
+  input?: Record<string, unknown> | null
+}
+
+async function runJob(supabase: Supabase, job: JobRow): Promise<unknown> {
   try {
     let result: unknown
     switch (job.kind) {
@@ -57,6 +77,15 @@ async function runJob(supabase: Supabase, job: { id: string; kind: string; proje
       case 'launch_kit':
         result = await runLaunchKit(supabase, job.project_id!)
         break
+      case 'sprint_propose':
+        result = await runSprintPropose(supabase, job.project_id!)
+        break
+      case 'sprint_review':
+        result = await runSprintReview(supabase, job.project_id!)
+        break
+      case 'metrics_screenshot':
+        result = await runMetricsScreenshot(supabase, job.project_id!, job.input ?? {})
+        break
       default:
         throw new Error(`unknown job kind "${job.kind}"`)
     }
@@ -64,6 +93,7 @@ async function runJob(supabase: Supabase, job: { id: string; kind: string; proje
       .from('mk_jobs')
       .update({ status: 'done', result: result as Record<string, unknown>, finished_at: new Date().toISOString() })
       .eq('id', job.id)
+    return result
   } catch (err) {
     const message = err instanceof Error ? err.message : 'job failed'
     console.error('marketkit job failed:', job.kind, message)
@@ -71,6 +101,41 @@ async function runJob(supabase: Supabase, job: { id: string; kind: string; proje
       .from('mk_jobs')
       .update({ status: 'error', error: message, finished_at: new Date().toISOString() })
       .eq('id', job.id)
+    return null
+  }
+}
+
+// Weekly cron batch: create + run one job per active project, sequentially
+// (keeps Claude call concurrency at 1), then send a Telegram summary.
+async function runSprintBatch(supabase: Supabase, kind: 'sprint_propose' | 'sprint_review') {
+  const { data: projects } = await supabase.from('mk_projects').select('id, name').eq('status', 'active')
+  const lines: string[] = []
+  for (const project of projects ?? []) {
+    const { data: job, error } = await supabase
+      .from('mk_jobs')
+      .insert({ project_id: project.id, kind, status: 'running', started_at: new Date().toISOString() })
+      .select('id, kind, project_id, input')
+      .single()
+    if (error || !job) {
+      console.error('sprint batch: job insert failed for', project.name, error?.message)
+      continue
+    }
+    const result = (await runJob(supabase, job)) as Record<string, unknown> | null
+    if (result) {
+      const detail =
+        kind === 'sprint_propose'
+          ? `${result.actions ?? 0} actions proposed`
+          : result.reviewed === 0
+            ? 'nothing to review'
+            : `${result.reviewed} actions reviewed`
+      lines.push(`• ${project.name}: ${detail}`)
+    } else {
+      lines.push(`• ${project.name}: failed (see mk_jobs)`)
+    }
+  }
+  if (lines.length) {
+    const title = kind === 'sprint_propose' ? '📋 MarketKit — weekly sprint proposed' : '📊 MarketKit — weekly sprint review'
+    await sendTelegram(`${title}\n${lines.join('\n')}\napp.mdntech.org/marketkit`)
   }
 }
 
@@ -230,6 +295,297 @@ interface LaunchKitOut {
   content?: { platform?: string; format?: string; draft?: string }[]
 }
 
+// ---------------------------------------------------------- task=sprint_propose
+// The weekly core loop (BRIEF §3.4): 3 concrete actions for the current week,
+// each with a UTM-tagged tracking link (M9 — plain UTM now, Dub in backlog B3).
+
+async function runSprintPropose(supabase: Supabase, projectId: string) {
+  const { data: project, error } = await supabase.from('mk_projects').select('*').eq('id', projectId).single()
+  if (error || !project) throw new Error('project not found')
+
+  const { data: profile } = await supabase
+    .from('mk_project_profiles')
+    .select('profile')
+    .eq('project_id', projectId)
+    .order('version', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!profile) throw new Error('run the AI scan first — no project profile exists yet')
+
+  const { data: strategy } = await supabase
+    .from('mk_strategies')
+    .select('id, positioning, channel_plan, launch_checklist')
+    .eq('project_id', projectId)
+    .order('version', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const week = mondayOfWeek()
+
+  // One sprint per week: re-rolling replaces unapproved proposals, but never an
+  // in-progress week (approved/done/skipped actions committed by the founder).
+  const { data: existing } = await supabase
+    .from('mk_actions')
+    .select('id, status')
+    .eq('project_id', projectId)
+    .eq('week', week)
+  const committed = (existing ?? []).filter((a) => a.status !== 'proposed')
+  if (committed.length) {
+    throw new Error(`this week's sprint is already in progress (${committed.length} action(s) approved) — review it on the Sprint tab`)
+  }
+  if (existing?.length) {
+    await supabase.from('mk_actions').delete().eq('project_id', projectId).eq('week', week).eq('status', 'proposed')
+  }
+
+  // Context: the last 4 weeks of actions (what was tried, what happened) + recent metrics.
+  const since = new Date(Date.now() - 28 * 86400_000).toISOString().slice(0, 10)
+  const { data: history } = await supabase
+    .from('mk_actions')
+    .select('week, title, channel, status, expected_outcome, actual_outcome')
+    .eq('project_id', projectId)
+    .gte('week', since)
+    .neq('week', week)
+    .order('week', { ascending: false })
+    .limit(20)
+  const { data: metrics } = await supabase
+    .from('mk_metrics_snapshots')
+    .select('source, platform, metric, value, period_start, period_end')
+    .eq('project_id', projectId)
+    .order('ingested_at', { ascending: false })
+    .limit(30)
+
+  const text = [
+    `PROJECT: ${project.name} (${project.url ?? 'no url'})`,
+    `CATEGORY: ${project.category} · BUDGET TIER: €${project.budget_tier}/mo · LANGUAGE: ${project.language}`,
+    `SPRINT WEEK: Monday ${week}`,
+    `\nPROJECT PROFILE:\n${JSON.stringify(profile.profile, null, 2)}`,
+    strategy
+      ? `\nSTRATEGY (positioning + ranked channels + checklist):\n${JSON.stringify(
+          { positioning: strategy.positioning, channel_plan: strategy.channel_plan, launch_checklist: strategy.launch_checklist },
+          null,
+          2
+        )}`
+      : '\nSTRATEGY: none generated yet — propose from the profile and channel defaults.',
+    history?.length
+      ? `\nPREVIOUS SPRINT ACTIONS (last 4 weeks — do not repeat, build on what worked):\n${JSON.stringify(history, null, 2)}`
+      : '\nPREVIOUS SPRINT ACTIONS: none — this is the first sprint.',
+    metrics?.length
+      ? `\nRECENT METRICS:\n${JSON.stringify(metrics, null, 2)}`
+      : '\nRECENT METRICS: none recorded yet.',
+    '\nPropose exactly 3 actions for this week as JSON, exactly as specified.',
+  ].join('\n')
+
+  const out = await callClaudeJSON<{
+    actions: { title: string; channel?: string; effort?: string; cost_eur?: number; expected_outcome?: string }[]
+  }>({
+    model: 'claude-sonnet-5',
+    system: SPRINT_PROPOSE_SYSTEM,
+    text,
+    maxTokens: 2000,
+    effort: 'medium',
+    disableThinking: true,
+  })
+
+  const proposed = (out.actions ?? []).slice(0, 3)
+  if (!proposed.length) throw new Error('model returned no actions')
+
+  let inserted = 0
+  for (const a of proposed) {
+    // M9: every action ships with a tracked link from day 1 — plain UTM until Dub (B3).
+    let linkId: string | null = null
+    if (project.url) {
+      try {
+        const url = new URL(project.url)
+        const utm = {
+          utm_source: slug(a.channel ?? 'marketkit'),
+          utm_medium: 'marketkit',
+          utm_campaign: `sprint-${week}`,
+        }
+        for (const [k, v] of Object.entries(utm)) url.searchParams.set(k, v)
+        const { data: link } = await supabase
+          .from('mk_links')
+          .insert({ project_id: projectId, url: url.toString(), utm })
+          .select('id')
+          .single()
+        linkId = link?.id ?? null
+      } catch {
+        /* unparseable project URL — action still valid without a link */
+      }
+    }
+
+    const effort = a.effort === 'S' || a.effort === 'M' || a.effort === 'L' ? a.effort : null
+    const { error: aErr } = await supabase.from('mk_actions').insert({
+      project_id: projectId,
+      strategy_id: strategy?.id ?? null,
+      week,
+      title: a.title,
+      channel: a.channel ?? null,
+      effort,
+      cost_eur: typeof a.cost_eur === 'number' && isFinite(a.cost_eur) ? a.cost_eur : 0,
+      expected_outcome: a.expected_outcome ?? null,
+      tracking_link_id: linkId,
+      status: 'proposed',
+    })
+    if (aErr) console.error('action insert failed:', aErr.message)
+    else inserted++
+  }
+  if (!inserted) throw new Error('no actions could be saved')
+
+  return { week, actions: inserted }
+}
+
+// ----------------------------------------------------------- task=sprint_review
+// Reviews past weeks' committed actions against recorded metrics — honest
+// "no data" over invented results. Annotates actual_outcome; status stays
+// the founder's call.
+
+async function runSprintReview(supabase: Supabase, projectId: string) {
+  const { data: project, error } = await supabase.from('mk_projects').select('*').eq('id', projectId).single()
+  if (error || !project) throw new Error('project not found')
+
+  const week = mondayOfWeek()
+  const { data: due } = await supabase
+    .from('mk_actions')
+    .select('id, week, title, channel, status, expected_outcome, tracking_link_id')
+    .eq('project_id', projectId)
+    .lt('week', week)
+    .in('status', ['approved', 'done'])
+    .is('reviewed_at', null)
+    .order('week', { ascending: true })
+  if (!due?.length) return { reviewed: 0 }
+
+  const { data: metrics } = await supabase
+    .from('mk_metrics_snapshots')
+    .select('source, platform, metric, value, period_start, period_end, ingested_at')
+    .eq('project_id', projectId)
+    .order('ingested_at', { ascending: false })
+    .limit(40)
+  const linkIds = due.map((a) => a.tracking_link_id).filter(Boolean) as string[]
+  const { data: links } = linkIds.length
+    ? await supabase.from('mk_links').select('id, url, clicks, conversions').in('id', linkIds)
+    : { data: [] as { id: string; url: string; clicks: number; conversions: number }[] }
+
+  const actionsForModel = due.map((a, i) => ({
+    index: i,
+    week: a.week,
+    title: a.title,
+    channel: a.channel,
+    status: a.status,
+    expected_outcome: a.expected_outcome,
+    tracking_link: links?.find((l) => l.id === a.tracking_link_id) ?? null,
+  }))
+
+  const text = [
+    `PROJECT: ${project.name} (${project.url ?? 'no url'})`,
+    `REVIEW DATE: ${new Date().toISOString().slice(0, 10)} (current sprint week starts ${week})`,
+    `\nACTIONS TO REVIEW (committed in past weeks, not yet reviewed):\n${JSON.stringify(actionsForModel, null, 2)}`,
+    metrics?.length
+      ? `\nRECORDED METRICS (newest first):\n${JSON.stringify(metrics, null, 2)}`
+      : '\nRECORDED METRICS: none recorded — say so plainly in every review.',
+    '\nReview each action as JSON, exactly as specified. Reference actions by their index.',
+  ].join('\n')
+
+  const out = await callClaudeJSON<{ reviews: { index: number; actual_outcome: string }[]; week_summary?: string }>({
+    model: 'claude-sonnet-5',
+    system: SPRINT_REVIEW_SYSTEM,
+    text,
+    maxTokens: 2000,
+    effort: 'medium',
+    disableThinking: true,
+  })
+
+  const now = new Date().toISOString()
+  let reviewed = 0
+  for (const r of out.reviews ?? []) {
+    const action = due[r.index]
+    if (!action || !r.actual_outcome) continue
+    const { error: uErr } = await supabase
+      .from('mk_actions')
+      .update({ actual_outcome: r.actual_outcome, reviewed_at: now })
+      .eq('id', action.id)
+    if (uErr) console.error('review update failed:', uErr.message)
+    else reviewed++
+  }
+
+  return { reviewed, week_summary: out.week_summary ?? null }
+}
+
+// ------------------------------------------------------ task=metrics_screenshot
+// B2: social/analytics screenshot → Claude vision → normalized mk_metrics_snapshots.
+// The MVP answer for X/LinkedIn/TikTok/Instagram, where APIs are gated (BRIEF §9).
+
+async function runMetricsScreenshot(supabase: Supabase, projectId: string, input: Record<string, unknown>) {
+  const storagePath = typeof input.storage_path === 'string' ? input.storage_path : ''
+  if (!storagePath) throw new Error('storage_path missing from job input')
+
+  const { data: blob, error } = await supabase.storage.from(BUCKET).download(storagePath)
+  if (error || !blob) throw new Error(`screenshot download failed: ${error?.message ?? 'not found'}`)
+  const buf = new Uint8Array(await blob.arrayBuffer())
+  if (buf.byteLength > MAX_IMAGE_BYTES) throw new Error('screenshot larger than 5 MB — crop or compress it')
+
+  const filename = typeof input.filename === 'string' ? input.filename : storagePath
+  const out = await callClaudeJSON<{
+    platform?: string
+    period_start?: string | null
+    period_end?: string | null
+    metrics?: { metric: string; value: number | string; period_start?: string | null; period_end?: string | null }[]
+    notes?: string
+  }>({
+    model: 'claude-sonnet-5',
+    system: METRICS_SCREENSHOT_SYSTEM,
+    text: `Extract the metrics from this analytics/social screenshot (filename: ${filename}). Return the JSON exactly as specified.`,
+    images: [{ media_type: mediaType(filename), data: encodeBase64(buf) }],
+    maxTokens: 2000,
+    effort: 'medium',
+    disableThinking: true,
+  })
+
+  const isDate = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s)
+  const rows = (out.metrics ?? [])
+    .map((m) => {
+      const value = typeof m.value === 'number' ? m.value : Number(String(m.value).replace(/[,\s]/g, ''))
+      if (!m.metric || !isFinite(value)) return null
+      return {
+        project_id: projectId,
+        source: 'screenshot',
+        platform: out.platform ?? null,
+        metric: slug(m.metric),
+        value,
+        period_start: isDate(m.period_start) ? m.period_start : isDate(out.period_start) ? out.period_start : null,
+        period_end: isDate(m.period_end) ? m.period_end : isDate(out.period_end) ? out.period_end : null,
+        raw: { storage_path: storagePath, filename, notes: out.notes ?? null },
+      }
+    })
+    .filter(Boolean)
+
+  if (!rows.length) {
+    throw new Error(out.notes ? `no metrics readable: ${out.notes.slice(0, 200)}` : 'no metrics could be read from this screenshot')
+  }
+
+  const { error: insErr } = await supabase.from('mk_metrics_snapshots').insert(rows)
+  if (insErr) throw new Error(`metrics insert failed: ${insErr.message}`)
+
+  return { inserted: rows.length, platform: out.platform ?? null }
+}
+
+// Monday (UTC) of the current week, YYYY-MM-DD — the sprint week convention.
+function mondayOfWeek(): string {
+  const d = new Date()
+  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+  utc.setUTCDate(utc.getUTCDate() - ((utc.getUTCDay() + 6) % 7))
+  return utc.toISOString().slice(0, 10)
+}
+
+function slug(s: string): string {
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 40) || 'other'
+  )
+}
+
 // ------------------------------------------------------------------- assets
 
 async function gatherAssets(supabase: Supabase, projectId: string) {
@@ -337,6 +693,47 @@ Return ONLY a single JSON object, no prose, no markdown fences, in exactly this 
   "content": [ { "platform": "x | linkedin | reddit | blog | ...", "format": "post | thread | article", "draft": "a real, ready-to-edit draft — the founder will voice-edit before posting" } ]
 }
 Rules: rank 3-6 channels for the budget tier (never recommend paid channels above the budget). launch_checklist 6-10 items. calendar exactly 30 entries (day 1..30), realistic cadence, not one per day. content 5-8 real drafts covering the top channels. Write drafts in the project's content language.`
+
+const SPRINT_PROPOSE_SYSTEM = `You are a pragmatic weekly marketing coach for a solo founder with very limited time (3-5 hours/week for marketing) and a tiny budget. Each week you propose exactly 3 concrete, do-this-week actions for one project, based on its profile, strategy, what was tried in previous sprints (and how it went), and recorded metrics.
+
+Return ONLY a single JSON object, no prose, no markdown fences, in exactly this shape:
+{
+  "actions": [
+    {
+      "title": "imperative, specific, completable in one week (e.g. 'Post the €0 launch checklist story in r/SideProject')",
+      "channel": "the channel it runs on (e.g. 'Reddit — r/SideProject', 'X', 'blog', 'directories', 'DM outreach')",
+      "effort": "S | M | L  (S ≈ under 1h, M ≈ 1-3h, L ≈ 3-5h)",
+      "cost_eur": 0,
+      "expected_outcome": "concrete and measurable (e.g. '200+ visits, 5+ signups', '10 replies')"
+    }
+  ]
+}
+Rules: exactly 3 actions. Total effort must fit in 3-5 founder-hours (never three L actions). Never exceed the project's budget tier — €0 tier means every cost_eur is 0. Do not repeat an action from the previous sprints list; if something worked, propose the natural next step; if something was skipped twice, propose an easier variant or drop the channel for now. Prefer the strategy's top-ranked channels and unfinished checklist items. Write titles and expected outcomes in English; any content the founder must write can be in the project's content language.`
+
+const SPRINT_REVIEW_SYSTEM = `You review last week's marketing actions for a solo founder's project. For each action you get its expected outcome, plus whatever metrics were actually recorded (analytics snapshots, link clicks). Be honest and specific: compare expected vs evidence. Where there is no relevant data, say plainly "no measurable data" and name the one tracking step that would fix it next time. Never invent numbers.
+
+Return ONLY a single JSON object, no prose, no markdown fences, in exactly this shape:
+{
+  "reviews": [
+    { "index": 0, "actual_outcome": "2-3 sentences: what the evidence shows vs what was expected, and one takeaway" }
+  ],
+  "week_summary": "2-3 sentences across all reviewed actions: what worked, what to change"
+}
+Rules: one review per action, referenced by its index from the input. Keep each actual_outcome under 60 words.`
+
+const METRICS_SCREENSHOT_SYSTEM = `You extract metrics from a screenshot of an analytics or social media dashboard (GA4, Search Console, Plausible, X/Twitter, LinkedIn, Instagram, TikTok, YouTube, Reddit, newsletter tools, app stores...). Read only what is actually visible — never estimate or infer numbers that are not shown.
+
+Return ONLY a single JSON object, no prose, no markdown fences, in exactly this shape:
+{
+  "platform": "ga4 | gsc | plausible | x | linkedin | instagram | tiktok | youtube | reddit | other",
+  "period_start": "YYYY-MM-DD or null if not visible",
+  "period_end": "YYYY-MM-DD or null",
+  "metrics": [
+    { "metric": "snake_case name (e.g. visitors, page_views, impressions, clicks, followers, engagement_rate_pct)", "value": 123 }
+  ],
+  "notes": "anything ambiguous, cropped, or worth flagging"
+}
+Rules: values must be plain numbers — expand K/M (1.2K → 1200), strip separators and % signs (name percentage metrics *_pct). Include a per-metric "period_start"/"period_end" only if that metric has its own visible period. If the image is NOT an analytics/metrics screenshot, return {"metrics": [], "notes": "explain what the image shows instead"}.`
 
 // ----------------------------------------------------------------------- util
 

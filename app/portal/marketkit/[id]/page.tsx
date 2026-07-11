@@ -14,6 +14,9 @@ import type {
   MkFounderQuestion,
   MkStrategy,
   MkContentItem,
+  MkAction,
+  MkLink,
+  MkMetricSnapshot,
   ProjectProfile,
   JobStatus,
 } from '@/lib/marketkit/types'
@@ -35,7 +38,7 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
     .maybeSingle()
   if (!project) notFound()
 
-  const [assetsRes, profileRes, questionsRes, strategyRes, contentRes, jobsRes] = await Promise.all([
+  const [assetsRes, profileRes, questionsRes, strategyRes, contentRes, actionsRes, linksRes, metricsRes, jobsRes] = await Promise.all([
     supabase.from('mk_project_assets').select('*').eq('project_id', id).order('created_at', { ascending: true }),
     supabase
       .from('mk_project_profiles')
@@ -54,6 +57,20 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
       .maybeSingle(),
     supabase.from('mk_content_items').select('*').eq('project_id', id).order('created_at', { ascending: false }),
     supabase
+      .from('mk_actions')
+      .select('*')
+      .eq('project_id', id)
+      .order('week', { ascending: false })
+      .order('created_at', { ascending: true })
+      .limit(60),
+    supabase.from('mk_links').select('*').eq('project_id', id),
+    supabase
+      .from('mk_metrics_snapshots')
+      .select('*')
+      .eq('project_id', id)
+      .order('ingested_at', { ascending: false })
+      .limit(100),
+    supabase
       .from('mk_jobs')
       .select('id, kind, status')
       .eq('project_id', id)
@@ -64,6 +81,9 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
   const jobs = (jobsRes.data ?? []) as { id: string; kind: string; status: JobStatus }[]
   const scanJob = jobs.find((j) => j.kind === 'scan') ?? null
   const launchJob = jobs.find((j) => j.kind === 'launch_kit') ?? null
+  const proposeJob = jobs.find((j) => j.kind === 'sprint_propose') ?? null
+  const reviewJob = jobs.find((j) => j.kind === 'sprint_review') ?? null
+  const metricsJob = jobs.find((j) => j.kind === 'metrics_screenshot') ?? null
 
   return (
     <PortalShell variant="marketing">
@@ -103,8 +123,14 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
           questions={(questionsRes.data ?? []) as MkFounderQuestion[]}
           strategy={(strategyRes.data ?? null) as MkStrategy | null}
           content={(contentRes.data ?? []) as MkContentItem[]}
+          actions={(actionsRes.data ?? []) as MkAction[]}
+          links={(linksRes.data ?? []) as MkLink[]}
+          metrics={(metricsRes.data ?? []) as MkMetricSnapshot[]}
           scanJob={scanJob ? { id: scanJob.id, status: scanJob.status } : null}
           launchJob={launchJob ? { id: launchJob.id, status: launchJob.status } : null}
+          proposeJob={proposeJob ? { id: proposeJob.id, status: proposeJob.status } : null}
+          reviewJob={reviewJob ? { id: reviewJob.id, status: reviewJob.status } : null}
+          metricsJob={metricsJob ? { id: metricsJob.id, status: metricsJob.status } : null}
         />
       </div>
     </PortalShell>
