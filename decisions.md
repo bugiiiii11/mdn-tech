@@ -434,3 +434,11 @@ Context: First execution session of `command-center/TECHKIT-BRIEF.md`. The brief
 **Why:** Placeholder URLs in `monitored_endpoints` would be junk data the poller might accidentally check; the CRUD UI exists precisely for late additions.
 
 ---
+
+## 2026-07-12 -- Session 40 -- TechKit design language stays TechKit-scoped (no CC-wide refresh)
+
+**Decision:** TechKit Session D's §7.4 open question — whether to extend the TechKit design language (layered dark gradient + brand-tinted glow orbs + data-density-first cards) to the rest of Command Center (sidebar, dashboard, projects, communications pages) — is resolved as **no, not now.** The TechKit pages keep their distinct look; the legacy CC pages stay on the older style. Revisit only in a dedicated design session if wanted.
+
+**Why:** TechKit is a self-contained module reached via its own tabbed shell, so the visual seam between it and legacy CC is minimal in practice. A CC-wide refresh is a design-first effort (every page reworked + re-verified) with no functional payoff, and folding it into a feature-shipping session risks a half-migrated look. Better as an intentional, scoped design pass than a rushed rider on Session D.
+
+**Alternatives:** Extend the language CC-wide now (large surface area, would have stretched Session D well past the digest work); adopt a shared design-token layer both old and new pages consume (correct long-term, but premature before the module count justifies it).
