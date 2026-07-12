@@ -137,6 +137,41 @@ export async function deleteCost(id: string) {
   return { ok: true }
 }
 
+// "Generate now" — runs the weekly digest task on demand (same window semantics
+// as the Monday cron: trailing 7 full UTC days, upserted on week_start). The
+// poller does the aggregate + Claude call synchronously, so allow up to 60s.
+export async function generateDigestNow() {
+  await requireUser()
+  const secret = process.env.CRON_SECRET
+  if (!secret) return { error: 'CRON_SECRET not set in this environment — add it to Vercel env to enable Generate now' }
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/techkit-poller`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${secret}`,
+        },
+        body: JSON.stringify({ task: 'digest' }),
+        signal: AbortSignal.timeout(60_000),
+      }
+    )
+    const text = await res.text()
+    let json: { error?: string; week_start?: string; model?: string } = {}
+    try {
+      json = JSON.parse(text)
+    } catch {
+      return { error: `poller returned HTTP ${res.status} (non-JSON response)` }
+    }
+    if (!res.ok) return { error: json.error ?? `poller returned ${res.status}` }
+    revalidatePath('/command-center/techkit/digests')
+    return { ok: true, week_start: json.week_start ?? null }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'poller unreachable' }
+  }
+}
+
 // "Check now" — invokes the poller for one endpoint. Needs CRON_SECRET in the
 // Next.js (Vercel) env; degrades to a friendly error until it's set.
 export async function checkEndpointNow(endpointId: string) {

@@ -462,7 +462,7 @@ Provider-level monitoring covers everything linked via `projects.{supabase_proje
 | `RESEND_API_KEY` | alert emails | new — create in Resend (domain already verified) |
 | `TELEGRAM_BOT_TOKEN` | alerts bot | new — @BotFather |
 | `TELEGRAM_ALERT_CHAT_ID` | target chat | new — Martin's chat id |
-| `ANTHROPIC_ADMIN_API_KEY` | cost reports | ⚠️ still needed — Anthropic Console → Settings → Organization → Admin keys (Session C shipped without it; collector degrades until set) |
+| `ANTHROPIC_ADMIN_API_KEY` | cost reports | ✅ done 2026-07-12 — Admin key created by Martin, pushed to edge secrets, 31-day backfill verified (repo priority 8 closed) |
 | `ANTHROPIC_API_KEY` | digest generation | exists — copy |
 | `CRUX_API_KEY` | web vitals | new — free GCP key |
 | `ALERT_EMAIL_TO` | recipient(s) | new |
@@ -502,10 +502,12 @@ Next.js (Vercel env) needs **no new secrets** — CC reads Postgres through exis
 
 **Exit criteria:** MTD spend per provider visible ✅; Claude spend tracked daily — pipeline live, data starts when the Admin key lands (repo priority 8 closes then).
 
-### Session D — AI digest + polish
-- [ ] **D1** `task=digest` (§10) + `techkit/digests` page + Monday cron.
-- [ ] **D2** Anomaly flags in digest input (WoW swings); unacked-incident nagging (24h-old open incidents re-ping Telegram).
-- [ ] **D3** Polish: empty states, mobile pass on overview, docs — update repo `handoff.md` + README mention. If the CC-wide design refresh (§7.4) hasn't happened yet, decide here whether to extend the TechKit design language to the rest of CC.
+### Session D — AI digest + polish ✅ SHIPPED + LIVE 2026-07-12 (Session 40)
+- [x] **D1** `task=digest` live (poller v12): migration-015 SQL aggregate RPC (`techkit_digest_aggregate` — uptime/p95 WoW, incidents + durations, deploys, per-provider cost WoW + MTD) → `claude-haiku-4-5` ops digest (Incidents / Availability / Costs / Trends / Recommended actions; mechanical fallback if the model call fails) → `techkit_digests` upsert on week_start → Resend email + 5-line Telegram summary. `techkit/digests` CC page + Digests tab + Generate-now button. Cron `techkit-digest` Mon 06:30 UTC — **all 7 TechKit crons active**.
+- [x] **D2** Anomaly flags in digest input (>30% WoW metric swings, min-4-samples-each-week guard) + unacked-incident nagging (hourly rollup task re-pings Telegram for 24h-old open incidents, once per 24h via `alert_events.last_nagged_at`).
+- [x] **D3** Empty states on the digests page + runbook/brief docs (handoff.md at session wrap). **Decision: CC-wide design refresh deferred** — TechKit design language stays TechKit-scoped; revisit in a dedicated design session if wanted. Mobile pass on overview also deferred (no reported issues).
+
+**Exit criteria:** Monday morning brings an AI ops summary to email + Telegram without anyone asking for it ✅ (first digest generated + delivered live in-session); stale open incidents nag until acknowledged ✅.
 
 ### Backlog (post-MVP, do not build now)
 - Customer-facing per-project status pages (`status.mdntech.org` or portal module) — **productization path**; pairs with the monitoring-retainer offer for clients (Royal Stroje / Melichárek / Zane).

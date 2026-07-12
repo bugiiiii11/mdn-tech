@@ -132,9 +132,9 @@ feed covers activity. Revisit if the Vercel plan changes (brief §15 Q2).
 # TechKit Session C go-live (2026-07-12)
 
 > ✅ **Costs backend LIVE** (poller v10 with `task=costs`, migration 014 applied + audited, daily cron
-> 06:15 UTC active, smoke-tested idempotent). ⚠️ **One Martin step open:** the Anthropic collector needs
-> `ANTHROPIC_ADMIN_API_KEY` (see below) — until then the task writes only the static-config rows and the
-> Costs page shows the empty-state explaining exactly this.
+> 06:15 UTC active, smoke-tested idempotent). ✅ **Admin key wired (2026-07-12):** `ANTHROPIC_ADMIN_API_KEY`
+> pushed to edge secrets, manual `task=costs` run backfilled 31 Anthropic daily rows (2026-06-11 → 2026-07-11,
+> $0.86 total) — `rows_upserted: 33`, `notes.anthropic.days: 31`, 0 false alerts. Repo priority 8 closed.
 
 **What was done (self-serve, Management API — same pattern as A/B):**
 1. **`techkit-poller` redeployed** (multipart, now 4 file parts: `techkit-poller/index.ts` +
@@ -153,7 +153,7 @@ feed covers activity. Revisit if the Vercel plan changes (brief §15 Q2).
    bar, daily Claude-spend bars, 6-month trend, manual-entry form (`source='manual'` — use for Railway plan
    fees, domains, one-offs), cost-rule list. Renders once `main` deploys.
 
-**⚠️ Open step — [Martin] create the Anthropic Admin API key:**
+**✅ Done (2026-07-12) — Anthropic Admin API key runbook (kept for key-rotation reference):**
 
 | Step | How |
 |---|---|
@@ -166,3 +166,41 @@ feed covers activity. Revisit if the Vercel plan changes (brief §15 Q2).
 shape — unverified; Railway's flat plan fee is a one-line manual entry on the Costs page instead) and Vercel
 usage API (not available on Hobby). Per brief §9 the dashboard renders usefully with Anthropic + static-config
 + manual rows alone.
+
+---
+
+# TechKit Session D go-live (2026-07-12)
+
+> ✅ **AI weekly digest LIVE** (poller v12 with `task=digest`, migration 015 applied + audited, Monday
+> 06:30 UTC cron active — **all 7 TechKit crons running**). First digest generated, delivered by email +
+> Telegram, and visible on the new CC **Digests** tab. No open Martin steps.
+
+**What was done (self-serve, Management API — same pattern as A/B/C):**
+1. **Migration `015_techkit_digest.sql` applied + audited** — (a) `techkit_digest_aggregate(p_since,
+   p_prev_since, p_until)` security-definer RPC (service-role only): computes the full §10.1 weekly
+   aggregate in SQL (per-endpoint uptime + p95 WoW, incident list + durations, open unacked, distinct
+   production deploys + failures, per-provider daily-row cost WoW + MTD, >30% WoW metric anomalies with
+   min-sample guards) — one RPC call, no PostgREST max-rows paging; (b) `alert_events.last_nagged_at`
+   column for the nag throttle; (c) cron `techkit-digest` (`30 6 * * 1` — after the 06:15 costs run so
+   the digested week includes fresh cost rows).
+2. **`techkit-poller` redeployed → v12** (multipart, same 4 file parts). New `task=digest`: RPC aggregate →
+   `claude-haiku-4-5` (raw fetch; note Haiku rejects `output_config.effort` and thinking is off by default —
+   both intentionally omitted) → markdown with sections Incidents / Availability / Costs / Trends /
+   Recommended actions → upsert into `techkit_digests` on `week_start` → full markdown emailed via Resend
+   (subject `TechKit weekly — <range>: <n> incidents, $<cost>`) + 5-line Telegram summary with the CC link.
+   If the Claude call fails, a mechanical fallback digest is stored (`model='fallback'`) so the cron never
+   leaves a blank week. **Window semantics:** trailing 7 full UTC days ending at today 00:00 — the Monday
+   cron covers exactly the completed Mon–Sun week; a manual run digests the trailing 7 days.
+3. **D2 nagging live:** the hourly `rollup` task now re-pings Telegram for open incidents older than 24h,
+   at most once per 24h each (`last_nagged_at` throttle), reported as `unacked_nagged` in the response.
+4. **CC Digests page** at `/command-center/techkit/digests` (new Digests tab): latest digest rendered as
+   markdown, previous weeks collapsible, email/telegram delivery pills, model tag, and a **Generate now**
+   button (server action → poller `task=digest`, needs `CRON_SECRET` in Vercel env — already set).
+5. **Smoke green:** wrong bearer → 401; `task=digest` ×2 → both ok, table holds exactly **1 row** for the
+   week (upsert proven); first real digest (week 2026-07-05→11: 1 incident, 99.96% uptime, $0.85) correctly
+   surfaced the Session-34 kill test and flagged an endpoint anomaly; email + Telegram delivered (flags
+   recorded); `rollup` → `unacked_nagged: 0` (nothing 24h+ open). `tsc` + `lint` + `next build` green.
+
+**Deferred from D3 (not blocking):** mobile pass on the overview grid and the CC-wide design-refresh
+decision (§7.4) — the TechKit design language stays TechKit-scoped for now; revisit if/when the rest of
+CC gets a design session.

@@ -10,6 +10,7 @@ const TABS = [
   { href: '/command-center/techkit/endpoints', label: 'Endpoints' },
   { href: '/command-center/techkit/costs', label: 'Costs' },
   { href: '/command-center/techkit/stats', label: 'Stats' },
+  { href: '/command-center/techkit/digests', label: 'Digests' },
   { href: '/command-center/techkit/live', label: 'Live' },
 ] as const
 

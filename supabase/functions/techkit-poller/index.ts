@@ -3,7 +3,7 @@
 // or by the CC "Check now" button with `{ task: "uptime", endpoint_id: "<uuid>" }`.
 // Deploy: supabase functions deploy techkit-poller --no-verify-jwt
 import { serviceClient } from '../_shared/supabase.ts'
-import { deliverAlert, type Severity } from '../_shared/notify.ts'
+import { deliverAlert, sendTelegram, sendEmail, type Severity } from '../_shared/notify.ts'
 import {
   fetchSupabaseMetrics,
   fetchRailwayMetrics,
@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       case 'costs':
         return json(await runCosts())
       case 'digest':
-        return json({ error: `task "${body.task}" not implemented yet (Session D)` }, 501)
+        return json(await runDigest())
       default:
         return json({ error: `unknown task "${body.task ?? ''}"` }, 400)
     }
@@ -293,7 +293,38 @@ async function runRollup() {
   const supabase = serviceClient()
   const { error } = await supabase.rpc('techkit_rollup_hourly')
   if (error) throw new Error(`rollup failed: ${error.message}`)
-  return { ok: true, task: 'rollup' }
+  const nagged = await nagUnackedIncidents(supabase)
+  return { ok: true, task: 'rollup', unacked_nagged: nagged }
+}
+
+// D2: open incidents older than 24h re-ping Telegram, at most once per 24h
+// each (alert_events.last_nagged_at, migration 015). Rides the hourly rollup
+// cron so no extra schedule is needed.
+async function nagUnackedIncidents(supabase: ReturnType<typeof serviceClient>): Promise<number> {
+  const dayMs = 24 * 3600_000
+  const { data, error } = await supabase
+    .from('alert_events')
+    .select('id, title, severity, opened_at, last_nagged_at')
+    .eq('status', 'open')
+    .lt('opened_at', new Date(Date.now() - dayMs).toISOString())
+    .limit(20)
+  if (error) {
+    console.error('nag query failed:', error.message)
+    return 0
+  }
+  let nagged = 0
+  for (const a of (data ?? []) as Array<{ id: string; title: string; opened_at: string; last_nagged_at: string | null }>) {
+    if (a.last_nagged_at && Date.now() - new Date(a.last_nagged_at).getTime() < dayMs) continue
+    const ageH = Math.round((Date.now() - new Date(a.opened_at).getTime()) / 3600_000)
+    const ok = await sendTelegram(
+      `⏰ Still unacknowledged after ${ageH}h: ${a.title}\nAck or resolve: https://admin.mdntech.org/command-center/techkit/incidents`
+    )
+    if (ok) {
+      await supabase.from('alert_events').update({ last_nagged_at: new Date().toISOString() }).eq('id', a.id)
+      nagged++
+    }
+  }
+  return nagged
 }
 
 // ------------------------------------------------------------- task=retention
@@ -789,6 +820,183 @@ async function runStats() {
   }
 
   return { ok: true, task: 'stats', metrics_written: metricRows.length, notes }
+}
+
+// ---------------------------------------------------------------- task=digest
+
+// §10: aggregate the last 7 full days in SQL (migration 015 RPC), have Claude
+// Haiku write a terse ops digest, store it in techkit_digests, email the full
+// markdown via Resend and send a 5-line Telegram summary with a CC link.
+//
+// Window semantics: the digested week is the 7 full UTC days ending at today
+// 00:00 — the Monday 06:30 cron therefore covers exactly the completed Mon–Sun
+// week (week_start = previous Monday); a manual mid-week run digests the
+// trailing 7 days (week_start = 7 days ago). week_start is UNIQUE → upsert,
+// so re-runs on the same anchor replace instead of duplicating.
+
+const DIGEST_MODEL = 'claude-haiku-4-5'
+const DIGESTS_URL = 'https://admin.mdntech.org/command-center/techkit/digests'
+
+interface DigestAggregate {
+  uptime: Array<{ endpoint: string; checks_total: number; checks_up: number; uptime_pct: number | null; p95_ms: number | null; p95_prev_ms: number | null }>
+  incidents: Array<{ title: string; severity: string; status: string; duration_min: number | null }>
+  incidents_prev_count: number
+  open_unacked: Array<{ title: string; severity: string; age_hours: number }>
+  deploys: { total: number; failed: number; prev_total: number; prev_failed: number }
+  costs: Array<{ provider: string; week_usd: number; prev_week_usd: number }>
+  mtd_total_usd: number
+  metric_anomalies: Array<{ provider: string; metric: string; week_avg: number; prev_avg: number; change_pct: number }>
+}
+
+async function runDigest() {
+  const supabase = serviceClient()
+  const todayUtc = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z')
+  const since = new Date(todayUtc.getTime() - 7 * 86400_000)
+  const prevSince = new Date(todayUtc.getTime() - 14 * 86400_000)
+  const weekStart = since.toISOString().slice(0, 10)
+  const weekEnd = new Date(todayUtc.getTime() - 86400_000).toISOString().slice(0, 10)
+  const rangeLabel = `${weekStart} → ${weekEnd}`
+
+  const { data, error } = await supabase.rpc('techkit_digest_aggregate', {
+    p_since: since.toISOString(),
+    p_prev_since: prevSince.toISOString(),
+    p_until: todayUtc.toISOString(),
+  })
+  if (error) throw new Error(`digest aggregate failed: ${error.message}`)
+  const agg = data as DigestAggregate
+
+  // headline numbers (also drive subject + Telegram summary)
+  const incidentCount = agg.incidents.length
+  const criticalCount = agg.incidents.filter((i) => i.severity === 'critical').length
+  const totalChecks = agg.uptime.reduce((a, u) => a + Number(u.checks_total), 0)
+  const upChecks = agg.uptime.reduce((a, u) => a + Number(u.checks_up), 0)
+  const uptimePctAll = totalChecks > 0 ? ((upChecks / totalChecks) * 100).toFixed(2) : null
+  const weekCost = agg.costs.reduce((a, c) => a + Number(c.week_usd), 0)
+
+  const notes: Record<string, unknown> = {}
+  let contentMd: string
+  let model = DIGEST_MODEL
+  try {
+    contentMd = await callClaudeMarkdown(
+      [
+        "You are TechKit's weekly ops digest writer for M.D.N Tech, a small web agency running Next.js/Supabase/Vercel/Railway projects.",
+        'Write a markdown ops digest with exactly these sections: ## Incidents, ## Availability, ## Costs, ## Trends, ## Recommended actions.',
+        'Terse, numbers-first, flag anomalies explicitly, no filler, no preamble, no title heading (the page adds one).',
+        'Percentages/latency deltas: compare this week vs previous week where prev values exist.',
+        'If a section has no data, one short line saying so. Recommended actions: max 3 bullets, only genuinely actionable items. Keep the whole digest under 400 words.',
+      ].join(' '),
+      `Week ${rangeLabel} (UTC). JSON aggregate:\n${JSON.stringify(agg)}`,
+      3000
+    )
+  } catch (err) {
+    // degrade to a mechanical digest so the cron never leaves a blank week
+    notes.claude_error = err instanceof Error ? err.message : String(err)
+    model = 'fallback'
+    contentMd = fallbackDigestMarkdown(agg, uptimePctAll, weekCost)
+  }
+
+  // deliveries (flags recorded on the row)
+  const subject = `TechKit weekly — ${rangeLabel}: ${incidentCount} incident${incidentCount === 1 ? '' : 's'}, $${weekCost.toFixed(2)}`
+  const sentEmail = await sendEmail(subject, contentMd)
+  const tgLines = [
+    `📊 TechKit weekly (${rangeLabel})`,
+    `Incidents: ${incidentCount}${criticalCount ? ` (${criticalCount} critical)` : ''} · open unacked: ${agg.open_unacked.length}`,
+    uptimePctAll !== null ? `Uptime: ${uptimePctAll}% across ${agg.uptime.length} endpoints` : 'Uptime: no check data',
+    `Cost: $${weekCost.toFixed(2)} this week · MTD $${Number(agg.mtd_total_usd).toFixed(2)}`,
+    `Digest: ${DIGESTS_URL}`,
+  ]
+  const sentTelegram = await sendTelegram(tgLines.join('\n'))
+
+  const { error: upErr } = await supabase.from('techkit_digests').upsert(
+    {
+      week_start: weekStart,
+      content_md: contentMd,
+      model,
+      input_summary: agg,
+      sent_email: sentEmail,
+      sent_telegram: sentTelegram,
+    },
+    { onConflict: 'week_start' }
+  )
+  if (upErr) throw new Error(`digest store failed: ${upErr.message}`)
+
+  return {
+    ok: true,
+    task: 'digest',
+    week_start: weekStart,
+    model,
+    incidents: incidentCount,
+    uptime_pct: uptimePctAll,
+    week_cost_usd: Number(weekCost.toFixed(2)),
+    sent_email: sentEmail,
+    sent_telegram: sentTelegram,
+    notes,
+  }
+}
+
+// Minimal Anthropic Messages call for the digest (Deno raw fetch, matching the
+// notify.ts style). Haiku 4.5 notes (verified against the claude-api skill,
+// 2026-07): thinking is off by default (omit the param) and the model does NOT
+// accept output_config.effort — sending it errors. Plain text out.
+async function callClaudeMarkdown(system: string, text: string, maxTokens: number): Promise<string> {
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set in Edge Function secrets')
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: DIGEST_MODEL,
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: text }],
+    }),
+  })
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    throw new Error(`Anthropic ${res.status}: ${errText.slice(0, 300)}`)
+  }
+  const data = await res.json()
+  if (data.stop_reason === 'refusal') throw new Error('model declined the request')
+  const out = (data.content ?? [])
+    .filter((b: { type: string }) => b.type === 'text')
+    .map((b: { text: string }) => b.text)
+    .join('')
+  if (!out.trim()) throw new Error('empty model output')
+  return out
+}
+
+function fallbackDigestMarkdown(agg: DigestAggregate, uptimePctAll: string | null, weekCost: number): string {
+  const lines: string[] = [
+    '> AI summary unavailable this week — mechanical digest below.',
+    '',
+    '## Incidents',
+    agg.incidents.length === 0
+      ? 'No incidents this week.'
+      : agg.incidents.map((i) => `- [${i.severity}] ${i.title} (${i.status}${i.duration_min !== null ? `, ${i.duration_min} min` : ''})`).join('\n'),
+    '',
+    '## Availability',
+    uptimePctAll !== null ? `Overall uptime ${uptimePctAll}% across ${agg.uptime.length} endpoints.` : 'No check data.',
+    ...agg.uptime.map((u) => `- ${u.endpoint}: ${u.uptime_pct ?? '—'}% up${u.p95_ms !== null ? `, p95 ${u.p95_ms}ms` : ''}`),
+    '',
+    '## Costs',
+    `Week total $${weekCost.toFixed(2)} · MTD $${Number(agg.mtd_total_usd).toFixed(2)}`,
+    ...agg.costs.map((c) => `- ${c.provider}: $${Number(c.week_usd).toFixed(2)} (prev $${Number(c.prev_week_usd).toFixed(2)})`),
+    '',
+    '## Trends',
+    agg.metric_anomalies.length === 0
+      ? 'No >30% week-over-week metric swings.'
+      : agg.metric_anomalies.map((m) => `- ${m.provider}/${m.metric}: ${m.change_pct > 0 ? '+' : ''}${m.change_pct}% (${m.prev_avg} → ${m.week_avg})`).join('\n'),
+    '',
+    '## Recommended actions',
+    agg.open_unacked.length > 0
+      ? agg.open_unacked.map((a) => `- Acknowledge open incident: ${a.title} (${a.age_hours}h old)`).join('\n')
+      : '- None.',
+  ]
+  return lines.join('\n')
 }
 
 // ----------------------------------------------------------------------- util
