@@ -442,3 +442,13 @@ Context: First execution session of `command-center/TECHKIT-BRIEF.md`. The brief
 **Why:** TechKit is a self-contained module reached via its own tabbed shell, so the visual seam between it and legacy CC is minimal in practice. A CC-wide refresh is a design-first effort (every page reworked + re-verified) with no functional payoff, and folding it into a feature-shipping session risks a half-migrated look. Better as an intentional, scoped design pass than a rushed rider on Session D.
 
 **Alternatives:** Extend the language CC-wide now (large surface area, would have stretched Session D well past the digest work); adopt a shared design-token layer both old and new pages consume (correct long-term, but premature before the module count justifies it).
+
+---
+
+## 2026-07-15 -- Session 41 -- MarketKit B3: committed-only Dub links + /links/info for stats
+
+**Decision:** Dub short links are created **lazily in `dub_sync`, and only for `mk_links` whose action is `approved` or `done`** (not at `sprint_propose` time, and not for `proposed` actions). Click/conversion stats are pulled via `GET /links/info?linkId=` rather than the `GET /analytics` endpoint. Backfill recovers a created-but-unpersisted link by `externalId`; the daily `source='dub'` rollup sums persisted last-known-good counts.
+
+**Why:** Dub's free tier allows only **25 new links/month**. `sprint_propose` proposes 3 actions/project/week and a re-roll *deletes* proposed actions — creating a Dub link on propose would permanently burn quota on discarded proposals and orphan the link. Gating on committed actions spends the budget only on work the founder actually committed to. `/links/info` is a standard endpoint (60 req/min, works on the **free tier**), whereas `/analytics` is Pro-only — so click stats work on Dub free. M9 (every action ships with a trackable link) stays satisfied by the plain-UTM `mk_links` row created at propose; Dub upgrades it to a short link once committed.
+
+**Alternatives:** Create a Dub link inline at propose for every action (simplest, but blows the 25/mo cap in ~1.5 weeks across the dogfood set and orphans re-rolled links); use `/analytics` for stats (richer, but Pro-only so nothing works on free); store the destination in a new column instead of overwriting `mk_links.url` with the short link (avoids the reconstruct-from-Dub coupling, but adds a migration for no MVP benefit).
