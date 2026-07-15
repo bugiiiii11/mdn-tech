@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Check, Copy, SkipForward, CheckCheck } from 'lucide-react'
+import { Check, Copy, SkipForward, CheckCheck, MousePointerClick } from 'lucide-react'
 import { Pill } from './ui'
 import { JobRunner } from './JobRunner'
 import { setActionStatus } from '@/app/portal/marketkit/actions'
@@ -146,14 +146,23 @@ function ActionCard({ action, link }: { action: MkAction; link: MkLink | null })
       )}
 
       {link && (
-        <button
-          onClick={copyLink}
-          className="inline-flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors max-w-full"
-          title={link.url}
-        >
-          {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
-          <span className="truncate">{copied ? 'Copied ✓' : link.url.replace(/^https?:\/\//, '')}</span>
-        </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={copyLink}
+            className="inline-flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-gray-300 transition-colors min-w-0"
+            title={link.url}
+          >
+            {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+            <span className="truncate">{copied ? 'Copied ✓' : link.url.replace(/^https?:\/\//, '')}</span>
+          </button>
+          {link.dub_id && (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-gray-500 whitespace-nowrap">
+              <MousePointerClick className="w-3 h-3 text-cyan-400/70" />
+              {link.clicks} {link.clicks === 1 ? 'click' : 'clicks'}
+              {link.conversions > 0 && <span className="text-green-400/80">· {link.conversions} conv</span>}
+            </span>
+          )}
+        </div>
       )}
 
       {(action.status === 'proposed' || action.status === 'approved') && (

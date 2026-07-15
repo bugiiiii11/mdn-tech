@@ -9,6 +9,7 @@
 // Deploy: multipart deploy endpoint (no CLI) — see MARKETKIT-SETUP.md.
 import { serviceClient } from '../_shared/supabase.ts'
 import { sendTelegram } from '../_shared/notify.ts'
+import { createDubLink, getDubLinkByExternalId, getDubStats, dubEnabled } from '../_shared/dub.ts'
 import { callClaudeJSON, type ClaudeImage } from './claude.ts'
 import { encodeBase64 } from 'jsr:@std/encoding/base64'
 
@@ -41,6 +42,13 @@ Deno.serve(async (req) => {
   if (body.task === 'sprint_propose_all' || body.task === 'sprint_review_all') {
     const kind = body.task === 'sprint_propose_all' ? 'sprint_propose' : 'sprint_review'
     EdgeRuntime.waitUntil(runSprintBatch(supabase, kind))
+    return json({ ok: true, task: body.task, status: 'running' }, 202)
+  }
+
+  // Daily Dub sync batch (migration 016): refresh tracked-link stats for every
+  // active project. Silent (no Telegram) — clicks trickle in, not alert-worthy.
+  if (body.task === 'dub_sync_all') {
+    EdgeRuntime.waitUntil(runDubSyncBatch(supabase))
     return json({ ok: true, task: body.task, status: 'running' }, 202)
   }
 
@@ -85,6 +93,9 @@ async function runJob(supabase: Supabase, job: JobRow): Promise<unknown> {
         break
       case 'metrics_screenshot':
         result = await runMetricsScreenshot(supabase, job.project_id!, job.input ?? {})
+        break
+      case 'dub_sync':
+        result = await runDubSync(supabase, job.project_id!)
         break
       default:
         throw new Error(`unknown job kind "${job.kind}"`)
@@ -566,6 +577,126 @@ async function runMetricsScreenshot(supabase: Supabase, projectId: string, input
   if (insErr) throw new Error(`metrics insert failed: ${insErr.message}`)
 
   return { inserted: rows.length, platform: out.platform ?? null }
+}
+
+// ------------------------------------------------------------- task=dub_sync
+// B3: turn tracked-link rows (M9 UTM links from sprint_propose) into Dub short
+// links and pull their click/conversion counts. Two moves per project:
+//   1. Backfill — create a Dub short link for a link that doesn't have one yet,
+//      but ONLY if it belongs to a committed (approved/done) action. Proposed
+//      actions are skipped: re-rolls delete them and would orphan the Dub link,
+//      permanently burning the free tier's 25-links/month budget.
+//   2. Refresh — pull clicks/conversions for every Dub-linked row.
+// Then a delete-then-insert project-level daily snapshot so the sprint review +
+// Metrics tab see tracked-link performance. Fully no-op (skipped) without a key.
+
+async function runDubSync(supabase: Supabase, projectId: string) {
+  if (!dubEnabled()) return { skipped: 'DUB_API_KEY not set' }
+
+  const { data: links } = await supabase
+    .from('mk_links')
+    .select('id, dub_id, url')
+    .eq('project_id', projectId)
+  if (!links?.length) return { created: 0, refreshed: 0, clicks: 0, conversions: 0 }
+
+  // Links attached to a committed action — the only ones that earn a Dub link.
+  const { data: committed } = await supabase
+    .from('mk_actions')
+    .select('tracking_link_id')
+    .eq('project_id', projectId)
+    .in('status', ['approved', 'done'])
+    .not('tracking_link_id', 'is', null)
+  const committedLinkIds = new Set((committed ?? []).map((a) => a.tracking_link_id as string))
+
+  const now = new Date().toISOString()
+  let created = 0
+  let refreshed = 0
+
+  for (const link of links) {
+    let dubId = link.dub_id as string | null
+
+    // 1. Backfill (committed actions only). link.url still holds the plain UTM
+    // destination for rows without a dub_id — that's the Dub target.
+    if (!dubId && committedLinkIds.has(link.id)) {
+      // If create fails, it may already exist from a prior run where the create
+      // succeeded but our DB write failed — recover it by externalId rather than
+      // orphaning the link (and permanently losing a free-tier slot).
+      const dub = (await createDubLink(link.url, link.id)) ?? (await getDubLinkByExternalId(link.id))
+      if (dub) {
+        const { error } = await supabase
+          .from('mk_links')
+          .update({ dub_id: dub.id, url: dub.shortLink, updated_at: now })
+          .eq('id', link.id)
+        if (error) {
+          // The link exists in Dub; next run recovers it by externalId (above).
+          console.error('dub backfill: link created but mk_links update failed for', link.id, error.message)
+        } else {
+          dubId = dub.id
+          created++
+        }
+      }
+    }
+
+    // 2. Refresh counts for any Dub-linked row.
+    if (dubId) {
+      const stats = await getDubStats(dubId)
+      if (stats) {
+        await supabase
+          .from('mk_links')
+          .update({ clicks: stats.clicks, conversions: stats.conversions, updated_at: now })
+          .eq('id', link.id)
+        refreshed++
+      }
+    }
+  }
+
+  // Project-level daily rollup as a metric (source='dub'), idempotent per day.
+  // Sum the PERSISTED last-known-good counts across every Dub-linked row (not
+  // just this run's successful fetches) so a partial-failure re-run can't
+  // overwrite a more-complete same-day snapshot with an undercount.
+  const { data: linked } = await supabase
+    .from('mk_links')
+    .select('clicks, conversions')
+    .eq('project_id', projectId)
+    .not('dub_id', 'is', null)
+  const totalClicks = (linked ?? []).reduce((n, l) => n + (l.clicks ?? 0), 0)
+  const totalConversions = (linked ?? []).reduce((n, l) => n + (l.conversions ?? 0), 0)
+
+  if (linked?.length) {
+    const today = now.slice(0, 10)
+    await supabase
+      .from('mk_metrics_snapshots')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('source', 'dub')
+      .eq('period_end', today)
+    const { error: snapErr } = await supabase.from('mk_metrics_snapshots').insert([
+      { project_id: projectId, source: 'dub', platform: 'dub', metric: 'link_clicks', value: totalClicks, period_end: today },
+      { project_id: projectId, source: 'dub', platform: 'dub', metric: 'link_conversions', value: totalConversions, period_end: today },
+    ])
+    if (snapErr) console.error('dub snapshot insert failed:', snapErr.message)
+  }
+
+  return { created, refreshed, clicks: totalClicks, conversions: totalConversions }
+}
+
+// Daily cron batch: one dub_sync job per active project (audit trail), sequential.
+// Silent — no Telegram; click drift isn't alert-worthy.
+async function runDubSyncBatch(supabase: Supabase) {
+  if (!dubEnabled()) return
+  const { data: projects } = await supabase.from('mk_projects').select('id, name').eq('status', 'active')
+  for (const project of projects ?? []) {
+    const { data: job, error } = await supabase
+      .from('mk_jobs')
+      .insert({ project_id: project.id, kind: 'dub_sync', status: 'running', started_at: new Date().toISOString() })
+      .select('id, kind, project_id, input')
+      .single()
+    if (error || !job) {
+      console.error('dub sync batch: job insert failed for', project.name, error?.message)
+      continue
+    }
+    await runJob(supabase, job)
+  }
 }
 
 // Monday (UTC) of the current week, YYYY-MM-DD — the sprint week convention.

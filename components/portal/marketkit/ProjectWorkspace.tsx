@@ -47,6 +47,7 @@ export function ProjectWorkspace({
   proposeJob,
   reviewJob,
   metricsJob,
+  dubSyncJob,
 }: {
   project: MkProject
   assets: MkAsset[]
@@ -63,6 +64,7 @@ export function ProjectWorkspace({
   proposeJob: JobState | null
   reviewJob: JobState | null
   metricsJob: JobState | null
+  dubSyncJob: JobState | null
 }) {
   const [tab, setTab] = useState<Tab>('profile')
 
@@ -212,10 +214,17 @@ export function ProjectWorkspace({
           <div>
             <h2 className="text-sm font-semibold text-white">Metrics</h2>
             <p className="text-[11px] text-gray-500 mt-1">
-              Screenshot import + manual entry. GA4 / Search Console / tracked-link pulls land in a later session.
+              Tracked-link clicks (Dub) + screenshot import + manual entry. GA4 / Search Console pulls land in a later
+              session.
             </p>
           </div>
-          <MetricsPanel projectId={project.id} snapshots={metrics} screenshotJob={metricsJob} />
+          <MetricsPanel
+            projectId={project.id}
+            snapshots={metrics}
+            links={links}
+            screenshotJob={metricsJob}
+            dubSyncJob={dubSyncJob}
+          />
         </Card>
       )}
     </div>

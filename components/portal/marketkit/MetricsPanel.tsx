@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ImageUp, Loader2, Plus, Trash2 } from 'lucide-react'
+import { ImageUp, Loader2, Plus, Trash2, MousePointerClick } from 'lucide-react'
 import { Pill } from './ui'
+import { JobRunner } from './JobRunner'
 import { addManualMetric, deleteMetric } from '@/app/portal/marketkit/actions'
-import type { MkMetricSnapshot, JobStatus } from '@/lib/marketkit/types'
+import type { MkMetricSnapshot, MkLink, JobStatus } from '@/lib/marketkit/types'
 
 // B2 metrics ingestion: screenshot → storage → metrics_screenshot job → Claude
 // vision → normalized mk_metrics_snapshots. Plus a manual-entry form for anything
@@ -31,17 +32,120 @@ const SOURCE_TONE: Record<string, 'purple' | 'green' | 'yellow' | 'gray'> = {
 export function MetricsPanel({
   projectId,
   snapshots,
+  links,
   screenshotJob,
+  dubSyncJob,
 }: {
   projectId: string
   snapshots: MkMetricSnapshot[]
+  links: MkLink[]
   screenshotJob: JobState | null
+  dubSyncJob: JobState | null
 }) {
   return (
     <div className="space-y-6">
+      <TrackedLinks projectId={projectId} links={links} dubSyncJob={dubSyncJob} />
       <ScreenshotIngest projectId={projectId} initialJob={screenshotJob} />
       <ManualEntry projectId={projectId} />
       <SnapshotTable projectId={projectId} snapshots={snapshots} />
+    </div>
+  )
+}
+
+// --- Tracked links (B3 — Dub) ---
+// Every sprint action ships with a UTM link (M9). Once Dub is connected they
+// become short links with real click/conversion stats, refreshed daily by the
+// marketkit-dub-sync cron; "Sync now" pulls on demand.
+
+function TrackedLinks({
+  projectId,
+  links,
+  dubSyncJob,
+}: {
+  projectId: string
+  links: MkLink[]
+  dubSyncJob: JobState | null
+}) {
+  if (links.length === 0) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold text-white">Tracked links</h3>
+        <p className="text-sm text-gray-500">
+          No tracked links yet. Each weekly sprint action ships with a UTM link — once you approve actions on the Sprint
+          tab, they appear here with click stats.
+        </p>
+      </div>
+    )
+  }
+
+  const connected = links.some((l) => l.dub_id)
+  const totalClicks = links.reduce((n, l) => n + (l.clicks ?? 0), 0)
+  const totalConversions = links.reduce((n, l) => n + (l.conversions ?? 0), 0)
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="text-sm font-semibold text-white">Tracked links</h3>
+          <p className="text-[11px] text-gray-500 mt-1">
+            {connected ? (
+              <>
+                <span className="text-cyan-300/80">{totalClicks.toLocaleString('en-US')}</span> clicks
+                {totalConversions > 0 && (
+                  <>
+                    {' · '}
+                    <span className="text-green-400/80">{totalConversions.toLocaleString('en-US')}</span> conversions
+                  </>
+                )}{' '}
+                across {links.length} link{links.length === 1 ? '' : 's'} · refreshed daily
+              </>
+            ) : (
+              'Plain UTM links today. Connect Dub to turn them into short links with real click stats.'
+            )}
+          </p>
+        </div>
+        <JobRunner
+          projectId={projectId}
+          kind="dub_sync"
+          label="Sync now"
+          runningLabel="Syncing…"
+          initialJobId={dubSyncJob?.id}
+          initialStatus={dubSyncJob?.status}
+        />
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="text-[10px] uppercase tracking-wider font-mono text-gray-500 border-b border-white/[0.06]">
+              <th className="py-2 pr-3 font-normal">Link</th>
+              <th className="py-2 pr-3 font-normal">Clicks</th>
+              <th className="py-2 pr-3 font-normal">Conv.</th>
+              <th className="py-2 font-normal">Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {links.map((l) => (
+              <tr key={l.id} className="border-b border-white/[0.04] text-sm">
+                <td className="py-2 pr-3">
+                  <a
+                    href={l.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-gray-300 hover:text-cyan-300 transition-colors max-w-[22rem]"
+                    title={l.url}
+                  >
+                    {l.dub_id && <MousePointerClick className="w-3 h-3 text-cyan-400/70 shrink-0" />}
+                    <span className="truncate">{l.url.replace(/^https?:\/\//, '')}</span>
+                  </a>
+                </td>
+                <td className="py-2 pr-3 text-white">{(l.clicks ?? 0).toLocaleString('en-US')}</td>
+                <td className="py-2 pr-3 text-gray-300">{(l.conversions ?? 0).toLocaleString('en-US')}</td>
+                <td className="py-2 text-gray-500 text-xs whitespace-nowrap">{l.updated_at?.slice(0, 10) ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

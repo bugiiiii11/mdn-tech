@@ -84,6 +84,7 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
   const proposeJob = jobs.find((j) => j.kind === 'sprint_propose') ?? null
   const reviewJob = jobs.find((j) => j.kind === 'sprint_review') ?? null
   const metricsJob = jobs.find((j) => j.kind === 'metrics_screenshot') ?? null
+  const dubSyncJob = jobs.find((j) => j.kind === 'dub_sync') ?? null
 
   return (
     <PortalShell variant="marketing">
@@ -131,6 +132,7 @@ export default async function MarketKitProjectPage({ params }: { params: Promise
           proposeJob={proposeJob ? { id: proposeJob.id, status: proposeJob.status } : null}
           reviewJob={reviewJob ? { id: reviewJob.id, status: reviewJob.status } : null}
           metricsJob={metricsJob ? { id: metricsJob.id, status: metricsJob.status } : null}
+          dubSyncJob={dubSyncJob ? { id: dubSyncJob.id, status: dubSyncJob.status } : null}
         />
       </div>
     </PortalShell>

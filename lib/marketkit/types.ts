@@ -4,7 +4,7 @@
 export type ProjectCategory = 'saas' | 'consumer_app' | 'game' | 'local_business'
 export type ProjectStatus = 'active' | 'paused' | 'archived'
 export type BudgetTier = 0 | 500 | 2000
-export type JobKind = 'scan' | 'launch_kit' | 'sprint_propose' | 'sprint_review' | 'metrics_screenshot'
+export type JobKind = 'scan' | 'launch_kit' | 'sprint_propose' | 'sprint_review' | 'metrics_screenshot' | 'dub_sync'
 export type JobStatus = 'queued' | 'running' | 'done' | 'error'
 export type ActionStatus = 'proposed' | 'approved' | 'done' | 'skipped'
 export type MetricSource = 'ga4' | 'gsc' | 'dub' | 'screenshot' | 'manual'

@@ -133,3 +133,59 @@ Two pg_cron schedules (reuse Vault secret `techkit_cron_secret`): `marketkit-spr
 - **Pausing a project** (`mk_projects.status = 'paused'`) removes it from the Monday cron batches.
 - **Metrics screenshots** upload to `mk/{project_id}/metrics/…` — same bucket + RLS as scan assets, but **no `mk_project_assets` row**, so the AI scan never reads them. The jobs API pins `storage_path` to the caller's project folder before the service-role worker touches it.
 - **Still not in Session B**: GA4/GSC pulls (needs a Google Cloud service account — next session), Dub tracked-link stats (B3), content voice-editing/publishing (C1).
+
+---
+
+# Session B3 go-live runbook — Dub tracked links
+
+**Status: CODE-COMPLETE, GO-LIVE PENDING (built Session 41, 2026-07-15).** Same "code done, build-verified, turn-on deferred" pattern as MarketKit Session A (Session 36) — nothing is deployed. The code degrades cleanly with **no `DUB_API_KEY`**: link creation is skipped, actions keep their plain UTM links, `dub_sync` runs are no-ops that report `skipped`. When Martin creates a Dub account and the key is added, one worker redeploy + one migration turn the whole loop on and it self-heals historical links on the next sync.
+
+**What B3 adds**
+- `supabase/functions/_shared/dub.ts` — tiny Dub REST client (create link via `POST /links`, pull counts via `GET /links/info`), enabled only when `DUB_API_KEY` is present. **`/links/info` is deliberate:** it's a standard endpoint (60 req/min, free tier) that returns the link's live `clicks`/`conversions`, whereas `GET /analytics` is Pro-only — so click stats work on Dub's free plan.
+- `marketkit-worker`: new `dub_sync` task per project + `dub_sync_all` batch entrypoint. `sprint_propose` is **unchanged** — it still creates the plain-UTM `mk_links` row (M9). `dub_sync` does the Dub work lazily: (a) **backfill** — create a Dub short link (store `dub_id`, rewrite `url` to the short link) for a link **only if its action is `approved`/`done`**; (b) **refresh** — pull `clicks`/`conversions` for every Dub-linked row; (c) write a delete-then-insert daily project-level `mk_metrics_snapshots` rollup (`source='dub'`, metric `link_clicks`/`link_conversions`).
+- `016_marketkit_dub.sql` — `idx_mk_links_project` + the daily `marketkit-dub-sync` cron (05:30 UTC, before the Monday 06:00 sprint review so it reads fresh clicks).
+- UI: Sprint board shows `N clicks · N conv` on each Dub-linked action; Metrics tab gains a **Tracked links** table + a **Sync now** button (`dub_sync` job).
+
+> **Why committed-only (approved/done) links?** The free tier allows **only 25 new links/month**. `sprint_propose` proposes 3 actions/project/week and a re-roll *deletes* the proposed ones — creating a Dub link on propose would permanently burn quota on discarded proposals and orphan the link. Gating creation on committed actions spends the budget only on work the founder actually committed to.
+
+### B3-0. [Martin] Create the Dub account + API key
+
+1. Sign up at **dub.co** (free tier). Optionally set a workspace default domain (free tier uses `dub.sh`; a branded domain is a paid upgrade — not required).
+2. Create a workspace **API key**: Dashboard → Settings → API Keys → Create. Copy it (starts `dub_…`).
+3. Paste into `.env.local` as `DUB_API_KEY=dub_…` (for reference/record — the **Next.js app never calls Dub**; only the edge worker does, so the operative copy is the edge secret in the next step).
+
+> **Conversions:** click counts work out of the box the moment a link is created. **Conversion (lead/sale) counts require Dub's conversion tracking installed on each destination site** (Dub `@dub/analytics` script + a server-side lead/sale event) — not in MVP scope, so `conversions` will read 0 until that's set up per site. The column + UI are wired so it lights up later with no code change.
+
+### B3-1. [Martin] Add `DUB_API_KEY` to Edge Function secrets
+
+Push it to Supabase Edge Function secrets (Management API `POST /secrets`, same call used for `ANTHROPIC_API_KEY` / `CRON_SECRET`). Do **not** touch the existing secrets. Until this exists the worker skips all Dub work cleanly.
+
+### B3-2. Redeploy `marketkit-worker`
+
+Same multipart deploy endpoint (`POST /v1/projects/{ref}/functions/deploy?slug=marketkit-worker`), now with **5 file parts** — adds the new shared Dub client:
+- `marketkit-worker/index.ts`
+- `marketkit-worker/claude.ts`
+- `_shared/supabase.ts`
+- `_shared/notify.ts`
+- `_shared/dub.ts`  ← **new — a redeploy without it fails at import time**
+
+Smoke: wrong bearer → `401`; right bearer + `{"task":"dub_sync_all"}` → `202`. With the key set, within ~1 min every active project's links get Dub short links (backfill) + refreshed counts; a project-level `source='dub'` metrics snapshot appears. **Without** the key, jobs finish `done` with `{"skipped":"DUB_API_KEY not set"}` and change nothing.
+
+### B3-3. Apply migration `016_marketkit_dub.sql`
+
+Adds the index + the daily `marketkit-dub-sync` cron (05:30 UTC). Apply **after** B3-2 (the cron calls `dub_sync_all`, which only the redeployed worker understands). Verify: `select jobname, schedule, active from cron.job where jobname = 'marketkit-dub-sync';`
+
+### B3-4. Smoke test (with the key live)
+
+1. On a project with at least one **approved/done** sprint action: run **Sync now** on the Metrics tab (or `POST …/marketkit-worker {"task":"dub_sync_all"}`). That link's `mk_links` row gets a `dub_id` and its `url` becomes a `dub.sh/…` short link. (Proposed-only actions are intentionally skipped — approve one first.)
+2. Open a short link in a browser → wait a few seconds (Dub is near-real-time) → **Sync now** again → the link's `clicks` increments in the Tracked links table and on the Sprint board action.
+3. Confirm a `source='dub'` row landed in `mk_metrics_snapshots` (feeds the sprint review + Metrics table).
+4. Re-run `dub_sync_all` twice → no duplicate links created (backfill is `dub_id is null`-guarded) and the daily snapshot is replaced, not duplicated (delete-then-insert per project per day).
+
+### B3 notes
+
+- **Graceful degradation is the invariant**: no key → plain UTM links keep working exactly as Session B shipped them; the only difference is short links + real click counts once the key lands. A Dub outage makes `dub_sync` a no-op (every call best-effort, returns a sentinel) and **never touches `sprint_propose`**.
+- **`mk_links.url` semantics**: before Dub it's the UTM'd destination; after a Dub link is created it's the **short link** (the destination lives in Dub, reconstructable from the project URL + `utm`). Rows without a `dub_id` still hold the plain destination, which is what the backfill uses as the Dub target.
+- **Idempotency**: backfill only creates a Dub link when `dub_id is null` **and** the action is committed; the per-project daily `dub` snapshot is delete-then-insert on `(project_id, source='dub', period_end=today)`. Safe to run the cron or **Sync now** as often as you like.
+- **Free-tier budget (25 new links/month)**: enough for ~1–2 active projects' committed actions. Onboarding the full dogfood set to Dub short links needs **Pro (~$25/mo, 1,000 links/mo)**. Click analytics via `/links/info` work on free; the `/analytics` endpoint (unused here) is Pro-only.
+- **Conversions stay 0 in MVP**: lead/sale tracking needs Dub's `@dub/analytics` script installed on each destination site **and** a Business+ plan. The `conversions` column + UI light up automatically once that's set up — no code change.

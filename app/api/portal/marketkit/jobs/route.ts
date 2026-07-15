@@ -5,7 +5,7 @@ import { invokeMarketkitWorker } from '@/lib/marketkit/jobs'
 
 export const dynamic = 'force-dynamic'
 
-const ALLOWED_KINDS = ['scan', 'launch_kit', 'sprint_propose', 'sprint_review', 'metrics_screenshot'] as const
+const ALLOWED_KINDS = ['scan', 'launch_kit', 'sprint_propose', 'sprint_review', 'metrics_screenshot', 'dub_sync'] as const
 type Kind = (typeof ALLOWED_KINDS)[number]
 
 // POST /api/portal/marketkit/jobs { project_id, kind } → queue an AI job and
