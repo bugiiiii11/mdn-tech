@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CosmicNebula } from "./cosmic-nebula";
 
 interface ServiceCardProps {
   icon: string;
@@ -366,6 +367,8 @@ export const Skills = () => {
           </svg>
         </Link>
       </motion.div>
+
+      <CosmicNebula />
 
     </section>
   );
