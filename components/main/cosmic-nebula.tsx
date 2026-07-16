@@ -188,10 +188,19 @@ export const CosmicNebula = () => {
   );
 
   return (
+    // Bleeds 160px past the section's top/bottom (section uses overflow-x-clip,
+    // so vertical overflow shows) and fades out via mask so the glow never has
+    // a hard edge against the neighboring sections.
     <div
       ref={wrapperRef}
       aria-hidden
-      className="absolute inset-0 -z-10 pointer-events-none overflow-hidden"
+      className="absolute inset-x-0 -top-40 -bottom-40 -z-10 pointer-events-none"
+      style={{
+        WebkitMaskImage:
+          "linear-gradient(to bottom, transparent, black 200px, black calc(100% - 200px), transparent)",
+        maskImage:
+          "linear-gradient(to bottom, transparent, black 200px, black calc(100% - 200px), transparent)",
+      }}
     >
       {reducedMotion ? (
         <StaticNebula />
