@@ -452,3 +452,23 @@ Context: First execution session of `command-center/TECHKIT-BRIEF.md`. The brief
 **Why:** Dub's free tier allows only **25 new links/month**. `sprint_propose` proposes 3 actions/project/week and a re-roll *deletes* proposed actions — creating a Dub link on propose would permanently burn quota on discarded proposals and orphan the link. Gating on committed actions spends the budget only on work the founder actually committed to. `/links/info` is a standard endpoint (60 req/min, works on the **free tier**), whereas `/analytics` is Pro-only — so click stats work on Dub free. M9 (every action ships with a trackable link) stays satisfied by the plain-UTM `mk_links` row created at propose; Dub upgrades it to a short link once committed.
 
 **Alternatives:** Create a Dub link inline at propose for every action (simplest, but blows the 25/mo cap in ~1.5 weeks across the dogfood set and orphans re-rolled links); use `/analytics` for stats (richer, but Pro-only so nothing works on free); store the destination in a new column instead of overwriting `mk_links.url` with the short link (avoids the reconstruct-from-Dub coupling, but adds a migration for no MVP benefit).
+
+---
+
+## 2026-07-16 -- Session 42 -- Landing product icons: inline stroke SVGs mapped from config ids (no image assets)
+
+**Decision:** `MarketingProduct.icon` stays a plain string in `lib/marketing/products.ts`, but it's an **icon id** (`chat`/`wrench`/`shield`/`rocket`/`pulse`), not an asset path. `ProductCard` maps the id to an inline heroicons-style stroke SVG — the same pattern the blog page already uses for `CategoryIcon`.
+
+**Why:** The existing `/icons/*.svg` set (AI, FullStack, Game, Mobile, UI, Web3) was drawn for the agency services grid and has no sensible matches for SignaKit/MarketKit/TechKit — reusing them would misrepresent the products, and hand-authoring five new filled SVGs to match that style is design work the rebuild spec didn't budget. Inline stroke icons inherit `currentColor` (hover cyan transition for free), add zero image requests, and the config keeps its "all card copy in one file" property.
+
+**Alternatives:** Reuse the closest existing SVGs (misleading pairings like Mobile.svg for TechKit); commission/hand-draw five matching filled icons (deferred — can slot in later by swapping the `ProductIcon` map without touching the config shape).
+
+---
+
+## 2026-07-16 -- Session 42 -- Footer "Documentation" + GitHub links point to github.com/bugiiiii11/handoff
+
+**Decision:** The new EN multi-column footer's Resources → "Documentation" link and the Connect-area GitHub icon both point to `https://github.com/bugiiiii11/handoff` (the public ToolKit skills mirror).
+
+**Why:** The rebuild spec lists "Documentation" and "GitHub" in the footer but no docs site exists yet. The handoff repo is the only public, branded, documentation-shaped surface we own — README + per-skill SKILL.md files. Pointing anywhere else would 404 or leak internal repos.
+
+**Alternatives:** Point Documentation at `app.mdntech.org/toolkit` (duplicates the adjacent "Claude Code Skills" link); omit both until a docs site ships (loses the footer column symmetry the spec asked for); link the private product repo (not public). Revisit when a real docs surface exists.
