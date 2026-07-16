@@ -367,20 +367,6 @@ export const Skills = () => {
         </Link>
       </motion.div>
 
-      <div className="w-full h-full absolute -z-10 pointer-events-none">
-        <div className="w-full h-full opacity-30 absolute flex items-center justify-center bg-cover">
-          <video
-            className="w-full h-auto"
-            preload="none"
-            playsInline
-            loop
-            muted
-            autoPlay
-          >
-            <source src="/videos/skills-bg.webm" type="video/webm" />
-          </video>
-        </div>
-      </div>
     </section>
   );
 };

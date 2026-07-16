@@ -239,7 +239,7 @@ export const Projects = () => {
   return (
     <section
       id="projects"
-      className="flex flex-col items-center justify-center py-20 px-4 md:px-20 w-full max-w-full overflow-hidden"
+      className="relative flex flex-col items-center justify-center py-20 px-4 md:px-20 w-full max-w-full overflow-hidden"
     >
       <motion.h2
         initial="hidden"
@@ -290,6 +290,21 @@ export const Projects = () => {
         </div>
       </div>
 
+      {/* Ambient skills-bg video — moved here from skills.tsx (rebuild A3) */}
+      <div className="w-full h-full absolute -z-10 pointer-events-none">
+        <div className="w-full h-full opacity-30 absolute flex items-center justify-center bg-cover">
+          <video
+            className="w-full h-auto"
+            preload="none"
+            playsInline
+            loop
+            muted
+            autoPlay
+          >
+            <source src="/videos/skills-bg.webm" type="video/webm" />
+          </video>
+        </div>
+      </div>
     </section>
   )
 }
