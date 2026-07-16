@@ -29,8 +29,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date("2026-03-13"),
+      lastModified: new Date("2026-07-16"),
       alternates: languageAlternates,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date("2026-07-16"),
     },
     {
       url: `${baseUrl}/sk`,

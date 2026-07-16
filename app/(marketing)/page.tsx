@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { LandingHero } from "@/components/landing/hero";
+import { LegacyHashRedirect } from "@/components/landing/legacy-hash-redirect";
 import { Products } from "@/components/landing/products";
 import { FreeTools } from "@/components/landing/free-tools";
 import { CreditsStrip } from "@/components/landing/credits-strip";
@@ -26,6 +27,7 @@ export default function Home() {
   return (
     <main className="h-full w-full overflow-x-hidden">
       <div className="flex flex-col gap-10 max-w-full">
+        <LegacyHashRedirect />
         <LandingHero />
         <Products />
         <FreeTools />
