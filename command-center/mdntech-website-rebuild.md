@@ -1,604 +1,256 @@
 # M.D.N Tech — Website Rebuild Plan
 
-## Site Structure & Content
+## Site Structure, Content & Launch Roadmap
 
-> **Version:** 1.0
-> **Date:** April 12, 2026
+> **Version:** 2.0
+> **Date:** July 16, 2026 (supersedes v1.0, April 12, 2026)
 > **Design System:** Space theme (existing — no visual changes)
-> **Tech Stack:** Next.js 14 + TypeScript + Tailwind + Framer Motion + Three.js
-> **Domain:** mdntech.org
-> **App Portal:** app.mdntech.org
+> **Tech Stack:** Next.js 14 + TypeScript + Tailwind + Framer Motion + Three.js/R3F
+> **Domain:** mdntech.org · **App Portal:** app.mdntech.org
+> **Execution:** dev branch only (`feat/landing-rebuild` + Vercel preview) — prod untouched until MVP launch decision
+
+---
+
+## Changelog v1.0 → v2.0
+
+| Area | v1.0 (April) | v2.0 (July) |
+|---|---|---|
+| Product lineup | SignaKit / ChatKit / TradeKit | **ChatKit + ToolKit live (MVP)**; SignaKit / MarketKit / TechKit coming-soon. TradeKit removed (superseded by ToolKit, repo S20). |
+| Versions | one landing | **Two renderable modes from one codebase: MVP + FULL** (config + env var) |
+| Pricing | per-card stats lines ("Free up to 1,000 users") | **Credits messaging, no pricing table** — "One account. One credit balance. All products." Prices live in the portal. |
+| Subpages | /about (team) + /development (services) | **Single /about page = entire current landing (8 sections, content unmodified)** |
+| Animations | "keep everything" | skills-bg.webm moves What We Build → Our Results; **new code-based cosmic animation** for What We Build |
+| Payments | not covered | **Network International (N-Genius) universal credits wallet — deliberately the LAST task** (Phase F). Legal OK from Filip. Same model reused for Rahadu portal. |
+| Roadmap | none | Phases A–F (landing → ToolKit → ChatKit → MVP launch → post-MVP products → payments) |
+
+**Locked decisions (Martin, 2026-07-16):**
+1. MVP mode shows SignaKit, MarketKit **and TechKit** as "Coming Soon" cards (no hidden products); FULL mode = all 5 live.
+2. No pricing table on the landing — credits value-prop messaging only; the landing must survive the payments pivot without rework.
+3. About Us = one page carrying the whole current landing; no /development split.
 
 ---
 
 ## Site Map
 
 ```
-mdntech.org (Landing Page)
+mdntech.org (NEW product landing — MVP or FULL mode)
 │
-├── /blog                    ← Blog listing + individual posts
-│   └── /blog/[slug]         ← Individual blog post
+├── /about                   ← ENTIRE current landing moves here (8 sections, unmodified)
+├── /blog                    ← existing (unchanged)
+│   └── /blog/[slug]
+├── /sk                      ← Slovak agency landing (DO NOT TOUCH)
+├── /privacy, /terms         ← existing (unchanged)
+├── /preview-full            ← optional, noindex — renders FULL mode for side-by-side review (dev only)
 │
-├── /about                   ← Team + company story (footer link)
-├── /development             ← Custom development services (footer link)
-├── /privacy                 ← Privacy policy (footer link)
-├── /terms                   ← Terms of service (footer link)
-│
-└── app.mdntech.org          ← Product portal (separate app)
-    ├── /dashboard            ← User home after login
-    ├── /signakit             ← SignaKit product
-    ├── /chatkit              ← ChatKit product
-    ├── /tradekit             ← TradeKit product
-    ├── /tools                ← Free tools & Claude Code skills
-    └── /settings             ← Account settings
+└── app.mdntech.org          ← customer portal (live)
+    ├── /toolkit              ← public, no auth (ToolKit / Handoff skills)
+    ├── /chatkit              ← ChatKit (post-auth landing)
+    ├── /marketkit            ← enrolment-gated
+    └── /settings, /upgrade
 ```
 
 ---
 
-## Navigation Bar
+## MVP / FULL Mode Mechanism
 
-**Layout:** Glassmorphism nav bar (same style as current site)
+**New file `lib/marketing/products.ts`** — single source of truth for the landing product lineup:
 
-**Left:** M.D.N Tech logo + wordmark
+```ts
+export type LandingMode = 'mvp' | 'full'
+export type ProductStatus = 'live' | 'coming-soon' | 'hidden'
 
-**Center links:**
-- Products (scrolls to products section)
-- Free Tools (scrolls to free tools section)
-- Blog (links to /blog)
+export interface MarketingProduct {
+  id: 'chatkit' | 'toolkit' | 'signakit' | 'marketkit' | 'techkit'
+  name: string
+  tagline: string        // gradient one-liner
+  description: string
+  icon: string
+  href: string           // app.mdntech.org target (live products only)
+  cta: string            // "Try Free", "Browse Skills" — never payment language
+  status: Record<LandingMode, ProductStatus>
+}
 
-**Right:**
-- Sign In (ghost button → app.mdntech.org/login)
-- Open App (primary gradient button → app.mdntech.org)
+export function getLandingMode(): LandingMode {
+  return process.env.NEXT_PUBLIC_LANDING_MODE === 'full' ? 'full' : 'mvp'
+}
+```
+
+**Status matrix (locked):**
+
+| Product | MVP | FULL |
+|---|---|---|
+| ChatKit | live | live |
+| ToolKit | live | live |
+| SignaKit | coming-soon | live |
+| MarketKit | coming-soon | live |
+| TechKit | coming-soon | live |
+
+**Why build-time env var:** page stays fully static (SEO/Lighthouse); Vercel scopes `NEXT_PUBLIC_LANDING_MODE=full` to **Preview** environment only; Production has no var → defaults to `mvp` (fail-safe — FULL cannot leak to prod). When all products ship: set the var in Production + redeploy, zero code change.
+
+**Coming-soon card rendering:** same glassmorphism card, "Coming Soon" badge, muted CTA (no link / "Notify me" mailto), description present — pre-markets the roadmap.
+
+**Credits future-proofing (constraint only — no implementation now):** all card copy lives in the config, never hard-coded in JSX; no per-product payment language; a future `credits` field slots into `MarketingProduct` without touching components.
 
 ---
 
 ## LANDING PAGE — Section by Section
 
----
-
 ### Section 1: Hero
+- **Background:** black hole video (`/videos/blackhole.webm`) + global starfield — identical block copied from `components/main/hero.tsx`.
+- **Badge:** `✦ AI-Powered Developer Tools`
+- **Headline (gradient):** `Your Tools. Your Rules.`
+- **Subtitle:** `Production-ready AI, Web3, and automation tools — built by engineers, ready to deploy.`
+- **Body:** `M.D.N Tech builds self-service developer tools that solve real problems. No sales calls, no onboarding meetings. Sign up, configure, and ship.`
+- **CTAs:** primary `Open the App` → app.mdntech.org · secondary `Explore Products` → `#products`
+- Keeps `id="home"` (footer logo links to `/#home`).
 
-**Background:** Keep the black hole video + star field (identical to current)
+### Section 2: Products (`id="products"`)
+- **Header:** `What We Build` · subtitle adapts to mode — MVP: `Two tools live today. Three more on the way. One account.` / FULL: `Five tools. One account. One credit balance.`
+- **5 cards from `lib/marketing/products.ts`** (glassmorphism shell cloned from `skills.tsx` ServiceCard + HUD borders):
 
-**Welcome badge** (pill component above title):
-```
-✦ AI-Powered Developer Tools
-```
+| Product | Tagline | Description core | CTA (live) |
+|---|---|---|---|
+| **ChatKit** | Your knowledge. Your chatbot. One line of code. | Turn any knowledge base into a branded AI chatbot. Paste content, pick tone, embed with a single tag. 30 free trial messages. | `Try Free →` app.mdntech.org/chatkit |
+| **ToolKit** | Claude Code superpowers. Free forever. | Production-tested Claude Code skills and safety hooks — session continuity (/start, /wrap), guarded automation, one-line install. MIT licensed. | `Browse Skills →` app.mdntech.org/toolkit |
+| **SignaKit** | Authentication that feels invisible. | Drop-in login and crypto wallet for any app. Google, Apple, email, or Web3 wallet. One line to integrate. | coming-soon (MVP) |
+| **MarketKit** | Your AI go-to-market copilot. | Scan your product, generate a launch kit, run weekly growth sprints with tracked metrics — marketing that ships itself. | coming-soon (MVP) |
+| **TechKit** | Ops visibility on autopilot. | Uptime, deploys, provider health, AI cost tracking, and a weekly AI ops digest — your stack, monitored. | coming-soon (MVP) |
 
-**Headline** (gradient text, purple → cyan):
-```
-Your Tools.
-Your Rules.
-```
+### Section 3: Free Tools (`id="free-tools"`)
+No account required. Two cards:
+- **Claude Code Skills (ToolKit)** — live skill count imported from `lib/portal/toolkit-skills.ts` → `Browse Skills →` app.mdntech.org/toolkit
+- **Try ChatKit Free** — trial messages count imported from `lib/portal/plans.ts` (`FREE` tier) so copy never drifts → `Start Free →` app.mdntech.org/chatkit
 
-**Subtitle** (gray-300, medium weight):
+### Section 4: Credits Value-Prop Strip
+Thin glassmorphism strip (NOT a pricing table):
 ```
-Production-ready AI, Web3, and automation tools —
-built by engineers, ready to deploy.
+One account. One credit balance. All products.
+Buy credits once, spend them across every M.D.N Tech tool. No per-product subscriptions to juggle.
 ```
+No prices, no packages, no gateway mention. CTA: `Open the App →`. (Concrete packages + checkout arrive in Phase F.)
 
-**Body text** (gray-400, base size):
-```
-M.D.N Tech builds self-service developer tools that solve
-real problems. No sales calls, no onboarding meetings.
-Sign up, configure, and ship.
-```
+### Section 5: Trust Bar
+3 circular avatars (from `TEAM_MEMBERS` in `constants/index.ts`) + `Built by 3 senior engineers · 30+ years combined experience · Based in UAE` → links to `/about`. Subtext: `Full-stack AI · Blockchain · Enterprise systems`. Plus custom-dev line: `Need custom development? We take on select projects → /about`.
 
-**CTAs:**
-- **Primary:** `Open the App` → app.mdntech.org (gradient button, same style as current "Start Your Project")
-- **Secondary:** `Explore Products` → scrolls to products section (outlined button, same style as current "See How We Build")
+### Section 6: Blog Preview (`id="blog"`)
+`From the Lab` — existing 3-card grid, `View All Posts →` /blog. Server component using `getAllPosts()` from `data/blog-posts.ts`.
 
----
+### Footer (multi-column, EN branch only — `isSk` branch byte-identical)
+- **Brand:** logo · `AI-powered tools for modern builders.` · © 2026 · UAE
+- **Products:** generated from `visibleProducts(getLandingMode())`
+- **Resources:** Blog · Claude Code Skills · Documentation
+- **Company:** About Us (/about) · Contact · Privacy · Terms
+- **Connect:** contact@mdntech.org · +971 58 228 3256 · GitHub · X
+- Black hole bookend video stays.
 
-### Section 2: Products
-
-**Section header** (gradient text):
-```
-What We Build
-```
-
-**Section subtitle** (gray-300):
-```
-Three tools. Three problems solved. One account.
-```
-
-**Three product cards** — use the same glassmorphism card style as the current "What We Build" service cards, but with these differences: each card gets a small product icon, a product name, a one-line tagline, a 2-3 sentence description, and a CTA button.
-
----
-
-#### Card 1: SignaKit
-
-**Icon:** Key/lock icon (similar style to current site icons)
-
-**Product name:** SignaKit
-
-**Tagline** (gradient text, small):
-```
-Authentication that feels invisible.
-```
-
-**Description** (gray-400):
-```
-Drop-in login and crypto wallet for any app. Google, Apple,
-email, or Web3 wallet — your users pick how they sign in.
-20ms signing, fully customizable UI, one line to integrate.
-```
-
-**CTA button:**
-```
-Get Started → (links to app.mdntech.org/signakit)
-```
-
-**Small stats line** (gray-500, below description):
-```
-Free up to 1,000 users · SDK for React, Next.js, Vue
-```
+### Navbar (`components/main/navbar.tsx` + `constants/index.ts`)
+`NAV_LINKS` → Products `/#products` · Free Tools `/#free-tools` · About `/about` · Blog `/blog`. Right side: **"Open App" gradient CTA → app.mdntech.org** (this closes old backlog priority 6 — Login/Portal CTA re-enable). `SK_NAV_LINKS` untouched.
 
 ---
 
-#### Card 2: ChatKit
+## /about — Migration of the Current Landing
 
-**Icon:** Chat bubble icon
-
-**Product name:** ChatKit
-
-**Tagline** (gradient text, small):
-```
-Your knowledge. Your chatbot. One line of code.
-```
-
-**Description** (gray-400):
-```
-Turn any knowledge base into a branded AI chatbot. Paste your
-content, pick a tone and style, embed with a single HTML tag.
-No training, no pipelines, no complexity.
-```
-
-**CTA button:**
-```
-Try Free → (links to app.mdntech.org/chatkit)
-```
-
-**Small stats line** (gray-500):
-```
-20 free messages to test · Embed anywhere with one <script> tag
-```
+**New `app/(marketing)/about/page.tsx`** imports the existing `components/main/*` sections **unmodified**, current order: `Hero, AboutUs, Skills, Process, Encryption, Projects, Team, ContactUs`.
+- All hash ids (`#about-us #services #process #security #projects #team #contact-us`) work automatically; internal fragment CTAs in `components/sub/hero-content.tsx` are relative → zero changes.
+- **Metadata:** `About Us | The Team Behind the Tools`, agency-flavored description, canonical `/about`, no hreflang cluster.
+- **Root metadata:** new product-first title/description in `config/index.ts`, keep transitional agency keywords ("AI developer tools and full-stack development, UAE") + existing sk/en hreflang on root.
+- **Legacy hash redirect:** new client component `components/landing/legacy-hash-redirect.tsx` mounted on the new root — on mount, if `window.location.hash` ∈ the 7 legacy ids → `router.replace('/about' + hash)`. (URL fragments never reach the server — `next.config.js` redirects cannot do this.) New landing must NOT reuse those 7 ids (it uses `products` / `free-tools` / `blog` / `home`).
+- **Sitemap (`app/sitemap.ts`):** add `/about`, bump root `lastModified`.
+- **Sweep:** grep `data/blog-posts.ts` + blog components for `/#` links → rewrite to `/about#...`.
 
 ---
 
-#### Card 3: TradeKit
+## Animations
 
-**Icon:** Chart/candlestick icon
+### 1. Move skills-bg.webm: "What We Build" → "Our Results"
+Both sections live on `/about` after migration.
+- `components/main/projects.tsx` ("Our Results", `id="projects"`): add `relative` to the section className; insert the bg block from `skills.tsx:370-383` as last child (`div.absolute.-z-10.pointer-events-none` > `.opacity-30` > `<video preload="none" playsInline loop muted autoPlay src="/videos/skills-bg.webm">`).
+- `components/main/skills.tsx`: remove the video block.
 
-**Product name:** TradeKit
-
-**Tagline** (gradient text, small):
-```
-Crypto analytics without the noise.
-```
-
-**Description** (gray-400):
-```
-Real-time BTC analytics powered by professional-grade
-indicators. EMA trends, RSI momentum, volatility scoring —
-read from TradingView, delivered clean.
-```
-
-**CTA button:**
-```
-View Analytics → (links to app.mdntech.org/tradekit)
-```
-
-**Small stats line** (gray-500):
-```
-Free analytics dashboard · Premium signals coming soon
-```
+### 2. New cosmic animation for "What We Build": `components/main/cosmic-nebula.tsx`
+R3F **"nebula drift"** (code-based, no video asset) — R3F/drei/maath already load on every marketing page via `StarsCanvas`, so marginal JS ≈ 0:
+- One `<Canvas dpr={[1,1.5]} gl={{alpha:true}}>`: 2–3 planes with **procedurally generated** nebula textures (runtime 2D-canvas radial gradients, theme purple `#7042f8` / cyan `#22d3ee`, additive blending), slow rotation + opacity pulse via `useFrame`; plus one drei `Points` field (~400 pts, pattern cloned from `star-background.tsx`) with slight z-drift toward camera (warp feel).
+- **Lazy mount** via `useInView` on the section ref; unmount off-screen (GPU cost zero on the rest of /about).
+- **`prefers-reduced-motion`** → static CSS fallback (two blurred radial-gradient divs). Mobile < 768px → half particle count.
+- Hard cap: **one** extra WebGL context beyond global `StarsCanvas`.
 
 ---
 
-### Section 3: Free Tools & Community
+## Branch / Deploy Strategy
 
-**Section header** (gradient text):
-```
-Free Tools
-```
-
-**Section subtitle** (gray-300):
-```
-Open resources for developers and builders. No account required.
-```
-
-**Three smaller cards** — more compact than the product cards. Use the same card styling but slightly smaller.
+- **Branch `feat/landing-rebuild`** cut from `main`; all work there; rebase onto `main` after unrelated prod hotfixes (collision surfaces: `navbar.tsx`, `footer.tsx`, `constants/index.ts`).
+- **Vercel:** auto preview per push (previews send `X-Robots-Tag: noindex` — nothing leaks to crawlers). Set `NEXT_PUBLIC_LANDING_MODE=full` as Preview-scoped var to review FULL; unset to review MVP.
+- **Critical pre-launch check:** one preview build with the var **unset** → verify default renders MVP (prod will have no var).
+- **Middleware:** preview hosts (`*.vercel.app`) fall through to the marketing branch of `lib/supabase/middleware.ts`; `/about` needs no middleware change.
+- **Launch (Phase D):** single merge → `main` = atomic prod swap (landing + about + sitemap + metadata). Post-launch: GSC re-index `/` + `/about`.
 
 ---
 
-#### Card 1: Claude Code Skills
+## ROADMAP — Phases A–F
 
-**Icon:** Terminal/code icon
+| Phase | Content | Estimate |
+|---|---|---|
+| **A — Landing rebuild (dev)** | Sessions A1–A3 below | ~2–2.5 sessions |
+| **B — ToolKit pre-release** | Analyze + optimize `/start` + `/wrap` skills before release (canonical source: `MindPalace\Resources\Skills\`; sync all copies: vault canonical / vault installed / repo `.claude/skills/` / `github.com/bugiiiii11/handoff` mirror). Package the 5 security hooks (`.claude/hooks/`: block-dangerous, protect-files, block-internal-urls, audit-all, scan-injection) as a **"Hooks bundle"** on the ToolKit page — new entry type in `lib/portal/toolkit-skills.ts` + install flow section on `/portal/toolkit`. | 1 session |
+| **C — ChatKit completion** | Wire feature gates in chatbot detail UI (`hasFeature()` exists, UI unconditional — ~30 min); improvement analysis pass (onboarding, widget UX, empty states); auto-learning / weekly reports / voice stay **deferred** (Max-tier, post-MVP). | 1 session |
+| **D — MVP LAUNCH** | Merge `feat/landing-rebuild` → main (MVP mode) · GSC re-index · social announcements (ToolKit = install funnel). | 15 min + go decision |
+| **E — Post-MVP products** | SignaKit build (from AuthVault base); MarketKit finish (B1 GA4/GSC, B3 Dub go-live, B5 dogfood); TechKit productization (currently internal CC module — customer-facing scope TBD). Flip each product to `live` in `products.ts` as it ships; FULL mode in prod via env var when all 5 live. | multi-session |
+| **F — PAYMENTS (deliberately LAST)** | **Network International (N-Genius) universal credits wallet** per `MindPalace\Projects\MDN-Tech\PAYMENT_NETWORK_INTERNATIONAL.md`: HPP flow, `payment_orders` (idempotency) + append-only `end_user_credits_ledger`, webhook-driven business logic, refunds + polling fallback. Replace mock checkout (`app/api/portal/subscription/route.ts`, `.../purchase/route.ts`); reconcile `lib/portal/plans.ts` tiers with the universal credits model. Legal OK (Filip). **Architecture reusable for Rahadu portal.** Start only when product functionality is 100% ready. | dedicated block |
 
-**Title:** Claude Code Skills
+### Phase A session breakdown
 
-**Description** (gray-400):
-```
-Production-tested skill files for Claude Code. Document
-creation, frontend design, project management — refined
-through hundreds of real builds.
-```
+**A1 — Foundation + new landing (~1 full session)**
+1. Branch `feat/landing-rebuild`
+2. `lib/marketing/products.ts` (types, 5 products, mode helper)
+3. `components/landing/`: `hero.tsx`, `product-card.tsx`, `products.tsx`, `free-tools.tsx`, `credits-strip.tsx`, `trust-bar.tsx`, `blog-preview.tsx`
+4. Rewrite `app/(marketing)/page.tsx` (composition + metadata, hreflang kept)
+5. `constants/index.ts` NAV_LINKS + navbar "Open App" CTA
+6. QA: `/sk`, `/blog`, both modes via local env var
 
-**CTA:** `Browse Skills →`
+**A2 — About migration + chrome + SEO plumbing (~half session)**
+1. `app/(marketing)/about/page.tsx` + metadata
+2. `components/landing/legacy-hash-redirect.tsx` + mount on root
+3. Footer multi-column (EN branch only)
+4. `app/sitemap.ts` + `config/index.ts` + `app/layout.tsx` JSON-LD text
+5. Blog `/#` link sweep
+6. QA: full nav, unset-var build = MVP default, `/sk` re-check
 
----
-
-#### Card 2: ChatKit Playground
-
-**Icon:** Play/test icon
-
-**Title:** Try ChatKit Free
-
-**Description** (gray-400):
-```
-Test a live AI chatbot with your own content. Paste any text,
-get a working chatbot in seconds. 20 messages free, no signup.
-```
-
-**CTA:** `Launch Playground →`
-
----
-
-#### Card 3: Crypto Dashboard
-
-**Icon:** Chart icon
-
-**Title:** Live BTC Analytics
-
-**Description** (gray-400):
-```
-Free real-time crypto analytics dashboard. Trend direction,
-momentum signals, and volatility readings — updated
-continuously from TradingView data.
-```
-
-**CTA:** `View Dashboard →`
+**A3 — Animations + perf (~half session)**
+1. skills-bg.webm move into `projects.tsx` + removal from `skills.tsx`
+2. `components/main/cosmic-nebula.tsx` (R3F nebula, lazy mount, reduced-motion fallback, mobile cap)
+3. Lighthouse pass on preview (`/` + `/about`), mobile check
+4. Final FULL/MVP preview review → branch ready for launch merge
 
 ---
 
-### Section 4: Trust Bar
+## Risks & Gotchas
 
-**Layout:** A single compact horizontal strip. Not full cards — just a clean, minimal credibility line.
-
-**Design:** Semi-transparent background strip with a subtle border, same glassmorphism treatment but much thinner than a card section.
-
-**Content — centered, single line with team avatars:**
-
-```
-[avatar] [avatar] [avatar]   Built by 3 senior engineers · 30+ years combined experience · Based in UAE
-```
-
-The three team member photos appear as small circular avatars (40-48px), followed by the text. The entire line links to /about.
-
-**Below the line, a subtle secondary text:**
-```
-Full-stack AI · Blockchain · Enterprise systems
-```
+| Risk | Mitigation |
+|---|---|
+| `/sk` breakage (shared navbar/footer branch on `pathname.startsWith("/sk")`) | Touch EN branches only; `SK_NAV_LINKS` + `components/sk/` untouched; explicit `/sk` QA every session |
+| SEO ranking loss (root content changes 100%) | Content moved wholesale unedited to `/about`; transitional keywords in root metadata; internal links (nav/trust-bar/footer) to `/about`; GSC re-crawl; accept temporary dip |
+| Dead `/#...` inbound anchors | `LegacyHashRedirect` (only mechanism that works for fragments); new landing avoids the 7 legacy ids |
+| Footer `logoHref="/#home"` dead-scroll | New hero keeps `id="home"` |
+| FULL mode leaking to prod | Default = `mvp` when var unset; verified via unset-var preview build |
+| /about perf (8 sections + 3 videos + nebula) | Nebula lazy-mounts; `preload="none"` on moved video; /about isn't the SEO-critical entry |
+| Copy drift vs portal reality | Free-tools/product cards import counts from `lib/portal/plans.ts` + `lib/portal/toolkit-skills.ts` |
+| Payments pivot invalidating landing | No pricing table anywhere; credits strip is copy-only |
 
 ---
 
-### Section 5: Blog Preview
+## QA / Verification Checklist (per session + pre-launch)
 
-**Section header** (gradient text):
-```
-From the Lab
-```
-
-**Section subtitle** (gray-300):
-```
-Engineering insights from the M.D.N Tech team.
-```
-
-**Layout:** Same 3-card blog grid as current site. Keep the exact same card design — category tags, featured badges, dates, read times, article previews, tag pills, and "Read article →" links.
-
-**CTA below cards:**
-```
-View All Posts → (links to /blog)
-```
+- [ ] `/sk` renders identically (nav, footer, content)
+- [ ] `/blog` + blog post pages fine; no `/#` legacy links remain
+- [ ] MVP mode = default with NO env var set (prod simulation)
+- [ ] FULL mode renders all 5 products live (preview var)
+- [ ] Legacy anchors `/#services` etc. land on `/about#...`
+- [ ] `id="home"` present on new hero (footer logo link)
+- [ ] Lighthouse ≥ current baseline on `/`; `/about` acceptable
+- [ ] Reduced-motion → static nebula fallback; mobile particle cap works
+- [ ] Sitemap includes `/about`; root metadata has hreflang cluster
+- [ ] No portal (`app/portal/*`, `app/command-center/*`) files touched in Phase A
 
 ---
 
-### Section 6: Footer
-
-**Layout:** Clean multi-column footer with the space theme background.
-
-**Column 1 — Brand:**
-```
-M.D.N Tech logo
-AI-powered tools for modern builders.
-
-© 2026 M.D.N Tech. All rights reserved.
-United Arab Emirates
-```
-
-**Column 2 — Products:**
-```
-Products
-─────────
-SignaKit
-ChatKit
-TradeKit
-```
-
-**Column 3 — Resources:**
-```
-Resources
-─────────
-Blog
-Claude Code Skills
-Documentation
-```
-
-**Column 4 — Company:**
-```
-Company
-─────────
-About Us
-Custom Development
-Contact
-Privacy Policy
-Terms of Service
-```
-
-**Column 5 — Connect:**
-```
-Connect
-─────────
-contact@mdntech.org
-+971 58 228 3256
-GitHub
-X (Twitter)
-```
-
----
-
-## SUBPAGES
-
----
-
-### /about — About Us
-
-**Page title** (gradient text):
-```
-The Team Behind the Tools
-```
-
-**Intro paragraph** (gray-300):
-```
-M.D.N Tech is a UAE-based technology company founded by three
-senior engineers who spent their careers building enterprise
-systems, launching Web3 platforms, and shipping production
-applications. We came together with a shared conviction:
-the best developer tools are built by people who use them.
-```
-
-**Team cards** — Use the same team card design from the current site (circular avatar, name, role, bio), but arranged in a full-page layout with more breathing room.
-
-#### Martin Jeřábek — CEO
-
-```
-Martin is the first point of contact for every project at
-M.D.N Tech — responsible for client relationships, product
-strategy, and delivery. With 10 years in the blockchain and
-Web3 space, he brings strategic depth to every product we ship.
-```
-
-#### Martin Hromek — CTO
-
-```
-20 years building enterprise systems. 5 years as a blockchain
-CTO. Martin has designed and delivered mission-critical
-infrastructure at a scale most engineers never encounter —
-and brings that depth to every product at M.D.N Tech.
-His focus: architecture that holds, infrastructure that scales.
-```
-
-#### Eric Lukas — Full-Stack AI Engineer
-
-```
-Eric is a full-stack AI engineer with 8 years of experience
-shipping production web apps, mobile applications, and AI
-integrations. With over 30 projects delivered across industries
-— from healthcare and fintech to enterprise tooling — he leads
-frontend, mobile, and AI integration across all M.D.N Tech products.
-```
-
-**Bottom section:**
-
-```
-Want to work with us directly?
-We also take on select custom development projects.
-```
-**CTA:** `Learn About Custom Development →` (links to /development)
-
----
-
-### /development — Custom Development
-
-**Page title** (gradient text):
-```
-Custom Development
-```
-
-**Intro paragraph** (gray-300):
-```
-Beyond our products, M.D.N Tech takes on select custom
-development projects. We build production-ready systems
-end-to-end — from architecture to deployment — with the
-same engineering standards behind our own tools.
-```
-
-**What We Build section** — Reuse the 6 service cards from the current site, same design:
-
-1. **Full-Stack Development** — Scalable web platforms, APIs, and microservices built on React, Next.js, TypeScript, Supabase, Railway, and Vercel.
-
-2. **Mobile Development** — Native-quality iOS and Android apps with React Native and Flutter. Telegram Mini Apps and Web3 wallet support.
-
-3. **Game Development** — Unity and Unreal Engine 5 — from game mechanics and economy design to Web3 integrations and multiplayer systems.
-
-4. **UI/UX & Product Design** — UX research, design systems, and pixel-perfect implementation from Figma designs. Full design-to-code pipeline.
-
-5. **Blockchain & Web3** — Smart contracts, DeFi systems, TGE launches, liquidity creation, and wallet integrations across the full Web3 stack.
-
-6. **AI & Intelligent Systems** — From intelligent automation to AI-native product features. RAG pipelines, AI agents, MCP servers, and production-grade AI engineering.
-
-**How We Work section** — Condensed version of current process:
-
-```
-Every project follows a five-phase process: Discovery, Architecture,
-Development, Testing, and Deployment. No phase begins until the
-previous one is approved — by our engineers and by you.
-```
-
-**Contact section:**
-
-```
-Let's Build Something That Matters
-
-Whether you're launching your first product or scaling an existing
-one, we'd like to hear what you're building.
-```
-
-**Contact info:**
-```
-contact@mdntech.org
-+971 58 228 3256
-United Arab Emirates
-```
-
-**Contact form** — Same design as current site (Name, Email, Message, Send button).
-
----
-
-### /blog — Blog Listing
-
-**Page title** (gradient text):
-```
-From the Lab
-```
-
-**Subtitle** (gray-300):
-```
-Engineering insights on AI, Web3, and building production systems.
-```
-
-**Layout:** Grid of blog cards (same design as current blog preview section). Filterable by category tags. Paginated.
-
-**Categories:**
-- AI & Engineering
-- Blockchain & Web3
-- Product Updates
-- Tutorials
-
----
-
-## APP PORTAL — app.mdntech.org
-
-This is a separate Next.js application sharing the same design tokens (colors, fonts, gradients) but with a functional dashboard layout rather than a marketing page layout.
-
-### Auth Flow
-
-- Sign up / Sign in via Supabase Auth (email + magic link, Google OAuth)
-- Single account across all products
-- After auth → redirect to /dashboard
-
-### Dashboard Home
-
-**Layout:** Sidebar navigation + main content area
-
-**Sidebar:**
-```
-M.D.N Tech (logo)
-─────────────────
-Dashboard
-─────────────────
-SignaKit
-ChatKit
-TradeKit
-─────────────────
-Free Tools
-  Claude Code Skills
-  Crypto Analytics
-─────────────────
-Settings
-```
-
-**Main area:**
-
-Welcome message:
-```
-Welcome back, [name].
-```
-
-Product tiles (3 cards):
-- SignaKit — status badge (Active/Inactive), quick stats, "Open →"
-- ChatKit — status badge, message count, "Open →"
-- TradeKit — status badge, latest signal, "Open →"
-
-Quick links:
-- Documentation
-- Blog
-- Contact Support
-
----
-
-## DESIGN NOTES
-
-### What stays the same:
-- All colors, gradients, and CSS variables from the design documentation
-- Star field 3D background (Three.js particle system)
-- Black hole video in hero
-- Glassmorphism card styling with purple borders
-- Framer Motion scroll-triggered animations
-- Gradient text treatment for section headers
-- Welcome badge pill component
-- HUD border effects on cards
-- 3D tilt hover effects
-- Video backgrounds for section transitions
-
-### What changes:
-- Navigation links (Products, Free Tools, Blog instead of About Us, Services, Process, Team, Contact Us)
-- Navigation CTAs (Sign In + Open App instead of Start Project)
-- Hero copy and CTAs (platform-focused instead of consultancy-focused)
-- Section content (products + free tools instead of services + process + stack + results)
-- Footer structure (multi-column with product/resource/company links)
-- Team and consultancy content moved to footer subpages
-- Blog stays but gets its own route instead of being a homepage section only
-
-### What gets removed from the landing page:
-- "Why Our Approach Changes Everything" (4 value prop cards) → cut
-- "How We Build" (5-phase process accordion) → moved to /development
-- "Our Engineering Stack" (9 tech category cards) → moved to /development
-- "Our Results" (6 stats cards) → cut (credibility handled by trust bar)
-- "Meet Our Team" (3 full team cards) → moved to /about, replaced by trust bar
-- "Start Your Project" (contact section) → moved to /development
-
-### Estimated sections on landing page:
-Current site: ~9 scroll sections
-New site: ~5 scroll sections (Hero → Products → Free Tools → Trust Bar → Blog Preview → Footer)
-
----
-
-## CONTENT SUMMARY — Quick Reference
-
-| Section | Purpose | Primary CTA |
-|---------|---------|-------------|
-| Hero | Position MDN Tech as a product platform | Open the App |
-| Products | Showcase SignaKit, ChatKit, TradeKit | Get Started / Try Free |
-| Free Tools | Drive organic traffic, build community | Browse / Launch / View |
-| Trust Bar | Credibility without heavy content | Links to /about |
-| Blog Preview | SEO + thought leadership | View All Posts |
-| Footer | Navigation + contact | Links to subpages |
-| /about | Team story + bios | Link to /development |
-| /development | Custom dev services + contact | Send Message |
-| /blog | All blog content | Read articles |
-
----
-
-*Document prepared April 12, 2026 — M.D.N Tech Website Rebuild v1.0*
+*Document v2.0 — July 16, 2026. Supersedes v1.0 (April 12, 2026). Decisions locked with Martin 2026-07-16; execution starts Phase A session A1.*
