@@ -22,6 +22,7 @@ import {
   type Keyword,
 } from '@/lib/portal/analytics'
 import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
+import { SuggestionList, type KBSuggestion } from '@/components/portal/learning/SuggestionList'
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -50,13 +51,23 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
     (chatbot.widget_config as any)?.fallback_message ||
     "I'm not sure about that. Please contact us directly for more details."
 
-  const [{ data: entries }, analytics, trend, keywords, usage] = await Promise.all([
+  const [{ data: entries }, analytics, trend, keywords, usage, suggestionsResult] = await Promise.all([
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
     getChatbotAnalytics(supabase, id, fallbackMsg),
     canViewAnalytics ? getMessagesTrend(supabase, id, 7) : Promise.resolve<MessageTrendPoint[]>([]),
     canViewAnalytics ? getTopKeywords(supabase, id, 8) : Promise.resolve<Keyword[]>([]),
     checkChatbotUsage(id),
+    learningUnlocked
+      ? supabase
+          .from('chatbot_kb_suggestions')
+          .select('id, title, content, category, rationale, created_at')
+          .eq('chatbot_id', id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as KBSuggestion[] }),
   ])
+
+  const suggestions = (suggestionsResult.data ?? []) as KBSuggestion[]
 
   const grouped = (entries ?? []).reduce((acc: Record<string, any[]>, e) => {
     acc[e.category] = [...(acc[e.category] ?? []), e]
@@ -244,8 +255,9 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
             <div>
               <p className="text-sm font-medium text-gray-200">More add-ons for this chatbot</p>
               <p className="text-xs text-gray-500 mt-1">
-                Auto-learning and weekly reports are one-time unlocks — coming soon. Conversation viewer and
-                analytics are available now.
+                {learningUnlocked
+                  ? 'Weekly reports are coming soon as a one-time unlock.'
+                  : 'Auto-learning is available now as a one-time unlock; weekly reports are coming soon.'}
               </p>
               <Link
                 href={`/portal/chatkit/${chatbot.id}/upgrade`}
@@ -297,6 +309,24 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
             <KBEntryList chatbotId={chatbot.id} grouped={grouped} basePath="/portal/chatkit" />
           )}
         </section>
+
+        {/* Auto-learning: pending KB suggestions drafted from rated replies */}
+        {learningUnlocked && (
+          <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-md bg-amber-500/10 text-amber-300 flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-medium text-white">Auto-learning</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {suggestions.length} pending suggestion{suggestions.length === 1 ? '' : 's'} · weekly pass runs Sunday
+                </p>
+              </div>
+            </div>
+            <SuggestionList chatbotId={chatbot.id} suggestions={suggestions} />
+          </section>
+        )}
       </div>
     </PortalShell>
   )

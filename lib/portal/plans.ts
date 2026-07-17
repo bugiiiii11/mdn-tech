@@ -78,7 +78,7 @@ export const STARTER_PACK_PRICE_CENTS = CREDIT_PACKS[0].priceCents
 export type FeatureId =
   | 'conversations'   // conversation viewer + markdown export (built)
   | 'analytics'       // message trends + top-keyword extraction (built)
-  | 'learning'        // auto-improve from rated conversations (NOT built yet)
+  | 'learning'        // auto-improve from rated conversations (built S48)
   | 'reports'         // weekly performance report (NOT built yet)
   | 'extra_chatbot'   // +1 chatbot slot (account-scoped)
 
@@ -131,7 +131,7 @@ export const FEATURES: FeatureDef[] = [
     tagline: 'The chatbot improves itself from rated conversations.',
     priceCents: 4900,
     priceLabel: '$49',
-    status: 'coming-soon',
+    status: 'available',
     scope: 'chatbot',
     benefits: [
       'Learns from thumbs-up / thumbs-down',
