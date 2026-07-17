@@ -32,7 +32,7 @@
 
 ## What Was Done (Session 44) -- Handoff v3: /handoff skill + real-usage auto-wrap
 
-- Consolidated start/wrap/save/doc-update into one `/handoff` skill (`.claude/skills/handoff/SKILL.md`, subcommands start|wrap|save|docs); old 4 skill folders deleted. Canonical copy in MatrixApp (commit `b45d1a5` there); public repo + ToolKit page updated same session.
+- Consolidated start/wrap/save/doc-update into one `/handoff` skill (`.claude/skills/handoff/SKILL.md`, subcommands start|wrap|save|docs); old 4 skill folders deleted. Canonical copy in MatrixApp (commit `b45d1a5` there). Public repo + ToolKit page NOT yet updated -- session paused mid-task (see next steps).
 - Auto-wrap hooks v3: old MatrixApp hook estimated tokens from transcript BYTE SIZE (250KB ~ "15% of 200k") -- wrong on 1M models. v3 reads real usage from transcript JSONL (`input_tokens + cache_creation + cache_read` of last main-thread assistant msg). Soft 15% -> wrap nudge; hard 17% -> wrap NOW; env-tunable (`AUTOWRAP_WINDOW` default 1M). Rationale: >20% of 1M = 200k tokens = 2x long-context pricing tier.
 - New `context-warn.sh` (UserPromptSubmit) warns before new work starts; `test-hooks.sh` = 17 smoke tests, green in both repos. Hooks wired in `settings.local.json` (Stop + UserPromptSubmit); **restart Claude Code to activate**.
 - Created root `CLAUDE.md` (session protocol + AUTO-WRAP rule + Mind Palace path for wrap extras).
@@ -40,7 +40,7 @@
 
 ## What To Do Next
 
-**Next session: Phase B (ToolKit pre-release -- skills polish + hooks bundle; handoff v3 done this session is the core of it).** Also confirm the `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually).
+**Next session: finish handoff v3 rollout (Phase B core), per approved plan `C:\Users\cryptomeda\.claude\plans\let-s-go-to-toolkit-delightful-goblet.md`:** (a) public repo `bugiiiii11/handoff` -- a local clone ALREADY EXISTS at `myprojects/handoff` (non-empty, uninspected -- inspect before overwriting); restructure to `skills/handoff/SKILL.md` + `hooks/`, remove old 4 skill folders, keep `build-kb`, rewrite README, push; (b) ToolKit page v3 updates (InstallBlock copy/verify/uninstall + optional hooks step, SkillCards -> /handoff subcommands + single sourceUrl, toolkit-skills.ts single handoff entry, "four skills" phrasing sweep) + `tsc`/lint/build green. Also: restart Claude Code to activate the new hooks; confirm `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually); commit `67e66da` is unpushed.
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
