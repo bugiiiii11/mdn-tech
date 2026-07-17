@@ -11,12 +11,11 @@ import { ThirdPartySkills } from '@/components/portal/handoff/ThirdPartySkills'
 import { FAQ } from '@/components/portal/handoff/FAQ'
 import { toolkitSkills } from '@/lib/portal/toolkit-skills'
 
-// MVP: hide M.D.N Tech-only auxiliary skills (CMO, Test, Security Review, plus
-// the legacy /start and /wrap entries which the new Handoff card replaces).
+// MVP: hide M.D.N Tech-only auxiliary skills (CMO, Test, Security Review) plus
+// the handoff entry itself -- this page already features it above the gallery.
 // They stay in the data file; only the visible gallery is filtered.
 const HIDDEN_SKILL_IDS = new Set([
-  'wrap',
-  'start',
+  'handoff',
   'cmo',
   'test',
   'security-review',
@@ -25,7 +24,7 @@ const HIDDEN_SKILL_IDS = new Set([
 export const metadata: Metadata = {
   title: 'Handoff — Claude Code workflow skills | M.D.N Tech',
   description:
-    'Four free skills that make Claude Code remember your project across sessions. One-line install, MIT licensed.',
+    'One free skill — /handoff — that makes Claude Code remember your project across sessions. One-line install, MIT licensed.',
 }
 
 export default function ToolKitPage() {

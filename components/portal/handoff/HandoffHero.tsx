@@ -24,11 +24,11 @@ export function HandoffHero() {
 
         <Reveal delay={0.2}>
           <p className="mt-6 text-base md:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Four free skills —{' '}
-            <code className="font-mono text-purple-300 text-sm">/start</code>,{' '}
-            <code className="font-mono text-purple-300 text-sm">/wrap</code>,{' '}
-            <code className="font-mono text-purple-300 text-sm">/save</code>,{' '}
-            <code className="font-mono text-purple-300 text-sm">/doc-update</code>
+            One free skill, four commands —{' '}
+            <code className="font-mono text-purple-300 text-sm">/handoff start</code>,{' '}
+            <code className="font-mono text-purple-300 text-sm">wrap</code>,{' '}
+            <code className="font-mono text-purple-300 text-sm">save</code>,{' '}
+            <code className="font-mono text-purple-300 text-sm">docs</code>
             {' '}— that turn every Claude Code session into the next one&apos;s starting point.
             No vendor lock-in. Install in one line.
           </p>

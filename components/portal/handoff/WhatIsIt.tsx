@@ -5,21 +5,21 @@ const items = [
   {
     icon: Clock,
     problem: '"I waste 10 minutes re-explaining context every session."',
-    skill: '/start',
+    skill: '/handoff start',
     solution:
       'Reads your handoff file and briefs Claude on the repo state in one command.',
   },
   {
     icon: FileText,
     problem: '"I lose track of what I tried and why."',
-    skill: '/wrap',
+    skill: '/handoff wrap',
     solution:
-      'Writes a session summary, commits, and pushes — every time. Documentation stays current automatically.',
+      'Writes a session summary, rotates old history to an archive, and commits locally — every time. Documentation stays current automatically.',
   },
   {
     icon: RefreshCw,
     problem: '"Docs go stale the moment I move on."',
-    skill: '/doc-update',
+    skill: '/handoff docs',
     solution:
       'Refreshes handoff and project docs from the latest session work — no manual writing required.',
   },

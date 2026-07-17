@@ -22,26 +22,16 @@ export interface ToolkitMCP {
 
 export const toolkitSkills: ToolkitSkill[] = [
   {
-    id: 'wrap',
-    name: 'Wrap',
+    id: 'handoff',
+    name: 'Handoff',
     category: 'session-management',
-    description: 'Session completion & context saving. Commits changes, updates docs, syncs memory.',
+    description: 'Full session lifecycle in one skill: /handoff start, wrap, save, docs. Optional auto-wrap hooks included.',
     author: 'M.D.N Tech',
     verified: true,
+    installationUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/handoff/SKILL.md',
     details:
-      'Essential for long-running projects. Automatically saves session state, commits pending changes, and updates project documentation. Critical for token efficiency — stores context across sessions instead of losing work.',
-    useCases: ['End of session cleanup', 'Automatic doc updates', 'Context persistence'],
-  },
-  {
-    id: 'start',
-    name: 'Start',
-    category: 'session-management',
-    description: 'Session initialization & project state review. Reads handoff, checks git status, flags stale items.',
-    author: 'M.D.N Tech',
-    verified: true,
-    details:
-      'Kick off any session with full context. Loads project history, displays recent commits, syncs with Mind Palace wiki. Never lose track of where you left off.',
-    useCases: ['Session initialization', 'Quick project status', 'Context loading'],
+      'One skill, four subcommands. start reads a hard-capped handoff.md and briefs the session; wrap updates docs, rotates history to an archive, and commits locally (never pushes unasked); save is a fire-exit snapshot before context runs out; docs refreshes documentation without a commit. Ships with optional hooks that measure real context usage from the transcript and nudge a wrap at 15% / 17% of the window.',
+    useCases: ['Session briefing', 'Context persistence', 'Auto-wrap before the long-context price cliff'],
   },
   {
     id: 'cmo',
