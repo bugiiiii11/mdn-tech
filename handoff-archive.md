@@ -1,5 +1,13 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 46) -- Phase B verified complete + ChatKit tier gates prio 2 (rotated 2026-07-17)
+
+- Public repo `bugiiiii11/handoff` restructure was ALREADY done and pushed (`63af63f`) -- the S45 "last Phase B item" note was stale. Verified: all 5 GitHub URLs the ToolKit page links to exist on origin/main; repo publicly readable (anonymous fetch of SKILL.md). Task 13 (README build-kb bonus section) also already shipped. Phase B COMPLETE.
+- Prio 2 wired (first Phase C item): chatbot detail page resolves per-bot tier (`resolveChatbotTier`, customers + credits_purchased); Conversations/Export buttons gated Starter+ (locked chip -> per-bot upgrade page); trend/keyword charts gated Pro+ (locked card -> /portal/upgrade; analytics queries skipped when locked); new Max teaser card for reports/learning (gate wired now; the features themselves are prio 3/4).
+- Enforcement is server-side, not just cosmetic: conversations page redirects free tier back to detail; export API now 403s for free tier (was owner-checked but tier-open -- any free user could export via direct URL).
+- tsc + lint + build green. Not browser-verified (portal requires Supabase login); gates reuse the existing `hasFeature`/tier resolvers from `lib/portal/plans.ts`.
+- NOTE: the tier gates above were REPLACED in S47 by the credits-only pivot (per-bot `feature_unlocks`); this entry records the intermediate state.
+
 ## What Was Done (Session 45) -- ToolKit gallery refresh: 9 market-top skills + real MCP section (rotated 2026-07-17)
 
 - Market research (multi-source, mid-2026): gallery refreshed with 9 adds -- Superpowers, Code Simplifier, Vercel Web Interface Guidelines, Webapp Testing, Firecrawl, Caveman, Trail of Bits, MCP Builder, Office Document Skills. Every URL fetch-verified before shipping.

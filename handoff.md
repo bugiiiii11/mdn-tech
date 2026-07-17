@@ -4,16 +4,14 @@
 
 ## Current State
 
-- **Phase:** Landing rebuild Phase B COMPLETE (S46). Phase C (ChatKit) in progress: S47 pivoted ChatKit to credits-only + one-time feature unlocks (subscriptions removed, migration 017 applied, build green). Branch `feat/landing-rebuild`, preview-only.
-- **Session count:** 47
-- **Products:** TechKit LIVE (all 7 crons), MarketKit A+B-core LIVE (B3 Dub code-complete, go-live pending), ChatKit live w/ credits-only mock checkout + per-bot feature unlocks, ToolKit public page live (+ Blender skill/MCP added S47).
+- **Phase:** Phase C (ChatKit completion) in progress: S48 shipped prio 7 (4 branded auth flow UIs) + prio 3 (Auto-learning, migration 018 applied, $49 unlock now available). Next build: prio 4 weekly reports. Branch `feat/landing-rebuild`, preview-only, 3 unpushed commits.
+- **Session count:** 48
+- **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout + per-bot unlocks (conversations/analytics/learning available; reports coming-soon), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-43 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 37 | 2026-07-11 | MarketKit go-live -- backend LIVE, E2E smoke, storage-RLS fix |
-| 38 | 2026-07-11 | MarketKit Session B -- weekly sprint loop + screenshot metrics (LIVE) |
 | 39 | 2026-07-12 | TechKit Session C -- costs (LIVE) |
 | 40 | 2026-07-12 | TechKit Session D -- AI weekly digest (LIVE); TechKit complete |
 | 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
@@ -23,13 +21,7 @@
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 | 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
 | 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
-
-## What Was Done (Session 46) -- Phase B verified complete + ChatKit tier gates (prio 2)
-
-- Public repo `bugiiiii11/handoff` restructure was ALREADY done and pushed (`63af63f`) -- the S45 "last Phase B item" note was stale. Verified: all 5 GitHub URLs the ToolKit page links to exist on origin/main; repo publicly readable (anonymous fetch of SKILL.md). Task 13 (README build-kb bonus section) also already shipped. Phase B COMPLETE.
-- Prio 2 wired (first Phase C item): chatbot detail page resolves per-bot tier (`resolveChatbotTier`, customers + credits_purchased); Conversations/Export buttons gated Starter+ (locked chip -> per-bot upgrade page); trend/keyword charts gated Pro+ (locked card -> /portal/upgrade; analytics queries skipped when locked); new Max teaser card for reports/learning (gate wired now; the features themselves are prio 3/4).
-- Enforcement is server-side, not just cosmetic: conversations page redirects free tier back to detail; export API now 403s for free tier (was owner-checked but tier-open -- any free user could export via direct URL).
-- tsc + lint + build green. Not browser-verified (portal requires Supabase login); gates reuse the existing `hasFeature`/tier resolvers from `lib/portal/plans.ts`.
+| 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
 
 ## What Was Done (Session 47) -- ChatKit credits-only pivot + PlanKit removal + Blender skills
 
@@ -42,9 +34,18 @@
 - GOTCHA (env parse): `.env.local` key is `SUPABASE_MANAGEMENT_API_KEY` (sbp_ PAT, 44 chars); split on first `=` not regex (regex dropped a char). Ref `ijfgwzacaabzeknlpaff`.
 - Verified: tsc clean + `npm run build` green (all routes). NOT browser-verified. ASSUMPTIONS pending user confirm: 1 credit/msg rate, pack + feature prices, feature unlocks priced in USD (not credits).
 
+## What Was Done (Session 48) -- Prio 7 auth flow UIs + prio 3 Auto-learning shipped
+
+- Prio 7 DONE (`4fc4dc5`): dual-mode `/reset-password` page (logged-out = request link via `resetPasswordForEmail`; recovery session via `/auth/callback` = set new password); LoginForm gained magic-link mode (`signInWithOtp`, `shouldCreateUser:false` -- no role-less junk accounts) + Forgot-password link; Settings "Security" card = email change (dual confirm) + password change with automatic reauth-OTP fallback (`reauthenticate()` -> `nonce`); `/reset-password` added to middleware public paths (both guards).
+- Prio 7 REMAINING (manual, dashboard): paste the 4 templates from `supabase/email-templates/` into Supabase Auth settings + allowlist `/auth/callback` redirect URLs. Email round-trips NOT tested (needs real inbox).
+- Prio 3 DONE (`b4f831e`): Auto-learning shipped + `learning` flipped to `available` ($49 unlock card now purchasable). Loop: owner rates replies (existing `message_feedback` from 005) -> Sunday 06:00 UTC cron `chatkit-learning` (or per-bot "Run now") -> `/api/portal/chatkit/learning/run` scans 7-day negative ratings (dedup via `source_message_ids`), Claude Haiku drafts <=5 KB suggestions -> detail-page Auto-learning section: accept (creates real KB entry) / dismiss.
+- Migration 018 APPLIED via Management API + verified (table + RLS policy + cron job all live).
+- OPS PENDING: set `CHATKIT_CRON_SECRET` on Vercel + same value as vault secret `chatkit_cron_secret` (`select vault.create_secret('<val>','chatkit_cron_secret')`); until then the Sunday cron 401s harmlessly. Manual "Run now" works without it (session auth).
+- Verified: tsc/lint/build green after each feature; login + reset-password smoke-tested HTTP 200 on localhost with new UI present. Learning loop NOT E2E-tested (needs login + rated messages).
+
 ## What To Do Next
 
-**Next session:** (1) User to confirm S47 credits-only ASSUMPTIONS (credit rate 1/msg, pack + feature prices, feature-unlock currency = USD) -- all constants in `lib/portal/plans.ts`, cheap to tweak. (2) Browser-test the credits flow locally (`/portal/chatkit/<id>/upgrade`). (3) prio 7 -- wire the 4 branded auth flow UIs (`supabase/email-templates/`). Unpushed commits accumulating (push only on explicit request).
+**Next session:** (1) User to confirm S47 credits-only ASSUMPTIONS (credit rate 1/msg, pack + feature prices, feature-unlock currency = USD) -- all constants in `lib/portal/plans.ts`, cheap to tweak. (2) Browser-test credits flow + auto-learning loop locally. (3) prio 4 -- weekly reports build (pairs with learning cron pattern). Ops: CHATKIT_CRON_SECRET (Vercel + vault) and Supabase email-template dashboard steps. 3 unpushed commits (push only on explicit request).
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
@@ -52,10 +53,10 @@
 | 0b | MarketKit B3 Dub go-live + Session B remainder | B3 built (S41, `5085da4`), NOT deployed -- **[Martin]** create Dub account, paste `dub_...` key into `.env.local`; then edge secret + worker redeploy (5 parts) + migration 016 (`MARKETKIT-SETUP.md` B3 runbook). **[Martin]** approve/skip sprint proposals + upload first metrics screenshots. Then B1 GA4/GSC (**[Martin]** Google Cloud service account) + B5 dogfood onboarding (ChatKit, Melicharek, Good Hair by Zane). |
 | 1 | Real payments (was Stripe; superseded by N-Genius plan F) | Mock checkout live: credit packs (`/api/portal/chatbot/[id]/purchase` {packId}), per-bot feature unlocks (`/api/portal/chatbot/[id]/feature`), account add-on (`/api/portal/feature`). Wire real payment on each. Gated on merchant account. |
 | 2b-NEW | ChatKit credits-only pivot (S47) | DONE + build-green + migration 017 applied. Model: 1 credit=1 msg, packs 500/$29 · 2.5k/$99 · 10k/$299; features = one-time per-bot USD unlocks (`FEATURES` in `lib/portal/plans.ts`); subscriptions removed (S46 tier gates replaced). ASSUMPTIONS to confirm: credit rate (1/msg), pack + feature prices, feature-unlock currency = USD not credits. Old subscription_* columns left dormant (migration 017 note) -- drop later. |
-| 3 | ChatKit Auto-Learning (one-time $49 unlock) | Feature card + gate wired S47 as `FEATURES` id `learning`, status `coming-soon`. TO SHIP: build rated-conversation loop + Sunday cron + auto-KB-suggestions, then flip status to `available`. ~5h. |
-| 4 | ChatKit Weekly reports (one-time $39 unlock) | Feature card + gate wired S47 as `FEATURES` id `reports`, status `coming-soon`. TO SHIP: build digest generation + email, then flip status to `available`. Pairs with prio 3. |
+| 3-DONE | ChatKit Auto-learning | SHIPPED S48 (`b4f831e`), status `available`. Remaining: ops secrets (see next-session line) + E2E test with rated messages. Follow TechKit digest pattern (015) for reports. |
+| 4 | ChatKit Weekly reports (one-time $39 unlock) | NEXT BUILD. `FEATURES` id `reports`, status `coming-soon`. Build digest generation + email, flip to `available`. Reuse learning cron pattern (018) + TechKit digest aggregation (015). |
 | 5 | ChatKit Voice (Cartesia Sonic-3) | Deferred. ~6h. |
-| 7 | Wire UI for 4 branded auth flows | Templates live in `supabase/email-templates/`; need login "Forgot password?" + `/portal/reset-password`, magic-link option, email-change form, reauth surface. NEXT UP. |
+| 7-DONE | Branded auth flow UIs | SHIPPED S48 (`4fc4dc5`). Remaining manual: paste 4 templates into Supabase dashboard + allowlist redirect URLs, then delete this row. |
 | 9 | SignaKit portal section | Hidden for MVP; reactivate post-ChatKit-monetization. |
 | 10 | Portal auth Supabase -> SignaKit | Pending, low. |
 | 11 | Mind Palace <-> CC sync bridge | Pending, low. |
@@ -73,8 +74,8 @@
 | `lib/portal/plans.ts` | ChatKit billing source of truth (S47): CREDIT_PACKS, FEATURES catalog, `isFeatureUnlocked`, `chatbotLimit`, `CREDITS_PER_MESSAGE`. All prices/rates here. |
 | `app/portal/chatkit/[id]/` + `[id]/upgrade` | Chatbot detail (per-bot unlock gates S47) + upgrade hub (credit packs + feature unlock cards) |
 | `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | Mock checkout: credit packs, per-bot unlocks, account add-on. Real payment = prio 1. |
-| `supabase/email-templates/` | 4 branded auth email templates (prio 7 wires their UIs) |
-| `supabase/migrations/` | 001-017; 017 (credits/addons) APPLIED S47; 016 (Dub) pending apply |
-| `supabase/functions/{techkit-poller,marketkit-worker}/` | Edge functions: poller v12, worker v2 (+dub_sync pending deploy) |
+| `supabase/email-templates/` | 4 branded auth email templates -- UIs wired S48; dashboard paste pending |
+| `supabase/migrations/` | 001-018; 017+018 APPLIED; 016 (Dub) pending apply |
+| `app/api/portal/chatkit/learning/run/` + `supabase/migrations/018_chatkit_learning.sql` | Auto-learning loop + cron pattern -- template for prio 4 reports |
 | `command-center/{TECHKIT,MARKETKIT}-SETUP.md` / `-BRIEF.md` | Go-live runbooks (Management API patterns) + product briefs/backlogs |
 | `decisions.md` | Locked architectural decisions |
