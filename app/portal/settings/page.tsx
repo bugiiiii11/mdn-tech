@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { UserCircle2, Mail, Building2, CalendarClock, Coins, ArrowUpRight, Bot } from 'lucide-react'
 import { FREE_TRIAL_MESSAGES, chatbotLimit } from '@/lib/portal/plans'
+import { AccountSecurity } from '@/components/portal/settings/AccountSecurity'
 
 export default async function PortalSettingsPage() {
   const supabase = await createClient()
@@ -100,13 +101,16 @@ export default async function PortalSettingsPage() {
           </div>
 
           <p className="text-xs text-gray-500">
-            Need to update profile details? Contact{' '}
+            Need to update your name or company? Contact{' '}
             <a href="mailto:contact@mdntech.org" className="text-purple-400 hover:text-purple-300 transition-colors">
               contact@mdntech.org
             </a>
             .
           </p>
         </section>
+
+        {/* Security card: change email + password */}
+        <AccountSecurity currentEmail={user.email ?? ''} />
       </div>
     </PortalShell>
   )
