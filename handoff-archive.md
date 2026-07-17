@@ -1,5 +1,17 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 44) -- Handoff v3: /handoff skill + real-usage auto-wrap (rotated 2026-07-17)
+
+- Consolidated start/wrap/save/doc-update into one `/handoff` skill (`.claude/skills/handoff/SKILL.md`, subcommands start|wrap|save|docs); old 4 skill folders deleted. Canonical copy in MatrixApp (commit `b45d1a5` there). Public repo + ToolKit page NOT yet updated -- session paused mid-task (see next steps).
+- Auto-wrap hooks v3: old MatrixApp hook estimated tokens from transcript BYTE SIZE (250KB ~ "15% of 200k") -- wrong on 1M models. v3 reads real usage from transcript JSONL (`input_tokens + cache_creation + cache_read` of last main-thread assistant msg). Soft 15% -> wrap nudge; hard 17% -> wrap NOW; env-tunable (`AUTOWRAP_WINDOW` default 1M). Rationale: >20% of 1M = 200k tokens = 2x long-context pricing tier.
+- New `context-warn.sh` (UserPromptSubmit) warns before new work starts; `test-hooks.sh` = 17 smoke tests, green in both repos. Hooks wired in `settings.local.json` (Stop + UserPromptSubmit); **restart Claude Code to activate**.
+- Created root `CLAUDE.md` (session protocol + AUTO-WRAP rule + Mind Palace path for wrap extras).
+- handoff.md capped ~150 lines; full 967-line history moved verbatim to `handoff-archive.md` (never read on start).
+
+| # | Date | Title |
+|---|------|-------|
+| 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
+
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
 ---

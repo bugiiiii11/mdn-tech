@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** Landing rebuild Phase A COMPLETE + verified; ToolKit page v3 + gallery/MCP refresh done (branch `feat/landing-rebuild`, preview-only). Next: finish Phase B (public handoff repo).
-- **Session count:** 45
-- **Products:** TechKit LIVE (all 7 crons), MarketKit A+B-core LIVE (B3 Dub code-complete, go-live pending), ChatKit live w/ mock checkout, ToolKit public page live.
+- **Phase:** Landing rebuild Phase B COMPLETE (ToolKit page v3 + public repo live and verified, S46). Phase C (ChatKit completion) started: tier feature gates wired S46. Branch `feat/landing-rebuild`, preview-only.
+- **Session count:** 46
+- **Products:** TechKit LIVE (all 7 crons), MarketKit A+B-core LIVE (B3 Dub code-complete, go-live pending), ChatKit live w/ mock checkout + tier gates, ToolKit public page live.
 
-## Session Summary (last 10 -- full table + sessions 1-41 detail in handoff-archive.md)
+## Session Summary (last 10 -- full table + sessions 1-43 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 36 | 2026-07-11 | MarketKit Session A -- portal module code-complete |
 | 37 | 2026-07-11 | MarketKit go-live -- backend LIVE, E2E smoke, storage-RLS fix |
 | 38 | 2026-07-11 | MarketKit Session B -- weekly sprint loop + screenshot metrics (LIVE) |
 | 39 | 2026-07-12 | TechKit Session C -- costs (LIVE) |
@@ -22,14 +21,7 @@
 | 43 | 2026-07-17 | Nebula seam fix + A3.3/A3.4 -- Phase A verification complete |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
-
-## What Was Done (Session 44) -- Handoff v3: /handoff skill + real-usage auto-wrap
-
-- Consolidated start/wrap/save/doc-update into one `/handoff` skill (`.claude/skills/handoff/SKILL.md`, subcommands start|wrap|save|docs); old 4 skill folders deleted. Canonical copy in MatrixApp (commit `b45d1a5` there). Public repo + ToolKit page NOT yet updated -- session paused mid-task (see next steps).
-- Auto-wrap hooks v3: old MatrixApp hook estimated tokens from transcript BYTE SIZE (250KB ~ "15% of 200k") -- wrong on 1M models. v3 reads real usage from transcript JSONL (`input_tokens + cache_creation + cache_read` of last main-thread assistant msg). Soft 15% -> wrap nudge; hard 17% -> wrap NOW; env-tunable (`AUTOWRAP_WINDOW` default 1M). Rationale: >20% of 1M = 200k tokens = 2x long-context pricing tier.
-- New `context-warn.sh` (UserPromptSubmit) warns before new work starts; `test-hooks.sh` = 17 smoke tests, green in both repos. Hooks wired in `settings.local.json` (Stop + UserPromptSubmit); **restart Claude Code to activate**.
-- Created root `CLAUDE.md` (session protocol + AUTO-WRAP rule + Mind Palace path for wrap extras).
-- handoff.md capped ~150 lines; full 967-line history moved verbatim to `handoff-archive.md` (never read on start).
+| 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
 
 ## What Was Done (Session 45) -- ToolKit gallery refresh: 9 market-top skills + real MCP section
 
@@ -39,28 +31,32 @@
 - Dead `toolkitMCPs` data surfaced: new `ThirdPartyMCPs` component (purple accent, collapsible `claude mcp add` setup commands); TradingView/Unity placeholders replaced with GitHub / Context7 / Playwright / Sentry (+ kept Supabase).
 - New `SkillCategory` values: development, security, documents, productivity (+ labels in ThirdPartySkills).
 - Competitive note: Matt Pocock ships a popular "Handoff" skill (~156K installs, same session-transfer concept). Deliberately NOT added to the gallery; positioning call open.
-- Corrected stale S44 note: ToolKit page v3 WAS already shipped in `5e309a3` -- the only Phase-B leftover is the public repo restructure.
 - Verified: tsc/lint/build green; rendered page checked on localhost (all skills, MCPs, labels present; 0 errors).
+
+## What Was Done (Session 46) -- Phase B verified complete + ChatKit tier gates (prio 2)
+
+- Public repo `bugiiiii11/handoff` restructure was ALREADY done and pushed (`63af63f`) -- the S45 "last Phase B item" note was stale. Verified: all 5 GitHub URLs the ToolKit page links to exist on origin/main; repo publicly readable (anonymous fetch of SKILL.md). Task 13 (README build-kb bonus section) also already shipped. Phase B COMPLETE.
+- Prio 2 wired (first Phase C item): chatbot detail page resolves per-bot tier (`resolveChatbotTier`, customers + credits_purchased); Conversations/Export buttons gated Starter+ (locked chip -> per-bot upgrade page); trend/keyword charts gated Pro+ (locked card -> /portal/upgrade; analytics queries skipped when locked); new Max teaser card for reports/learning (gate wired now; the features themselves are prio 3/4).
+- Enforcement is server-side, not just cosmetic: conversations page redirects free tier back to detail; export API now 403s for free tier (was owner-checked but tier-open -- any free user could export via direct URL).
+- tsc + lint + build green. Not browser-verified (portal requires Supabase login); gates reuse the existing `hasFeature`/tier resolvers from `lib/portal/plans.ts`.
 
 ## What To Do Next
 
-**Next session: public repo `bugiiiii11/handoff` restructure (last Phase B core item), per approved plan `C:\Users\cryptomeda\.claude\plans\let-s-go-to-toolkit-delightful-goblet.md`:** a local clone ALREADY EXISTS at `myprojects/handoff` (non-empty, uninspected -- inspect before overwriting); restructure to `skills/handoff/SKILL.md` + `hooks/`, remove old 4 skill folders, keep `build-kb`, rewrite README, push. Also: restart Claude Code to activate the v3 hooks (if not yet done); confirm `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually); 3 commits unpushed + Session-45 wrap commit.
+**Next session (Phase C continuation): prio 7 -- wire the 4 branded auth flow UIs** (email templates already live in `supabase/email-templates/`): login "Forgot password?" + `/portal/reset-password`, magic-link option, email-change form, reauth surface. Also: restart Claude Code to activate the v3 hooks (if not yet done); confirm `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually); 6 commits unpushed (push only on explicit request).
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0-NEW | Landing rebuild v2 + MVP launch roadmap | Phase A COMPLETE + verified (S43). Spec: `command-center/mdntech-website-rebuild.md` v2.0. Roadmap: A done -> B ToolKit pre-release -> C ChatKit completion (incl. prio 2) -> D MVP LAUNCH -> E post-MVP products -> F payments LAST (N-Genius, vault `PAYMENT_NETWORK_INTERNATIONAL.md`). MVP/FULL modes via `NEXT_PUBLIC_LANDING_MODE` (unset = MVP). |
+| 0-NEW | Landing rebuild v2 + MVP launch roadmap | Phases A+B COMPLETE (S43/S46). Spec: `command-center/mdntech-website-rebuild.md` v2.0. Roadmap: C ChatKit completion (prio 2 done S46; next prio 7) -> D MVP LAUNCH -> E post-MVP products -> F payments LAST (N-Genius, vault `PAYMENT_NETWORK_INTERNATIONAL.md`). MVP/FULL modes via `NEXT_PUBLIC_LANDING_MODE` (unset = MVP). |
 | 0b | MarketKit B3 Dub go-live + Session B remainder | B3 built (S41, `5085da4`), NOT deployed -- **[Martin]** create Dub account, paste `dub_...` key into `.env.local`; then edge secret + worker redeploy (5 parts) + migration 016 (`MARKETKIT-SETUP.md` B3 runbook). **[Martin]** approve/skip sprint proposals + upload first metrics screenshots. Then B1 GA4/GSC (**[Martin]** Google Cloud service account) + B5 dogfood onboarding (ChatKit, Melicharek, Good Hair by Zane). |
 | 1 | Real payments (was Stripe; superseded by N-Genius plan F) | Mock checkout live (`/api/portal/subscription`, `/api/portal/chatbot/[id]/purchase`); schema has stripe_* columns. Gated on merchant account. |
-| 2 | Wire feature gates in chatbot detail UI | `hasFeature(tier, ...)` exists in `lib/portal/plans.ts`; gate conversations (Starter+), trends/keywords (Pro+), reports/learning (Max). ~30 min; part of Phase C. |
-| 3 | ChatKit Auto-Learning MVP (Max tier) | Deferred. Flag UI + Sunday cron + weekly report. ~5h. |
-| 4 | Weekly auto-reports (Max tier) | Deferred. Pairs with prio 3; ship before serious Max marketing. |
+| 3 | ChatKit Auto-Learning MVP (Max tier) | Deferred. Flag UI + Sunday cron + weekly report. ~5h. Gate already wired (S46). |
+| 4 | Weekly auto-reports (Max tier) | Deferred. Pairs with prio 3; ship before serious Max marketing. Gate already wired (S46). |
 | 5 | ChatKit Voice (Cartesia Sonic-3) | Deferred. ~6h. |
-| 7 | Wire UI for 4 branded auth flows | Templates live in `supabase/email-templates/`; need login "Forgot password?" + `/portal/reset-password`, magic-link option, email-change form, reauth surface. |
+| 7 | Wire UI for 4 branded auth flows | Templates live in `supabase/email-templates/`; need login "Forgot password?" + `/portal/reset-password`, magic-link option, email-change form, reauth surface. NEXT UP. |
 | 9 | SignaKit portal section | Hidden for MVP; reactivate post-ChatKit-monetization. |
 | 10 | Portal auth Supabase -> SignaKit | Pending, low. |
 | 11 | Mind Palace <-> CC sync bridge | Pending, low. |
 | 12 | SEO action plan | Follow `seo-audit/ACTION-PLAN.md`. |
-| 13 | Handoff README "bonus skill" section | Low. `build-kb` framing in public repo README. |
 | 14 | Delete `.next-stale-1777403470/` | Local only; safety hook blocks `rm -rf .*` -- delete via Explorer or `rmdir /s /q`. |
 | 15 | SK Part B + domain 301 | Client-repo footer links (melicharek, RoyalStroje, zane) -> mdntech.org/sk at next touch of each repo; `mdntech.sk` purchase + 301; `.com -> .org` 301 at registrar. |
 
@@ -69,23 +65,12 @@
 | File | Purpose |
 |------|---------|
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
-| `CLAUDE.md` | Session protocol + auto-wrap rule + conventions |
-| `.claude/skills/handoff/SKILL.md` | Handoff v3 skill (start/wrap/save/docs) |
-| `.claude/hooks/{auto-wrap,context-warn,test-hooks}.sh` | Real-usage session hooks + tests |
+| `CLAUDE.md` + `.claude/skills/handoff/` + `.claude/hooks/` | Session protocol, /handoff v3 skill, real-usage auto-wrap hooks (restart to activate) |
 | `command-center/mdntech-website-rebuild.md` | Landing rebuild spec v2.0 (Phases A-F) |
-| `lib/marketing/products.ts` | 5-product registry + MVP/FULL mode helper (`NEXT_PUBLIC_LANDING_MODE`) |
-| `app/(marketing)/page.tsx` + `components/landing/*` | Product-first landing (S42) |
-| `app/(marketing)/about/page.tsx` | Old landing moved here; LegacyHashRedirect on root |
-| `components/main/cosmic-nebula.tsx` | R3F nebula (lazy in-view, reduced-motion fallback, seam-fix mask) |
-| `app/(marketing)/sk/page.tsx` + `constants/sk.ts` | SK agency landing + all SK copy |
-| `app/portal/toolkit/page.tsx` + `components/portal/handoff/*` | Public ToolKit page (InstallBlock, SkillCards, FAQ...) |
-| `lib/portal/toolkit-skills.ts` | ToolKit gallery data (skills + MCPs) |
-| `lib/portal/plans.ts` | ChatKit pricing source of truth + tier/feature resolvers |
-| `lib/chat/usage.ts` | Cap-check + atomic usage increment |
-| `middleware.ts` | Session guard + host branching (admin/app/marketing) |
+| `lib/portal/plans.ts` | ChatKit pricing source of truth + `hasFeature`/tier resolvers |
+| `app/portal/chatkit/[id]/` | Chatbot detail + conversations + upgrade (tier gates wired S46) |
+| `supabase/email-templates/` | 4 branded auth email templates (prio 7 wires their UIs) |
 | `supabase/migrations/` | 001-016 applied thru 015; 016 (Dub) pending apply |
 | `supabase/functions/{techkit-poller,marketkit-worker}/` | Edge functions: poller v12, worker v2 (+dub_sync pending deploy) |
-| `command-center/{TECHKIT,MARKETKIT}-SETUP.md` | Go-live runbooks (Management API patterns) |
-| `command-center/{TECHKIT,MARKETKIT}-BRIEF.md` | Product briefs + session backlogs |
+| `command-center/{TECHKIT,MARKETKIT}-SETUP.md` / `-BRIEF.md` | Go-live runbooks (Management API patterns) + product briefs/backlogs |
 | `decisions.md` | Locked architectural decisions |
-| `.mcp.json` | Supabase MCP (project `ijfgwzacaabzeknlpaff`) |
