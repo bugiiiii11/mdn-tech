@@ -4,20 +4,18 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { UserCircle2, Mail, Building2, CalendarClock, Sparkles, ArrowUpRight } from 'lucide-react'
-import { PLANS, resolveAccountTier } from '@/lib/portal/plans'
-import { CancelSubscriptionButton } from '@/components/portal/upgrade/PlanActionButton'
+import { UserCircle2, Mail, Building2, CalendarClock, Coins, ArrowUpRight, Bot } from 'lucide-react'
+import { FREE_TRIAL_MESSAGES, chatbotLimit } from '@/lib/portal/plans'
 
 export default async function PortalSettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
-  const { data: customer } = await supabase
-    .from('customers')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle()
+  const [{ data: customer }, { count: chatbotCount }] = await Promise.all([
+    supabase.from('customers').select('*').eq('id', user.id).maybeSingle(),
+    supabase.from('chatbots').select('id', { count: 'exact', head: true }).eq('owner_id', user.id),
+  ])
 
   if (!customer) redirect('/portal/login')
 
@@ -25,16 +23,9 @@ export default async function PortalSettingsPage() {
     ? new Date(customer.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : '—'
 
-  const tier = resolveAccountTier({
-    subscription_plan: customer?.subscription_plan ?? null,
-    subscription_status: customer?.subscription_status ?? null,
-    current_period_end: customer?.current_period_end ?? null,
-  })
-  const plan = PLANS[tier]
-  const isCanceled = customer?.subscription_status === 'canceled'
-  const periodEnd = customer?.current_period_end
-    ? new Date(customer.current_period_end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    : null
+  const extraSlots = customer?.extra_chatbot_slots ?? 0
+  const limit = chatbotLimit(extraSlots)
+  const botsUsed = chatbotCount ?? 0
 
   const fields: { label: string; value: string; icon: typeof Mail }[] = [
     { label: 'Email', value: user.email ?? '—', icon: Mail },
@@ -54,63 +45,41 @@ export default async function PortalSettingsPage() {
             Account
           </h1>
           <p className="text-gray-400 text-sm mt-2 max-w-xl">
-            The basics on file for your M.D.N Tech account, plus your current ChatKit plan.
+            The basics on file for your M.D.N Tech account, plus your ChatKit billing.
           </p>
         </header>
 
-        {/* Subscription card */}
+        {/* Billing card */}
         <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-300" />
-              <h2 className="text-sm font-medium text-white">ChatKit plan</h2>
+              <Coins className="w-4 h-4 text-purple-300" />
+              <h2 className="text-sm font-medium text-white">ChatKit billing</h2>
             </div>
-            <span
-              className={`text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-full border ${
-                isCanceled
-                  ? 'text-amber-200 bg-amber-500/10 border-amber-400/30'
-                  : tier === 'free'
-                    ? 'text-gray-300 bg-gray-500/10 border-white/10'
-                    : 'text-green-300 bg-green-500/10 border-green-400/30'
-              }`}
-            >
-              {isCanceled ? 'Cancelling' : tier === 'free' ? 'Free' : 'Active'}
+            <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-full border text-green-300 bg-green-500/10 border-green-400/30">
+              Pay as you go
             </span>
           </div>
 
           <div className="bg-[#0a0a14] border border-white/5 rounded-lg p-4 space-y-2">
-            <div className="flex items-baseline justify-between gap-3">
-              <div>
-                <span className="text-lg font-semibold text-white">{plan.name}</span>
-                <span className="text-gray-500 text-xs ml-2">{plan.priceLabel}</span>
-              </div>
-              {plan.monthlyMessages !== null && customer?.subscription_status === 'active' && (
-                <span className="text-xs text-gray-400">
-                  {(customer.period_messages_used ?? 0).toLocaleString()} /{' '}
-                  {plan.monthlyMessages.toLocaleString()} this cycle
-                </span>
-              )}
+            <p className="text-sm text-gray-200">
+              Credits fuel messages — {FREE_TRIAL_MESSAGES} free per chatbot, then 1 credit per message. No
+              subscription. Premium features are one-time unlocks per chatbot.
+            </p>
+            <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
+              <Bot className="w-3.5 h-3.5 text-gray-500" />
+              Using {botsUsed} of {limit} chatbot{limit === 1 ? '' : 's'}
+              {extraSlots > 0 && <span className="text-gray-500">· {extraSlots} extra purchased</span>}
             </div>
-            <p className="text-xs text-gray-500">{plan.description}</p>
-            {periodEnd && (customer?.subscription_status === 'active' || isCanceled) && (
-              <p className="text-xs text-gray-500">
-                {isCanceled ? 'Access ends' : 'Renews'} {periodEnd}.
-              </p>
-            )}
           </div>
 
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <Link
-              href="/portal/upgrade"
-              className="inline-flex items-center gap-1.5 text-xs text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              {tier === 'free' ? 'See plans' : 'Manage plan'}
-              <ArrowUpRight className="w-3 h-3" />
-            </Link>
-            {customer?.subscription_status === 'active' && !isCanceled && (
-              <CancelSubscriptionButton />
-            )}
-          </div>
+          <Link
+            href="/portal/upgrade"
+            className="inline-flex items-center gap-1.5 text-xs text-purple-300 hover:text-purple-200 transition-colors"
+          >
+            Manage credits &amp; add-ons
+            <ArrowUpRight className="w-3 h-3" />
+          </Link>
         </section>
 
         {/* Profile card */}

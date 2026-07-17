@@ -6,7 +6,6 @@ import { HandoffHero } from '@/components/portal/handoff/HandoffHero'
 import { WhatIsIt } from '@/components/portal/handoff/WhatIsIt'
 import { InstallBlock } from '@/components/portal/handoff/InstallBlock'
 import { SkillCards } from '@/components/portal/handoff/SkillCards'
-import { PlanKitTeaser } from '@/components/portal/handoff/PlanKitTeaser'
 import { ThirdPartySkills } from '@/components/portal/handoff/ThirdPartySkills'
 import { ThirdPartyMCPs } from '@/components/portal/handoff/ThirdPartyMCPs'
 import { FAQ } from '@/components/portal/handoff/FAQ'
@@ -39,7 +38,6 @@ export default function ToolKitPage() {
       <WhatIsIt />
       <InstallBlock />
       <SkillCards />
-      <PlanKitTeaser />
       <ThirdPartySkills skills={visibleThirdPartySkills} />
       <ThirdPartyMCPs mcps={toolkitMCPs} />
       <FAQ />

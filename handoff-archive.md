@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 45) -- ToolKit gallery refresh: 9 market-top skills + real MCP section (rotated 2026-07-17)
+
+- Market research (multi-source, mid-2026): gallery refreshed with 9 adds -- Superpowers, Code Simplifier, Vercel Web Interface Guidelines, Webapp Testing, Firecrawl, Caveman, Trail of Bits, MCP Builder, Office Document Skills. Every URL fetch-verified before shipping.
+- Gotcha: Karpathy repo MOVED -- `forrestchang/...` -> `multica-ai/andrej-karpathy-skills` (193k stars); old gallery link fixed.
+- Gotcha: `code-simplifier` is NOT in `anthropics/skills` -- it lives at `anthropics/claude-plugins-official/plugins/code-simplifier`. Vercel's skill folder is `web-design-guidelines` (not "web-interface-guidelines") under `vercel-labs/agent-skills`.
+- Dead `toolkitMCPs` data surfaced: new `ThirdPartyMCPs` component (purple accent, collapsible `claude mcp add` setup commands); TradingView/Unity placeholders replaced with GitHub / Context7 / Playwright / Sentry (+ kept Supabase).
+- New `SkillCategory` values: development, security, documents, productivity (+ labels in ThirdPartySkills).
+- Competitive note: Matt Pocock ships a popular "Handoff" skill (~156K installs, same session-transfer concept). Deliberately NOT added to the gallery; positioning call open.
+- Verified: tsc/lint/build green; rendered page checked on localhost (all skills, MCPs, labels present; 0 errors).
+
 ## What Was Done (Session 44) -- Handoff v3: /handoff skill + real-usage auto-wrap (rotated 2026-07-17)
 
 - Consolidated start/wrap/save/doc-update into one `/handoff` skill (`.claude/skills/handoff/SKILL.md`, subcommands start|wrap|save|docs); old 4 skill folders deleted. Canonical copy in MatrixApp (commit `b45d1a5` there). Public repo + ToolKit page NOT yet updated -- session paused mid-task (see next steps).

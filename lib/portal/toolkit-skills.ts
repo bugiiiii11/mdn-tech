@@ -10,6 +10,7 @@ export type SkillCategory =
   | 'security'
   | 'documents'
   | 'productivity'
+  | 'creative'
 
 export interface ToolkitSkill {
   id: string
@@ -269,6 +270,18 @@ export const toolkitSkills: ToolkitSkill[] = [
       'Anthropic\'s official document toolkit -- four skills (pdf, docx, xlsx, pptx) that let Claude generate and manipulate real office files: fill PDFs, format Word docs, build spreadsheets with formulas, and assemble slide decks, all with layout preserved.',
     useCases: ['PDF generation', 'Spreadsheet automation', 'Report building'],
   },
+  {
+    id: 'blender-skills',
+    name: 'Blender Skills',
+    category: 'creative',
+    description: 'Expert Claude Code skills for Blender 5.x -- geometry nodes, shaders, rigging, physics, and bpy scripting.',
+    author: 'ra100',
+    verified: true,
+    installationUrl: 'https://github.com/ra100/blender-claude-plugin',
+    details:
+      'Eight focused skills covering the whole Blender Python surface -- geometry nodes, shader and compositing nodes, the bpy scripting API, animation and rigging, modifiers, physics, and Cycles/EEVEE rendering -- each with node catalogs, API references, and working recipes. Targets Blender 5.0/5.1 and Python 3.13. Integrates with the Blender MCP when present, otherwise emits runnable bpy scripts.',
+    useCases: ['Procedural geometry nodes', 'Shader & material recipes', 'Python (bpy) automation'],
+  },
 ]
 
 export const toolkitMCPs: ToolkitMCP[] = [
@@ -311,5 +324,13 @@ export const toolkitMCPs: ToolkitMCP[] = [
     connectedServices: ['PostgreSQL', 'Authentication', 'Real-time Subscriptions'],
     setupGuide:
       'claude mcp add --transport http supabase "https://mcp.supabase.com/mcp?project_ref=YOUR_PROJECT_REF"',
+  },
+  {
+    id: 'blender-mcp',
+    name: 'Blender MCP',
+    description: 'Drive Blender from natural language -- Claude builds, edits, and renders 3D scenes in your viewport.',
+    connectedServices: ['Scene & Object Control', 'Materials & Rendering', 'PolyHaven / Sketchfab Assets'],
+    setupGuide:
+      'claude mcp add blender -- uvx blender-mcp',
   },
 ]

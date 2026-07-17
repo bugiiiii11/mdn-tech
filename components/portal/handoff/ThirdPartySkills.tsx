@@ -14,6 +14,7 @@ const categoryLabels: Record<string, string> = {
   security: 'Security',
   documents: 'Documents',
   productivity: 'Productivity',
+  creative: '3D & Creative',
 }
 
 interface Props {
