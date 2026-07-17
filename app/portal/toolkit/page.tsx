@@ -8,8 +8,9 @@ import { InstallBlock } from '@/components/portal/handoff/InstallBlock'
 import { SkillCards } from '@/components/portal/handoff/SkillCards'
 import { PlanKitTeaser } from '@/components/portal/handoff/PlanKitTeaser'
 import { ThirdPartySkills } from '@/components/portal/handoff/ThirdPartySkills'
+import { ThirdPartyMCPs } from '@/components/portal/handoff/ThirdPartyMCPs'
 import { FAQ } from '@/components/portal/handoff/FAQ'
-import { toolkitSkills } from '@/lib/portal/toolkit-skills'
+import { toolkitSkills, toolkitMCPs } from '@/lib/portal/toolkit-skills'
 
 // MVP: hide M.D.N Tech-only auxiliary skills (CMO, Test, Security Review) plus
 // the handoff entry itself -- this page already features it above the gallery.
@@ -40,6 +41,7 @@ export default function ToolKitPage() {
       <SkillCards />
       <PlanKitTeaser />
       <ThirdPartySkills skills={visibleThirdPartySkills} />
+      <ThirdPartyMCPs mcps={toolkitMCPs} />
       <FAQ />
 
       <footer className="py-10">

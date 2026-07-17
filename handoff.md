@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** Landing rebuild Phase A COMPLETE + verified (branch `feat/landing-rebuild`, preview-only). Next: Phase B (ToolKit pre-release).
-- **Session count:** 44
+- **Phase:** Landing rebuild Phase A COMPLETE + verified; ToolKit page v3 + gallery/MCP refresh done (branch `feat/landing-rebuild`, preview-only). Next: finish Phase B (public handoff repo).
+- **Session count:** 45
 - **Products:** TechKit LIVE (all 7 crons), MarketKit A+B-core LIVE (B3 Dub code-complete, go-live pending), ChatKit live w/ mock checkout, ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-41 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 35 | 2026-07-11 | TechKit Session B -- providers, deploy feed, stats (LIVE) |
 | 36 | 2026-07-11 | MarketKit Session A -- portal module code-complete |
 | 37 | 2026-07-11 | MarketKit go-live -- backend LIVE, E2E smoke, storage-RLS fix |
 | 38 | 2026-07-11 | MarketKit Session B -- weekly sprint loop + screenshot metrics (LIVE) |
@@ -22,13 +21,7 @@
 | 42 | 2026-07-16/17 | Landing rebuild Phase A -- A1+A2+A3 code-complete |
 | 43 | 2026-07-17 | Nebula seam fix + A3.3/A3.4 -- Phase A verification complete |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
-
-## What Was Done (Session 43) -- Nebula seam fix + Lighthouse + mode review: Phase A verified
-
-- Nebula seam fix `7d4a9bb`: section `overflow-hidden` -> `overflow-x-clip`, CosmicNebula wrapper extended `-top-40 -bottom-40` with 200px mask-image fade -- glow bleeds across section boundaries, no hard edge. Playwright-verified both seams, 0px horizontal overflow.
-- A3.3 Lighthouse on Vercel preview: needed a **Protection Bypass for Automation secret** (`PATCH /v9/projects/{id}/protection-bypass`, use `?x-vercel-protection-bypass=<secret>&x-vercel-set-bypass-cookie=true`) -- first run silently measured the SSO login page. Scores: `/` mobile 66 / desktop 95, `/about` mobile 52 / desktop 84, CLS 0 everywhere; SEO 69 = preview noindex artifact. Mobile drag = hero blackhole video LCP + three.js TBT -- pre-existing, post-launch follow-ups, not Phase-A blockers.
-- A3.4: unset `NEXT_PUBLIC_LANDING_MODE` in all Vercel envs confirmed -> preview IS the MVP-default check (3 Coming Soon badges); FULL mode verified locally (0 badges, 5 live cards). **Phase A ready for Phase D launch merge.**
-- Vercel GitHub incident (since 2026-07-16 23:09 UTC) swallowed preview builds for `7d4a9bb`/`b4f5cdf` -- confirm preview rebuilt once cleared, or click Redeploy.
+| 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 
 ## What Was Done (Session 44) -- Handoff v3: /handoff skill + real-usage auto-wrap
 
@@ -38,9 +31,20 @@
 - Created root `CLAUDE.md` (session protocol + AUTO-WRAP rule + Mind Palace path for wrap extras).
 - handoff.md capped ~150 lines; full 967-line history moved verbatim to `handoff-archive.md` (never read on start).
 
+## What Was Done (Session 45) -- ToolKit gallery refresh: 9 market-top skills + real MCP section
+
+- Market research (multi-source, mid-2026): gallery refreshed with 9 adds -- Superpowers, Code Simplifier, Vercel Web Interface Guidelines, Webapp Testing, Firecrawl, Caveman, Trail of Bits, MCP Builder, Office Document Skills. Every URL fetch-verified before shipping.
+- Gotcha: Karpathy repo MOVED -- `forrestchang/...` -> `multica-ai/andrej-karpathy-skills` (193k stars); old gallery link fixed.
+- Gotcha: `code-simplifier` is NOT in `anthropics/skills` -- it lives at `anthropics/claude-plugins-official/plugins/code-simplifier`. Vercel's skill folder is `web-design-guidelines` (not "web-interface-guidelines") under `vercel-labs/agent-skills`.
+- Dead `toolkitMCPs` data surfaced: new `ThirdPartyMCPs` component (purple accent, collapsible `claude mcp add` setup commands); TradingView/Unity placeholders replaced with GitHub / Context7 / Playwright / Sentry (+ kept Supabase).
+- New `SkillCategory` values: development, security, documents, productivity (+ labels in ThirdPartySkills).
+- Competitive note: Matt Pocock ships a popular "Handoff" skill (~156K installs, same session-transfer concept). Deliberately NOT added to the gallery; positioning call open.
+- Corrected stale S44 note: ToolKit page v3 WAS already shipped in `5e309a3` -- the only Phase-B leftover is the public repo restructure.
+- Verified: tsc/lint/build green; rendered page checked on localhost (all skills, MCPs, labels present; 0 errors).
+
 ## What To Do Next
 
-**Next session: finish handoff v3 rollout (Phase B core), per approved plan `C:\Users\cryptomeda\.claude\plans\let-s-go-to-toolkit-delightful-goblet.md`:** (a) public repo `bugiiiii11/handoff` -- a local clone ALREADY EXISTS at `myprojects/handoff` (non-empty, uninspected -- inspect before overwriting); restructure to `skills/handoff/SKILL.md` + `hooks/`, remove old 4 skill folders, keep `build-kb`, rewrite README, push; (b) ToolKit page v3 updates (InstallBlock copy/verify/uninstall + optional hooks step, SkillCards -> /handoff subcommands + single sourceUrl, toolkit-skills.ts single handoff entry, "four skills" phrasing sweep) + `tsc`/lint/build green. Also: restart Claude Code to activate the new hooks; confirm `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually); commit `67e66da` is unpushed.
+**Next session: public repo `bugiiiii11/handoff` restructure (last Phase B core item), per approved plan `C:\Users\cryptomeda\.claude\plans\let-s-go-to-toolkit-delightful-goblet.md`:** a local clone ALREADY EXISTS at `myprojects/handoff` (non-empty, uninspected -- inspect before overwriting); restructure to `skills/handoff/SKILL.md` + `hooks/`, remove old 4 skill folders, keep `build-kb`, rewrite README, push. Also: restart Claude Code to activate the v3 hooks (if not yet done); confirm `feat/landing-rebuild` Vercel preview rebuilt post-incident (or Redeploy manually); 3 commits unpushed + Session-45 wrap commit.
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
