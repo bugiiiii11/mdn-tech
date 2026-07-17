@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 47) -- ChatKit credits-only pivot + PlanKit removal + Blender skills (rotated 2026-07-17)
+
+- ChatKit monetization REWRITTEN (per user decision): subscriptions removed entirely. New model = credits fuel messages (1 credit = 1 msg, `CREDITS_PER_MESSAGE`), free trial 30 msgs/bot, credit packs 500/$29 · 2.5k/$99 · 10k/$299; premium features are ONE-TIME per-chatbot USD unlocks (`FEATURES` catalog in `lib/portal/plans.ts`). Free vs paid only -- any unlock works regardless of credit balance.
+- `plans.ts` fully rewritten (source of truth): CREDIT_PACKS, FEATURES (conversations $19 / analytics $29 = available; learning $49 / reports $39 = coming-soon; extra_chatbot $49 = account scope), `isFeatureUnlocked`, `chatbotLimit`. Removed PLANS/tiers/resolveTier/hasFeature/isSubscriptionActive.
+- Gating switched tier -> per-bot `feature_unlocks` jsonb: detail page, conversations page, export route (still server-enforced 403/redirect). Metering in `usage.ts` simplified to per-chatbot credits (subscription branch + period counters gone). `/api/portal/subscription` route DELETED; new `/feature` (account) + `/chatbot/[id]/feature` (per-bot) routes; purchase route takes `{packId}`.
+- Migration 017 APPLIED via Management API (verified 5 cols live): `chatbots.feature_unlocks` jsonb, `customers.extra_chatbot_slots` int, `chatbot_purchases` +kind/pack_id/feature_id. Old `subscription_*` cols left DORMANT (non-destructive) -- drop in a later migration.
+- Pages reworked: per-bot upgrade (packs + unlock cards), account upgrade (credit model + extra-chatbot add-on), ChatKitPricing, settings (billing card), new-chatbot limit, UsageMeter, BuyCreditsButton (pack-aware) + new UnlockFeatureButton. PlanActionButton (subs) + PlanKitTeaser DELETED; PlanKit section removed from ToolKit page.
+- ToolKit gallery: added Blender MCP (`ahujasid/blender-mcp`) + Blender Skills (`ra100/blender-claude-plugin`) under new `creative` category (label "3D & Creative"); both URL-verified live. Skipped optional 3rd (freshtechbro web-export skill).
+- GOTCHA (env parse): `.env.local` key is `SUPABASE_MANAGEMENT_API_KEY` (sbp_ PAT, 44 chars); split on first `=` not regex (regex dropped a char). Ref `ijfgwzacaabzeknlpaff`.
+- Verified: tsc clean + `npm run build` green (all routes). NOT browser-verified. ASSUMPTIONS pending user confirm: 1 credit/msg rate, pack + feature prices, feature unlocks priced in USD (not credits).
+
 ## What Was Done (Session 46) -- Phase B verified complete + ChatKit tier gates prio 2 (rotated 2026-07-17)
 
 - Public repo `bugiiiii11/handoff` restructure was ALREADY done and pushed (`63af63f`) -- the S45 "last Phase B item" note was stale. Verified: all 5 GitHub URLs the ToolKit page links to exist on origin/main; repo publicly readable (anonymous fetch of SKILL.md). Task 13 (README build-kb bonus section) also already shipped. Phase B COMPLETE.

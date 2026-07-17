@@ -140,23 +140,14 @@ export async function getMessagesTrend(
 }
 
 /**
- * Extract top keywords from user messages
+ * Extract top keywords from a batch of message texts (shared by the analytics
+ * page and the weekly report generator)
  */
-export async function getTopKeywords(
-  supabase: SupabaseClient,
-  chatbotId: string,
-  limit: number = 10
-): Promise<Keyword[]> {
-  const { data: userMessages } = await supabase
-    .from('chat_messages')
-    .select('content')
-    .eq('chatbot_id', chatbotId)
-    .eq('role', 'user');
-
+export function extractKeywords(contents: string[], limit: number = 10): Keyword[] {
   const wordCount = new Map<string, number>();
 
-  userMessages?.forEach((msg) => {
-    const words: string[] = msg.content
+  contents.forEach((content) => {
+    const words: string[] = content
       .toLowerCase()
       .split(/[\s\p{P}]+/u)
       .filter((word: string) => word.length > 2 && !STOPWORDS.has(word));
@@ -170,6 +161,23 @@ export async function getTopKeywords(
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([word, count]) => ({ word, count }));
+}
+
+/**
+ * Extract top keywords from user messages
+ */
+export async function getTopKeywords(
+  supabase: SupabaseClient,
+  chatbotId: string,
+  limit: number = 10
+): Promise<Keyword[]> {
+  const { data: userMessages } = await supabase
+    .from('chat_messages')
+    .select('content')
+    .eq('chatbot_id', chatbotId)
+    .eq('role', 'user');
+
+  return extractKeywords((userMessages ?? []).map((m) => m.content), limit);
 }
 
 /**

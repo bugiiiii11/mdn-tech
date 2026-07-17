@@ -79,7 +79,7 @@ export type FeatureId =
   | 'conversations'   // conversation viewer + markdown export (built)
   | 'analytics'       // message trends + top-keyword extraction (built)
   | 'learning'        // auto-improve from rated conversations (built S48)
-  | 'reports'         // weekly performance report (NOT built yet)
+  | 'reports'         // weekly performance report + email digest (built S49)
   | 'extra_chatbot'   // +1 chatbot slot (account-scoped)
 
 export type FeatureStatus = 'available' | 'coming-soon'
@@ -145,7 +145,7 @@ export const FEATURES: FeatureDef[] = [
     tagline: 'A performance digest in your inbox every week.',
     priceCents: 3900,
     priceLabel: '$39',
-    status: 'coming-soon',
+    status: 'available',
     scope: 'chatbot',
     benefits: [
       'Weekly email summary',

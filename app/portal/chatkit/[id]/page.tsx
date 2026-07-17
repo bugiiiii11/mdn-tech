@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft, Lock, Sparkles } from 'lucide-react'
+import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft, Lock, Sparkles, FileBarChart } from 'lucide-react'
 import { KBEntryList } from '@/components/command-center/chatbots/KBEntryList'
 import { KBExportButton } from '@/components/command-center/chatbots/KBExportButton'
 import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
@@ -23,6 +23,7 @@ import {
 } from '@/lib/portal/analytics'
 import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
 import { SuggestionList, type KBSuggestion } from '@/components/portal/learning/SuggestionList'
+import { ReportList, type ChatbotReport } from '@/components/portal/reports/ReportList'
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -51,7 +52,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
     (chatbot.widget_config as any)?.fallback_message ||
     "I'm not sure about that. Please contact us directly for more details."
 
-  const [{ data: entries }, analytics, trend, keywords, usage, suggestionsResult] = await Promise.all([
+  const [{ data: entries }, analytics, trend, keywords, usage, suggestionsResult, reportsResult] = await Promise.all([
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
     getChatbotAnalytics(supabase, id, fallbackMsg),
     canViewAnalytics ? getMessagesTrend(supabase, id, 7) : Promise.resolve<MessageTrendPoint[]>([]),
@@ -65,9 +66,18 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] as KBSuggestion[] }),
+    reportsUnlocked
+      ? supabase
+          .from('chatbot_reports')
+          .select('id, period_start, period_end, stats, summary, email_sent, created_at')
+          .eq('chatbot_id', id)
+          .order('period_start', { ascending: false })
+          .limit(8)
+      : Promise.resolve({ data: [] as ChatbotReport[] }),
   ])
 
   const suggestions = (suggestionsResult.data ?? []) as KBSuggestion[]
+  const reports = (reportsResult.data ?? []) as ChatbotReport[]
 
   const grouped = (entries ?? []).reduce((acc: Record<string, any[]>, e) => {
     acc[e.category] = [...(acc[e.category] ?? []), e]
@@ -246,7 +256,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         {/* Usage quota (compact, sits with overview metrics) */}
         <UsageMeter chatbotId={chatbot.id} usage={usage} />
 
-        {/* Add-ons still available to unlock (auto-learning + weekly reports ship later) */}
+        {/* Add-ons still available to unlock */}
         {(!reportsUnlocked || !learningUnlocked) && (
           <section className="bg-[#0d0d20]/60 border border-white/[0.06] rounded-xl p-4 flex items-start gap-3 backdrop-blur-sm">
             <span className="w-7 h-7 rounded-md bg-pink-500/10 text-pink-300 flex items-center justify-center flex-shrink-0">
@@ -256,8 +266,10 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
               <p className="text-sm font-medium text-gray-200">More add-ons for this chatbot</p>
               <p className="text-xs text-gray-500 mt-1">
                 {learningUnlocked
-                  ? 'Weekly reports are coming soon as a one-time unlock.'
-                  : 'Auto-learning is available now as a one-time unlock; weekly reports are coming soon.'}
+                  ? 'Weekly reports are available as a one-time unlock.'
+                  : reportsUnlocked
+                  ? 'Auto-learning is available as a one-time unlock.'
+                  : 'Auto-learning and weekly reports are available as one-time unlocks.'}
               </p>
               <Link
                 href={`/portal/chatkit/${chatbot.id}/upgrade`}
@@ -325,6 +337,24 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
               </div>
             </div>
             <SuggestionList chatbotId={chatbot.id} suggestions={suggestions} />
+          </section>
+        )}
+
+        {/* Weekly reports: performance digests generated Monday + emailed */}
+        {reportsUnlocked && (
+          <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-md bg-cyan-500/10 text-cyan-300 flex items-center justify-center">
+                <FileBarChart className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-medium text-white">Weekly reports</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {reports.length} report{reports.length === 1 ? '' : 's'} · generated Monday mornings
+                </p>
+              </div>
+            </div>
+            <ReportList chatbotId={chatbot.id} reports={reports} />
           </section>
         )}
       </div>
