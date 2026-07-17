@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft } from 'lucide-react'
+import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft, Lock, Sparkles } from 'lucide-react'
 import { KBEntryList } from '@/components/command-center/chatbots/KBEntryList'
 import { KBExportButton } from '@/components/command-center/chatbots/KBExportButton'
 import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
@@ -18,7 +18,10 @@ import {
   getChatbotAnalytics,
   getMessagesTrend,
   getTopKeywords,
+  type MessageTrendPoint,
+  type Keyword,
 } from '@/lib/portal/analytics'
+import { hasFeature, resolveChatbotTier } from '@/lib/portal/plans'
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -28,14 +31,32 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
   const { id } = await params
   const userId = user.id
 
-  const { data: chatbot } = await supabase
-    .from('chatbots')
-    .select('*')
-    .eq('id', id)
-    .eq('owner_id', user.id)
-    .single()
+  const [{ data: chatbot }, { data: customer }] = await Promise.all([
+    supabase
+      .from('chatbots')
+      .select('*')
+      .eq('id', id)
+      .eq('owner_id', user.id)
+      .single(),
+    supabase
+      .from('customers')
+      .select('subscription_plan, subscription_status, current_period_end')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ])
 
   if (!chatbot) notFound()
+
+  const tier = resolveChatbotTier(
+    {
+      subscription_plan: customer?.subscription_plan ?? null,
+      subscription_status: customer?.subscription_status ?? null,
+      current_period_end: customer?.current_period_end ?? null,
+    },
+    chatbot
+  )
+  const canViewConversations = hasFeature(tier, 'conversations')
+  const canViewAnalytics = hasFeature(tier, 'analytics')
 
   const fallbackMsg =
     (chatbot.widget_config as any)?.fallback_message ||
@@ -44,8 +65,8 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
   const [{ data: entries }, analytics, trend, keywords, usage] = await Promise.all([
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
     getChatbotAnalytics(supabase, id, fallbackMsg),
-    getMessagesTrend(supabase, id, 7),
-    getTopKeywords(supabase, id, 8),
+    canViewAnalytics ? getMessagesTrend(supabase, id, 7) : Promise.resolve<MessageTrendPoint[]>([]),
+    canViewAnalytics ? getTopKeywords(supabase, id, 8) : Promise.resolve<Keyword[]>([]),
     checkChatbotUsage(id),
   ])
 
@@ -125,7 +146,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-5 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-white">Activity</h2>
-            {hasConversations && (
+            {hasConversations && canViewConversations && (
               <div className="flex items-center gap-2">
                 <Link
                   href={`/portal/chatkit/${chatbot.id}/conversations`}
@@ -142,6 +163,15 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
                   Export
                 </a>
               </div>
+            )}
+            {hasConversations && !canViewConversations && (
+              <Link
+                href={`/portal/chatkit/${chatbot.id}/upgrade`}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-gray-500 border border-white/10 hover:border-purple-400/40 hover:text-purple-300 rounded-md transition-colors"
+              >
+                <Lock className="w-3 h-3" />
+                Conversation viewer — Starter+
+              </Link>
             )}
           </div>
 
@@ -161,7 +191,25 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Charts row — only render meaningful content */}
-          {hasConversations ? (
+          {hasConversations && !canViewAnalytics ? (
+            <div className="bg-[#0a0a14] border border-dashed border-white/10 rounded-lg px-4 py-6 flex items-start gap-3">
+              <span className="w-7 h-7 rounded-md bg-purple-500/10 text-purple-300 flex items-center justify-center flex-shrink-0">
+                <Lock className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <p className="text-sm font-medium text-gray-200">Trends + keyword analytics</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Message trends and top-keyword extraction are included in the Pro plan.
+                </p>
+                <Link
+                  href="/portal/upgrade"
+                  className="inline-block mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  Upgrade to Pro →
+                </Link>
+              </div>
+            </div>
+          ) : hasConversations ? (
             <div className={`grid gap-3 ${showTrend && showKeywords ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
               {showTrend ? (
                 <TrendChart data={trend} title="Messages — last 7 days" />
@@ -198,6 +246,27 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
 
         {/* Usage quota (compact, sits with overview metrics) */}
         <UsageMeter chatbotId={chatbot.id} usage={usage} />
+
+        {/* Max features: weekly reports + auto-learning (ship later; gate wired now) */}
+        {!hasFeature(tier, 'reports') && (
+          <section className="bg-[#0d0d20]/60 border border-white/[0.06] rounded-xl p-4 flex items-start gap-3 backdrop-blur-sm">
+            <span className="w-7 h-7 rounded-md bg-pink-500/10 text-pink-300 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-3.5 h-3.5" />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-gray-200">Weekly auto-reports + chatbot learning</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Max chatbots get a weekly performance report and learn from rated conversations automatically.
+              </p>
+              <Link
+                href="/portal/upgrade"
+                className="inline-block mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                See Max plan →
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Deploy */}
         {chatbot.status === 'active' && (

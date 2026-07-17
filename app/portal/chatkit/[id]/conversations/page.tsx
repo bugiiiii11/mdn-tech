@@ -7,6 +7,7 @@ import { ChevronLeft } from 'lucide-react'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { ConversationViewer } from '@/components/portal/analytics/ConversationViewer'
 import { getConversationsWithMessages } from '@/lib/portal/analytics'
+import { hasFeature, resolveChatbotTier } from '@/lib/portal/plans'
 
 interface ConversationsPageProps {
   params: Promise<{ id: string }>
@@ -24,14 +25,35 @@ export default async function ConversationsPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
-  const { data: chatbot } = await supabase
-    .from('chatbots')
-    .select('id, name, widget_config, owner_id')
-    .eq('id', chatbotId)
-    .single()
+  const [{ data: chatbot }, { data: customer }] = await Promise.all([
+    supabase
+      .from('chatbots')
+      .select('id, name, widget_config, owner_id, credits_purchased')
+      .eq('id', chatbotId)
+      .single(),
+    supabase
+      .from('customers')
+      .select('subscription_plan, subscription_status, current_period_end')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ])
 
   if (!chatbot || chatbot.owner_id !== user.id) {
     redirect('/portal/chatkit')
+  }
+
+  // Conversation viewer is Starter+; free-tier accounts land back on the
+  // detail page, which shows the locked state with the upgrade path.
+  const tier = resolveChatbotTier(
+    {
+      subscription_plan: customer?.subscription_plan ?? null,
+      subscription_status: customer?.subscription_status ?? null,
+      current_period_end: customer?.current_period_end ?? null,
+    },
+    chatbot
+  )
+  if (!hasFeature(tier, 'conversations')) {
+    redirect(`/portal/chatkit/${chatbotId}`)
   }
 
   const fallbackMessage =

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse, NextRequest } from 'next/server'
 import { exportConversationsMarkdown } from '@/lib/portal/analytics'
+import { hasFeature, resolveChatbotTier } from '@/lib/portal/plans'
 
 export async function GET(
   request: NextRequest,
@@ -19,14 +20,37 @@ export async function GET(
     }
 
     // Verify chatbot ownership
-    const { data: chatbot } = await supabase
-      .from('chatbots')
-      .select('id, name, owner_id')
-      .eq('id', chatbotId)
-      .single()
+    const [{ data: chatbot }, { data: customer }] = await Promise.all([
+      supabase
+        .from('chatbots')
+        .select('id, name, owner_id, credits_purchased')
+        .eq('id', chatbotId)
+        .single(),
+      supabase
+        .from('customers')
+        .select('subscription_plan, subscription_status, current_period_end')
+        .eq('id', user.id)
+        .maybeSingle(),
+    ])
 
     if (!chatbot || chatbot.owner_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Conversation export is Starter+ (matches the detail-page gate)
+    const tier = resolveChatbotTier(
+      {
+        subscription_plan: customer?.subscription_plan ?? null,
+        subscription_status: customer?.subscription_status ?? null,
+        current_period_end: customer?.current_period_end ?? null,
+      },
+      chatbot
+    )
+    if (!hasFeature(tier, 'conversations')) {
+      return NextResponse.json(
+        { error: 'Conversation export requires the Starter pack or a subscription' },
+        { status: 403 }
+      )
     }
 
     // Generate markdown
