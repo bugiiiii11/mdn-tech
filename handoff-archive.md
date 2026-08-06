@@ -1,5 +1,13 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 48) -- Prio 7 auth flow UIs + prio 3 Auto-learning shipped (rotated 2026-08-07)
+
+- Prio 7 DONE (`4fc4dc5`): dual-mode `/reset-password` page (logged-out = request link via `resetPasswordForEmail`; recovery session via `/auth/callback` = set new password); LoginForm gained magic-link mode (`signInWithOtp`, `shouldCreateUser:false` -- no role-less junk accounts) + Forgot-password link; Settings "Security" card = email change (dual confirm) + password change with automatic reauth-OTP fallback (`reauthenticate()` -> `nonce`); `/reset-password` added to middleware public paths (both guards).
+- Prio 7 REMAINING (manual, dashboard): Martin task 2 (email templates). Email round-trips NOT tested (needs real inbox).
+- Prio 3 DONE (`b4f831e`): Auto-learning shipped + `learning` flipped to `available` ($49 unlock card now purchasable). Loop: owner rates replies (existing `message_feedback` from 005) -> Sunday 06:00 UTC cron `chatkit-learning` (or per-bot "Run now") -> `/api/portal/chatkit/learning/run` scans 7-day negative ratings (dedup via `source_message_ids`), Claude Haiku drafts <=5 KB suggestions -> detail-page Auto-learning section: accept (creates real KB entry) / dismiss.
+- Migration 018 APPLIED via Management API + verified (table + RLS policy + cron job all live).
+- Verified: tsc/lint/build green after each feature; login + reset-password smoke-tested HTTP 200 on localhost with new UI present. Learning loop NOT E2E-tested (needs login + rated messages).
+
 ## What Was Done (Session 47) -- ChatKit credits-only pivot + PlanKit removal + Blender skills (rotated 2026-07-17)
 
 - ChatKit monetization REWRITTEN (per user decision): subscriptions removed entirely. New model = credits fuel messages (1 credit = 1 msg, `CREDITS_PER_MESSAGE`), free trial 30 msgs/bot, credit packs 500/$29 · 2.5k/$99 · 10k/$299; premium features are ONE-TIME per-chatbot USD unlocks (`FEATURES` catalog in `lib/portal/plans.ts`). Free vs paid only -- any unlock works regardless of credit balance.

@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** Phase C (ChatKit completion) BUILD-COMPLETE: S49 shipped prio 4 Weekly reports (migration 019 applied) -- all 4 ChatKit features now `available`; only Voice (prio 5) stays deferred. Blockers are Martin's manual tasks (below) + browser E2E, then Phase D MVP launch prep. Branch `feat/landing-rebuild`, preview-only, 5 unpushed commits after wrap.
-- **Session count:** 49
-- **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout + per-bot unlocks (conversations/analytics/learning/reports ALL available), ToolKit public page live.
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (re-baselined 2026-08-07; MVP launch target ~31.08). S50 locked the universal credit system + payments design and executed Phase 0.1 (feat/landing-rebuild merged + pushed to main = prod deploy; fixes prod pg_cron 018/019 404s). Next: Phase 0.2-0.5 security fix-pack.
+- **Session count:** 50
+- **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (all 4 features available; Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-43 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 40 | 2026-07-12 | TechKit Session D -- AI weekly digest (LIVE); TechKit complete |
 | 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
 | 42 | 2026-07-16/17 | Landing rebuild Phase A -- A1+A2+A3 code-complete |
 | 43 | 2026-07-17 | Nebula seam fix + A3.3/A3.4 -- Phase A verification complete |
@@ -22,14 +21,7 @@
 | 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
 | 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
 | 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
-
-## What Was Done (Session 48) -- Prio 7 auth flow UIs + prio 3 Auto-learning shipped
-
-- Prio 7 DONE (`4fc4dc5`): dual-mode `/reset-password` page (logged-out = request link via `resetPasswordForEmail`; recovery session via `/auth/callback` = set new password); LoginForm gained magic-link mode (`signInWithOtp`, `shouldCreateUser:false` -- no role-less junk accounts) + Forgot-password link; Settings "Security" card = email change (dual confirm) + password change with automatic reauth-OTP fallback (`reauthenticate()` -> `nonce`); `/reset-password` added to middleware public paths (both guards).
-- Prio 7 REMAINING (manual, dashboard): Martin task 2 below. Email round-trips NOT tested (needs real inbox).
-- Prio 3 DONE (`b4f831e`): Auto-learning shipped + `learning` flipped to `available` ($49 unlock card now purchasable). Loop: owner rates replies (existing `message_feedback` from 005) -> Sunday 06:00 UTC cron `chatkit-learning` (or per-bot "Run now") -> `/api/portal/chatkit/learning/run` scans 7-day negative ratings (dedup via `source_message_ids`), Claude Haiku drafts <=5 KB suggestions -> detail-page Auto-learning section: accept (creates real KB entry) / dismiss.
-- Migration 018 APPLIED via Management API + verified (table + RLS policy + cron job all live).
-- Verified: tsc/lint/build green after each feature; login + reset-password smoke-tested HTTP 200 on localhost with new UI present. Learning loop NOT E2E-tested (needs login + rated messages).
+| 50 | 2026-08-06/07 | Credit system + payments design locked; launch plan re-baselined; merged to main (Phase 0.1) |
 
 ## What Was Done (Session 49) -- Prio 4 Weekly reports shipped; Phase C build-complete
 
@@ -41,42 +33,51 @@
 - Verified: tsc/lint/build green; route smoke-tested on localhost dev (unauthenticated POST -> clean 401 JSON). NOT E2E-tested (needs login + chat traffic + real inbox).
 - NEW OPS: `RESEND_API_KEY` must exist in Vercel env for the portal app (present in `.env.local`; edge functions have their own copy) -- verify in Martin task 3.
 
+## What Was Done (Session 50) -- Credit system + payments locked; launch plan re-baselined; merged to main
+
+- Universal credit system DECIDED (2026-08-06): account-level append-only ledger; Stripe sells ONLY credit packs; everything else (unlocks, future image/video gen) = internal ledger spend. Packs unchanged ($29/500 · $99/2.5k · $299/10k; Scale gets "Best value" badge) + hidden Enterprise $999/40k prepared later; unlocks re-priced to credits @ Growth reference ~4c: conversations 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250.
+- Policy locked: 12-mo credit expiry (30-day warning email); refund 14 days ONLY if 0 credits of that purchase used (ElevenLabs pattern); failed action = auto re-credit, never money; chargeback clawback = negative ledger entry + account auto-suspend (only path to negative balance -- spends are pre-checked); signup grant 50 promo credits.
+- B2B-only checkout CONFIRMED long-term: company name required, VAT ID OR business reg number (ICO), "purchasing as a business" checkbox, reverse-charge EU B2B, no OSS. EU-side evidence approach to be confirmed by Filip (added to plan SS2.0b).
+- Provider path: Stripe UAE v1 (fees verified: 2.9% + AED1 domestic, +1% intl card, +1% FX, zero fixed costs); N-Genius later DATA-driven -- check Stripe card-country report at ~$2k/mo (setup ~AED 3,500). MoR ruled out; Lemon Squeezy plan ABANDONED (auto-memory updated).
+- Launch plan doc updated (MindPalace): new SS2.4b/2.7/2.8, SS2.5 locked, SS3.1 DONE (Martin confirmed prices in chat), timeline re-baselined (T4 = MVP launch ~31.08), new "Otvorene otazky" section, Phase 8 notes (GoTrue templates via config/SMTP, edge functions -> Next API routes, drop unused Realtime/Storage); isHosting UAE costs verified: Elite $50.99 + Premium $33.99, total infra ~$85-125/mo.
+- Sequencing (Martin): UAE substance finishes FIRST, then isHosting servers -- Phase 8 stays post-launch; until then product polish. Wio fully working. Stripe activation = Martin's critical-path task NOW (1-2 week verification).
+- Phase 0.1 EXECUTED: feat/landing-rebuild (19 commits) merged into main + pushed on explicit user request -- prod deploy via Vercel.
+
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
-1. **Confirm pricing (2 min, just reply in chat):** 1 credit = 1 message; packs 500/$29 · 2,500/$99 · 10,000/$299; one-time unlocks: conversations $19, analytics $29, learning $49, reports $39, extra chatbot $49 (all USD). Reply "prices OK" or list changes -- every number lives in `lib/portal/plans.ts`, cheap to tweak.
+1. **Stripe UAE activation (CRITICAL PATH, start this week):** dashboard.stripe.com -> create account for the FZE: trade license 7813, Emirates ID + residence visa, Wio account details (Wio confirmed working). Verification takes 1-2 weeks and gates Phase 2 payments -- start before anything else.
 2. **Supabase auth email templates (10 min):** supabase.com/dashboard -> project `ijfgwzacaabzeknlpaff` -> Authentication -> Emails (Templates tab). For each template slot, open the matching file in `supabase/email-templates/` (5 files: confirm-signup, magic-link, reset-password, email-change, reauthentication), copy the whole HTML into the template Source, Save. Then Authentication -> URL Configuration: Site URL = `https://app.mdntech.org`; add Redirect URLs `https://app.mdntech.org/auth/callback` and `http://localhost:3000/auth/callback`.
 3. **ChatKit cron secret + Resend key (5 min):** generate a random 32+ char string. (a) vercel.com -> M.D.N Tech site project -> Settings -> Environment Variables -> add `CHATKIT_CRON_SECRET` = that value (Production) -> redeploy; while there CONFIRM `RESEND_API_KEY` is listed too (add from `.env.local` line 30 if missing). (b) Supabase dashboard -> SQL Editor -> run: `select vault.create_secret('<that value>', 'chatkit_cron_secret');` -- powers both Sunday learning + Monday reports crons; until then they 401 harmlessly.
 4. **Dub account for MarketKit B3 (10 min):** sign up at dub.co -> Settings -> API Keys -> Create key (starts `dub_...`) -> paste into `.env.local` as `DUB_API_KEY=dub_...` -> tell the next session "Dub key ready" (it then runs the 5-part go-live runbook in `command-center/MARKETKIT-SETUP.md` B3).
 5. **Browser E2E pass (15 min, after 2+3):** `npm run dev` -> log in at `localhost:3000/portal/login` -> open your chatbot: buy a credit pack + unlock a feature (mock checkout, no real charge); rate a reply thumbs-down in Conversations then hit Auto-learning "Run now"; hit Weekly reports "Run now" and check your inbox for the report email. Report anything broken.
+6. **Ask Filip:** compliance answers (plan SS2.0b) incl. the B2B evidence approach (VAT ID or ICO + business self-declaration); isHosting docs whenever available (not blocking -- prices already verified).
 
 ## What To Do Next
 
-**Next session:** work through whatever Martin reports from the tasks above (price tweaks, E2E findings, Dub go-live, email round-trip fixes). Then Phase D MVP launch prep per the spec. 5 unpushed commits -- push only on explicit request.
+**Next session:** Phase 0.2-0.5 security fix-pack (admin escalation via `handle_new_user()` default role; column-level REVOKE on credits/unlocks/slots; admin check on `GET /api/infrastructure`; manual exploit verification). Then Phase 1 hardening -> Phase 2 credit bank + Stripe adapter (test mode can start before Stripe live keys arrive).
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0 | Landing rebuild v2 + MVP launch roadmap | Phases A+B COMPLETE (S43/S46); C build-complete (S49, Voice deferred). Spec: `command-center/mdntech-website-rebuild.md` v2.0. Next: D MVP LAUNCH -> E post-MVP products -> F payments LAST (N-Genius, vault `PAYMENT_NETWORK_INTERNATIONAL.md`). MVP/FULL modes via `NEXT_PUBLIC_LANDING_MODE` (unset = MVP). |
-| 0b | MarketKit B3 Dub go-live + Session B remainder | B3 built (S41, `5085da4`), NOT deployed -- gated on Martin task 4; then edge secret + worker redeploy (5 parts) + migration 016 (`MARKETKIT-SETUP.md` B3 runbook). Also [Martin] approve/skip sprint proposals + upload first metrics screenshots. Then B1 GA4/GSC (Google Cloud service account) + B5 dogfood onboarding (ChatKit, Melicharek, Good Hair by Zane). |
-| 1 | Real payments (N-Genius, plan F) | Mock checkout live on 3 routes: credit packs (`/api/portal/chatbot/[id]/purchase` {packId}), per-bot unlocks (`.../feature` {featureId}), account add-on (`/api/portal/feature`). Wire real payment on each. Gated on merchant account. |
+| 0 | Launch plan Phases 0-6 -- MVP launch ~31.08 | Master checklist: MindPalace launch plan doc. 0.1 DONE (S50). Next: 0.2-0.5 security -> 1 hardening -> 2 credit bank (account-level ledger, `PaymentProvider` abstraction, migrate `chatbots.credits_purchased` -> ledger, credit-priced unlocks per S50 decisions) -> 3-6. |
+| 0b | MarketKit B3 Dub go-live + Session B remainder | Gated on Martin task 4; then edge secret + worker redeploy (5 parts) + migration 016 (`MARKETKIT-SETUP.md` B3 runbook). Then B1 GA4/GSC (Google Cloud service account) + B5 dogfood onboarding. |
 | 5 | ChatKit Voice (Cartesia Sonic-3) | Deferred. ~6h. |
+| 8 | Phase 8 UAE hosting migration (isHosting) | AFTER substance done + post-launch (Martin 2026-08-07). Costs verified ~$85-125/mo. Plan SS8 has full checklist. |
 | 9 | SignaKit portal section | Hidden for MVP; reactivate post-ChatKit-monetization. |
-| 10 | Portal auth Supabase -> SignaKit | Pending, low. |
-| 11 | Mind Palace <-> CC sync bridge | Pending, low. |
 | 12 | SEO action plan | Follow `seo-audit/ACTION-PLAN.md`. |
 | 14 | Delete `.next-stale-1777403470/` | Local only; safety hook blocks `rm -rf .*` -- delete via Explorer or `rmdir /s /q`. |
-| 15 | SK Part B + domain 301 | Client-repo footer links (melicharek, RoyalStroje, zane) -> mdntech.org/sk at next touch of each repo; `mdntech.sk` purchase + 301; `.com -> .org` 301 at registrar. |
+| 15 | SK Part B + domain 301 | Client-repo footer links -> mdntech.org/sk at next touch of each repo; `mdntech.sk` purchase + 301; `.com -> .org` 301 at registrar. |
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
-| `CLAUDE.md` + `.claude/skills/handoff/` + `.claude/hooks/` | Session protocol, /handoff v3 skill, auto-wrap hooks |
-| `command-center/mdntech-website-rebuild.md` | Landing rebuild spec v2.0 (Phases A-F) -- Phase D is next |
-| `lib/portal/plans.ts` | ChatKit billing source of truth: CREDIT_PACKS, FEATURES, `isFeatureUnlocked`, `chatbotLimit`, `CREDITS_PER_MESSAGE`. All prices here (Martin task 1). |
-| `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | Mock checkout routes -- wire real payments here (prio 1) |
+| `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8 + open questions) -- updated S50 |
+| `lib/portal/plans.ts` | Billing source of truth -- Phase 2 repricing (credit-priced unlocks, hidden Enterprise pack) lands here |
+| `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | Mock checkout routes -- collapse into single credit purchase + ledger spends (Phase 2) |
 | `app/api/portal/chatkit/{learning,reports}/run/` | The two ChatKit cron routes (shared `chatkit_cron_secret`; Sun 06:00 / Mon 06:10 UTC) |
 | `supabase/email-templates/` | 5 branded auth email templates -- dashboard paste = Martin task 2 |
 | `supabase/migrations/` | 001-019; 017+018+019 APPLIED; 016 (Dub) pending apply after Martin task 4 |
-| `command-center/{TECHKIT,MARKETKIT}-SETUP.md` / `-BRIEF.md` | Go-live runbooks (Management API patterns) + product briefs/backlogs |
+| `command-center/mdntech-website-rebuild.md` | Landing rebuild spec v2.0 (Phases A-F) |
+| `MindPalace/.../PAYMENT_NETWORK_INTERNATIONAL.md` | N-Genius reference for the later adapter (SS11 webhook pattern reusable for Stripe) |
 | `decisions.md` | Locked architectural decisions |
