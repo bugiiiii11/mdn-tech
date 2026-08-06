@@ -16,7 +16,7 @@ const organizationSchema = {
   url: "https://mdntech.org",
   logo: "https://mdntech.org/logo.png",
   description:
-    "UAE-based tech agency specializing in AI systems, Web3 solutions, and full-stack development with global delivery.",
+    "UAE-based team building self-service AI developer tools — ChatKit, ToolKit, and more — plus select custom AI, Web3, and full-stack development.",
   foundingDate: "2024-01-01",
   address: {
     "@type": "PostalAddress",
@@ -53,7 +53,7 @@ const websiteSchema = {
   name: "M.D.N Tech",
   url: "https://mdntech.org",
   description:
-    "Ship production-ready AI systems, Web3 solutions, and full-stack applications faster.",
+    "Self-service AI developer tools, built by engineers — ChatKit chatbots, free Claude Code skills, and more.",
   inLanguage: ["en", "sk"],
   publisher: {
     "@type": "Organization",

@@ -45,21 +45,13 @@ const qas: QA[] = [
         <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
           ~/.claude/skills/
         </code>
-        . The install command writes four directories there:{' '}
+        . The install command writes two directories there:{' '}
         <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
-          start
-        </code>
-        ,{' '}
+          handoff
+        </code>{' '}
+        and{' '}
         <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
-          wrap
-        </code>
-        ,{' '}
-        <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
-          save
-        </code>
-        ,{' '}
-        <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
-          doc-update
+          build-kb
         </code>
         . Each contains a single{' '}
         <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
@@ -69,7 +61,9 @@ const qas: QA[] = [
         <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
           git clone
         </code>{' '}
-        from GitHub. The skills themselves only run the commands you see in the SKILL.md files.
+        from GitHub. The skills themselves only run the commands you see in the SKILL.md file. The
+        auto-wrap hooks are a separate, opt-in step — nothing is registered unless you wire them
+        into your own settings.
       </>
     ),
   },

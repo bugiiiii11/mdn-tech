@@ -9,34 +9,37 @@ interface Skill {
   sourceUrl: string
 }
 
+const SKILL_SOURCE_URL =
+  'https://github.com/bugiiiii11/handoff/blob/main/skills/handoff/SKILL.md'
+
 const skills: Skill[] = [
   {
-    name: '/start',
-    purpose: 'Session initialization — reads handoff, checks repo state, surfaces emergency snapshots, presents a briefing.',
+    name: '/handoff start',
+    purpose: 'Session briefing — reads the capped handoff.md, checks git status and unpushed commits, consumes any emergency snapshot. Read-only.',
     useWhen: 'At the beginning of every session — Claude needs the briefing before suggesting next steps.',
-    example: '> /start\n\nSession Briefing\nLast session: 21 — Strategic pivot...\nUnpushed: 0 · Last commit: a594d6f',
-    sourceUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/start/SKILL.md',
+    example: '> /handoff start\n\nSession Briefing\nLast session: 44 — Handoff v3...\nUnpushed: 2 · Last commit: bc74d79',
+    sourceUrl: SKILL_SOURCE_URL,
   },
   {
-    name: '/wrap',
-    purpose: 'Auto-detects dirty repos, commits and pushes if needed, updates handoff.md and decisions.md when stale.',
-    useWhen: 'Mid-session checkpoint or end-of-session cleanup — safe to call anytime.',
-    example: '> /wrap\n\nWorking tree dirty\nProposed commit: feat: install block\nDocs stale? handoff.md needs entry.',
-    sourceUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/wrap/SKILL.md',
+    name: '/handoff wrap',
+    purpose: 'Updates handoff.md (docs before commit), rotates overflow to handoff-archive.md, commits locally. Never pushes unless you ask.',
+    useWhen: 'Mid-session checkpoint or end-of-session cleanup — idempotent, safe to call anytime.',
+    example: '> /handoff wrap\n\nhandoff.md → Session 45 section\nRotated 1 section to archive\n✓ Committed locally (no push)',
+    sourceUrl: SKILL_SOURCE_URL,
   },
   {
-    name: '/save',
-    purpose: 'Emergency context save — dumps session state to emergency-snapshot.md before compaction hits.',
-    useWhen: 'When context is running low (80%+) and you need to preserve what happened this session.',
-    example: '> /save\n\nWriting emergency-snapshot.md...\n✓ Saved. /start in next session resumes.',
-    sourceUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/save/SKILL.md',
+    name: '/handoff save',
+    purpose: 'Emergency context save — dumps session state to emergency-snapshot.md in a handful of tool calls. No commit, no questions.',
+    useWhen: 'When context is nearly full and you need to preserve what happened this session, fast.',
+    example: '> /handoff save\n\nWriting emergency-snapshot.md...\n✓ Saved. /handoff start next session resumes.',
+    sourceUrl: SKILL_SOURCE_URL,
   },
   {
-    name: '/doc-update',
-    purpose: 'Smart doc updater — refreshes handoff.md, decisions.md, and project docs based on actual session work.',
-    useWhen: 'After a focused chunk of work, before /wrap, when you want the docs to reflect reality.',
-    example: '> /doc-update\n\nhandoff.md → adding Session 22 entry\ndecisions.md → no new decisions',
-    sourceUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/doc-update/SKILL.md',
+    name: '/handoff docs',
+    purpose: 'Docs-only refresh — runs the wrap’s handoff.md update and archive rotation without committing.',
+    useWhen: 'After a focused chunk of work, when you want the docs to reflect reality but aren’t ready to commit.',
+    example: '> /handoff docs\n\nhandoff.md → updating Session 45 entry\nNo commit — docs only',
+    sourceUrl: SKILL_SOURCE_URL,
   },
 ]
 
@@ -47,7 +50,7 @@ export function SkillCards() {
         <Reveal>
           <div className="text-center mb-12">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-purple-400/80 mb-3">
-              The four skills
+              One skill. Four commands.
             </p>
             <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tight">
               Small surface. Sharp edges.

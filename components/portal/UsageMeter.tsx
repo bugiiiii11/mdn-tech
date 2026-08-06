@@ -2,25 +2,18 @@ import Link from 'next/link'
 import { AlertCircle, CheckCircle2, Sparkles } from 'lucide-react'
 import type { ChatbotUsage } from '@/lib/chat/usage'
 
-const TIER_LABELS: Record<ChatbotUsage['mode'], string> = {
+const MODE_LABELS: Record<ChatbotUsage['mode'], string> = {
   trial: 'Free trial',
-  starter: 'Starter credits',
-  subscription: 'Monthly usage',
+  credits: 'Message credits',
 }
 
 export function UsageMeter({ chatbotId, usage }: { chatbotId: string; usage: ChatbotUsage }) {
-  const { used, total_limit, remaining, mode, tier } = usage
+  const { used, total_limit, remaining, mode } = usage
   const percentage = total_limit > 0 ? Math.round((used / total_limit) * 100) : 0
   const isLimitReached = used >= total_limit
-  const isWarning =
-    !isLimitReached &&
-    (mode === 'subscription' ? remaining <= Math.max(50, total_limit * 0.05) : remaining <= 5)
+  const isWarning = !isLimitReached && remaining <= 5
 
-  const isSubscription = mode === 'subscription'
-  const upgradeHref = isSubscription ? '/portal/upgrade' : `/portal/chatkit/${chatbotId}/upgrade`
-  const upgradeLabel = isSubscription
-    ? tier === 'max' ? 'Manage plan' : 'Upgrade plan'
-    : 'Buy credits'
+  const upgradeHref = `/portal/chatkit/${chatbotId}/upgrade`
 
   const meterTone = isLimitReached
     ? 'bg-red-500'
@@ -43,11 +36,10 @@ export function UsageMeter({ chatbotId, usage }: { chatbotId: string; usage: Cha
           ) : (
             <CheckCircle2 className={`w-4 h-4 ${iconColor}`} />
           )}
-          <h3 className="text-sm font-medium text-white">{TIER_LABELS[mode]}</h3>
+          <h3 className="text-sm font-medium text-white">{MODE_LABELS[mode]}</h3>
         </div>
         <span className="text-xs text-gray-400">
-          {used.toLocaleString()} / {total_limit.toLocaleString()}{' '}
-          {isSubscription ? 'this month' : 'messages'}
+          {used.toLocaleString()} / {total_limit.toLocaleString()} messages
         </span>
       </div>
 
@@ -61,46 +53,40 @@ export function UsageMeter({ chatbotId, usage }: { chatbotId: string; usage: Cha
       {isLimitReached && (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <p className="text-xs text-red-300">
-            {isSubscription
-              ? 'Monthly cap reached. Upgrade to keep your chatbots live this cycle.'
-              : 'Limit reached. Your chatbot is paused on visitor sites.'}
+            Credits depleted. Your chatbot is paused on visitor sites.
           </p>
           <Link
             href={upgradeHref}
             className="inline-flex items-center gap-1.5 button-primary text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap"
           >
             <Sparkles className="w-3 h-3" />
-            {upgradeLabel}
+            Buy credits
           </Link>
         </div>
       )}
       {isWarning && (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <p className="text-xs text-yellow-300">
-            {isSubscription
-              ? `${remaining.toLocaleString()} messages left this month.`
-              : `Only ${remaining.toLocaleString()} ${remaining === 1 ? 'message' : 'messages'} left.`}
+            Only {remaining.toLocaleString()} {remaining === 1 ? 'message' : 'messages'} left.
           </p>
           <Link
             href={upgradeHref}
             className="text-xs text-purple-300 hover:text-purple-200 transition-colors whitespace-nowrap"
           >
-            {upgradeLabel} →
+            Buy credits →
           </Link>
         </div>
       )}
       {!isLimitReached && !isWarning && (
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
           <p className="text-xs text-gray-500">
-            {mode === 'trial' && 'Free trial — credits never expire after upgrade.'}
-            {mode === 'starter' && 'Starter credits never expire.'}
-            {mode === 'subscription' && 'Cap resets at the end of the billing cycle.'}
+            {mode === 'trial' ? 'Free trial — credits never expire after top-up.' : 'Credits never expire.'}
           </p>
           <Link
             href={upgradeHref}
             className="text-xs text-gray-400 hover:text-purple-300 transition-colors whitespace-nowrap"
           >
-            {upgradeLabel} →
+            Buy credits →
           </Link>
         </div>
       )}

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ChevronLeft, Sparkles } from 'lucide-react'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { PortalChatbotForm } from '@/components/portal/chatbots/PortalChatbotForm'
-import { PLANS, resolveAccountTier } from '@/lib/portal/plans'
+import { chatbotLimit } from '@/lib/portal/plans'
 
 export default async function NewChatbotPage() {
   const supabase = await createClient()
@@ -16,7 +16,7 @@ export default async function NewChatbotPage() {
   const [{ data: customer }, { count: existingCount }] = await Promise.all([
     supabase
       .from('customers')
-      .select('subscription_plan, subscription_status, current_period_end')
+      .select('extra_chatbot_slots')
       .eq('id', user.id)
       .maybeSingle(),
     supabase
@@ -25,14 +25,9 @@ export default async function NewChatbotPage() {
       .eq('owner_id', user.id),
   ])
 
-  const tier = resolveAccountTier({
-    subscription_plan: customer?.subscription_plan ?? null,
-    subscription_status: customer?.subscription_status ?? null,
-    current_period_end: customer?.current_period_end ?? null,
-  })
-  const plan = PLANS[tier]
+  const limit = chatbotLimit(customer?.extra_chatbot_slots ?? 0)
   const currentCount = existingCount ?? 0
-  const atLimit = currentCount >= plan.chatbotLimit
+  const atLimit = currentCount >= limit
 
   return (
     <PortalShell variant="marketing">
@@ -68,17 +63,12 @@ export default async function NewChatbotPage() {
                 </span>
               </div>
               <h2 className="text-xl font-semibold text-white">
-                You&apos;re using {currentCount} of {plan.chatbotLimit}{' '}
-                {plan.chatbotLimit === 1 ? 'chatbot' : 'chatbots'} on the {plan.name} plan.
+                You&apos;re using {currentCount} of {limit}{' '}
+                {limit === 1 ? 'chatbot' : 'chatbots'}.
               </h2>
               <p className="text-sm text-gray-400">
-                Upgrade to{' '}
-                <span className="text-purple-300 font-medium">
-                  {tier === 'free' || tier === 'starter' ? 'Pro' : 'Max'}
-                </span>{' '}
-                to add another chatbot. {tier === 'free' || tier === 'starter'
-                  ? 'Pro covers 2 chatbots and 5,000 messages a month.'
-                  : 'Max covers 3 chatbots and 25,000 messages a month.'}
+                Add another chatbot slot to your account — a one-time{' '}
+                <span className="text-purple-300 font-medium">$49</span> unlock, no subscription.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link
@@ -86,7 +76,7 @@ export default async function NewChatbotPage() {
                   className="inline-flex items-center gap-1.5 button-primary text-white text-sm px-4 py-2 rounded-lg"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  See plans
+                  Add a chatbot
                 </Link>
                 <Link
                   href="/portal/chatkit"

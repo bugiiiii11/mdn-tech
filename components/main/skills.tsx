@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { CosmicNebula } from "./cosmic-nebula";
 
 interface ServiceCardProps {
   icon: string;
@@ -291,7 +292,7 @@ export const Skills = () => {
   return (
     <section
       id="services"
-      className="flex flex-col items-center justify-center gap-3 h-full relative overflow-hidden py-20 px-4 md:px-20 w-full max-w-full"
+      className="flex flex-col items-center justify-center gap-3 h-full relative overflow-x-clip py-20 px-4 md:px-20 w-full max-w-full"
     >
       <motion.h2
         initial="hidden"
@@ -367,20 +368,8 @@ export const Skills = () => {
         </Link>
       </motion.div>
 
-      <div className="w-full h-full absolute -z-10 pointer-events-none">
-        <div className="w-full h-full opacity-30 absolute flex items-center justify-center bg-cover">
-          <video
-            className="w-full h-auto"
-            preload="none"
-            playsInline
-            loop
-            muted
-            autoPlay
-          >
-            <source src="/videos/skills-bg.webm" type="video/webm" />
-          </video>
-        </div>
-      </div>
+      <CosmicNebula />
+
     </section>
   );
 };

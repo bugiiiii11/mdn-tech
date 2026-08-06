@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse, NextRequest } from 'next/server'
 import { exportConversationsMarkdown } from '@/lib/portal/analytics'
+import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
 
 export async function GET(
   request: NextRequest,
@@ -21,12 +22,21 @@ export async function GET(
     // Verify chatbot ownership
     const { data: chatbot } = await supabase
       .from('chatbots')
-      .select('id, name, owner_id')
+      .select('id, name, owner_id, feature_unlocks')
       .eq('id', chatbotId)
       .single()
 
     if (!chatbot || chatbot.owner_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Conversation export requires the one-time "conversations" unlock
+    // (matches the detail-page gate).
+    if (!isFeatureUnlocked(chatbot.feature_unlocks as FeatureUnlocks, 'conversations')) {
+      return NextResponse.json(
+        { error: 'Conversation export requires the Conversation viewer add-on' },
+        { status: 403 }
+      )
     }
 
     // Generate markdown

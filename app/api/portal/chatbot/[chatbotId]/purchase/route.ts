@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { STARTER_PACK_CREDITS, STARTER_PACK_PRICE_CENTS } from '@/lib/chat/usage'
+import { CREDIT_PACKS, creditPackById } from '@/lib/portal/plans'
 
 export const dynamic = 'force-dynamic'
 
+// POST /api/portal/chatbot/[chatbotId]/purchase  { packId?: 'starter' | 'growth' | 'scale' }
+// Mock credit-pack purchase. Adds the pack's credits to the chatbot's balance.
+// Real Stripe / MoR checkout slots in here later.
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ chatbotId: string }> }
 ) {
   const { chatbotId } = await params
@@ -14,6 +17,18 @@ export async function POST(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Default to the Starter pack when no body is sent (legacy callers).
+  let packId = CREDIT_PACKS[0].id as string
+  try {
+    const body = await req.json()
+    if (body?.packId) packId = String(body.packId)
+  } catch {
+    // no body — keep default
+  }
+
+  const pack = creditPackById(packId)
+  if (!pack) return NextResponse.json({ error: 'Invalid pack' }, { status: 400 })
 
   // Ownership check via RLS-enforced client
   const { data: chatbot } = await supabase
@@ -30,8 +45,10 @@ export async function POST(
   const { error: insertErr } = await service.from('chatbot_purchases').insert({
     chatbot_id: chatbotId,
     customer_id: user.id,
-    amount_cents: STARTER_PACK_PRICE_CENTS,
-    credits_added: STARTER_PACK_CREDITS,
+    amount_cents: pack.priceCents,
+    credits_added: pack.credits,
+    kind: 'credits',
+    pack_id: pack.id,
     status: 'mock',
   })
 
@@ -42,7 +59,7 @@ export async function POST(
   const { error: updateErr } = await service
     .from('chatbots')
     .update({
-      credits_purchased: (chatbot.credits_purchased ?? 0) + STARTER_PACK_CREDITS,
+      credits_purchased: (chatbot.credits_purchased ?? 0) + pack.credits,
     })
     .eq('id', chatbotId)
 
@@ -50,5 +67,5 @@ export async function POST(
     return NextResponse.json({ error: updateErr.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, credits_added: STARTER_PACK_CREDITS })
+  return NextResponse.json({ ok: true, credits_added: pack.credits, pack_id: pack.id })
 }

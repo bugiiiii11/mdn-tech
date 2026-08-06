@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { NAV_LINKS, SOCIALS } from "@/constants";
 import { SK_NAV_LINKS } from "@/constants/sk";
+import { APP_URL } from "@/lib/marketing/products";
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -47,6 +48,16 @@ export const Navbar = () => {
             ))}
           </div>
         </div>
+
+        {/* Open App CTA (EN only — /sk chrome stays untouched) */}
+        {!isSk && (
+          <a
+            href={APP_URL}
+            className="hidden md:block py-2 px-5 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold flex-shrink-0"
+          >
+            Open App
+          </a>
+        )}
 
         {/* Hamburger Menu */}
         <button
@@ -106,6 +117,17 @@ export const Navbar = () => {
                 </Link>
               ))}
             </div>
+
+            {/* Open App CTA (EN only) */}
+            {!isSk && (
+              <a
+                href={APP_URL}
+                className="block w-full py-3 px-4 mb-6 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Open App
+              </a>
+            )}
 
             {/* Divider */}
             <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mb-6" />

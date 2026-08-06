@@ -6,17 +6,16 @@ import { HandoffHero } from '@/components/portal/handoff/HandoffHero'
 import { WhatIsIt } from '@/components/portal/handoff/WhatIsIt'
 import { InstallBlock } from '@/components/portal/handoff/InstallBlock'
 import { SkillCards } from '@/components/portal/handoff/SkillCards'
-import { PlanKitTeaser } from '@/components/portal/handoff/PlanKitTeaser'
 import { ThirdPartySkills } from '@/components/portal/handoff/ThirdPartySkills'
+import { ThirdPartyMCPs } from '@/components/portal/handoff/ThirdPartyMCPs'
 import { FAQ } from '@/components/portal/handoff/FAQ'
-import { toolkitSkills } from '@/lib/portal/toolkit-skills'
+import { toolkitSkills, toolkitMCPs } from '@/lib/portal/toolkit-skills'
 
-// MVP: hide M.D.N Tech-only auxiliary skills (CMO, Test, Security Review, plus
-// the legacy /start and /wrap entries which the new Handoff card replaces).
+// MVP: hide M.D.N Tech-only auxiliary skills (CMO, Test, Security Review) plus
+// the handoff entry itself -- this page already features it above the gallery.
 // They stay in the data file; only the visible gallery is filtered.
 const HIDDEN_SKILL_IDS = new Set([
-  'wrap',
-  'start',
+  'handoff',
   'cmo',
   'test',
   'security-review',
@@ -25,7 +24,7 @@ const HIDDEN_SKILL_IDS = new Set([
 export const metadata: Metadata = {
   title: 'Handoff — Claude Code workflow skills | M.D.N Tech',
   description:
-    'Four free skills that make Claude Code remember your project across sessions. One-line install, MIT licensed.',
+    'One free skill — /handoff — that makes Claude Code remember your project across sessions. One-line install, MIT licensed.',
 }
 
 export default function ToolKitPage() {
@@ -39,8 +38,8 @@ export default function ToolKitPage() {
       <WhatIsIt />
       <InstallBlock />
       <SkillCards />
-      <PlanKitTeaser />
       <ThirdPartySkills skills={visibleThirdPartySkills} />
+      <ThirdPartyMCPs mcps={toolkitMCPs} />
       <FAQ />
 
       <footer className="py-10">

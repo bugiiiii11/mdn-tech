@@ -19,12 +19,15 @@ function isLocalDev(host: string): boolean {
 // Public portal paths (no auth required). ToolKit is the install destination
 // linked from social posts; signup-before-install would kill the funnel.
 // /auth/callback handles the post-email-confirm code exchange — must be
-// accessible before the session exists.
+// accessible before the session exists. /reset-password is dual-mode: it must
+// load for logged-out users (to request a reset link) as well as for users
+// arriving with a recovery session (to set the new password).
 function isPublicPortalPath(pathname: string): boolean {
   return (
     pathname === '/' ||
     pathname === '/login' ||
     pathname === '/signup' ||
+    pathname === '/reset-password' ||
     pathname === '/toolkit' ||
     pathname.startsWith('/toolkit/') ||
     pathname.startsWith('/auth/')
@@ -178,6 +181,7 @@ export async function updateSession(request: NextRequest) {
   const isPortal = pathname.startsWith('/portal')
   const isPortalLogin = pathname === '/portal/login'
   const isPortalSignup = pathname === '/portal/signup'
+  const isPortalResetPassword = pathname === '/portal/reset-password'
   const isPortalToolkit = pathname === '/portal/toolkit' || pathname.startsWith('/portal/toolkit/')
   const isPortalAuthCallback = pathname.startsWith('/portal/auth/')
 
@@ -193,7 +197,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isPortal && !isPortalLogin && !isPortalSignup && !isPortalToolkit && !isPortalAuthCallback && !user) {
+  if (isPortal && !isPortalLogin && !isPortalSignup && !isPortalResetPassword && !isPortalToolkit && !isPortalAuthCallback && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/portal/login'
     return NextResponse.redirect(url)

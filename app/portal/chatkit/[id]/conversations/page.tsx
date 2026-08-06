@@ -7,6 +7,7 @@ import { ChevronLeft } from 'lucide-react'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { ConversationViewer } from '@/components/portal/analytics/ConversationViewer'
 import { getConversationsWithMessages } from '@/lib/portal/analytics'
+import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
 
 interface ConversationsPageProps {
   params: Promise<{ id: string }>
@@ -26,12 +27,18 @@ export default async function ConversationsPage({
 
   const { data: chatbot } = await supabase
     .from('chatbots')
-    .select('id, name, widget_config, owner_id')
+    .select('id, name, widget_config, owner_id, feature_unlocks')
     .eq('id', chatbotId)
     .single()
 
   if (!chatbot || chatbot.owner_id !== user.id) {
     redirect('/portal/chatkit')
+  }
+
+  // Conversation viewer requires the one-time "conversations" unlock; accounts
+  // without it land back on the detail page, which shows the unlock path.
+  if (!isFeatureUnlocked(chatbot.feature_unlocks as FeatureUnlocks, 'conversations')) {
+    redirect(`/portal/chatkit/${chatbotId}`)
   }
 
   const fallbackMessage =

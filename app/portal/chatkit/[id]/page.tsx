@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
-import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft } from 'lucide-react'
+import { Bot, Plus, Download, MessageSquare, MessagesSquare, Hash, AlertTriangle, Activity, ChevronLeft, Lock, Sparkles, FileBarChart } from 'lucide-react'
 import { KBEntryList } from '@/components/command-center/chatbots/KBEntryList'
 import { KBExportButton } from '@/components/command-center/chatbots/KBExportButton'
 import { WidgetConfigForm } from '@/components/command-center/chatbots/WidgetConfigForm'
@@ -18,7 +18,12 @@ import {
   getChatbotAnalytics,
   getMessagesTrend,
   getTopKeywords,
+  type MessageTrendPoint,
+  type Keyword,
 } from '@/lib/portal/analytics'
+import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
+import { SuggestionList, type KBSuggestion } from '@/components/portal/learning/SuggestionList'
+import { ReportList, type ChatbotReport } from '@/components/portal/reports/ReportList'
 
 export default async function ChatbotDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -37,17 +42,42 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
 
   if (!chatbot) notFound()
 
+  const unlocks = chatbot.feature_unlocks as FeatureUnlocks
+  const canViewConversations = isFeatureUnlocked(unlocks, 'conversations')
+  const canViewAnalytics = isFeatureUnlocked(unlocks, 'analytics')
+  const reportsUnlocked = isFeatureUnlocked(unlocks, 'reports')
+  const learningUnlocked = isFeatureUnlocked(unlocks, 'learning')
+
   const fallbackMsg =
     (chatbot.widget_config as any)?.fallback_message ||
     "I'm not sure about that. Please contact us directly for more details."
 
-  const [{ data: entries }, analytics, trend, keywords, usage] = await Promise.all([
+  const [{ data: entries }, analytics, trend, keywords, usage, suggestionsResult, reportsResult] = await Promise.all([
     supabase.from('chatbot_kb_entries').select('*').eq('chatbot_id', id).order('sort_order').order('category'),
     getChatbotAnalytics(supabase, id, fallbackMsg),
-    getMessagesTrend(supabase, id, 7),
-    getTopKeywords(supabase, id, 8),
+    canViewAnalytics ? getMessagesTrend(supabase, id, 7) : Promise.resolve<MessageTrendPoint[]>([]),
+    canViewAnalytics ? getTopKeywords(supabase, id, 8) : Promise.resolve<Keyword[]>([]),
     checkChatbotUsage(id),
+    learningUnlocked
+      ? supabase
+          .from('chatbot_kb_suggestions')
+          .select('id, title, content, category, rationale, created_at')
+          .eq('chatbot_id', id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as KBSuggestion[] }),
+    reportsUnlocked
+      ? supabase
+          .from('chatbot_reports')
+          .select('id, period_start, period_end, stats, summary, email_sent, created_at')
+          .eq('chatbot_id', id)
+          .order('period_start', { ascending: false })
+          .limit(8)
+      : Promise.resolve({ data: [] as ChatbotReport[] }),
   ])
+
+  const suggestions = (suggestionsResult.data ?? []) as KBSuggestion[]
+  const reports = (reportsResult.data ?? []) as ChatbotReport[]
 
   const grouped = (entries ?? []).reduce((acc: Record<string, any[]>, e) => {
     acc[e.category] = [...(acc[e.category] ?? []), e]
@@ -125,7 +155,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-5 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-white">Activity</h2>
-            {hasConversations && (
+            {hasConversations && canViewConversations && (
               <div className="flex items-center gap-2">
                 <Link
                   href={`/portal/chatkit/${chatbot.id}/conversations`}
@@ -142,6 +172,15 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
                   Export
                 </a>
               </div>
+            )}
+            {hasConversations && !canViewConversations && (
+              <Link
+                href={`/portal/chatkit/${chatbot.id}/upgrade`}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] text-gray-500 border border-white/10 hover:border-purple-400/40 hover:text-purple-300 rounded-md transition-colors"
+              >
+                <Lock className="w-3 h-3" />
+                Unlock conversation viewer
+              </Link>
             )}
           </div>
 
@@ -161,7 +200,25 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Charts row — only render meaningful content */}
-          {hasConversations ? (
+          {hasConversations && !canViewAnalytics ? (
+            <div className="bg-[#0a0a14] border border-dashed border-white/10 rounded-lg px-4 py-6 flex items-start gap-3">
+              <span className="w-7 h-7 rounded-md bg-purple-500/10 text-purple-300 flex items-center justify-center flex-shrink-0">
+                <Lock className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <p className="text-sm font-medium text-gray-200">Trends + keyword analytics</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Message trends and top-keyword extraction are a one-time $29 add-on for this chatbot.
+                </p>
+                <Link
+                  href={`/portal/chatkit/${chatbot.id}/upgrade`}
+                  className="inline-block mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  Unlock analytics →
+                </Link>
+              </div>
+            </div>
+          ) : hasConversations ? (
             <div className={`grid gap-3 ${showTrend && showKeywords ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
               {showTrend ? (
                 <TrendChart data={trend} title="Messages — last 7 days" />
@@ -198,6 +255,31 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
 
         {/* Usage quota (compact, sits with overview metrics) */}
         <UsageMeter chatbotId={chatbot.id} usage={usage} />
+
+        {/* Add-ons still available to unlock */}
+        {(!reportsUnlocked || !learningUnlocked) && (
+          <section className="bg-[#0d0d20]/60 border border-white/[0.06] rounded-xl p-4 flex items-start gap-3 backdrop-blur-sm">
+            <span className="w-7 h-7 rounded-md bg-pink-500/10 text-pink-300 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-3.5 h-3.5" />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-gray-200">More add-ons for this chatbot</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {learningUnlocked
+                  ? 'Weekly reports are available as a one-time unlock.'
+                  : reportsUnlocked
+                  ? 'Auto-learning is available as a one-time unlock.'
+                  : 'Auto-learning and weekly reports are available as one-time unlocks.'}
+              </p>
+              <Link
+                href={`/portal/chatkit/${chatbot.id}/upgrade`}
+                className="inline-block mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                See add-ons →
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Deploy */}
         {chatbot.status === 'active' && (
@@ -239,6 +321,42 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
             <KBEntryList chatbotId={chatbot.id} grouped={grouped} basePath="/portal/chatkit" />
           )}
         </section>
+
+        {/* Auto-learning: pending KB suggestions drafted from rated replies */}
+        {learningUnlocked && (
+          <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-md bg-amber-500/10 text-amber-300 flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-medium text-white">Auto-learning</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {suggestions.length} pending suggestion{suggestions.length === 1 ? '' : 's'} · weekly pass runs Sunday
+                </p>
+              </div>
+            </div>
+            <SuggestionList chatbotId={chatbot.id} suggestions={suggestions} />
+          </section>
+        )}
+
+        {/* Weekly reports: performance digests generated Monday + emailed */}
+        {reportsUnlocked && (
+          <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-md bg-cyan-500/10 text-cyan-300 flex items-center justify-center">
+                <FileBarChart className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <h2 className="text-sm font-medium text-white">Weekly reports</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {reports.length} report{reports.length === 1 ? '' : 's'} · generated Monday mornings
+                </p>
+              </div>
+            </div>
+            <ReportList chatbotId={chatbot.id} reports={reports} />
+          </section>
+        )}
       </div>
     </PortalShell>
   )

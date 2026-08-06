@@ -258,24 +258,20 @@ export const OTHER_SKILL = [
 
 export const NAV_LINKS = [
   {
-    title: "About Us",
-    link: "/#about-us",
+    title: "Products",
+    link: "/#products",
   },
   {
-    title: "Services",
-    link: "/#services",
+    title: "Free Tools",
+    link: "/#free-tools",
   },
   {
-    title: "Process",
-    link: "/#process",
+    title: "About",
+    link: "/about",
   },
   {
-    title: "Team",
-    link: "/#team",
-  },
-  {
-    title: "Contact Us",
-    link: "/#contact-us",
+    title: "Blog",
+    link: "/blog",
   },
 ] as const;
 
