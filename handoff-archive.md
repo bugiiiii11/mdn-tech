@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 49) -- Prio 4 Weekly reports shipped; Phase C build-complete (rotated 2026-08-07)
+
+- Weekly reports SHIPPED; `reports` flipped to `available` in `lib/portal/plans.ts` -- $39 per-bot unlock purchasable everywhere with zero UI edits (all surfaces read `FEATURES` status). Last coming-soon feature gone.
+- Loop: Monday 06:10 UTC cron `chatkit-reports` (migration 019) or detail-page "Run now" -> `/api/portal/chatkit/reports/run` aggregates last 7d vs prev 7d (conversations, replies, fallback rate via widget_config fallback string, owner ratings +/-, top keywords via new shared `extractKeywords` in `lib/portal/analytics.ts`) -> Haiku 2-4 sentence narrative -> upsert `chatbot_reports` (unique chatbot_id+period_start, re-runs never duplicate) -> Resend email to `customers.email` from reports@mdntech.org.
+- Route mirrors learning/run (cron = all reports-unlocked active bots; manual = ownership + unlock checks). REUSES the same `chatkit_cron_secret` vault pair -- one secret powers both ChatKit crons, no new ops. Zero-activity bots skipped (no noise emails); narrative or email failure never fails the run (`email_sent` flag records delivery).
+- UI: new `components/portal/reports/ReportList.tsx` + Weekly reports section on chatbot detail page (last 8 reports, expandable stat tiles w/ WoW deltas, keyword chips, narrative, emailed badge, Run now); stale "reports coming soon" teaser copy fixed.
+- Migration 019 APPLIED via Management API + verified (table + RLS select policy + active cron). NOTE: email templates are 5 files (incl. confirm-signup), not 4 as S48 noted.
+- Verified: tsc/lint/build green; route smoke-tested on localhost dev (unauthenticated POST -> clean 401 JSON). NOT E2E-tested (needs login + chat traffic + real inbox).
+- NEW OPS: `RESEND_API_KEY` must exist in Vercel env for the portal app (present in `.env.local`; edge functions have their own copy) -- verify in Martin task 3.
+
 ## What Was Done (Session 48) -- Prio 7 auth flow UIs + prio 3 Auto-learning shipped (rotated 2026-08-07)
 
 - Prio 7 DONE (`4fc4dc5`): dual-mode `/reset-password` page (logged-out = request link via `resetPasswordForEmail`; recovery session via `/auth/callback` = set new password); LoginForm gained magic-link mode (`signInWithOtp`, `shouldCreateUser:false` -- no role-less junk accounts) + Forgot-password link; Settings "Security" card = email change (dual confirm) + password change with automatic reauth-OTP fallback (`reauthenticate()` -> `nonce`); `/reset-password` added to middleware public paths (both guards).
@@ -47,6 +57,7 @@
 
 | # | Date | Title |
 |---|------|-------|
+| 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
