@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 50) -- Credit system + payments locked; launch plan re-baselined; merged to main (rotated 2026-08-07)
+
+- Universal credit system DECIDED (2026-08-06): account-level append-only ledger; Stripe sells ONLY credit packs; everything else (unlocks, future image/video gen) = internal ledger spend. Packs unchanged ($29/500 - $99/2.5k - $299/10k; Scale gets "Best value" badge) + hidden Enterprise $999/40k prepared later; unlocks re-priced to credits @ Growth reference ~4c: conversations 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250.
+- Policy locked: 12-mo credit expiry (30-day warning email); refund 14 days ONLY if 0 credits of that purchase used (ElevenLabs pattern); failed action = auto re-credit, never money; chargeback clawback = negative ledger entry + account auto-suspend (only path to negative balance -- spends are pre-checked); signup grant 50 promo credits.
+- B2B-only checkout CONFIRMED long-term: company name required, VAT ID OR business reg number (ICO), "purchasing as a business" checkbox, reverse-charge EU B2B, no OSS. EU-side evidence approach to be confirmed by Filip (plan SS2.0b).
+- Provider path: Stripe UAE v1 (fees verified: 2.9% + AED1 domestic, +1% intl card, +1% FX, zero fixed costs); N-Genius later DATA-driven -- check Stripe card-country report at ~$2k/mo (setup ~AED 3,500). MoR ruled out; Lemon Squeezy plan ABANDONED.
+- Launch plan doc updated (MindPalace): new SS2.4b/2.7/2.8, SS2.5 locked, SS3.1 DONE, timeline re-baselined (T4 = MVP launch ~31.08), Phase 8 notes; isHosting UAE costs verified: total infra ~$85-125/mo.
+- Sequencing (Martin): UAE substance finishes FIRST, then isHosting servers -- Phase 8 stays post-launch. Wio fully working. Stripe activation = Martin's critical-path task NOW (1-2 week verification).
+- Phase 0.1 EXECUTED: feat/landing-rebuild (19 commits) merged into main + pushed -- prod deploy via Vercel.
+
 ## What Was Done (Session 49) -- Prio 4 Weekly reports shipped; Phase C build-complete (rotated 2026-08-07)
 
 - Weekly reports SHIPPED; `reports` flipped to `available` in `lib/portal/plans.ts` -- $39 per-bot unlock purchasable everywhere with zero UI edits (all surfaces read `FEATURES` status). Last coming-soon feature gone.
