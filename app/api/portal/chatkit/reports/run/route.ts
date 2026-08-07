@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isFeatureUnlocked, type FeatureUnlocks } from '@/lib/portal/plans'
 import { extractKeywords, type Keyword } from '@/lib/portal/analytics'
+import { isCronRequest } from '@/lib/auth/cron'
 
 // Weekly report generation pass. Two callers:
 //  - Monday pg_cron (migration 019) with Bearer CHATKIT_CRON_SECRET -> all
@@ -43,9 +44,7 @@ type ReportStats = {
 const BOT_COLUMNS = 'id, name, owner_id, feature_unlocks, widget_config'
 
 export async function POST(request: NextRequest) {
-  const cronSecret = process.env.CHATKIT_CRON_SECRET
-  const authHeader = request.headers.get('authorization') ?? ''
-  const isCron = Boolean(cronSecret) && authHeader === `Bearer ${cronSecret}`
+  const isCron = isCronRequest(request)
 
   let body: { chatbotId?: string } = {}
   try {

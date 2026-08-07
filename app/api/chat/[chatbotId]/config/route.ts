@@ -1,31 +1,55 @@
 import { createServiceClient } from '@/lib/supabase/service'
-import { corsHeaders, corsResponse } from '@/lib/chat/cors'
+import { corsHeaders, corsResponse, isOriginAllowed, requestOrigin } from '@/lib/chat/cors'
 import { checkChatbotUsage } from '@/lib/chat/usage'
+import { chatbotIdSchema } from '@/lib/chat/schemas'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-export async function OPTIONS() {
-  return corsResponse()
+export async function OPTIONS(req: Request) {
+  return corsResponse(requestOrigin(req))
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ chatbotId: string }> }
 ) {
-  const { chatbotId } = await params
+  const { chatbotId: rawChatbotId } = await params
+  const origin = requestOrigin(req)
+  const cors = corsHeaders(origin)
+
+  const idCheck = chatbotIdSchema.safeParse(rawChatbotId)
+  if (!idCheck.success) {
+    return NextResponse.json({ error: 'Chatbot not found' }, { status: 404, headers: cors })
+  }
+  const chatbotId = idCheck.data
+
   const supabase = createServiceClient()
 
   const { data: chatbot, error } = await supabase
     .from('chatbots')
-    .select('name, client_name, status, widget_config, owner_id')
+    .select('name, client_name, status, widget_config, owner_id, allowed_domains')
     .eq('id', chatbotId)
     .single()
 
   if (error || !chatbot || chatbot.status !== 'active') {
+    return NextResponse.json({ error: 'Chatbot not found' }, { status: 404, headers: cors })
+  }
+
+  // Same domain binding as the message route: refuse to hand over the widget
+  // config (greeting, colour, client name) to an unauthorised embed, so a
+  // lifted snippet fails visibly at load instead of on first message.
+  const allowedDomains: string[] = chatbot.allowed_domains ?? []
+  if (!chatbot.owner_id && allowedDomains.length === 0) {
     return NextResponse.json(
-      { error: 'Chatbot not found' },
-      { status: 404, headers: corsHeaders }
+      { error: 'This chatbot is not configured for public use.' },
+      { status: 403, headers: cors }
+    )
+  }
+  if (!isOriginAllowed(origin, allowedDomains)) {
+    return NextResponse.json(
+      { error: 'This chatbot is not authorised on this domain.' },
+      { status: 403, headers: cors }
     )
   }
 
@@ -45,5 +69,5 @@ export async function GET(
     primaryColor: config.primary_color || '#7c3aed',
     position: config.position || 'bottom-right',
     disabled,
-  }, { headers: corsHeaders })
+  }, { headers: cors })
 }

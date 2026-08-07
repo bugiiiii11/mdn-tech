@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (re-baselined 2026-08-07; MVP launch target ~31.08). **Phase 0 CLOSED** (0.1 merge+deploy S50, 0.2-0.5 security fix-pack S51). Next: Phase 1 hardening (all six items are ChatKit-facing) -> Phase 2 credit bank.
-- **Session count:** 51
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (re-baselined 2026-08-07; MVP launch target ~31.08). **Phase 0 CLOSED** (S50-S51, code now live on main). **Phase 1 CLOSED** (1.1-1.6, S52, branch-only). Next: Phase 2 credit bank.
+- **Session count:** 52
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (all 4 features available; Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-43 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 42 | 2026-07-16/17 | Landing rebuild Phase A -- A1+A2+A3 code-complete |
 | 43 | 2026-07-17 | Nebula seam fix + A3.3/A3.4 -- Phase A verification complete |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
@@ -22,16 +21,7 @@
 | 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
 | 50 | 2026-08-06/07 | Credit system + payments design locked; launch plan re-baselined; merged to main (Phase 0.1) |
 | 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
-
-## What Was Done (Session 50) -- Credit system + payments locked; launch plan re-baselined; merged to main
-
-- Universal credit system DECIDED (2026-08-06): account-level append-only ledger; Stripe sells ONLY credit packs; everything else (unlocks, future image/video gen) = internal ledger spend. Packs unchanged ($29/500 - $99/2.5k - $299/10k; Scale gets "Best value" badge) + hidden Enterprise $999/40k prepared later; unlocks re-priced to credits @ Growth reference ~4c: conversations 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250.
-- Policy locked: 12-mo credit expiry (30-day warning email); refund 14 days ONLY if 0 credits of that purchase used (ElevenLabs pattern); failed action = auto re-credit, never money; chargeback clawback = negative ledger entry + account auto-suspend (only path to negative balance -- spends are pre-checked); signup grant 50 promo credits.
-- B2B-only checkout CONFIRMED long-term: company name required, VAT ID OR business reg number (ICO), "purchasing as a business" checkbox, reverse-charge EU B2B, no OSS. EU-side evidence approach to be confirmed by Filip (plan SS2.0b).
-- Provider path: Stripe UAE v1 (fees verified: 2.9% + AED1 domestic, +1% intl card, +1% FX, zero fixed costs); N-Genius later DATA-driven -- check Stripe card-country report at ~$2k/mo (setup ~AED 3,500). MoR ruled out; Lemon Squeezy plan ABANDONED.
-- Launch plan doc updated (MindPalace): new SS2.4b/2.7/2.8, SS2.5 locked, SS3.1 DONE, timeline re-baselined (T4 = MVP launch ~31.08), Phase 8 notes; isHosting UAE costs verified: total infra ~$85-125/mo.
-- Sequencing (Martin): UAE substance finishes FIRST, then isHosting servers -- Phase 8 stays post-launch. Wio fully working. Stripe activation = Martin's critical-path task NOW (1-2 week verification).
-- Phase 0.1 EXECUTED: feat/landing-rebuild (19 commits) merged into main + pushed -- prod deploy via Vercel.
+| 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 
 ## What Was Done (Session 51) -- Security fix-pack: 6 confirmed prod exploits closed (Phase 0.2-0.5)
 
@@ -45,6 +35,19 @@
 - Test scripts live in the session scratchpad only (not committed) -- Phase 3.5 should port them into the CI E2E suite.
 - SHIPPING GAP: migration 020 is live on PROD (DB-side exploits are closed everywhere), but the code half (`d3acf72`) is pushed only to `feat/landing-rebuild`. Until it merges to `main`, prod `/api/infrastructure` still admits any signed-in account and the Command Center staff gate is not deployed. Merge early next session.
 
+## What Was Done (Session 52) -- Phase 0 merged to main; Phase 1 hardening 1.1-1.6
+
+- Phase 0.2-0.5 code merged to `main` + pushed (`7328d97`) -- the S51 shipping gap is closed; the `/api/infrastructure` guard and CC staff gate are live in prod alongside migration 020.
+- **Phase 1 CLOSED in one commit `b9aab5b` (branch-only -- NOT deployed).** Migration `021_chatkit_hardening.sql` APPLIED to prod and verified. 021 alone changes nothing in prod: no deployed code reads the new column/table, so there is no repeat of the S51 gap -- but the protections only go live on the next merge to main.
+- 1.1 domain binding: `chatbots.allowed_domains` (hostnames, `*.` wildcard) enforced server-side in both `/api/chat` routes + field in `WidgetConfigForm`. Empty = allow-any so no customer widget broke. The blanket CORS `*` block was REMOVED from `next.config.js` -- it would have emitted a second, conflicting ACAO alongside the per-request one and browsers reject that.
+- 1.2: the only owner-less bot is a REAL live client widget (Royal Stroje). Rather than break it, its allow-list was seeded in the migration from observed `chat_conversations.source_url` traffic (`royalstroje.sk`). Internal bots: empty allow-list is now a hard DENY (not allow-all), 500 msg/day cap, and `messages_used` ticks for them too.
+- 1.3 rate limiting is **Postgres-backed, not Upstash** as the plan said -- Upstash needs an account + env vars from Martin and the whole point of the Phase 1 block was that it is unblocked. `rate_limits` table + `rate_limit_hit()` RPC, atomic, cross-lambda, per-IP + per-bot in ONE round trip, daily purge cron. It **fails open** on DB error by design (every request still has to clear the credit check before it can cost anything). Swap to Upstash later is a one-file change in `lib/chat/rate-limit.ts`.
+- Two flaws found while building, both fixed: the limiter originally sat AFTER the chatbot+KB queries (so unlimited 404s could still hammer Postgres -- moved before), and a supplied `conversationId` was never scoped to its chatbot (one bot could append to another's conversation).
+- 1.4: zod on the chat routes; `/api/subscribe` was an open unvalidated pipe into the Brevo list -- now validated + 5/hour. NOTE: zod v4 `.uuid()` is strict about version/variant bits; hand-written test uuids must be well-formed v4 or they 404 before reaching any logic.
+- 1.5: CSP on every page (no `unsafe-eval` in prod, `upgrade-insecure-requests` prod-only -- it breaks http://localhost navigation in dev); timing-safe cron secret compare in `lib/auth/cron.ts`, shared by both cron routes.
+- 1.6: visitor text is neutralized + framed as untrusted data in the KB-drafting prompt; suspicious drafts get `flagged`/`flag_reason`, a portal warning, and a two-click confirm enforced in the API (not just the UI). Ratings are owner-only, which was already a real gate.
+- Verified: domain binding 7/7, input validation 8/8, limiter blocks at exactly limit+1 with correct Retry-After, sanitizer 22/22, cron compare 8/8, 0 CSP violations across 7 pages in a PRODUCTION build (Playwright). tsc + lint + build green. Probe scripts are in the session scratchpad only -- Phase 3.5 should port them.
+
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
 1. **Stripe UAE activation (CRITICAL PATH, start this week):** dashboard.stripe.com -> create account for the FZE: trade license 7813, Emirates ID + residence visa, Wio account details (Wio confirmed working). Verification takes 1-2 weeks and gates Phase 2 payments -- start before anything else.
@@ -57,18 +60,14 @@
 
 ## What To Do Next -- ChatKit remaining work
 
-**Next session: Phase 1 hardening.** All six items are ChatKit-facing and none are blocked on Martin -- this is the clean next block. Then Phase 2 (credit bank), which is now easier because 020 already made every billing column service-role-only.
+**Next session: merge Phase 1 to main, then start Phase 2 (credit bank).** Phase 2 is easier now -- 020 made every billing column service-role-only and 021 established the migration patterns for it.
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 1 | **Phase 1.1 Widget domain-binding** | `allowed_domains` per chatbot + origin check in `/api/chat/*`, replacing CORS `*` (`lib/chat/cors.ts`). Doubles as a product feature ("your widget only runs on your domain"). Needs a migration + a field in the portal widget config UI. |
-| 1 | **Phase 1.2 Close unmetered internal bots** | `owner_id IS NULL` -> `Infinity` in `lib/chat/usage.ts:42-52`. Any leaked internal bot ID = free unlimited Claude. Give internal bots a cap + origin lock. |
-| 1 | **Phase 1.3 Durable rate limiting** | In-memory `Map` does nothing on serverless (every request may be a cold lambda). Upstash Redis, per-IP AND per-bot, on `/api/chat/*` and the portal routes. |
-| 1 | **Phase 1.4 Zod validation on public routes** | zod is already in deps with 0 usages. Validate + bound `visitorId`, `sourceUrl`, message length on the public chat routes. |
-| 1 | **Phase 1.5 CSP header + timing-safe cron compare** | CSP in `next.config`/middleware; `crypto.timingSafeEqual` for `CHATKIT_CRON_SECRET` in both `learning/run` and `reports/run`. |
-| 1 | **Phase 1.6 Learning-loop poisoning** | An anonymous visitor can shape KB suggestions today. Sanitize/flag suggested entries; owner review stays mandatory. Highest-value of the six -- it writes to the bot's permanent prompt. |
-| 2 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate `chatbots.credits_purchased` balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250) and the 3 mock-checkout routes collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" badge on Scale; 2.7 policy build (12-mo expiry + 30-day warning email, refund window, auto re-credit, chargeback clawback + auto-suspend, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys land. NOTE: grant SELECT-only to `authenticated` on the new ledger; all writes service-role. |
-| 3 | Phase 3.5 E2E + CI | Port the S51 security probe scripts into a committed suite; add GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
+| 0 | **Merge `feat/landing-rebuild` -> `main`** | `b9aab5b` (Phase 1) is branch-only. Migration 021 is already live on prod but inert until this code deploys. Nothing is broken meanwhile -- just unprotected. Verify after deploy: the Royal Stroje widget still answers on royalstroje.sk (its allow-list is now ENFORCED). |
+| 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate `chatbots.credits_purchased` balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250) and the 3 mock-checkout routes collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" badge on Scale; 2.7 policy build (12-mo expiry + 30-day warning email, refund window, auto re-credit, chargeback clawback + auto-suspend, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys land. NOTE: grant SELECT-only to `authenticated` on the new ledger; all writes service-role. |
+| 3 | Phase 3.5 E2E + CI | Port the S51 + S52 probe scripts into a committed suite (S52 added: domain binding, input validation, rate limiter, sanitizer, cron compare, Playwright CSP check -- all scratchpad-only). Add GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
+| 4 | Widen the Phase 1 controls | Rate limiting covers `/api/chat/*` + `/api/subscribe`; the authenticated portal routes are still unlimited. CSP still needs `unsafe-inline` for scripts -- nonce-based CSP via middleware is the follow-up. |
 | 5 | ChatKit Voice (Cartesia Sonic-3) | Deferred. ~6h. |
 | 0b | MarketKit B3 Dub go-live + Session B remainder | Gated on Martin task 4; then edge secret + worker redeploy (5 parts) + migration 016 (`MARKETKIT-SETUP.md` B3 runbook). Then B1 GA4/GSC + B5 dogfood onboarding. |
 | 8 | Phase 8 UAE hosting migration (isHosting) | AFTER substance + post-launch. Costs verified ~$85-125/mo. Plan SS8 has the checklist. |
@@ -82,13 +81,14 @@
 | File | Purpose |
 |------|---------|
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
-| `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) -- Phase 0 fully checked off S51 |
+| `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) -- Phases 0 and 1 fully checked off (S51/S52) |
 | `supabase/migrations/020_security_fixpack.sql` | The security model: column grants, invite-only staff, chatbot-limit trigger. Read before touching billing columns or adding tables |
 | `lib/auth/team.ts` | Staff identity from the DB (`requireAdmin` guard). `user_metadata` is NOT authoritative -- users can rewrite it |
 | `lib/portal/plans.ts` | Billing source of truth -- Phase 2 repricing (credit-priced unlocks, hidden Enterprise pack) lands here |
 | `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | The 3 mock checkout routes -- collapse into one credit purchase + ledger spends (Phase 2) |
-| `lib/chat/{usage,cors}.ts` | Metering + CORS -- Phase 1.1/1.2 land here |
+| `supabase/migrations/021_chatkit_hardening.sql` | Phase 1 DB half: `allowed_domains`, `rate_limits` + `rate_limit_hit()`, suggestion flags. APPLIED to prod |
+| `lib/chat/{cors,rate-limit,schemas,sanitize}.ts` | The Phase 1 public-surface controls: origin matching, durable limiter, zod contracts, injection heuristics |
 | `app/api/portal/chatkit/{learning,reports}/run/` | The two ChatKit cron routes (shared `chatkit_cron_secret`; Sun 06:00 / Mon 06:10 UTC) |
 | `supabase/email-templates/` | 5 branded auth email templates -- dashboard paste = Martin task 2 |
-| `supabase/migrations/` | 001-020; 017-020 APPLIED; 016 (Dub) pending apply after Martin task 4 |
+| `supabase/migrations/` | 001-021; 017-021 APPLIED; 016 (Dub) pending apply after Martin task 4 |
 | `decisions.md` | Locked architectural decisions |

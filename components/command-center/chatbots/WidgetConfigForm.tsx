@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { normalizeDomain } from '@/lib/chat/cors'
 
 const inp = 'w-full bg-[#0a0a1a] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50 transition-colors'
 
@@ -13,7 +14,30 @@ type WidgetConfig = {
   fallback_message?: string
 }
 
-export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; config: WidgetConfig }) {
+// One domain per line, and whatever the owner pasted gets normalised to a bare
+// hostname before it is saved -- the API matches on hostname only.
+function parseDomains(raw: string): { domains: string[]; invalid: string[] } {
+  const domains: string[] = []
+  const invalid: string[] = []
+  for (const line of raw.split(/[\n,]/)) {
+    const entry = line.trim()
+    if (!entry) continue
+    const normalized = normalizeDomain(entry)
+    if (!normalized) invalid.push(entry)
+    else if (!domains.includes(normalized)) domains.push(normalized)
+  }
+  return { domains, invalid }
+}
+
+export function WidgetConfigForm({
+  chatbotId,
+  config,
+  allowedDomains = [],
+}: {
+  chatbotId: string
+  config: WidgetConfig
+  allowedDomains?: string[]
+}) {
   const router = useRouter()
   const [form, setForm] = useState<WidgetConfig>({
     greeting: config.greeting ?? '',
@@ -21,11 +45,18 @@ export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; con
     primary_color: config.primary_color ?? '#7c3aed',
     fallback_message: config.fallback_message ?? '',
   })
+  const [domains, setDomains] = useState(allowedDomains.join('\n'))
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
 
   async function handleSave() {
+    const { domains: parsedDomains, invalid } = parseDomains(domains)
+    if (invalid.length > 0) {
+      setError(`Not a valid domain: ${invalid.join(', ')}`)
+      return
+    }
+
     setSaving(true)
     setError('')
     setSaved(false)
@@ -33,7 +64,7 @@ export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; con
     const supabase = createClient()
     const { error: err } = await supabase
       .from('chatbots')
-      .update({ widget_config: form })
+      .update({ widget_config: form, allowed_domains: parsedDomains })
       .eq('id', chatbotId)
 
     setSaving(false)
@@ -98,6 +129,22 @@ export function WidgetConfigForm({ chatbotId, config }: { chatbotId: string; con
             onChange={e => setForm({ ...form, fallback_message: e.target.value })}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-gray-400 block mb-1">Allowed domains</label>
+        <textarea
+          className={inp + ' h-20 resize-none font-mono text-xs'}
+          placeholder={'example.com\n*.example.com'}
+          value={domains}
+          onChange={e => setDomains(e.target.value)}
+          spellCheck={false}
+        />
+        <p className="text-[10px] text-gray-600 mt-1">
+          One per line. Your widget only answers on these domains — anywhere else it is refused, so
+          nobody can copy your snippet and spend your credits. <span className="text-gray-500">example.com</span> also
+          covers www; use <span className="text-gray-500">*.example.com</span> for all subdomains. Leave empty to allow any site.
+        </p>
       </div>
 
       {error && <p className="text-xs text-red-400">{error}</p>}

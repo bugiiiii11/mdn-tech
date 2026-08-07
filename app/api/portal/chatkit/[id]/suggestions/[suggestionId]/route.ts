@@ -15,7 +15,7 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { action?: string } = {}
+  let body: { action?: string; confirmFlagged?: boolean } = {}
   try {
     body = await request.json()
   } catch {
@@ -44,6 +44,21 @@ export async function POST(
   if (!suggestion) return NextResponse.json({ error: 'Suggestion not found' }, { status: 404 })
   if (suggestion.status !== 'pending') {
     return NextResponse.json({ error: 'Suggestion already reviewed' }, { status: 409 })
+  }
+
+  // A flagged draft was built from visitor text that looks like a prompt
+  // injection attempt, and accepting it writes into the bot's permanent
+  // prompt. The portal shows the warning and sends confirmFlagged; enforcing
+  // it here too means a scripted accept cannot skip the human read.
+  if (action === 'accept' && suggestion.flagged && body.confirmFlagged !== true) {
+    return NextResponse.json(
+      {
+        error: 'This suggestion is flagged as possible prompt injection. Review the full draft and confirm.',
+        flagged: true,
+        flagReason: suggestion.flag_reason ?? null,
+      },
+      { status: 409 }
+    )
   }
 
   let kbEntryId: string | null = null

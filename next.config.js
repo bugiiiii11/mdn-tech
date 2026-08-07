@@ -1,3 +1,34 @@
+const isDev = process.env.NODE_ENV !== "production";
+
+// Content-Security-Policy for our own pages (mdntech.org, app., admin.).
+//
+// It does NOT apply to the embeddable widget: public/widget.js executes inside
+// the customer's page under the customer's CSP.
+//
+// 'unsafe-inline' + 'unsafe-eval' in script-src are Next.js requirements --
+// the framework ships inline bootstrap scripts, and dev mode needs eval for
+// React Fast Refresh. Tightening those needs nonce-based CSP via middleware,
+// which is a separate piece of work; everything else is locked down now.
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob:",
+  "font-src 'self' data:",
+  // Supabase (auth, data, realtime) + EmailJS (contact forms, browser SDK).
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.emailjs.com",
+  "worker-src 'self' blob:",
+  "frame-src 'none'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  // Prod only: on http://localhost this rewrites navigations to https and the
+  // dev server (plain http) drops them.
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -14,27 +45,11 @@ const nextConfig = {
   },
   async headers() {
     return [
-      {
-        source: "/api/chat/:path*",
-        headers: [
-          {
-            key: "Access-Control-Allow-Origin",
-            value: "*",
-          },
-          {
-            key: "Access-Control-Allow-Methods",
-            value: "GET, POST, OPTIONS",
-          },
-          {
-            key: "Access-Control-Allow-Headers",
-            value: "Content-Type",
-          },
-          {
-            key: "Access-Control-Max-Age",
-            value: "86400",
-          },
-        ],
-      },
+      // NOTE: the /api/chat/* CORS block that used to live here is gone. It
+      // pinned Access-Control-Allow-Origin to "*" for every widget request and
+      // would now emit a second, conflicting value alongside the per-chatbot
+      // header the route handlers set (lib/chat/cors.ts), which browsers reject
+      // outright. CORS for the widget API is owned by the routes.
       {
         source: "/videos/:path*",
         headers: [
@@ -47,6 +62,10 @@ const nextConfig = {
       {
         source: "/:path*",
         headers: [
+          {
+            key: "Content-Security-Policy",
+            value: csp,
+          },
           {
             key: "X-DNS-Prefetch-Control",
             value: "on",
