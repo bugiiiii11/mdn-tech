@@ -1,14 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { checkRateLimit, clientIp } from "@/lib/chat/rate-limit";
+
+// Public, unauthenticated newsletter signup. "email.includes('@')" used to be
+// the entire validation and there was no limit at all, so one script could
+// stuff the Brevo list with junk addresses and burn the send quota.
+
+const subscribeSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+});
+
+const SUBSCRIBE_RULE = { limit: 5, window: 3600 };
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
-
-    // Validate email
-    if (!email || !email.includes("@")) {
+    const parsed = subscribeSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Valid email is required" },
         { status: 400 }
+      );
+    }
+    const { email } = parsed.data;
+
+    const { allowed, retryAfter } = await checkRateLimit([
+      { key: `subscribe:${clientIp(request)}`, ...SUBSCRIBE_RULE },
+    ]);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many signups from this address. Try again later." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
       );
     }
 

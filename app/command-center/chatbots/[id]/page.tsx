@@ -116,7 +116,11 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
       )}
 
       {/* Widget Config */}
-      <WidgetConfigForm chatbotId={chatbot.id} config={chatbot.widget_config ?? {}} />
+      <WidgetConfigForm
+        chatbotId={chatbot.id}
+        config={chatbot.widget_config ?? {}}
+        allowedDomains={chatbot.allowed_domains ?? []}
+      />
 
       {/* KB entries by category */}
       <div className="space-y-4">

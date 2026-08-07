@@ -39,7 +39,11 @@ export async function checkChatbotUsage(chatbotId: string): Promise<ChatbotUsage
     .eq('id', chatbotId)
     .maybeSingle<ChatbotState>()
 
-  // Internal/admin chatbots (no owner) bypass billing.
+  // Internal/admin chatbots (no owner) have no credit balance to draw down, so
+  // there is nothing for this function to meter. They are NOT unlimited: the
+  // public route caps them with INTERNAL_BOT_DAILY_RULE and refuses to serve
+  // them at all unless allowed_domains is set (see the chat message route).
+  // Before that, a leaked owner-less chatbot id was free unlimited Claude.
   if (!chatbot || !chatbot.owner_id) {
     return {
       allowed: true,

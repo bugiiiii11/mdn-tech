@@ -61,7 +61,7 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
     learningUnlocked
       ? supabase
           .from('chatbot_kb_suggestions')
-          .select('id, title, content, category, rationale, created_at')
+          .select('id, title, content, category, rationale, created_at, flagged, flag_reason')
           .eq('chatbot_id', id)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
@@ -287,7 +287,11 @@ export default async function ChatbotDetailPage({ params }: { params: Promise<{ 
         )}
 
         {/* Widget Config */}
-        <WidgetConfigForm chatbotId={chatbot.id} config={chatbot.widget_config ?? {}} />
+        <WidgetConfigForm
+          chatbotId={chatbot.id}
+          config={chatbot.widget_config ?? {}}
+          allowedDomains={chatbot.allowed_domains ?? []}
+        />
 
         {/* Knowledge Base */}
         <section className="bg-[#0d0d20]/80 border border-white/[0.06] rounded-xl p-5 space-y-4 backdrop-blur-sm">

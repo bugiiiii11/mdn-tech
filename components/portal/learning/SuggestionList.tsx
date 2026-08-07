@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, X, RefreshCw, Lightbulb } from 'lucide-react'
+import { Check, X, RefreshCw, Lightbulb, ShieldAlert } from 'lucide-react'
 
 export type KBSuggestion = {
   id: string
@@ -11,6 +11,8 @@ export type KBSuggestion = {
   category: string
   rationale: string | null
   created_at: string
+  flagged?: boolean
+  flag_reason?: string | null
 }
 
 export function SuggestionList({
@@ -25,14 +27,27 @@ export function SuggestionList({
   const [error, setError] = useState<string | null>(null)
   const [ranEmpty, setRanEmpty] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
+  // Flagged drafts take two clicks: the first opens the draft so the owner
+  // actually reads what a visitor may have planted in it.
+  const [confirming, setConfirming] = useState<string | null>(null)
 
-  async function review(id: string, action: 'accept' | 'dismiss') {
+  function onAccept(s: KBSuggestion) {
+    if (s.flagged && confirming !== s.id) {
+      setExpanded(s.id)
+      setConfirming(s.id)
+      return
+    }
+    setConfirming(null)
+    review(s.id, 'accept', Boolean(s.flagged))
+  }
+
+  async function review(id: string, action: 'accept' | 'dismiss', confirmFlagged = false) {
     setBusy(id)
     setError(null)
     const res = await fetch(`/api/portal/chatkit/${chatbotId}/suggestions/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, confirmFlagged }),
     })
     setBusy(null)
     if (!res.ok) {
@@ -104,7 +119,12 @@ export function SuggestionList({
       ) : (
         <ul className="space-y-2">
           {suggestions.map((s) => (
-            <li key={s.id} className="bg-[#0a0a14] border border-white/5 rounded-lg p-4">
+            <li
+              key={s.id}
+              className={`bg-[#0a0a14] border rounded-lg p-4 ${
+                s.flagged ? 'border-amber-500/30' : 'border-white/5'
+              }`}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -112,9 +132,21 @@ export function SuggestionList({
                     <span className="text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-400/20">
                       {s.category}
                     </span>
+                    {s.flagged && (
+                      <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-400/25">
+                        <ShieldAlert className="w-3 h-3" />
+                        Review carefully
+                      </span>
+                    )}
                   </div>
                   {s.rationale && (
                     <p className="text-xs text-gray-500 mt-1">{s.rationale}</p>
+                  )}
+                  {s.flagged && (
+                    <p className="text-xs text-amber-300/90 mt-2 bg-amber-500/5 border border-amber-500/20 rounded-lg px-2.5 py-2">
+                      {s.flag_reason ||
+                        'A visitor message behind this draft looks like an attempt to plant instructions. Read the full draft before accepting.'}
+                    </p>
                   )}
                   <button
                     type="button"
@@ -128,14 +160,27 @@ export function SuggestionList({
                       {s.content}
                     </pre>
                   )}
+                  {confirming === s.id && (
+                    <p className="text-xs text-amber-200 mt-2">
+                      Read the draft above, then press accept again to add it to your knowledge base.
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     type="button"
-                    onClick={() => review(s.id, 'accept')}
+                    onClick={() => onAccept(s)}
                     disabled={busy !== null}
-                    title="Accept — add to knowledge base"
-                    className="w-7 h-7 rounded-md bg-green-500/10 text-green-300 border border-green-400/20 hover:bg-green-500/20 disabled:opacity-50 flex items-center justify-center transition-colors"
+                    title={
+                      s.flagged && confirming !== s.id
+                        ? 'Flagged — click to review before accepting'
+                        : 'Accept — add to knowledge base'
+                    }
+                    className={`w-7 h-7 rounded-md border disabled:opacity-50 flex items-center justify-center transition-colors ${
+                      confirming === s.id
+                        ? 'bg-amber-500/15 text-amber-200 border-amber-400/30 hover:bg-amber-500/25'
+                        : 'bg-green-500/10 text-green-300 border-green-400/20 hover:bg-green-500/20'
+                    }`}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </button>
