@@ -103,9 +103,13 @@ export async function updateSession(request: NextRequest) {
   if (isAdminHost(host)) {
     const accountType = user?.user_metadata?.account_type
 
-    // Customer trying to access admin portal → redirect to admin login
+    // Customer trying to access admin portal → send them to their own portal.
+    // NOT to the admin login: that page bounces logged-in users to `/`, which
+    // lands back here — an infinite redirect. Note this only reads
+    // user_metadata, which the user can rewrite; the real staff check is the
+    // team_members lookup in app/command-center/layout.tsx.
     if (user && accountType === 'customer') {
-      return NextResponse.redirect(new URL(`https://${ADMIN_HOST}/login?error=unauthorized`))
+      return NextResponse.redirect(new URL(`https://${PORTAL_HOST}/`))
     }
 
     // Require login for protected paths
