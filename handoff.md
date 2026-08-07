@@ -43,6 +43,7 @@
 - Two extras found in the same auth path and fixed: an infinite redirect loop in `lib/supabase/middleware.ts` (customer on admin host -> admin login -> `/` -> repeat; now goes to the portal host), and `team_members` self-promotion (the update policy had no `WITH CHECK`, so an engineer could set their own role to admin).
 - Verification: exploit suite 0/7; legitimate-path regression 22/22 (create+edit bot, widget config, service-role billing writes, paid slot unlocks the 2nd bot, profile edit, invite flow, RLS visibility); `/api/infrastructure` 401 anon / 403 customer / 403 forged `account_type=team` / 200 invited admin; CC gate 4/4. All throwaway accounts deleted, DB confirmed clean. tsc + lint + build green.
 - Test scripts live in the session scratchpad only (not committed) -- Phase 3.5 should port them into the CI E2E suite.
+- SHIPPING GAP: migration 020 is live on PROD (DB-side exploits are closed everywhere), but the code half (`d3acf72`) is pushed only to `feat/landing-rebuild`. Until it merges to `main`, prod `/api/infrastructure` still admits any signed-in account and the Command Center staff gate is not deployed. Merge early next session.
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
