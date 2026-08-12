@@ -6,20 +6,18 @@ import { usePathname } from "next/navigation";
 import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo, RxGithubLogo } from "react-icons/rx";
 
 import { APP_URL, getLandingMode, visibleProducts } from "@/lib/marketing/products";
+import { NewsletterForm } from "@/components/main/newsletter-form";
+import { BlackholeVideo } from "@/components/main/blackhole-video";
+import { TOOLKIT_REPO } from "@/lib/marketing/links";
 
-// Shared blackhole bookend above the footer.
+// Shared blackhole bookend above the footer. BlackholeVideo carries the
+// reduced-motion + poster handling (WCAG 2.2.2).
 const FooterBookend = () => (
   <div className="relative w-full max-w-full overflow-hidden" style={{ height: "270px" }}>
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
+    <BlackholeVideo
       className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain -z-10"
       style={{ height: "540px" }}
-    >
-      <source src="/videos/blackhole.webm" type="video/webm" />
-    </video>
+    />
   </div>
 );
 
@@ -92,7 +90,9 @@ export const Footer = () => {
     return <SkFooter />;
   }
 
-  // EN multi-column footer (website-rebuild v2.0 Phase A2).
+  // EN footer (website-rebuild v2.1). Deeper than the page void (#010109 vs
+  // #030014) so the page visibly "lands" on it, with a violet hairline where
+  // the blackhole bookend meets the panel.
   const mode = getLandingMode();
   const products = visibleProducts(mode);
 
@@ -100,34 +100,47 @@ export const Footer = () => {
     { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
     { name: "X", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
     { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
-    { name: "GitHub", icon: RxGithubLogo, link: "https://github.com/bugiiiii11/handoff" },
+    { name: "GitHub", icon: RxGithubLogo, link: TOOLKIT_REPO },
   ];
 
   const linkClass = "text-sm text-gray-400 hover:text-white transition-colors w-fit";
+  const headingClass =
+    "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 
   return (
     <>
       <FooterBookend />
-      <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden" style={{ zIndex: 11 }}>
-        <div className="max-w-5xl mx-auto px-4 md:px-8 pt-8 pb-4 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
-            {/* Brand */}
-            <div className="col-span-2 md:col-span-1 max-w-[280px]">
+      <footer
+        className="w-full max-w-full relative bg-[#010109] overflow-hidden border-t border-[#7042f833]"
+        style={{ zIndex: 11 }}
+      >
+        {/* Violet horizon glow along the top edge — the last trace of the
+            blackhole above, fading into the panel. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-px left-1/2 -translate-x-1/2 h-px w-[70%] bg-gradient-to-r from-transparent via-purple-500/60 to-transparent"
+        />
+
+        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-14 pb-6 relative z-10">
+          {/* Brand + newsletter band */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10 pb-10 mb-10 border-b border-white/[0.06]">
+            <div className="max-w-sm">
               <Link href="/#home" className="inline-flex items-center gap-2.5 mb-3">
                 <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                AI-powered tools for modern builders.
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Self-service AI tools for growing businesses — built and run by
+                a senior engineering team in the UAE.
               </p>
-              <div className="flex items-center gap-1 mt-4 -ml-2">
+              <div className="flex items-center gap-1 mt-5 -ml-2">
                 {socials.map(({ name, icon: Icon, link }) => (
                   <Link
                     key={name}
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg text-gray-500 hover:text-purple-400 hover:bg-white/5 transition-colors"
+                    className="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-white/5 transition-colors"
                     aria-label={name}
                   >
                     <Icon className="w-5 h-5" />
@@ -136,19 +149,35 @@ export const Footer = () => {
               </div>
             </div>
 
+            <div className="w-full max-w-sm lg:flex-shrink-0">
+              <h4 className={headingClass}>Product updates</h4>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                New tools, new features, occasional engineering notes. No spam,
+                unsubscribe anytime.
+              </p>
+              <NewsletterForm />
+            </div>
+          </div>
+
+          {/* Link columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             {/* Products — generated from the landing lineup */}
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">Products</h4>
-              <nav className="flex flex-col gap-2">
+              <h4 className={headingClass}>Products</h4>
+              <nav className="flex flex-col gap-2.5">
                 {products.map((product) =>
                   product.status[mode] === "live" ? (
                     <a key={product.id} href={product.href} className={linkClass}>
                       {product.name}
                     </a>
                   ) : (
-                    <Link key={product.id} href="/#products" className={`${linkClass} text-gray-500`}>
+                    <Link
+                      key={product.id}
+                      href="/#coming-soon"
+                      className={linkClass}
+                    >
                       {product.name}
-                      <span className="ml-1.5 text-[10px] uppercase tracking-wide text-purple-400/70">Soon</span>
+                      <span className="ml-1.5 text-[10px] uppercase tracking-wide text-purple-300">Soon</span>
                     </Link>
                   )
                 )}
@@ -157,8 +186,8 @@ export const Footer = () => {
 
             {/* Resources */}
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">Resources</h4>
-              <nav className="flex flex-col gap-2">
+              <h4 className={headingClass}>Resources</h4>
+              <nav className="flex flex-col gap-2.5">
                 <Link href="/blog" className={linkClass}>
                   Blog
                 </Link>
@@ -166,58 +195,66 @@ export const Footer = () => {
                   Claude Code Skills
                 </a>
                 <a
-                  href="https://github.com/bugiiiii11/handoff"
+                  href={TOOLKIT_REPO}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={linkClass}
                 >
-                  Documentation
+                  ToolKit on GitHub
                 </a>
+                <Link href="/#faq" className={linkClass}>
+                  FAQ
+                </Link>
               </nav>
             </div>
 
             {/* Company */}
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">Company</h4>
-              <nav className="flex flex-col gap-2">
+              <h4 className={headingClass}>Company</h4>
+              <nav className="flex flex-col gap-2.5">
                 <Link href="/about" className={linkClass}>
                   About Us
                 </Link>
                 <Link href="/about#contact-us" className={linkClass}>
                   Contact
                 </Link>
-                <Link href="/privacy" className={linkClass}>
-                  Privacy Policy
-                </Link>
-                <Link href="/terms" className={linkClass}>
-                  Terms &amp; Conditions
+                <Link href="/sk" className={linkClass} hrefLang="sk">
+                  Slovensky
                 </Link>
               </nav>
             </div>
 
             {/* Connect */}
             <div>
-              <h4 className="text-white text-sm font-medium mb-3">Connect</h4>
-              <div className="flex flex-col gap-2">
+              <h4 className={headingClass}>Connect</h4>
+              <div className="flex flex-col gap-2.5">
+                <a href={APP_URL} className={linkClass}>
+                  Open the App
+                </a>
                 <a href="mailto:contact@mdntech.org" className={linkClass}>
                   contact@mdntech.org
                 </a>
                 <a href="tel:+971582283256" className={linkClass}>
                   +971 58 228 3256
                 </a>
-                <a href={APP_URL} className={linkClass}>
-                  Open the App
-                </a>
               </div>
             </div>
           </div>
 
           {/* Bottom line */}
-          <div className="pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500">
+          <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
             <p className="leading-relaxed">
-              Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813
+              M.D.N Tech FZE · Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813
             </p>
-            <p>© 2026 M.D.N TECH</p>
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <Link href="/privacy" className="hover:text-gray-300 transition-colors">
+                Privacy
+              </Link>
+              <Link href="/terms" className="hover:text-gray-300 transition-colors">
+                Terms
+              </Link>
+              <span>© 2026 M.D.N TECH</span>
+            </div>
           </div>
         </div>
       </footer>

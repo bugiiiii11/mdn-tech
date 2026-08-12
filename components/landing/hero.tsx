@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 import { slideInFromLeft } from "@/lib/motion";
 import { APP_URL } from "@/lib/marketing/products";
+import { BlackholeVideo } from "@/components/main/blackhole-video";
 
 // New product-first hero (website-rebuild v2.0). Background block copied from
 // components/main/hero.tsx — keeps id="home" (footer logo links to /#home).
@@ -13,16 +14,7 @@ export const LandingHero = () => {
       id="home"
       className="relative flex flex-col h-full w-full max-w-full overflow-hidden"
     >
-      <video
-        autoPlay
-        muted
-        loop
-        preload="auto"
-        playsInline
-        className="rotate-180 absolute top-[-355px] md:top-[-340px] left-1/2 -translate-x-1/2 w-[350%] md:w-full md:left-0 md:translate-x-0 h-full object-contain -z-10 pointer-events-none"
-      >
-        <source src="/videos/blackhole.webm" type="video/webm" />
-      </video>
+      <BlackholeVideo className="rotate-180 absolute top-[-355px] md:top-[-340px] left-1/2 -translate-x-1/2 w-[350%] md:w-full md:left-0 md:translate-x-0 h-full object-contain -z-10 pointer-events-none" />
 
       <motion.div
         initial="hidden"
@@ -35,7 +27,7 @@ export const LandingHero = () => {
             className="Welcome-box py-[8px] px-[12px] border border-[#7042f88b] opacity-[0.9] rounded-full"
           >
             <span className="Welcome-text text-[13px] text-gray-300">
-              ✦ AI-Powered Developer Tools
+              ✦ Self-Service AI Tools for Business
             </span>
           </motion.div>
 
@@ -45,10 +37,10 @@ export const LandingHero = () => {
           >
             <span className="text-center break-words">
               <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-purple-500 to-cyan-500">
-                Your Tools.
+                Grow Your Business
               </span>{" "}
               <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-cyan-500 to-purple-500">
-                Your Rules.
+                with AI.
               </span>
             </span>
           </motion.h1>
@@ -57,17 +49,9 @@ export const LandingHero = () => {
             variants={slideInFromLeft(0.8)}
             className="text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
           >
-            Production-ready AI, Web3, and automation tools — built by
-            engineers, ready to deploy.
-          </motion.p>
-
-          <motion.p
-            variants={slideInFromLeft(0.9)}
-            className="text-base md:text-lg text-gray-400 my-2 max-w-[700px] text-center leading-relaxed"
-          >
-            M.D.N Tech builds self-service developer tools that solve real
-            problems. No sales calls, no onboarding meetings. Sign up,
-            configure, and ship.
+            An AI chatbot trained on your content, free Claude Code skills,
+            and more — self-service tools that go live in minutes, no sales
+            calls.
           </motion.p>
 
           <motion.div
@@ -80,7 +64,7 @@ export const LandingHero = () => {
               href={APP_URL}
               className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
             >
-              Open the App
+              Start Free
             </motion.a>
             <motion.a
               whileHover={{ scale: 1.05 }}
@@ -88,7 +72,7 @@ export const LandingHero = () => {
               href="#products"
               className="py-3 px-8 text-center text-white cursor-pointer rounded-lg font-semibold border border-[#7042f88b] bg-[#7042f815] hover:bg-[#7042f825] transition-colors"
             >
-              Explore Products
+              Explore the Tools
             </motion.a>
           </motion.div>
         </div>

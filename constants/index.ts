@@ -262,8 +262,12 @@ export const NAV_LINKS = [
     link: "/#products",
   },
   {
-    title: "Free Tools",
-    link: "/#free-tools",
+    title: "ChatKit",
+    link: "/#chatkit",
+  },
+  {
+    title: "ToolKit",
+    link: "/#toolkit",
   },
   {
     title: "About",
