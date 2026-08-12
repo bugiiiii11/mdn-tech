@@ -192,3 +192,31 @@ export const BASE_CHATBOT_LIMIT = 1
 export function chatbotLimit(extraSlots: number | null | undefined): number {
   return BASE_CHATBOT_LIMIT + Math.max(0, extraSlots ?? 0)
 }
+
+// --- Prose labels --------------------------------------------------------------
+//
+// The two allowance phrases the marketing surfaces kept retyping as inline
+// ternaries (ten copies at the last count, already diverging between digits and
+// spelled numbers). Deciding the wording here — next to the constants it reads —
+// means raising BASE_CHATBOT_LIMIT or CREDITS_PER_MESSAGE reworks every surface
+// the same way. Call sites should migrate to these instead of adding copy #11.
+
+// Small counts read as prose ("two chatbots"), larger ones stay digits.
+function spellCount(count: number): string {
+  const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+  return words[count] ?? String(count)
+}
+
+/** "one chatbot" / "two chatbots" — the base allowance as prose. */
+export function chatbotAllowanceLabel(): string {
+  return BASE_CHATBOT_LIMIT === 1
+    ? 'one chatbot'
+    : `${spellCount(BASE_CHATBOT_LIMIT)} chatbots`
+}
+
+/** "one credit per reply" / "two credits per reply" — the metering phrase. */
+export function creditsPerReplyLabel(): string {
+  return CREDITS_PER_MESSAGE === 1
+    ? 'one credit per reply'
+    : `${spellCount(CREDITS_PER_MESSAGE)} credits per reply`
+}

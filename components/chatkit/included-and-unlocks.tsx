@@ -9,9 +9,9 @@ import {
   fadeUp,
 } from "@/components/product-pages/primitives";
 import {
-  BASE_CHATBOT_LIMIT,
   FEATURES,
   FREE_TRIAL_MESSAGES,
+  chatbotAllowanceLabel,
   featureById,
 } from "@/lib/portal/plans";
 
@@ -43,13 +43,17 @@ import {
 // The report cadence is described as the designed schedule, and the on-demand
 // run — which does work today — is stated first.
 
+// Headings deliberately out-specify the homepage ChatKit section: this is the
+// deeper page, so where the homepage says "Answers from your content" these
+// h4s carry the extra mechanism the bodies already describe. No heading here
+// duplicates a homepage heading verbatim.
 const included: { title: string; body: string }[] = [
   {
-    title: "Answers from your content",
+    title: "Grounded answers with your own fallback line",
     body: "Grounded in the knowledge base you wrote, with your own fallback line whenever the answer is not in it.",
   },
   {
-    title: "Replies in the visitor's language",
+    title: "One knowledge base, every visitor language",
     body: "One chatbot for an international audience, with no per-language setup and no second knowledge base.",
   },
   {
@@ -57,7 +61,7 @@ const included: { title: string; body: string }[] = [
     body: "Including the free-text system prompt, which is where you set how the chatbot behaves rather than just what it knows.",
   },
   {
-    title: "The domain allow-list",
+    title: "Hostname allow-list, enforced server-side",
     body: "Restrict the chatbot to hostnames you name. It starts empty, which allows any origin, so fill it in the day you go live.",
   },
   {
@@ -165,9 +169,8 @@ export const IncludedAndUnlocks = () => (
           <span className="text-xs font-medium text-gray-400 border border-white/[0.12] rounded-full px-2 py-0.5 whitespace-nowrap">
             {extraChatbot.priceLabel} once
           </span>
-          . Every account starts with{" "}
-          {BASE_CHATBOT_LIMIT === 1 ? "one chatbot" : `${BASE_CHATBOT_LIMIT} chatbots`}
-          , and each slot you add is a separate chatbot with its own knowledge
+          . Every account starts with {chatbotAllowanceLabel()}, and each slot
+          you add is a separate chatbot with its own knowledge
           base, styling, domain list and credits.
         </p>
       ) : null}

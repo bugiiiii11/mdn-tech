@@ -15,11 +15,17 @@
 // FAQ accordion + FAQPage schema live in ./faq; JSON-LD entity references live
 // in ./schema.
 
-export { CheckItem, GlassCard, StatChip } from "./static-primitives";
+export {
+  CheckItem,
+  GlassCard,
+  PROSE_LINK_CLASS,
+  StatChip,
+} from "./static-primitives";
 
 export {
   CtaBand,
   CtaButton,
+  FADE_UP,
   PageHero,
   Section,
   fadeUp,

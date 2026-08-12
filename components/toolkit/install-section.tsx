@@ -5,7 +5,7 @@ import { Fragment, useEffect, useState } from "react";
 import { GlassCard, Section } from "@/components/product-pages/primitives";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
 
-import { MDN_SKILLS } from "./catalogue";
+import { MDN_COUNT, MDN_SKILLS, numberWord } from "./catalogue";
 import { CodeBlock } from "./code-block";
 import { Code } from "./inline-code";
 
@@ -16,28 +16,39 @@ import { Code } from "./inline-code";
 // command, because a warning underneath an install button is decoration.
 //
 // HONESTY CONSTRAINTS (do not regress):
-//  - The "writes nothing else on disk" promise is scoped to the M.D.N Tech
-//    skills. It is not a property of the catalogue, and it is not true of the
-//    optional hooks (see the auto-wrap section) or of third-party skills.
+//  - The footprint promise is "a git clone in your current directory, plus
+//    files under ~/.claude/skills/ — nothing else". Never shrink it back to
+//    "only inside ~/.claude/skills/": the install command visibly clones a
+//    full repository into the working directory, and the uninstall commands
+//    must keep removing BOTH the skill directories and that clone.
+//  - The promise is scoped to the M.D.N Tech skills. It is not a property of
+//    the catalogue, and it is not true of the optional hooks (see the
+//    auto-wrap section) or of third-party skills.
 //  - Never "installs the directory" or "installs N skills": this command copies
 //    one repo's skills/ directory, nothing more.
 //  - No timing claim. It is one paste, not a measured 30 seconds.
 //
-// The two directory names below are derived from the catalogue (the M.D.N Tech
-// entries that carry a source link), so the copy tracks the data rather than a
-// memory of what the repo contained.
+// The skill directory names and count are derived from the catalogue (the
+// M.D.N Tech entries that carry a source link), so the copy and the uninstall
+// commands track the data rather than a memory of what the repo contained.
 
 type Shell = "unix" | "windows";
 
 const CLONE_URL = `${TOOLKIT_REPO}.git`;
 
+// The directory `git clone` creates — the repository name, derived from the
+// same URL the command uses so the two cannot disagree.
+const CLONE_DIR = TOOLKIT_REPO.split("/").pop() ?? "handoff";
+
+const SKILL_DIR_IDS = MDN_SKILLS.map((skill) => skill.id);
+
 const installCommands: Record<Shell, string> = {
   unix: `git clone ${CLONE_URL} && \\
   mkdir -p ~/.claude/skills && \\
-  cp -r handoff/skills/* ~/.claude/skills/`,
+  cp -r ${CLONE_DIR}/skills/* ~/.claude/skills/`,
   windows: `git clone ${CLONE_URL}
 New-Item -ItemType Directory -Force -Path "$HOME\\.claude\\skills" | Out-Null
-Copy-Item -Recurse -Force handoff\\skills\\* "$HOME\\.claude\\skills\\"`,
+Copy-Item -Recurse -Force ${CLONE_DIR}\\skills\\* "$HOME\\.claude\\skills\\"`,
 };
 
 const backupCommands: Record<Shell, string> = {
@@ -46,13 +57,21 @@ const backupCommands: Record<Shell, string> = {
 };
 
 const updateCommands: Record<Shell, string> = {
-  unix: "cd handoff && git pull && cp -r skills/* ~/.claude/skills/",
-  windows: `cd handoff; git pull; Copy-Item -Recurse -Force skills\\* "$HOME\\.claude\\skills\\"`,
+  unix: `cd ${CLONE_DIR} && git pull && cp -r skills/* ~/.claude/skills/`,
+  windows: `cd ${CLONE_DIR}; git pull; Copy-Item -Recurse -Force skills\\* "$HOME\\.claude\\skills\\"`,
 };
 
+// Removes everything the install created: every skill directory AND the
+// clone. Dropping either half regresses the "how do I undo it" promise.
 const uninstallCommands: Record<Shell, string> = {
-  unix: "rm -rf ~/.claude/skills/handoff",
-  windows: `Remove-Item -Recurse -Force "$HOME\\.claude\\skills\\handoff"`,
+  unix: `rm -rf ${SKILL_DIR_IDS.map((id) => `~/.claude/skills/${id}`).join(
+    " "
+  )} && \\
+  rm -rf ${CLONE_DIR}`,
+  windows: `Remove-Item -Recurse -Force ${SKILL_DIR_IDS.map(
+    (id) => `"$HOME\\.claude\\skills\\${id}"`
+  ).join(", ")}
+Remove-Item -Recurse -Force ${CLONE_DIR}`,
 };
 
 const genericCommands: Record<Shell, string> = {
@@ -82,10 +101,16 @@ function detectShell(): Shell {
 
 export const InstallSection = () => {
   const [shell, setShell] = useState<Shell>("unix");
+  // True only while the current value came from browser detection — a manual
+  // tab click clears it, so the sentence above the command never claims a
+  // browser guess the visitor overrode.
   const [detected, setDetected] = useState(false);
 
-  // Server renders the unix variant; the tabs make the choice explicit either
-  // way, so a wrong guess costs one click and never a wrong command.
+  // Server renders the unix variant; detection swaps it after hydration, and
+  // the "Showing the … variant" sentence directly above the command block
+  // names the result, so the swap explains itself where it happens. The tabs
+  // make the choice explicit either way — a wrong guess costs one click and
+  // never a wrong command.
   useEffect(() => {
     setShell(detectShell());
     setDetected(true);
@@ -152,14 +177,9 @@ export const InstallSection = () => {
 
         {/* Half 2 — our concrete one-liner. */}
         <div className="border-t border-white/[0.06] pt-10">
-          <h3 className="text-lg font-semibold text-white mb-2">
+          <h3 className="text-lg font-semibold text-white mb-4">
             The one paste for the M.D.N Tech skills
           </h3>
-          <p className="mb-5 text-sm md:text-base text-gray-400 leading-relaxed">
-            {detected
-              ? `Showing the ${shellLabels[shell]} variant based on your browser — switch if that is wrong.`
-              : "Pick your shell."}
-          </p>
 
           <div
             role="group"
@@ -170,8 +190,14 @@ export const InstallSection = () => {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setShell(tab.id)}
+                // A manual pick clears `detected` so the sentence below stops
+                // attributing the choice to browser detection.
+                onClick={() => {
+                  setShell(tab.id);
+                  setDetected(false);
+                }}
                 aria-pressed={shell === tab.id}
+                aria-controls="install-commands"
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
                   shell === tab.id
                     ? "bg-[#7042f833] text-white"
@@ -199,7 +225,22 @@ export const InstallSection = () => {
             </div>
           </div>
 
-          <CodeBlock code={installCommands[shell]} label={shellLabels[shell]} />
+          {/* The live region the toggle buttons point at. The "Showing the …
+              variant" sentence sits directly above the command it describes,
+              so both the post-hydration detection swap and a toggle click are
+              self-explaining in place — and aria-live announces the change
+              without renaming the buttons mid-press. */}
+          <div id="install-commands" aria-live="polite">
+            <p className="mb-3 text-sm md:text-base text-gray-400 leading-relaxed">
+              {detected
+                ? `Showing the ${shellLabels[shell]} variant, guessed from your browser — switch above if that is wrong.`
+                : `Showing the ${shellLabels[shell]} variant.`}
+            </p>
+            <CodeBlock
+              code={installCommands[shell]}
+              label={shellLabels[shell]}
+            />
+          </div>
 
           <p className="mt-4 text-sm text-gray-400 leading-relaxed">
             Verify by opening Claude Code in any project and typing{" "}
@@ -212,19 +253,26 @@ export const InstallSection = () => {
                 What it writes
               </h4>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Only inside <Code>~/.claude/skills/</Code>. The repository&apos;s{" "}
+                A git clone in your current directory, plus files under{" "}
+                <Code>~/.claude/skills/</Code> — nothing else. The clone&apos;s{" "}
                 <Code>skills/</Code> directory is copied in — that is{" "}
+                {/* joinWithAnd() semantics kept in JSX so each id stays a
+                    <Code> span: ", " between items, " and " before the last. */}
                 {MDN_SKILLS.map((skill, index) => (
                   <Fragment key={skill.id}>
-                    {index > 0 ? " and " : ""}
+                    {index > 0
+                      ? index === MDN_SKILLS.length - 1
+                        ? " and "
+                        : ", "
+                      : ""}
                     <Code>{skill.id}</Code>
                   </Fragment>
                 ))}
-                , each a single <Code>SKILL.md</Code>. Nothing else on disk, no
-                daemon, no telemetry, no network call after the{" "}
-                <Code>git clone</Code>. That promise covers these two skills — it
-                is not a claim about the rest of the catalogue, and the optional
-                hooks are a separate story.
+                , each a single <Code>SKILL.md</Code>. No daemon, no telemetry,
+                no network call after the <Code>git clone</Code>. That promise
+                covers these {numberWord(MDN_COUNT)} skills — it is not a claim
+                about the rest of the catalogue, and the optional hooks are a
+                separate story.
               </p>
             </GlassCard>
 
@@ -264,8 +312,10 @@ export const InstallSection = () => {
                 Uninstalling
               </h4>
               <p className="text-sm text-gray-400 leading-relaxed">
-                One line per skill directory. Nothing else to unwind, because
-                nothing else was written.
+                Two removals: the skill directories under{" "}
+                <Code>~/.claude/skills/</Code>, and the clone the install step
+                left in your working directory. After that there is nothing
+                else to unwind.
               </p>
               <div className="mt-3">
                 <CodeBlock

@@ -1,4 +1,8 @@
-import { GlassCard, Section } from "@/components/product-pages/primitives";
+import {
+  GlassCard,
+  PROSE_LINK_CLASS,
+  Section,
+} from "@/components/product-pages/primitives";
 
 import {
   ANTHROPIC_COUNT,
@@ -8,6 +12,7 @@ import {
   SKILL_GROUPS,
   THIRD_PARTY_AUTHORS,
   joinWithAnd,
+  numberWord,
 } from "./catalogue";
 
 // The directory itself, enumerated in crawlable HTML — the substance the
@@ -42,7 +47,13 @@ const statements = [
   },
   {
     title: "We carry no licence data",
-    body: "There is no licence field in this catalogue, so we will not tell you a third-party skill's terms — read the repo. MIT applies to the M.D.N Tech skills only, and that LICENSE is linked.",
+    // The MIT claim is scoped to the published M.D.N Tech skills (MDN_COUNT =
+    // the ones with a source link, in the public MIT repo) — the catalogue's
+    // unpublished M.D.N Tech entries carry no licence at all, so "the M.D.N
+    // Tech skills" unqualified would overreach.
+    body: `There is no licence field in this catalogue, so we will not tell you a third-party skill's terms — read the repo. MIT applies to the ${numberWord(
+      MDN_COUNT
+    )} M.D.N Tech skills published in our repo, and that LICENSE is linked.`,
   },
   {
     title: "Third-party claims are attributed, never adopted",
@@ -68,7 +79,9 @@ export const Directory = () => (
               <h4 className="text-base font-semibold text-white mb-1.5">
                 {statement.title}
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              {/* Body of a titled item, so gray-300 (the Legibility Floor
+                  Rule) — not a subordinate caption. */}
+              <p className="text-sm text-gray-300 leading-relaxed">
                 {statement.body}
               </p>
             </div>
@@ -93,7 +106,10 @@ export const Directory = () => (
                   <h4 className="text-base font-semibold text-white">
                     {skill.name}
                   </h4>
-                  <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+                  {/* The description is the card's substance — gray-300 per
+                      the Legibility Floor Rule. The byline below stays
+                      gray-400: genuinely subordinate. */}
+                  <p className="mt-2 text-sm text-gray-300 leading-relaxed">
                     {skill.description}
                   </p>
 
@@ -102,7 +118,7 @@ export const Directory = () => (
                       {skill.useCases.slice(0, 3).map((useCase) => (
                         <li
                           key={useCase}
-                          className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-gray-400"
+                          className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-xs text-gray-400"
                         >
                           {useCase}
                         </li>
@@ -112,13 +128,19 @@ export const Directory = () => (
 
                   <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/[0.06] pt-4 text-xs">
                     <span className="text-gray-400">by {skill.author}</span>
+                    {/* 20+ of these render on one page, so the accessible
+                        name carries the skill; the visible "Source ↗" and its
+                        glyph are hidden from AT (WCAG 2.4.4). */}
                     <a
                       href={skill.installationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+                      className={`font-medium ${PROSE_LINK_CLASS}`}
                     >
-                      Source ↗
+                      <span className="sr-only">
+                        Source for {skill.name}
+                      </span>
+                      <span aria-hidden="true">Source ↗</span>
                     </a>
                   </div>
                 </GlassCard>

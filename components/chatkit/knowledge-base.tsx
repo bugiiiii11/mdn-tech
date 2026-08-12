@@ -3,8 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { GlassCard, Section, fadeUp } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import {
+  GlassCard,
+  PROSE_LINK_CLASS,
+  Section,
+  fadeUp,
+} from "@/components/product-pages/primitives";
 
 // "Your knowledge base: the chatbot's only source of truth".
 //
@@ -105,23 +109,27 @@ export const KnowledgeBase = () => (
         ChatKit&apos;s own category headings, skipping any category it does not
         have enough source material for rather than inventing one. You paste
         each section into the matching entry. It is also packaged as{" "}
-        <a
-          href={`${APP_URL}/toolkit`}
-          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+        {/* Both links land on /toolkit — the indexable page — never the
+            noindex portal or a homepage fragment. The anchors are real Section
+            ids with scroll-mt-24: #mdn-skills documents Build KB, #directory
+            is the full list. */}
+        <Link
+          href="/toolkit#mdn-skills"
+          className={`${PROSE_LINK_CLASS} font-medium`}
         >
           the free /build-kb skill
-        </a>{" "}
+        </Link>{" "}
         in{" "}
         <Link
-          href="/#toolkit"
-          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+          href="/toolkit#directory"
+          className={`${PROSE_LINK_CLASS} font-medium`}
         >
           our free directory of Claude Code skills
         </Link>
         . New to Claude Code?{" "}
         <Link
           href="/blog/claude-code-complete-guide"
-          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+          className={`${PROSE_LINK_CLASS} font-medium`}
         >
           Our complete guide to Claude Code
         </Link>{" "}
@@ -149,7 +157,11 @@ export const KnowledgeBase = () => (
       </p>
     </motion.div>
 
-    {/* Sort-order guidance. The hard cap is stated once, in #limits. */}
+    {/* Sort-order guidance. Sort order SELECTS the entries (first five in
+        sort order — MAX_KB_ENTRIES in the message route); the prompt builder
+        then regroups the survivors by category (lib/chat/prompt.ts), so order
+        decides who makes the cut, not where they land. The character cap and
+        the rest of the fine print stay in #limits. */}
     <motion.div
       initial="hidden"
       whileInView="visible"
@@ -161,14 +173,12 @@ export const KnowledgeBase = () => (
         Sort order is a priority list, not a filing preference
       </h3>
       <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-        Entries are sent in sort order, so put your highest-value answers first
-        and keep each one tight and single-topic — one entry per subject beats
-        one long entry covering five. There is a hard cap on how much reaches the
-        model, and it is stated plainly in{" "}
-        <a
-          href="#limits"
-          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-        >
+        Sort order decides which entries make the cut — only the first five
+        reach the model, and inside the prompt those five are regrouped by
+        category. So put your highest-value answers first and keep each one
+        tight and single-topic — one entry per subject beats one long entry
+        covering five. The caps are stated plainly in{" "}
+        <a href="#limits" className={`${PROSE_LINK_CLASS} font-medium`}>
           the limits section
         </a>
         .

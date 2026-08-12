@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   CheckItem,
   GlassCard,
+  PROSE_LINK_CLASS,
   Section,
 } from "@/components/product-pages/primitives";
 
@@ -78,7 +79,10 @@ const HANDOFF_MODES = [
 export const MdnSkills = () => (
   <Section
     id="mdn-skills"
-    title={`The ${numberWord(MDN_COUNT)} skills we wrote and ship in this repo`}
+    // "publish", not "ship in this repo": the site's own .claude/skills/
+    // holds three (incl. the unpublished `test`), the public repo holds
+    // MDN_COUNT — "this repo" was ambiguous between the two.
+    title={`The ${numberWord(MDN_COUNT)} skills we wrote and publish`}
     intro={`${MDN_COUNT} of the ${LISTED_COUNT} entries above are ours, and they are the ones you can obtain: ${joinWithAnd(
       MDN_SKILLS.map((skill) => skill.name)
     )}. They are MIT, they live in this site's own .claude/skills/, and they are what this page was written with.`}
@@ -157,10 +161,7 @@ export const MdnSkills = () => (
           project runner with no source link, so it
           is described here as proof rather than offered as a download. If you
           want the people behind them,{" "}
-          <Link
-            href="/about"
-            className="text-cyan-400 transition-colors hover:text-cyan-300"
-          >
+          <Link href="/about" className={PROSE_LINK_CLASS}>
             the team that wrote these skills
           </Link>{" "}
           is on the about page.

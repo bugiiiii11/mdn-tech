@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 53) -- Phase 1 live on prod; landing SEO rework v2.1 (rotated 2026-08-13)
+
+- **Phase 1 is now DEPLOYED** (`03c84d1` merged to main + pushed). Verified against live prod 12/12: Royal Stroje loads from both `royalstroje.sk` and `www.`, foreign origins 403 on config + message, single ACAO, CSP live without `unsafe-eval`, `/api/subscribe` + chat reject malformed input, cron 401s. Plus 4/4 regression: every owned bot with an empty allow-list still accepts any origin.
+- **Test gotcha:** zod runs at `message/route.ts:70`, BEFORE the domain check at :101. A domain-binding probe with a schema-invalid body 400s and proves nothing -- it must send a valid `visitorId`. Carry into the Phase 3.5 E2E port.
+- **Landing rework `6572531`** (branch-only): ~300 -> ~1200 words, business-first positioning. New sections: chatkit-section, toolkit-section, coming-soon (no CTAs), why-us, faq. FAQ renders 10 Q&As and builds FAQPage JSON-LD from the SAME array (10/10 text parity verified).
+- **A 63-agent adversarial review caught 4 FALSE claims in the new copy** -- now HONESTY CONSTRAINTS in component headers: (1) trial does NOT include every feature (`feature_unlocks` defaults `'{}'`, migration 017) -- paid unlocks split out with prices from `plans.ts`; (2) ToolKit is a CURATED DIRECTORY, only a minority of skills are ours, no licence field exists -- never "our MIT skills"; (3) "one credit balance across all products" false until Phase 2 ledger (credits live on `chatbots.credits_purchased`); (4) domain allow-list starts EMPTY (= allow any), opt-in not automatic.
+- A11y: `MotionConfig reducedMotion="user"` over marketing tree; `BlackholeVideo` pauses under reduced motion (WCAG 2.2.2) with 48KB poster; footer gray-500 -> gray-400; `noscript` fallback (framer SSRs `opacity:0`, page was BLANK without JS).
+- Added `PRODUCT.md` + `DESIGN.md`: brand register, users, anti-references, "Event Horizon" visual system (Bent Light, Gradient Crown, Legibility Floor, Glow-Not-Shadow). Read before design/copy work.
+- Safety hook false positives x2 flagged (git push `--ff-only` matched force-push pattern; `curl.*\|.*sh` matched "ship" in echo) -- pattern fixes proposed, not yet applied.
+- 38 lower-severity review findings left unfixed (mostly pre-existing): gradient taglines on `<p>`, placeholder team links, no SoftwareApplication schema on landing, products grid empty cell.
+
 ## What Was Done (Session 52) -- Phase 0 merged to main; Phase 1 hardening 1.1-1.6 (rotated 2026-08-12)
 
 - Phase 0.2-0.5 code merged to `main` + pushed (`7328d97`) -- the S51 shipping gap is closed; the `/api/infrastructure` guard and CC staff gate are live in prod alongside migration 020.
@@ -94,6 +105,7 @@
 |---|------|-------|
 | 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
+| 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

@@ -2,33 +2,28 @@
 
 import { motion } from "framer-motion";
 
-import { APP_URL } from "@/lib/marketing/products";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
-import { toolkitSkills } from "@/lib/portal/toolkit-skills";
+import { LISTED_COUNT, MDN_COUNT } from "@/lib/marketing/toolkit-catalogue";
 
 // ToolKit deep-dive — the genuinely-free product and top-of-funnel trust
 // builder for the developer audience.
 //
 // HONESTY CONSTRAINT (do not regress): ToolKit is a CURATED DIRECTORY. Most of
 // the catalogue is third-party work (Anthropic, Vercel Labs, Trail of Bits,
-// obra and others) under each author's own licence. Only the skills authored by
-// M.D.N Tech are ours to describe as "ours", MIT, or "what we run daily".
-// Both counts below are derived from the data, never hard-coded, so the copy
-// cannot drift as the catalogue grows.
-
-const TOTAL_SKILLS = toolkitSkills.length;
-const OUR_SKILLS = toolkitSkills.filter(
-  (skill) => skill.author === "M.D.N Tech"
-).length;
+// obra and others) under each author's own licence. Only the M.D.N Tech skills
+// PUBLISHED in our repo may be described as "ours" or MIT — not the
+// unpublished entries. Both counts come from lib/marketing/toolkit-catalogue,
+// the same module /toolkit reads, so this section and the deep-dive page can
+// never publish different numbers.
 
 const points = [
   {
-    title: `${TOTAL_SKILLS} skills, curated not scraped`,
+    title: `${LISTED_COUNT} skills, curated not scraped`,
     text: "Every skill in the directory is one we evaluated and would use ourselves — from Anthropic, Vercel Labs, Trail of Bits, the community, and our own workshop. Each entry links straight to its source.",
   },
   {
-    title: `${OUR_SKILLS} skills we wrote and run daily`,
-    text: "Session continuity, safety hooks, guarded automation, and test runners — MIT licensed, and the same ones that built and shipped this website.",
+    title: `${MDN_COUNT} skills we wrote ourselves`,
+    text: "Session continuity and chatbot knowledge-base generation — MIT licensed, installable from our GitHub repo, and the same skills we use building this site.",
   },
   {
     title: "Free, and no account needed",
@@ -72,7 +67,7 @@ export const ToolKitSection = () => {
         variants={fadeUp(0.15)}
         className="text-lg text-gray-300 text-center mb-14 max-w-3xl"
       >
-        {TOTAL_SKILLS} Claude Code skills worth your time — {OUR_SKILLS} built
+        {LISTED_COUNT} Claude Code skills worth your time — {MDN_COUNT} built
         in-house, the rest hand-picked from Anthropic, Vercel Labs, Trail of
         Bits and the community.
       </motion.p>
@@ -146,10 +141,12 @@ export const ToolKitSection = () => {
         variants={fadeUp(0.15)}
         className="flex flex-col sm:flex-row items-center gap-4 mt-12"
       >
+        {/* The indexable /toolkit page, not the noindex portal — internal link
+            equity has to land on the surface that is meant to rank. */}
         <motion.a
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          href={`${APP_URL}/toolkit`}
+          href="/toolkit"
           className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
         >
           Browse the Directory →

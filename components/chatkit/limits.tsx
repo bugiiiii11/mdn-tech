@@ -3,7 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
+import {
+  CtaButton,
+  PROSE_LINK_CLASS,
+  Section,
+  fadeUp,
+} from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
@@ -85,7 +90,7 @@ export const Limits = () => (
           <h3 className="text-base md:text-lg font-semibold text-white mb-2">
             {limit.title}
           </h3>
-          <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+          <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             {limit.body}
           </p>
         </motion.div>
@@ -96,16 +101,12 @@ export const Limits = () => (
         <h3 className="text-base md:text-lg font-semibold text-white mb-2">
           Conversations are stored, not discarded
         </h3>
-        <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+        <p className="text-sm md:text-base text-gray-300 leading-relaxed">
           Full transcripts, plus a random visitor id, the IP address the message
           came from and the page the chat started on. That retention is what
-          makes transcripts, exports and analytics possible — our privacy policy
-          has{" "}
-          <Link
-            href="/privacy"
-            className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-          >
-            exactly what we store
+          makes transcripts, exports and analytics possible. See also{" "}
+          <Link href="/privacy" className={`${PROSE_LINK_CLASS} font-medium`}>
+            our privacy policy
           </Link>
           .
         </p>
@@ -115,13 +116,10 @@ export const Limits = () => (
         <h3 className="text-base md:text-lg font-semibold text-white mb-2">
           No certifications or uptime guarantee to quote
         </h3>
-        <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+        <p className="text-sm md:text-base text-gray-300 leading-relaxed">
           We have no compliance badge to show you and we do not publish an
           uptime figure. What we do have are the named mechanisms in{" "}
-          <a
-            href="#control"
-            className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-          >
+          <a href="#control" className={`${PROSE_LINK_CLASS} font-medium`}>
             the previous section
           </a>
           .
@@ -140,14 +138,11 @@ export const Limits = () => (
         If none of that is a dealbreaker, {FREE_TRIAL_MESSAGES} messages will
         tell you the rest.
       </p>
-      <motion.a
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        href={`${APP_URL}/chatkit`}
-        className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
-      >
-        Create your chatbot — {FREE_TRIAL_MESSAGES} free messages
-      </motion.a>
+      {/* Shared CtaButton; the short label stays on one line at 360px, and
+          the sentence above already carries the trial size. */}
+      <CtaButton
+        cta={{ href: `${APP_URL}/chatkit`, label: "Create your chatbot free" }}
+      />
     </motion.div>
   </Section>
 );

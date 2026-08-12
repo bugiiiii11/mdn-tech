@@ -36,7 +36,9 @@ const specs = [
   },
   {
     title: "Mobile is a different layout, not a shrunk one",
-    body: "Below 480 pixels the panel goes near-full-width — calc(100vw - 16px) — caps its height at 65vh so it never swallows the page, and the bubble drops to 50 pixels.",
+    // "wide or narrower", not "below": the breakpoint is max-width: 480px,
+    // which fires AT 480 too.
+    body: "On screens 480 pixels wide or narrower the panel goes near-full-width — calc(100vw - 16px) — caps its height at 65vh so it never swallows the page, and the bubble drops to 50 pixels.",
   },
   {
     title: "Answers stream in as they are written",
@@ -60,7 +62,13 @@ const specs = [
   },
 ];
 
-/** CSS-only mock at the widget's real proportions. Decoration — aria-hidden. */
+/**
+ * CSS-only mock at the widget's real proportions. Decoration — aria-hidden.
+ * Two deliberate contrast bumps over the real widget's chrome: the footer
+ * badge and the input placeholder render at gray-400 here, because spec item
+ * 8 points the reader at the badge and an unreadable proof point helps nobody
+ * (the real widget's dimmer values measured 2.56:1 and 3.61:1).
+ */
 const WidgetMock = () => (
   <div
     aria-hidden="true"
@@ -104,7 +112,7 @@ const WidgetMock = () => (
 
     {/* Input row */}
     <div className="flex items-center gap-2 border-t border-[#7042f833] p-3">
-      <span className="flex-1 rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-[13px] text-gray-500">
+      <span className="flex-1 rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-[13px] text-gray-400">
         Type a message...
       </span>
       <span className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-xl bg-[#7c3aed]">
@@ -114,7 +122,7 @@ const WidgetMock = () => (
       </span>
     </div>
 
-    <div className="py-1.5 text-center text-[10px] text-gray-600">
+    <div className="py-1.5 text-center text-[11px] text-gray-400">
       Powered by M.D.N Tech
     </div>
   </div>
@@ -123,7 +131,7 @@ const WidgetMock = () => (
 export const WidgetAnatomy = () => (
   <Section
     id="widget"
-    title="What your visitors actually see"
+    title="What your visitors actually see: inside the chat widget"
     intro="The panel below is drawn at the widget's real proportions, in its real layout. Everything alongside it is a specific figure rather than a promise, so you can judge whether it will suit your site before you install it."
     wide
   >
@@ -153,7 +161,7 @@ export const WidgetAnatomy = () => (
             <h3 className="text-base md:text-lg font-semibold text-white mb-1.5">
               {spec.title}
             </h3>
-            <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+            <p className="text-sm md:text-base text-gray-300 leading-relaxed">
               {spec.body}
             </p>
           </motion.li>

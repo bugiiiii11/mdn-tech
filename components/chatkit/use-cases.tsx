@@ -3,8 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
-import { BASE_CHATBOT_LIMIT, featureById } from "@/lib/portal/plans";
+import {
+  PROSE_LINK_CLASS,
+  Section,
+  fadeUp,
+} from "@/components/product-pages/primitives";
+import { chatbotAllowanceLabel, featureById } from "@/lib/portal/plans";
 
 // "AI customer support for small businesses" — recognition, not testimonials.
 //
@@ -58,7 +62,7 @@ export const UseCases = () => (
   <Section
     id="use-cases"
     title="AI customer support for small businesses, without a support team"
-    intro={`Every account starts with ${BASE_CHATBOT_LIMIT === 1 ? "one chatbot" : `${BASE_CHATBOT_LIMIT} chatbots`}. Here is what filling it in looks like for four kinds of business, described in the categories you would actually use.`}
+    intro={`Every account starts with ${chatbotAllowanceLabel()}. Here is what filling it in looks like for four kinds of business, described in the categories you would actually use.`}
     wide
   >
     <motion.div
@@ -106,10 +110,7 @@ export const UseCases = () => (
     >
       We run ChatKit on our own client sites — the same widget, the same nine
       categories, the same credit counter. You can read about{" "}
-      <Link
-        href="/about"
-        className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-      >
+      <Link href="/about" className={`${PROSE_LINK_CLASS} font-medium`}>
         the engineers who build and run it
       </Link>{" "}
       if that matters to you.

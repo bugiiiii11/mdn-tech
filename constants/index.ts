@@ -263,11 +263,11 @@ export const NAV_LINKS = [
   },
   {
     title: "ChatKit",
-    link: "/#chatkit",
+    link: "/chatkit",
   },
   {
     title: "ToolKit",
-    link: "/#toolkit",
+    link: "/toolkit",
   },
   {
     title: "About",

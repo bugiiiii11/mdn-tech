@@ -3,7 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
+import {
+  PROSE_LINK_CLASS,
+  Section,
+  fadeUp,
+} from "@/components/product-pages/primitives";
+import { CHAT_BOT_RULE, CHAT_IP_RULE } from "@/lib/chat/rate-limit-rules";
 
 // "Domain control, spend protection, and what happens at zero credits" — the
 // two money fears that stop a self-service signup, answered with named
@@ -20,9 +25,10 @@ import { Section, fadeUp } from "@/components/product-pages/primitives";
 //   lib/chat/cors.ts:1-15     why enforcement is a 403, not CORS headers
 //   app/api/chat/[chatbotId]/config/route.ts:39-54  403 at widget load
 //   app/api/chat/[chatbotId]/message/route.ts:101-103  403 at send
-//   lib/chat/rate-limit.ts:32-33  CHAT_IP_RULE 20/60, CHAT_BOT_RULE 120/60
-//     — NOT imported: that module pulls in the Supabase SERVICE client and is
-//     strictly server-only, so the two figures are written out below.
+//   lib/chat/rate-limit-rules.ts  CHAT_IP_RULE / CHAT_BOT_RULE — the client-
+//     safe split of rate-limit.ts (which stays server-only via the service
+//     client). Imported and interpolated below, so the figures cannot drift
+//     from what the route enforces.
 //   lib/chat/rate-limit.ts:49-55  deliberate fail-open on infrastructure error
 //   lib/chat/schemas.ts:10-35     zod validation before any database work
 //   app/api/chat/[chatbotId]/message/route.ts:140-152  conversation scoping
@@ -42,7 +48,7 @@ const blocks = [
   {
     title: "Abuse cannot run up your bill",
     body: [
-      "Rate limits are applied per visitor IP and per chatbot, per minute — 20 requests a minute from one visitor, 120 a minute across a single chatbot — and they are evaluated before the chatbot record, your knowledge base or the model are touched. Traffic that is going to be blocked never reaches anything that costs a credit.",
+      `Rate limits are applied per visitor IP and per chatbot, per minute — ${CHAT_IP_RULE.limit} requests a minute from one visitor, ${CHAT_BOT_RULE.limit} a minute across a single chatbot — and they are evaluated before the chatbot record, your knowledge base or the model are touched. Traffic that is going to be blocked never reaches anything that costs a credit.`,
       "The limiter is deliberately built to fail open on an infrastructure error. A database hiccup should never take a paying customer's chatbot offline, and every request that gets past the limiter still has to clear the credit check behind it.",
       "Separately: every field on the public endpoint is validated before any database work happens, and a conversation id belonging to one chatbot can never read or write another chatbot's thread, even if somebody knows a valid one.",
     ],
@@ -79,9 +85,11 @@ export const Control = () => (
             {block.title}
           </h3>
           <div className="flex flex-col gap-3">
-            {block.body.map((paragraph) => (
+            {/* Index keys: the array is a static module const, never
+                reordered, and a content-prefix key can silently collide. */}
+            {block.body.map((paragraph, index) => (
               <p
-                key={paragraph.slice(0, 40)}
+                key={index}
                 className="text-sm md:text-base text-gray-300 leading-relaxed"
               >
                 {paragraph}
@@ -100,12 +108,9 @@ export const Control = () => (
       className="mt-12 max-w-3xl text-center text-sm text-gray-400 leading-relaxed"
     >
       No compliance badges here on purpose — these are the mechanisms, named, so
-      you can judge them. Our privacy policy sets out{" "}
-      <Link
-        href="/privacy"
-        className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-      >
-        exactly what we store
+      you can judge them. There is also{" "}
+      <Link href="/privacy" className={`${PROSE_LINK_CLASS} font-medium`}>
+        our privacy policy
       </Link>
       .
     </motion.p>

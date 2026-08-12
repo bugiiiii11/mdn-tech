@@ -25,6 +25,13 @@ export const fadeUp = (delay = 0): Variants => ({
   },
 });
 
+// The no-delay case hoisted to one identity. `fadeUp(0)` inline in JSX mints a
+// fresh Variants object every render, which hands framer-motion a "new"
+// animation for content that already played — mostly harmless in these
+// render-once sections, but install-section re-renders on every shell-toggle
+// click. Keep the factory for the genuinely varying delays.
+export const FADE_UP = fadeUp(0);
+
 export type CtaLink = {
   href: string;
   label: string;
@@ -144,7 +151,7 @@ export const PageHero = ({
       )}
     >
       {hasTrail ? (
-        <motion.div variants={fadeUp(0)} className="w-full">
+        <motion.div variants={FADE_UP} className="w-full">
           <Breadcrumb trail={trail as Crumb[]} />
         </motion.div>
       ) : null}
@@ -239,7 +246,7 @@ export const Section = ({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      variants={fadeUp(0)}
+      variants={FADE_UP}
       className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
     >
       {title}
@@ -294,7 +301,7 @@ export const CtaBand = ({
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      variants={fadeUp(0)}
+      variants={FADE_UP}
       className="relative w-full max-w-4xl overflow-hidden rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm"
     >
       <div

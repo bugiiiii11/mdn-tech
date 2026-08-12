@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CtaBand } from "@/components/product-pages/primitives";
+import { CtaBand, PROSE_LINK_CLASS } from "@/components/product-pages/primitives";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
 import { APP_URL } from "@/lib/marketing/products";
 
@@ -32,17 +32,11 @@ export const ToolkitClosing = () => (
 
     <p className="-mt-10 px-4 pb-16 text-center text-sm text-gray-400">
       Built a knowledge base with Build KB?{" "}
-      <a
-        href={`${APP_URL}/chatkit`}
-        className="text-cyan-400 transition-colors hover:text-cyan-300"
-      >
+      <a href={`${APP_URL}/chatkit`} className={PROSE_LINK_CLASS}>
         Start a chatbot free
       </a>
       . Otherwise, there is{" "}
-      <Link
-        href="/blog"
-        className="text-cyan-400 transition-colors hover:text-cyan-300"
-      >
+      <Link href="/blog" className={PROSE_LINK_CLASS}>
         more engineering writing
       </Link>{" "}
       where this came from.

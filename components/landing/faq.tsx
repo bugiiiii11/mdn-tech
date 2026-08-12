@@ -11,12 +11,19 @@ import {
   FREE_TRIAL_MESSAGES,
   BASE_CHATBOT_LIMIT,
 } from "@/lib/portal/plans";
-import { toolkitSkills } from "@/lib/portal/toolkit-skills";
+import { LISTED_COUNT, MDN_COUNT } from "@/lib/marketing/toolkit-catalogue";
 
 // FAQ + FAQPage structured data. Both the visible accordion and the JSON-LD
 // are generated from the SAME array, so the schema can never drift from the
-// rendered text (Google penalises mismatches). Prices and counts come from
-// lib/portal/plans.ts, the billing source of truth — never hard-coded here.
+// rendered text (Google penalises mismatches). Prices come from
+// lib/portal/plans.ts, the billing source of truth; skill counts come from
+// lib/marketing/toolkit-catalogue, the one definition of "a skill in the
+// directory" — never hard-coded here.
+//
+// An entry may carry an optional `link`, rendered at the end of the answer and
+// appended to the schema text by answerText() — the same pattern as
+// components/toolkit/faq.tsx, so the JSON-LD still says exactly what a visitor
+// reads.
 //
 // Native <details>/<summary>: keyboard-accessible and open-able with JS
 // disabled, which also means crawlers see every answer in the HTML.
@@ -36,11 +43,10 @@ const cheapestAddOn =
     (a, b) => a.priceCents - b.priceCents
   )[0]?.priceLabel ?? "";
 
-const OUR_SKILL_COUNT = toolkitSkills.filter(
-  (skill) => skill.author === "M.D.N Tech"
-).length;
+type FaqLink = { href: string; label: string };
+type FaqEntry = { question: string; answer: string; link?: FaqLink };
 
-const FAQS: { question: string; answer: string }[] = [
+const FAQS: FaqEntry[] = [
   {
     question: "Do I need coding skills to add an AI chatbot to my website?",
     answer:
@@ -76,7 +82,8 @@ const FAQS: { question: string; answer: string }[] = [
   },
   {
     question: "Is ToolKit actually free, or is it a trial?",
-    answer: `ToolKit is genuinely free: no trial clock, no account, no upsell. It is a curated directory of ${toolkitSkills.length} Claude Code skills we think are worth your time. ${OUR_SKILL_COUNT} of them are written by M.D.N Tech and released under the MIT license; the rest are hand-picked from Anthropic, Vercel Labs, Trail of Bits and the wider community, and each one links to its source so you install it from the author under their own terms.`,
+    answer: `ToolKit is genuinely free: no trial clock, no account, no upsell. It is a curated directory of ${LISTED_COUNT} Claude Code skills — ${MDN_COUNT} written by us and MIT licensed, the rest hand-picked from other authors, each linking to its own source.`,
+    link: { href: "/toolkit", label: "Browse the full directory" },
   },
   {
     question: "How many chatbots can I create?",
@@ -89,13 +96,17 @@ const FAQS: { question: string; answer: string }[] = [
   },
 ];
 
+/** Exactly the text a visitor reads, so the schema cannot drift from the page. */
+const answerText = (entry: FaqEntry) =>
+  entry.link ? `${entry.answer} ${entry.link.label}.` : entry.answer;
+
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: FAQS.map(({ question, answer }) => ({
+  mainEntity: FAQS.map((entry) => ({
     "@type": "Question",
-    name: question,
-    acceptedAnswer: { "@type": "Answer", text: answer },
+    name: entry.question,
+    acceptedAnswer: { "@type": "Answer", text: answerText(entry) },
   })),
 };
 
@@ -143,7 +154,7 @@ export const Faq = () => {
       </motion.p>
 
       <div className="w-full max-w-3xl flex flex-col divide-y divide-white/[0.06] border-y border-white/[0.06]">
-        {FAQS.map(({ question, answer }) => (
+        {FAQS.map(({ question, answer, link }) => (
           <details key={question} className="group py-5">
             <summary className="flex items-start justify-between gap-6 cursor-pointer list-none text-white hover:text-cyan-400 transition-colors duration-200 [&::-webkit-details-marker]:hidden">
               <h3 className="text-base md:text-lg font-medium">{question}</h3>
@@ -165,6 +176,18 @@ export const Faq = () => {
             </summary>
             <p className="mt-3 pr-11 text-sm md:text-base text-gray-400 leading-relaxed">
               {answer}
+              {link ? (
+                <>
+                  {" "}
+                  <Link
+                    href={link.href}
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+                  >
+                    {link.label}
+                  </Link>
+                  .
+                </>
+              ) : null}
             </p>
           </details>
         ))}

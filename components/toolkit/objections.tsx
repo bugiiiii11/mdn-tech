@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Section } from "@/components/product-pages/primitives";
+import { PROSE_LINK_CLASS, Section } from "@/components/product-pages/primitives";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
 
 import { MDN_COUNT, numberWord } from "./catalogue";
@@ -27,11 +27,11 @@ const objections: { question: string; answer: ReactNode }[] = [
         It is a page that costs us hosting and earns nothing directly, so the
         suspicion is reasonable. What it is not is a gate: no account, no email
         capture, no modal, no interstitial, nothing to dismiss before you read.
-        Every mention of the paid product on this page is a plain text link you
-        can ignore, and the skills work identically whether you click one or
-        not. If that ever changes — a signup wall, an email-for-download step —
-        the page stops being what it says it is, and the copy above stops being
-        true.
+        The ChatKit prices quoted on this page are disclosure, not a checkout —
+        no CTA here leads to a payment, and the skills work identically whether
+        you ever click through or not. If that ever changes — a signup wall, an
+        email-for-download step — the page stops being what it says it is, and
+        the copy above stops being true.
       </>
     ),
   },
@@ -71,7 +71,7 @@ const objections: { question: string; answer: ReactNode }[] = [
           href={`${TOOLKIT_REPO}/blob/main/LICENSE`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-cyan-400 transition-colors hover:text-cyan-300"
+          className={PROSE_LINK_CLASS}
         >
           LICENSE is in the repo
         </a>{" "}
@@ -87,12 +87,14 @@ const objections: { question: string; answer: ReactNode }[] = [
     question: "What does it do to my machine?",
     answer: (
       <>
-        Our install writes only into <Code>~/.claude/skills/</Code>. It
-        overwrites same-named directories without asking, which is why the
-        backup command sits above the install command rather than below it.
+        Our install leaves a git clone in your current directory and writes the
+        skill files into <Code>~/.claude/skills/</Code> — nothing else. It
+        overwrites same-named skill directories without asking, which is why
+        the backup command sits above the install command rather than below it.
         There is no daemon, no telemetry and no network call after the{" "}
-        <Code>git clone</Code>, and uninstalling is one line. All of that is
-        scoped to our {numberWord(MDN_COUNT)} skills: a third-party skill is the
+        <Code>git clone</Code>, and the uninstall commands above remove both
+        the skills and the clone. All of that is scoped to our{" "}
+        {numberWord(MDN_COUNT)} skills: a third-party skill is the
         author&apos;s code and runs under your review, not ours.
       </>
     ),

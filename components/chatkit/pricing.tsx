@@ -4,17 +4,20 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 import {
+  CtaButton,
   GlassCard,
+  PROSE_LINK_CLASS,
   Section,
   StatChip,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
 import {
-  BASE_CHATBOT_LIMIT,
   CREDITS_PER_MESSAGE,
   CREDIT_PACKS,
   FREE_TRIAL_MESSAGES,
+  chatbotAllowanceLabel,
+  creditsPerReplyLabel,
   featureById,
 } from "@/lib/portal/plans";
 
@@ -28,15 +31,26 @@ import {
 //
 // PAYMENT LANGUAGE — hard constraint: no payment processor is integrated
 // (both purchase routes write status 'mock'), so this is a published price
-// list, not a checkout. No "buy", "checkout", "secure payment", "cards
-// accepted", "invoice", "refund" or "money-back" language appears anywhere.
-// The only button in the section is the free-trial CTA.
+// list, not a checkout. No "buy", "secure payment", "cards accepted",
+// "invoice", "refund" or "money-back" language appears anywhere, and the only
+// button in the section is the free-trial CTA. The word "checkout" appears
+// exactly once — in the closing paragraph's disclosure that it is NOT live
+// yet, which is the honest statement of the constraint rather than a hedge
+// around it.
 //
 // HONESTY CONSTRAINT #3: credits live on chatbots.credits_purchased, per
 // chatbot. One ACCOUNT is true; one BALANCE is not. Stated explicitly below.
 
 const EXTRA_CHATBOT_PRICE = featureById("extra_chatbot")?.priceLabel ?? "";
 
+// en-US digit grouping without toLocaleString: this is a client component, so
+// a formatter runs on both sides of the hydration boundary, and the runtime's
+// ICU data is the one input we cannot pin. String arithmetic is deterministic.
+const formatCount = (n: number) =>
+  String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+// Different grammatical shape from creditsPerReplyLabel(), so it stays local —
+// but still derived from the constant, never typed.
 const CREDIT_RATIO_SENTENCE =
   CREDITS_PER_MESSAGE === 1
     ? "One credit, one reply."
@@ -45,7 +59,7 @@ const CREDIT_RATIO_SENTENCE =
 const mechanics = [
   {
     title: CREDIT_RATIO_SENTENCE,
-    body: `Visitor questions cost nothing. Only the chatbot's answer moves the counter, once, after the reply has finished streaming. Because it is ${CREDITS_PER_MESSAGE === 1 ? "one credit per message" : `${CREDITS_PER_MESSAGE} credits per message`}, the credit number and the message number are the same number — there is no conversion to work out.`,
+    body: `Visitor questions cost nothing. Only the chatbot's answer moves the counter, once, after the reply has finished streaming. Because it is ${creditsPerReplyLabel()}, the credit number and the message number are the same number — there is no conversion to work out.`,
   },
   {
     title: "Credits do not expire and do not reset.",
@@ -79,7 +93,7 @@ export const Pricing = () => (
           <h3 className="text-base md:text-lg font-semibold text-white mb-2">
             {mechanic.title}
           </h3>
-          <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+          <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             {mechanic.body}
           </p>
         </motion.div>
@@ -112,7 +126,10 @@ export const Pricing = () => (
             <div className="flex items-center justify-between gap-3 mb-4">
               <h4 className="text-lg font-semibold text-white">{pack.name}</h4>
               {pack.highlight ? (
-                <span className="text-[10px] font-medium uppercase tracking-wider text-purple-400/70">
+                /* Solid purple-400 at the 12px label size: purple-400/70 at
+                   10px measured 4.08:1 on the highlighted card — under AA for
+                   the one mark that names the recommended pack. */
+                <span className="text-xs font-medium uppercase tracking-wider text-purple-400">
                   Best value
                 </span>
               ) : null}
@@ -120,10 +137,8 @@ export const Pricing = () => (
 
             <p className="text-3xl font-bold text-white">{pack.priceLabel}</p>
             <p className="mt-1 text-sm text-gray-400">
-              {pack.credits.toLocaleString("en-US")} credits ={" "}
-              {Math.floor(pack.credits / CREDITS_PER_MESSAGE).toLocaleString(
-                "en-US"
-              )}{" "}
+              {formatCount(pack.credits)} credits ={" "}
+              {formatCount(Math.floor(pack.credits / CREDITS_PER_MESSAGE))}{" "}
               replies
             </p>
 
@@ -157,29 +172,30 @@ export const Pricing = () => (
         What a balance is attached to
       </h3>
       <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-        Every account starts with{" "}
-        {BASE_CHATBOT_LIMIT === 1 ? "one chatbot" : `${BASE_CHATBOT_LIMIT} chatbots`}
-        , and additional slots are a one-time {EXTRA_CHATBOT_PRICE} each. Credits
-        sit on the chatbot, not on the account: two chatbots on the same login
-        have two separate balances, two knowledge bases and two sets of settings,
-        and credits do not move between them.
+        Every account starts with {chatbotAllowanceLabel()}, and additional
+        slots are a one-time {EXTRA_CHATBOT_PRICE} each. Credits sit on the
+        chatbot, not on the account: two chatbots on the same login have two
+        separate balances, two knowledge bases and two sets of settings, and
+        credits do not move between them.
       </p>
     </motion.div>
 
     {/* The only button in this section, and it is the free trial — not a
         checkout. No payment processor is integrated. */}
-    <motion.a
+    <motion.div
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
       variants={fadeUp(0.15)}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      href={`${APP_URL}/chatkit`}
-      className="mt-14 py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
+      className="mt-14"
     >
-      Start with {FREE_TRIAL_MESSAGES} free messages
-    </motion.a>
+      <CtaButton
+        cta={{
+          href: `${APP_URL}/chatkit`,
+          label: `Start with ${FREE_TRIAL_MESSAGES} free messages`,
+        }}
+      />
+    </motion.div>
 
     <motion.p
       initial="hidden"
@@ -188,20 +204,18 @@ export const Pricing = () => (
       variants={fadeUp(0.1)}
       className="mt-6 max-w-3xl text-center text-sm text-gray-400 leading-relaxed"
     >
-      Prices are listed here so you can budget before you start. Sign-up and the
-      free trial need no card at all, and current prices and availability always
-      live{" "}
+      Prices are listed here so you can budget before you start. Payment is not
+      live yet: while checkout is being set up, credits are granted from inside
+      the app, and no card is charged today. Sign-up and the free trial need no
+      card either, and current prices and availability always live{" "}
       <a
         href={`${APP_URL}/chatkit`}
-        className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+        className={`${PROSE_LINK_CLASS} font-medium`}
       >
         in the app
       </a>
       .{" "}
-      <Link
-        href="/terms"
-        className="underline underline-offset-2 hover:text-gray-300 transition-colors duration-300"
-      >
+      <Link href="/terms" className={`${PROSE_LINK_CLASS} font-medium`}>
         Terms of service
       </Link>
       .

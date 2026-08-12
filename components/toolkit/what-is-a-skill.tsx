@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import { GlassCard, Section } from "@/components/product-pages/primitives";
+import {
+  GlassCard,
+  PROSE_LINK_CLASS,
+  Section,
+} from "@/components/product-pages/primitives";
 
 import { Code } from "./inline-code";
 
@@ -12,6 +16,12 @@ import { Code } from "./inline-code";
 // The four-way comparison exists because SKILL.md, CLAUDE.md, MCP servers and
 // hooks get conflated constantly; each row points at the section that covers it,
 // so the page reads as a route rather than a list.
+//
+// HONESTY CONSTRAINT (do not regress): Claude Code itself requires a paid plan
+// (Pro, Max, Team, Enterprise) or an API account — the free Claude.ai plan
+// does not include it, per Anthropic's own docs. The closing paragraph's claim
+// is that SKILLS add no cost on top of that; never widen it back to "works on
+// free-tier Claude Code".
 
 // The four things people conflate. Each maps to a later section id.
 const distinctions = [
@@ -67,14 +77,14 @@ export const WhatIsASkill = () => (
             href="https://docs.claude.com/en/docs/claude-code/skills"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-cyan-400 transition-colors hover:text-cyan-300"
+            className={PROSE_LINK_CLASS}
           >
             Claude Code skills reference
           </a>
           . If you are new to the tool itself, start with{" "}
           <Link
             href="/blog/claude-code-complete-guide"
-            className="text-cyan-400 transition-colors hover:text-cyan-300"
+            className={PROSE_LINK_CLASS}
           >
             our complete guide to Claude Code
           </Link>
@@ -115,7 +125,7 @@ export const WhatIsASkill = () => (
                 {item.body}{" "}
                 <a
                   href={item.href}
-                  className="whitespace-nowrap text-cyan-400 transition-colors hover:text-cyan-300"
+                  className={`whitespace-nowrap ${PROSE_LINK_CLASS}`}
                 >
                   {item.hrefLabel} ↓
                 </a>
@@ -126,9 +136,11 @@ export const WhatIsASkill = () => (
       </div>
 
       <p className="text-base text-gray-300 leading-relaxed">
-        None of this needs a paid Claude plan. Skills work on free-tier Claude
-        Code, because they are files the model reads rather than a subscription
-        feature someone switches on for you.
+        Skills add no cost on top of whatever Claude Code plan you already have
+        — they are files the model reads, not a subscription feature someone
+        switches on for you. Claude Code itself is the paid part: it needs a
+        Pro, Max, Team or Enterprise plan, or an API account, and the free
+        Claude.ai tier does not include it.
       </p>
     </div>
   </Section>

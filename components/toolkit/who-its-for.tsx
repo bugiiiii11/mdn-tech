@@ -1,7 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { CheckItem, Section } from "@/components/product-pages/primitives";
+import {
+  CheckItem,
+  PROSE_LINK_CLASS,
+  Section,
+} from "@/components/product-pages/primitives";
 
 import { skillName } from "./catalogue";
 import { Code } from "./inline-code";
@@ -77,10 +81,7 @@ export const WhoItsFor = () => (
             {skillName("build-kb")} reads the user-facing content already in
             your repo and writes one <Code>knowledge-base.md</Code>. Paste it
             into{" "}
-            <Link
-              href="/chatkit"
-              className="text-cyan-400 transition-colors hover:text-cyan-300"
-            >
+            <Link href="/chatkit" className={PROSE_LINK_CLASS}>
               ChatKit, our AI chatbot for websites
             </Link>
             , or into anything else that accepts Markdown.

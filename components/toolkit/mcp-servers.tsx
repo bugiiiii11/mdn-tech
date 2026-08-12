@@ -1,4 +1,8 @@
-import { GlassCard, Section } from "@/components/product-pages/primitives";
+import {
+  GlassCard,
+  PROSE_LINK_CLASS,
+  Section,
+} from "@/components/product-pages/primitives";
 import { toolkitMCPs } from "@/lib/portal/toolkit-skills";
 
 import { CodeBlock } from "./code-block";
@@ -48,7 +52,10 @@ export const McpServers = () => (
           <li key={mcp.id} className="h-full">
             <GlassCard className="flex h-full flex-col">
               <h3 className="text-base font-semibold text-white">{mcp.name}</h3>
-              <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+              {/* The description is the card's body, so gray-300 (Legibility
+                  Floor Rule); the WHY line below is the subordinate second
+                  paragraph and stays gray-400. */}
+              <p className="mt-2 text-sm text-gray-300 leading-relaxed">
                 {mcp.description}
               </p>
 
@@ -63,7 +70,7 @@ export const McpServers = () => (
                   {mcp.connectedServices.map((service) => (
                     <li
                       key={service}
-                      className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[11px] text-gray-400"
+                      className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-xs text-gray-400"
                     >
                       {service}
                     </li>
@@ -72,8 +79,14 @@ export const McpServers = () => (
               )}
 
               <details className="group mt-auto border-t border-white/[0.06] pt-4">
-                <summary className="cursor-pointer list-none text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300 [&::-webkit-details-marker]:hidden">
+                <summary
+                  className={`cursor-pointer list-none text-xs font-medium ${PROSE_LINK_CLASS} [&::-webkit-details-marker]:hidden`}
+                >
                   Setup command
+                  {/* Six identically-labelled controls on one page — the
+                      sr-only suffix names the server so they can be told
+                      apart in a controls list (WCAG 2.4.4). */}
+                  <span className="sr-only"> for {mcp.name}</span>
                   <span
                     aria-hidden="true"
                     className="ml-1 inline-block transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none"

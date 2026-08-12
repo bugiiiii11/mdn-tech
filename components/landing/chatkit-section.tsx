@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { APP_URL } from "@/lib/marketing/products";
@@ -261,7 +262,7 @@ export const ChatKitSection = () => {
         whileInView="visible"
         viewport={{ once: true }}
         variants={fadeUp(0.15)}
-        className="flex flex-col sm:flex-row items-center gap-5 mt-12"
+        className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-5 mt-12"
       >
         <motion.a
           whileHover={{ scale: 1.05 }}
@@ -275,6 +276,14 @@ export const ChatKitSection = () => {
           {FREE_TRIAL_MESSAGES} free messages · no credit card · nothing to
           cancel
         </p>
+        {/* Internal link into the indexable deep-dive — the app CTA above goes
+            to a noindex host, so this is where homepage authority flows. */}
+        <Link
+          href="/chatkit"
+          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium text-sm"
+        >
+          Read the full ChatKit breakdown →
+        </Link>
       </motion.div>
     </section>
   );

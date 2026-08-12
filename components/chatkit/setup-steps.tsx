@@ -2,7 +2,13 @@
 
 import { motion } from "framer-motion";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
+import { CodeBlock } from "@/components/product-pages/code-block";
+import {
+  CtaButton,
+  PROSE_LINK_CLASS,
+  Section,
+  fadeUp,
+} from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
@@ -42,7 +48,9 @@ const steps = [
 export const SetupSteps = () => (
   <Section
     id="setup"
-    title="Add an AI chatbot to your website in four steps — no coding"
+    // "no developer needed", not "no coding": step 4 is hand-editing your page
+    // HTML, so "no coding" would be the soft claim on a literal page.
+    title="Add an AI chatbot to your website in four steps — no developer needed"
     intro="Everything below is a form you fill in yourself. These are the actual fields, in the order you meet them, so you can see the whole job before you start it."
     wide
   >
@@ -91,20 +99,19 @@ export const SetupSteps = () => (
             your own chatbot id in place of the placeholder:
           </p>
 
-          <div className="mt-4 overflow-x-auto rounded-xl border border-[#7042f88b] bg-[#030014]/70 backdrop-blur-sm p-4">
-            <code className="block whitespace-pre font-mono text-xs md:text-sm text-cyan-300">
-              {EMBED_SNIPPET}
-            </code>
+          {/* Shared CodeBlock: gray-200 text (code is content, not action —
+              the Bent Light Rule), scrolling inside its own <pre>, and a copy
+              button — which this step wants more than any other, because the
+              whole step IS "paste this line". */}
+          <div className="mt-4">
+            <CodeBlock code={EMBED_SNIPPET} label="your page HTML" />
           </div>
 
           <p className="mt-4 text-sm text-gray-400 leading-relaxed">
             It has to be a real script tag in your page HTML. Tag managers and
             script injectors that add it dynamically are not supported, because
             widget.js reads the tag it was loaded from —{" "}
-            <a
-              href="#faq"
-              className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-            >
+            <a href="#faq" className={`${PROSE_LINK_CLASS} font-medium`}>
               the FAQ explains why
             </a>
             .
@@ -131,16 +138,13 @@ export const SetupSteps = () => (
       variants={fadeUp(0.15)}
       className="mt-8 flex flex-col items-center gap-3"
     >
-      <motion.a
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        href={`${APP_URL}/chatkit`}
-        className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
-      >
-        Create your chatbot — {FREE_TRIAL_MESSAGES} free messages
-      </motion.a>
+      {/* Shared CtaButton — the short label stays on one line at 360px, and
+          the note underneath carries the trial size instead. */}
+      <CtaButton
+        cta={{ href: `${APP_URL}/chatkit`, label: "Create your chatbot free" }}
+      />
       <p className="text-sm text-gray-400">
-        No credit card, nothing to cancel.
+        {FREE_TRIAL_MESSAGES} free messages — no credit card, nothing to cancel.
       </p>
     </motion.div>
   </Section>

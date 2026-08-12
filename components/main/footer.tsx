@@ -6,9 +6,19 @@ import { usePathname } from "next/navigation";
 import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo, RxGithubLogo } from "react-icons/rx";
 
 import { APP_URL, getLandingMode, visibleProducts } from "@/lib/marketing/products";
+import type { MarketingProduct } from "@/lib/marketing/products";
 import { NewsletterForm } from "@/components/main/newsletter-form";
 import { BlackholeVideo } from "@/components/main/blackhole-video";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
+
+// Products with an indexable marketing deep-dive get the internal route in
+// the footer instead of product.href (the app host is noindex, so sending
+// every sitewide footer link there wastes the strongest internal-link slot).
+// The Connect column keeps "Open the App" for people who want the portal.
+const MARKETING_ROUTES: Partial<Record<MarketingProduct["id"], string>> = {
+  chatkit: "/chatkit",
+  toolkit: "/toolkit",
+};
 
 // Shared blackhole bookend above the footer. BlackholeVideo carries the
 // reduced-motion + poster handling (WCAG 2.2.2).
@@ -165,22 +175,30 @@ export const Footer = () => {
             <div>
               <h4 className={headingClass}>Products</h4>
               <nav className="flex flex-col gap-2.5">
-                {products.map((product) =>
-                  product.status[mode] === "live" ? (
+                {products.map((product) => {
+                  if (product.status[mode] !== "live") {
+                    return (
+                      <Link
+                        key={product.id}
+                        href="/#coming-soon"
+                        className={linkClass}
+                      >
+                        {product.name}
+                        <span className="ml-1.5 text-[10px] uppercase tracking-wide text-purple-300">Soon</span>
+                      </Link>
+                    );
+                  }
+                  const marketingHref = MARKETING_ROUTES[product.id];
+                  return marketingHref ? (
+                    <Link key={product.id} href={marketingHref} className={linkClass}>
+                      {product.name}
+                    </Link>
+                  ) : (
                     <a key={product.id} href={product.href} className={linkClass}>
                       {product.name}
                     </a>
-                  ) : (
-                    <Link
-                      key={product.id}
-                      href="/#coming-soon"
-                      className={linkClass}
-                    >
-                      {product.name}
-                      <span className="ml-1.5 text-[10px] uppercase tracking-wide text-purple-300">Soon</span>
-                    </Link>
-                  )
-                )}
+                  );
+                })}
               </nav>
             </div>
 
@@ -191,9 +209,9 @@ export const Footer = () => {
                 <Link href="/blog" className={linkClass}>
                   Blog
                 </Link>
-                <a href={`${APP_URL}/toolkit`} className={linkClass}>
+                <Link href="/toolkit" className={linkClass}>
                   Claude Code Skills
-                </a>
+                </Link>
                 <a
                   href={TOOLKIT_REPO}
                   target="_blank"

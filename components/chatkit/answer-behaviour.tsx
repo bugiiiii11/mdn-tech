@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 import { Section, fadeUp } from "@/components/product-pages/primitives";
-import { CREDITS_PER_MESSAGE } from "@/lib/portal/plans";
+import { creditsPerReplyLabel } from "@/lib/portal/plans";
 
 // "How ChatKit answers" — the three unusual behavioural constraints in the
 // system prompt, sold as reasons to buy rather than apologised for.
@@ -24,15 +24,12 @@ import { CREDITS_PER_MESSAGE } from "@/lib/portal/plans";
 // statement. The model is named as Anthropic's Claude WITHOUT the pinned model
 // id, so a version bump does not falsify the page.
 
-const CREDIT_PHRASE =
-  CREDITS_PER_MESSAGE === 1
-    ? "one reply is one credit"
-    : `one reply is ${CREDITS_PER_MESSAGE} credits`;
-
 const rules = [
   {
     title: "It answers like a busy professional, not a brochure",
-    body: `The instructions cap every reply at two or three sentences, with no bullet lists, no headings, no markdown and no emojis, and a hard ceiling on output length behind that. On a support widget this is what people actually want: the answer, not an essay. It is also the cheaper behaviour, because ${CREDIT_PHRASE} whether the reply is one line or five.`,
+    // The metering phrase comes from creditsPerReplyLabel() in plans.ts — the
+    // one spelling every marketing surface shares.
+    body: `The instructions cap every reply at two or three sentences, with no bullet lists, no headings, no markdown and no emojis, and a hard ceiling on output length behind that. On a support widget this is what people actually want: the answer, not an essay. It is also the cheaper behaviour, because it is ${creditsPerReplyLabel()} whether the reply is one line or five.`,
   },
   {
     title: "When it does not know, it says your line — word for word",

@@ -27,10 +27,10 @@ export type RateLimitResult = {
   retryAfter: number
 }
 
-// Public chat surface. Per-IP stops one visitor hammering; per-bot caps what a
-// leaked chatbot id can cost across many IPs (a botnet defeats the IP bucket).
-export const CHAT_IP_RULE = { limit: 20, window: 60 }
-export const CHAT_BOT_RULE = { limit: 120, window: 60 }
+// Public chat surface rules live in rate-limit-rules.ts (a client-safe module,
+// because the marketing copy quotes the figures) and are re-exported here so
+// server callers keep their single import.
+export { CHAT_IP_RULE, CHAT_BOT_RULE } from '@/lib/chat/rate-limit-rules'
 
 // Owner-less internal bots have no credit balance to run down, so their spend
 // ceiling is time-based instead. See lib/chat/usage.ts.
