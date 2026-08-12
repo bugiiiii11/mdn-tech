@@ -4,16 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (re-baselined 2026-08-07; MVP launch target ~31.08). **Phase 0 + Phase 1 CLOSED and LIVE ON PROD** (verified S53). Parallel track started: website/SEO rebuild v2.1. Next: Phase 2 credit bank, and /chatkit + /toolkit marketing pages.
-- **Session count:** 53
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (re-baselined 2026-08-07; MVP launch target ~31.08). **Phase 0 + Phase 1 CLOSED and LIVE ON PROD** (verified S53). Website track in progress: landing v2.1 + `/chatkit` + `/toolkit` all built, branch-only, NOT deployed. Next: finish the S54 fix pass, then Phase 2 credit bank.
+- **Session count:** 54
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (all 4 features available; Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-43 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 43 | 2026-07-17 | Nebula seam fix + A3.3/A3.4 -- Phase A verification complete |
-| 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 | 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
 | 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
@@ -23,19 +21,7 @@
 | 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
 | 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 | 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
-
-## What Was Done (Session 52) -- Phase 0 merged to main; Phase 1 hardening 1.1-1.6
-
-- Phase 0.2-0.5 code merged to `main` + pushed (`7328d97`) -- the S51 shipping gap is closed; the `/api/infrastructure` guard and CC staff gate are live in prod alongside migration 020.
-- **Phase 1 CLOSED in one commit `b9aab5b` (branch-only -- NOT deployed).** Migration `021_chatkit_hardening.sql` APPLIED to prod and verified. 021 alone changes nothing in prod: no deployed code reads the new column/table, so there is no repeat of the S51 gap -- but the protections only go live on the next merge to main.
-- 1.1 domain binding: `chatbots.allowed_domains` (hostnames, `*.` wildcard) enforced server-side in both `/api/chat` routes + field in `WidgetConfigForm`. Empty = allow-any so no customer widget broke. The blanket CORS `*` block was REMOVED from `next.config.js` -- it would have emitted a second, conflicting ACAO alongside the per-request one and browsers reject that.
-- 1.2: the only owner-less bot is a REAL live client widget (Royal Stroje). Rather than break it, its allow-list was seeded in the migration from observed `chat_conversations.source_url` traffic (`royalstroje.sk`). Internal bots: empty allow-list is now a hard DENY (not allow-all), 500 msg/day cap, and `messages_used` ticks for them too.
-- 1.3 rate limiting is **Postgres-backed, not Upstash** as the plan said -- Upstash needs an account + env vars from Martin and the whole point of the Phase 1 block was that it is unblocked. `rate_limits` table + `rate_limit_hit()` RPC, atomic, cross-lambda, per-IP + per-bot in ONE round trip, daily purge cron. It **fails open** on DB error by design (every request still has to clear the credit check before it can cost anything). Swap to Upstash later is a one-file change in `lib/chat/rate-limit.ts`.
-- Two flaws found while building, both fixed: the limiter originally sat AFTER the chatbot+KB queries (so unlimited 404s could still hammer Postgres -- moved before), and a supplied `conversationId` was never scoped to its chatbot (one bot could append to another's conversation).
-- 1.4: zod on the chat routes; `/api/subscribe` was an open unvalidated pipe into the Brevo list -- now validated + 5/hour. NOTE: zod v4 `.uuid()` is strict about version/variant bits; hand-written test uuids must be well-formed v4 or they 404 before reaching any logic.
-- 1.5: CSP on every page (no `unsafe-eval` in prod, `upgrade-insecure-requests` prod-only -- it breaks http://localhost navigation in dev); timing-safe cron secret compare in `lib/auth/cron.ts`, shared by both cron routes.
-- 1.6: visitor text is neutralized + framed as untrusted data in the KB-drafting prompt; suspicious drafts get `flagged`/`flag_reason`, a portal warning, and a two-click confirm enforced in the API (not just the UI). Ratings are owner-only, which was already a real gate.
-- Verified: domain binding 7/7, input validation 8/8, limiter blocks at exactly limit+1 with correct Retry-After, sanitizer 22/22, cron compare 8/8, 0 CSP violations across 7 pages in a PRODUCTION build (Playwright). tsc + lint + build green. Probe scripts are in the session scratchpad only -- Phase 3.5 should port them.
+| 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 
 ## What Was Done (Session 53) -- Phase 1 live on prod; landing SEO rework v2.1
 
@@ -51,6 +37,16 @@
 - Added `PRODUCT.md` + `DESIGN.md` (impeccable context): brand register, users, anti-references, and the "Event Horizon" visual system with named rules (Bent Light, Gradient Crown, Legibility Floor, Glow-Not-Shadow). Future design work should read these first.
 - **Safety hook false positives x2** -- did not work around, flagging for a pattern fix: `git push.*-f.*main` matched `--ff-only` across three chained commands; `curl.*\|.*sh` matched the word "ship" in an echo string. Proposed: anchor the force flag to the push itself (`git push[^;&|]*\s(-f|--force)\b[^;&|]*\bmain\b`) and require a real shell binary after the pipe.
 - 38 lower-severity review findings left UNFIXED (mostly pre-existing): gradient taglines on `<p>` in product-card, 2px corner brackets, placeholder linkedin.com/github.com links in `TEAM_MEMBERS`, no SoftwareApplication schema, products grid empty cell.
+
+## What Was Done (Session 54) -- /chatkit + /toolkit deep-dive pages built and reviewed
+
+- **29 new files, branch-only, UNCOMMITTED AT WRAP TIME** (auto-wrap fired at 39% while the fix workflow was still running -- see "What To Do Next" row 0). `/chatkit` = 12 sections (setup, knowledge base, widget anatomy, answer behaviour, use cases, included-vs-paid, pricing, control, honest limits, 12-Q FAQ); `/toolkit` = 12 sections (what-is-a-skill, install, enumerated directory, our skills, MCP servers, cost, objections, 11-Q FAQ). Shared shells in `components/product-pages/primitives.tsx`.
+- Method that worked and is worth repeating: **code truth-audit BEFORE writing copy.** An agent read plans.ts / migrations / the portal UI / the API routes and produced a fact contract plus a forbidden-claims list; the copywriter agent was forbidden to exceed it. Then 4 adversarial verifiers re-derived every claim from code independently.
+- First pass was green on `tsc` + `lint` + `build` with 66 claims verified -- and still had **5 critical + 6 high** defects. Do not treat a green build as evidence the copy is true.
+- **The 5 criticals:** (1) `/toolkit` claimed twice that Claude Code runs on the free Claude tier -- FALSE (Pro/Max/Team/Enterprise/Console required), and one instance was inside FAQPage JSON-LD; (2) `/chatkit`'s SoftwareApplication `featureList` spread the four PAID unlocks under a single `price:"0"` Offer -- the visible copy drew the line correctly and the schema erased it (honesty constraint 1, broken in the one place nobody reads); (3) the page cited `/privacy` for "exactly what we store" about transcripts/visitor IPs/source URLs -- the retention is real but the policy is the pre-ChatKit agency one and covers none of it; (4)+(5) **both pages were orphaned** -- absent from `sitemap.ts`, nav still on `/#chatkit`, footer pointing at the noindex portal; a repo-wide grep for `/toolkit` as an href returned only the page's own canonical.
+- **Product bug found en route and FIXED (committed):** `app/api/chat/[chatbotId]/message/route.ts` fetched conversation history with `.order('created_at', { ascending: true }).limit(20)` -- that is the OLDEST 20 rows, while the comment said "last 20". Past message 20 the model never saw the recent turns or the question it was answering. Now descending + reverse. Affects the live Royal Stroje widget.
+- Other real defects: the homepage and `/toolkit` published **contradictory skill counts** (21/5 vs 18/2) both inside structured data -- root cause is two private derivations, being fixed by lifting one definition into `lib/marketing/toolkit-catalogue.ts`; per-page `openGraph` silently wiped the root's og:image/site_name/locale (Next replaces the object, it does not deep-merge); pricing published real prices with no disclosure that checkout is still `status:'mock'`.
+- **Open decision for Martin:** ChatKit stores full transcripts + visitor IPs + source URLs and `/privacy` documents none of it. The page copy was de-scoped to stop citing the policy, but the disclosure gap itself is real and legally sensitive -- it needs a ChatKit section in the privacy policy before the pages go live.
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
@@ -68,7 +64,9 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0 | **Website track: `/chatkit` + `/toolkit` marketing pages** | AGREED PLAN: landing first (done S53), then dedicated per-product pages -- this is where organic traffic actually lands (today ChatKit's only URL is a portal page on app.mdntech.org, which no searcher will find). Reuse the approved landing sections. Then /about + blog rework (the 3 template-era articles are generic; needs real engineering content), then /sk alignment. THEN re-run the SEO audit -- `seo-audit/` is STALE (predates the whole rebuild, still references mdntech.com and `components/main/` files). Target clusters: /chatkit = "AI chatbot for website / chatbot without coding"; /toolkit = "Claude Code skills" (low competition, winnable #1). |
+| 0 | **FINISH THE S54 FIX PASS -- start here** | A 7-agent fix workflow (`wz1vrff31`) was STILL RUNNING when auto-wrap fired, so the 29 new files were committed mid-flight and may contain partially-applied fixes. FIRST: run `npx tsc --noEmit && npm run lint && npm run build` -- all three were green before the fix pass. Then check the workflow result / its `journal.jsonl` for which of the 60 findings landed. Full finding list + prescribed fixes: `scratchpad/review-findings.md` (regenerate from the task output if the scratchpad is gone). The 3 re-verify agents (honesty, design/a11y, build+SEO) may not have run at all -- re-run them before trusting the pages. Nothing is deployed and nothing was pushed, so there is no prod risk. |
+| 0a | Then: rest of the website track | /about + blog rework (the 3 template-era articles are generic; needs real engineering content), then /sk alignment. THEN re-run the SEO audit -- `seo-audit/` is STALE (predates the whole rebuild, still references mdntech.com and `components/main/` files). Target clusters: /chatkit = "AI chatbot for website / chatbot without coding"; /toolkit = "Claude Code skills" (low competition, winnable #1). User asked for a PUSH once the pages are done -- do it only after the fix pass verifies clean. |
+| 0c | **ChatKit privacy disclosure** | Blocking the pages going live: transcripts + visitor IPs + `source_url` are stored (`message/route.ts`), `/privacy` documents none of it. Needs a ChatKit section -- Martin's call on wording. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate `chatbots.credits_purchased` balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250) and the 3 mock-checkout routes collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" badge on Scale; 2.7 policy build (12-mo expiry + 30-day warning email, refund window, auto re-credit, chargeback clawback + auto-suspend, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys land. NOTE: grant SELECT-only to `authenticated` on the new ledger; all writes service-role. |
 | 3 | Phase 3.5 E2E + CI | Port the S51 + S52 probe scripts into a committed suite (S52 added: domain binding, input validation, rate limiter, sanitizer, cron compare, Playwright CSP check -- all scratchpad-only). Add GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
 | 4 | Widen the Phase 1 controls | Rate limiting covers `/api/chat/*` + `/api/subscribe`; the authenticated portal routes are still unlimited. CSP still needs `unsafe-inline` for scripts -- nonce-based CSP via middleware is the follow-up. |
@@ -87,7 +85,9 @@
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
 | `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) -- Phases 0 and 1 checked off AND live on prod (S53) |
 | `PRODUCT.md` / `DESIGN.md` | Brand register, users, anti-references / the "Event Horizon" visual system + named rules. Read BOTH before any design or copy work |
-| `components/landing/` | The v2.1 landing: hero, products, chatkit-section, toolkit-section, coming-soon, why-us, faq, credits-strip. The two product sections are the template for the /chatkit + /toolkit pages |
+| `components/landing/` | The v2.1 landing: hero, products, chatkit-section, toolkit-section, coming-soon, why-us, faq, credits-strip |
+| `components/product-pages/primitives.tsx` | Shared shells for both product pages (PageHero = the only h1, Section, GlassCard, StatChip, CtaBand, CheckItem, fadeUp). Read this BEFORE editing `components/chatkit/**` or `components/toolkit/**` |
+| `lib/marketing/toolkit-catalogue.ts` | Single source of truth for "a skill in the directory" = an entry with an `installationUrl`. Both the homepage and /toolkit must import counts from here -- they published contradictory numbers when each derived its own |
 | `lib/portal/plans.ts` | Billing source of truth. ALL landing prices/counts import from here -- never hard-code a price or a trial number in a component |
 | `lib/portal/toolkit-skills.ts` | ToolKit catalogue. Only `author: 'M.D.N Tech'` entries (5 of 21) are ours -- the rest are third-party under their own terms |
 | `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | The 3 mock checkout routes -- collapse into one credit purchase + ledger spends (Phase 2) |

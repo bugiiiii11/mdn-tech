@@ -1,21 +1,11 @@
 import { CheckCircle, ExternalLink } from 'lucide-react'
-import type { ToolkitSkill } from '@/lib/portal/toolkit-skills'
+import { CATEGORY_LABELS, type ToolkitSkill } from '@/lib/portal/toolkit-skills'
 import { Reveal } from './Reveal'
 
-const categoryLabels: Record<string, string> = {
-  'session-management': 'Session Management',
-  marketing: 'Marketing',
-  testing: 'Testing & QA',
-  safety: 'Safety & Validation',
-  design: 'Design',
-  seo: 'SEO',
-  infrastructure: 'Infrastructure',
-  development: 'Development',
-  security: 'Security',
-  documents: 'Documents',
-  productivity: 'Productivity',
-  creative: '3D & Creative',
-}
+// Category labels live next to the SkillCategory union in
+// lib/portal/toolkit-skills.ts so the portal gallery and the marketing
+// directory cannot disagree. The stored strings are sentence case; the label
+// below is uppercased in CSS, so this renders exactly as it always did.
 
 interface Props {
   skills: ToolkitSkill[]
@@ -49,7 +39,7 @@ export function ThirdPartySkills({ skills }: Props) {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <p className="font-mono text-[11px] text-cyan-400/80 uppercase tracking-wider mb-1.5">
-                      {categoryLabels[skill.category] || skill.category}
+                      {CATEGORY_LABELS[skill.category]}
                     </p>
                     <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                       {skill.name}

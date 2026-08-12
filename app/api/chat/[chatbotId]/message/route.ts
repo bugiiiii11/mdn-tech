@@ -177,20 +177,25 @@ export async function POST(
     content: message,
   })
 
-  // Fetch conversation history (last 20 messages)
+  // Fetch conversation history (last 20 messages). Descending + limit takes the
+  // NEWEST 20; ascending + limit would take the oldest 20, so past message 20 the
+  // model would never see the recent turns — or the question it is answering.
   const { data: history } = await supabase
     .from('chat_messages')
     .select('role, content')
     .eq('conversation_id', convId)
-    .order('created_at', { ascending: true })
+    .order('created_at', { ascending: false })
     .limit(20)
 
-  // Build messages for Claude
+  // Build messages for Claude — reversed back into chronological order.
   const systemPrompt = buildSystemPrompt(chatbot, kbEntries)
-  const messages: { role: 'user' | 'assistant'; content: string }[] = (history ?? []).map(m => ({
-    role: m.role as 'user' | 'assistant',
-    content: m.content,
-  }))
+  const messages: { role: 'user' | 'assistant'; content: string }[] = (history ?? [])
+    .slice()
+    .reverse()
+    .map(m => ({
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+    }))
 
   // Stream Claude response
   const anthropic = new Anthropic({ apiKey: process.env.CLAUDE_CHATBOT_API_KEY })
