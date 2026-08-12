@@ -92,7 +92,7 @@ export const MdnSkills = () => (
         <h3 className="text-lg font-semibold text-white mb-2">
           Handoff — one skill, {numberWord(HANDOFF_MODES.length)} subcommands
         </h3>
-        <p className="mb-6 text-sm md:text-base text-gray-400 leading-relaxed">
+        <p className="mb-6 text-sm md:text-base text-gray-300 leading-relaxed">
           Session continuity, with the guarantee that makes each mode
           trustworthy attached to it.
         </p>
@@ -124,7 +124,7 @@ export const MdnSkills = () => (
         <h3 className="text-lg font-semibold text-white mb-2">
           Build KB — a knowledge base out of the repo you already have
         </h3>
-        <p className="mb-6 text-sm md:text-base text-gray-400 leading-relaxed">
+        <p className="mb-6 text-sm md:text-base text-gray-300 leading-relaxed">
           It scans the user-facing content already in your repository — README,
           marketing pages, docs, pricing, support — and writes one{" "}
           <Code>knowledge-base.md</Code> organised into fixed sections.
@@ -140,7 +140,7 @@ export const MdnSkills = () => (
             changes, it stops and asks first.
           </CheckItem>
         </div>
-        <p className="mt-6 text-sm md:text-base text-gray-400 leading-relaxed">
+        <p className="mt-6 text-sm md:text-base text-gray-300 leading-relaxed">
           The output pastes into ChatKit — or into any other chatbot. It is a
           Markdown file, not an export format, and nothing in the skill checks
           whether you have an account here.

@@ -59,7 +59,7 @@ const FAQS: FaqEntry[] = [
   },
   {
     question: "How much does ChatKit cost?",
-    answer: `ChatKit runs on credits instead of a monthly subscription. One credit covers one chatbot reply, and packs start at ${starter.priceLabel} for ${starter.credits.toLocaleString("en-US")} credits. Credits do not expire monthly and there is no recurring charge — when you stop buying, you simply stop spending. Optional add-ons such as auto-learning or weekly reports are separate one-time unlocks starting at ${cheapestAddOn}.`,
+    answer: `ChatKit runs on credits instead of a monthly subscription. One credit covers one chatbot reply, and packs start at ${starter.priceLabel} for ${starter.credits.toLocaleString("en-US")} credits. Credits do not expire monthly and there is no recurring charge. Optional add-ons such as auto-learning or weekly reports are separate one-time unlocks starting at ${cheapestAddOn}. Payment is not live yet — while checkout is being set up, credits are granted from inside the app and no card is charged today; the full price list lives on the ChatKit page.`,
   },
   {
     question: "Is the free trial really free?",

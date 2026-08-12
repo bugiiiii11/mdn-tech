@@ -9,6 +9,7 @@ import {
   PROSE_LINK_CLASS,
   Section,
   StatChip,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
@@ -89,7 +90,7 @@ export const Pricing = () => (
       className="grid w-full max-w-5xl grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8"
     >
       {mechanics.map((mechanic) => (
-        <motion.div key={mechanic.title} variants={fadeUp(0)}>
+        <motion.div key={mechanic.title} variants={FADE_UP}>
           <h3 className="text-base md:text-lg font-semibold text-white mb-2">
             {mechanic.title}
           </h3>
@@ -210,12 +211,12 @@ export const Pricing = () => (
       card either, and current prices and availability always live{" "}
       <a
         href={`${APP_URL}/chatkit`}
-        className={`${PROSE_LINK_CLASS} font-medium`}
+        className={PROSE_LINK_CLASS}
       >
         in the app
       </a>
       .{" "}
-      <Link href="/terms" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/terms" className={PROSE_LINK_CLASS}>
         Terms of service
       </Link>
       .

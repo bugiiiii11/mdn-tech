@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
+import { FADE_UP, Section } from "@/components/product-pages/primitives";
 
 // "What your visitors actually see" — an ANNOTATED widget mock. The homepage
 // shows a mock and says nothing; this section says what every number is.
@@ -140,7 +140,7 @@ export const WidgetAnatomy = () => (
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={fadeUp(0)}
+        variants={FADE_UP}
         className="flex justify-center lg:sticky lg:top-28"
       >
         <WidgetMock />
@@ -157,7 +157,7 @@ export const WidgetAnatomy = () => (
         className="flex flex-col gap-7 list-none"
       >
         {specs.map((spec) => (
-          <motion.li key={spec.title} variants={fadeUp(0)}>
+          <motion.li key={spec.title} variants={FADE_UP}>
             <h3 className="text-base md:text-lg font-semibold text-white mb-1.5">
               {spec.title}
             </h3>

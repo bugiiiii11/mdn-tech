@@ -13,7 +13,7 @@ export interface MarketingProduct {
   tagline: string; // gradient one-liner
   description: string;
   icon: string; // icon id, rendered by ProductIcon in product-card.tsx
-  href: string; // app.mdntech.org target (live products only)
+  href: string; // link target — marketing page ("/toolkit") or app.mdntech.org
   cta: string; // "Try Free", "Browse Skills" — never payment language
   status: Record<LandingMode, ProductStatus>;
 }
@@ -34,11 +34,11 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
   {
     id: "toolkit",
     name: "ToolKit",
-    tagline: "Claude Code superpowers. Free forever.",
+    tagline: "Claude Code superpowers. Free today.",
     description:
-      "Production-tested Claude Code skills and safety hooks — session continuity (/start, /wrap), guarded automation, one-line install. MIT licensed.",
+      "Production-tested Claude Code skills and safety hooks — session continuity (/handoff start, /handoff wrap), guarded automation, a paste-and-go install. The two published skills are MIT licensed.",
     icon: "wrench",
-    href: `${APP_URL}/toolkit`,
+    href: "/toolkit",
     cta: "Browse Skills",
     status: { mvp: "live", full: "live" },
   },

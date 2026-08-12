@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   PROSE_LINK_CLASS,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { CHAT_BOT_RULE, CHAT_IP_RULE } from "@/lib/chat/rate-limit-rules";
@@ -80,7 +81,7 @@ export const Control = () => (
       className="flex w-full max-w-3xl flex-col gap-12"
     >
       {blocks.map((block) => (
-        <motion.div key={block.title} variants={fadeUp(0)}>
+        <motion.div key={block.title} variants={FADE_UP}>
           <h3 className="text-lg font-semibold text-white mb-3">
             {block.title}
           </h3>
@@ -109,7 +110,7 @@ export const Control = () => (
     >
       No compliance badges here on purpose — these are the mechanisms, named, so
       you can judge them. There is also{" "}
-      <Link href="/privacy" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/privacy" className={PROSE_LINK_CLASS}>
         our privacy policy
       </Link>
       .

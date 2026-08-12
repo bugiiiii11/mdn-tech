@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   PROSE_LINK_CLASS,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { chatbotAllowanceLabel, featureById } from "@/lib/portal/plans";
@@ -76,7 +77,7 @@ export const UseCases = () => (
       className="grid w-full max-w-5xl grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-11"
     >
       {scenarios.map((scenario) => (
-        <motion.div key={scenario.title} variants={fadeUp(0)}>
+        <motion.div key={scenario.title} variants={FADE_UP}>
           <h3 className="text-lg font-semibold text-white mb-3">
             {scenario.title}
           </h3>
@@ -94,7 +95,7 @@ export const UseCases = () => (
           <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             {scenario.entries}
           </p>
-          <p className="mt-2 text-sm md:text-base text-gray-400 leading-relaxed">
+          <p className="mt-2 text-sm md:text-base text-gray-300 leading-relaxed">
             {scenario.outcome}
           </p>
         </motion.div>
@@ -110,7 +111,7 @@ export const UseCases = () => (
     >
       We run ChatKit on our own client sites — the same widget, the same nine
       categories, the same credit counter. You can read about{" "}
-      <Link href="/about" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/about" className={PROSE_LINK_CLASS}>
         the engineers who build and run it
       </Link>{" "}
       if that matters to you.

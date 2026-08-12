@@ -3,11 +3,24 @@
 import { Points, PointMaterial } from "@react-three/drei";
 import { Canvas, type PointsProps, useFrame } from "@react-three/fiber";
 import * as random from "maath/random";
-import { useState, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import type { Points as PointsType } from "three";
 
 export const StarBackground = (props: PointsProps) => {
   const ref = useRef<PointsType | null>(null);
+
+  // R3F animates outside framer-motion, so the marketing tree's
+  // ReducedMotionProvider cannot reach it — honour the OS setting directly.
+  const reducedMotion = useRef(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => {
+      reducedMotion.current = mq.matches;
+    };
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   // Particle count must be divisible by 3 (x, y, z per point)
   // 3000 = 1000 particles, good balance of performance and visual quality
@@ -16,7 +29,7 @@ export const StarBackground = (props: PointsProps) => {
   );
 
   useFrame((_state, delta) => {
-    if (ref.current) {
+    if (ref.current && !reducedMotion.current) {
       ref.current.rotation.x -= delta / 10;
       ref.current.rotation.y -= delta / 15;
     }

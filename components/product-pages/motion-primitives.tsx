@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { PROSE_LINK_CLASS } from "./static-primitives";
+
 // The animated half of the product-page shell (/chatkit, /toolkit). Everything
 // here touches framer-motion, so the client boundary starts at this file and
 // nowhere else — the static primitives live in ./static-primitives and must
@@ -96,10 +98,7 @@ const Breadcrumb = ({ trail }: { trail: Crumb[] }) => (
             </span>
           ) : null}
           {crumb.href ? (
-            <a
-              href={crumb.href}
-              className="text-cyan-400 transition-colors duration-300 hover:text-cyan-300"
-            >
+            <a href={crumb.href} className={PROSE_LINK_CLASS}>
               {crumb.label}
             </a>
           ) : (
@@ -314,8 +313,8 @@ export const CtaBand = ({
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-purple-500/10 via-transparent to-cyan-500/10"
       />
 
-      <div className="relative z-10 flex flex-col items-center gap-5 p-10 md:p-12 text-center">
-        <h2 className="text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+      <div className="relative z-10 flex flex-col items-center gap-5 p-6 sm:p-10 md:p-12 text-center">
+        <h2 className="text-2xl md:text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500">
           {title}
         </h2>
         <p className="max-w-2xl text-base md:text-lg text-gray-300 leading-relaxed">

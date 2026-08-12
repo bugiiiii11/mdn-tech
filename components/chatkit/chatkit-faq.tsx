@@ -65,7 +65,7 @@ const FAQS: FaqEntry[] = [
     question:
       "Can I install it through Google Tag Manager or a script-injecting plugin?",
     answer:
-      "No. ChatKit needs a literal script tag in your page HTML, just before the closing body tag, because the widget reads its chatbot id from the tag it was loaded from. A copy added dynamically by a tag manager or an async loader has no such tag to read, so the widget exits silently and nothing appears.",
+      "No — installs through a tag manager or a script-injecting plugin are not supported or tested. The supported install is a literal script tag in your page HTML, just before the closing body tag, and it is the only path we debug against. If the snippet arrives any other way and the widget misbehaves, moving the tag into the page HTML is the first thing to try.",
   },
   {
     question: "Can I remove the 'Powered by M.D.N Tech' link?",
@@ -75,7 +75,7 @@ const FAQS: FaqEntry[] = [
   {
     question: "Do you store my visitors' conversations, and what exactly is saved?",
     answer:
-      "Yes. Every visitor message and every chatbot reply is stored as a full transcript, together with a randomly generated visitor id that is not tied to any identity, the IP address the message came from, and the URL of the page where the chat started. That retention is precisely what makes transcripts, exports, fallback rate and keyword analytics possible. Our privacy policy is at mdntech.org/privacy.",
+      "Yes. Every visitor message and every chatbot reply is stored as a full transcript, together with a randomly generated visitor id that is not tied to any identity, the IP address the conversation started from, and the URL of the page where the chat started. That retention is precisely what makes transcripts, exports, fallback rate and keyword analytics possible. Our privacy policy is at mdntech.org/privacy.",
   },
   {
     question: "What is the fastest way to build the knowledge base?",
@@ -98,15 +98,15 @@ export const ChatKitFaq = () => (
     {/* Navigation only — the conversion CTA moved to the closing band. */}
     <p className="mt-10 max-w-2xl text-center text-sm text-gray-400 leading-relaxed">
       Anything else you want to check first:{" "}
-      <Link href="/privacy" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/privacy" className={PROSE_LINK_CLASS}>
         our privacy policy
       </Link>
       ,{" "}
-      <Link href="/" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/" className={PROSE_LINK_CLASS}>
         the rest of the M.D.N Tech lineup
       </Link>
       , or{" "}
-      <Link href="/blog" className={`${PROSE_LINK_CLASS} font-medium`}>
+      <Link href="/blog" className={PROSE_LINK_CLASS}>
         more from our engineering blog
       </Link>
       .

@@ -7,6 +7,7 @@ import {
   GlassCard,
   PROSE_LINK_CLASS,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 
@@ -46,7 +47,7 @@ export const KnowledgeBase = () => (
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      variants={fadeUp(0)}
+      variants={FADE_UP}
       className="w-full max-w-3xl"
     >
       <GlassCard className="p-8">
@@ -115,21 +116,21 @@ export const KnowledgeBase = () => (
             is the full list. */}
         <Link
           href="/toolkit#mdn-skills"
-          className={`${PROSE_LINK_CLASS} font-medium`}
+          className={PROSE_LINK_CLASS}
         >
           the free /build-kb skill
         </Link>{" "}
         in{" "}
         <Link
           href="/toolkit#directory"
-          className={`${PROSE_LINK_CLASS} font-medium`}
+          className={PROSE_LINK_CLASS}
         >
           our free directory of Claude Code skills
         </Link>
         . New to Claude Code?{" "}
         <Link
           href="/blog/claude-code-complete-guide"
-          className={`${PROSE_LINK_CLASS} font-medium`}
+          className={PROSE_LINK_CLASS}
         >
           Our complete guide to Claude Code
         </Link>{" "}
@@ -178,7 +179,7 @@ export const KnowledgeBase = () => (
         category. So put your highest-value answers first and keep each one
         tight and single-topic — one entry per subject beats one long entry
         covering five. The caps are stated plainly in{" "}
-        <a href="#limits" className={`${PROSE_LINK_CLASS} font-medium`}>
+        <a href="#limits" className={PROSE_LINK_CLASS}>
           the limits section
         </a>
         .

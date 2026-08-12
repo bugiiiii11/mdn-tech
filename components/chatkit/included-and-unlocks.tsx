@@ -6,6 +6,7 @@ import {
   CheckItem,
   GlassCard,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import {
@@ -110,7 +111,7 @@ export const IncludedAndUnlocks = () => (
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      variants={fadeUp(0)}
+      variants={FADE_UP}
       className="w-full"
     >
       <h3 className="text-lg font-semibold text-white mb-2 text-center">
@@ -154,7 +155,7 @@ export const IncludedAndUnlocks = () => (
                 {feature.priceLabel} once
               </span>
             </h4>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-300 leading-relaxed">
               {UNLOCK_DETAIL[feature.id] ?? feature.tagline}
             </p>
           </GlassCard>
@@ -163,7 +164,7 @@ export const IncludedAndUnlocks = () => (
 
       {/* Account-scoped, so it is called out separately from the four above. */}
       {extraChatbot ? (
-        <p className="mt-8 text-sm md:text-base text-gray-400 leading-relaxed text-center max-w-3xl mx-auto">
+        <p className="mt-8 text-sm md:text-base text-gray-300 leading-relaxed text-center max-w-3xl mx-auto">
           One more unlock sits at account level rather than on a single chatbot:{" "}
           <span className="text-white font-medium">{extraChatbot.name}</span>{" "}
           <span className="text-xs font-medium text-gray-400 border border-white/[0.12] rounded-full px-2 py-0.5 whitespace-nowrap">

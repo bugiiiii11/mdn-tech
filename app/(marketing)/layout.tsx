@@ -18,11 +18,19 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
   return (
     <div
       className={cn(
-        "overflow-y-auto overflow-x-hidden",
+        // overflow-x-clip, never hidden/auto: an overflow-hidden ancestor is a
+        // non-scrolling scrollport and silently disables position:sticky below.
+        "overflow-x-clip",
         inter.className,
         cedarvilleCursive.variable
       )}
     >
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-[#030014] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:ring-2 focus:ring-cyan-500"
+      >
+        Skip to content
+      </a>
       {/* framer-motion server-renders its `initial` state as inline
           opacity:0, so every reveal is invisible until hydration. The text is
           in the HTML either way, but without this a visitor with JS disabled
@@ -44,7 +52,7 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
       <ReducedMotionProvider>
         <StarsCanvas />
         <Navbar />
-        {children}
+        <div id="content">{children}</div>
         <Footer />
       </ReducedMotionProvider>
     </div>

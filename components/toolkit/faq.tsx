@@ -5,6 +5,10 @@ import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 import { LISTED_COUNT, MDN_COUNT, MDN_SKILLS, numberWord } from "./catalogue";
 
+// The directory `git clone` creates — derived from the same URL the install
+// section uses, so this answer cannot disagree with the actual commands.
+const CLONE_DIR = TOOLKIT_REPO.split("/").pop() ?? "handoff";
+
 // FAQ for /toolkit. The accordion, the FAQPage JSON-LD and the anti-drift
 // contract (schema text = exactly the rendered answer + link label) all come
 // from the shared machinery in components/product-pages/faq — this file only
@@ -64,7 +68,7 @@ const FAQS: FaqEntry[] = [
       (skill) => `~/.claude/skills/${skill.id}`
     ).join(
       " "
-    )} for the skills and rm -rf handoff for the clone — or Remove-Item -Recurse -Force on Windows.`,
+    )} for the skills and rm -rf ${CLONE_DIR} for the clone — or Remove-Item -Recurse -Force on Windows.`,
   },
   {
     question: "How do I check a skill is safe before I run it?",

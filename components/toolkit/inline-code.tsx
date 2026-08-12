@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 // because these spans carry meaning — they are the literal thing you type.
 
 export const Code = ({ children }: { children: ReactNode }) => (
-  <code className="rounded bg-[#7042f81f] px-1.5 py-0.5 font-mono text-[0.85em] text-purple-200 break-words">
+  <code className="rounded bg-[#7042f81f] px-1.5 py-0.5 font-mono text-[0.9em] text-purple-200 break-words">
     {children}
   </code>
 );

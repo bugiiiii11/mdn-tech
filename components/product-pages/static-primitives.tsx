@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 // half an export came from. Because ./primitives itself is a server module,
 // importing GlassCard from it does not drag the boundary along.
 
-// The one spelling of the inline prose link. Two variants had grown across the
-// page trees (with and without a pinned duration-300), so equivalent links
-// animated differently on /chatkit and /toolkit — consumers should use this
-// constant instead of retyping the classes.
+// The one spelling of the inline prose link. Variants had grown across the
+// page trees (with/without duration-300, with/without font-medium), so
+// equivalent links rendered differently on /chatkit and /toolkit — consumers
+// should use this constant bare, never with appended weight or colour classes.
 export const PROSE_LINK_CLASS =
-  "text-cyan-400 transition-colors duration-300 hover:text-cyan-300";
+  "font-medium text-cyan-400 transition-colors duration-300 hover:text-cyan-300";
 
 export const GlassCard = ({
   children,

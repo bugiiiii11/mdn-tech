@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import { Section, fadeUp } from "@/components/product-pages/primitives";
+import { FADE_UP, Section, fadeUp } from "@/components/product-pages/primitives";
 import { creditsPerReplyLabel } from "@/lib/portal/plans";
 
 // "How ChatKit answers" — the three unusual behavioural constraints in the
@@ -63,7 +63,7 @@ export const AnswerBehaviour = () => (
       className="grid w-full max-w-5xl grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10"
     >
       {rules.map((rule) => (
-        <motion.div key={rule.title} variants={fadeUp(0)}>
+        <motion.div key={rule.title} variants={FADE_UP}>
           <h3 className="text-lg font-semibold text-white mb-2">{rule.title}</h3>
           <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             {rule.body}

@@ -4,7 +4,6 @@ import {
   type Crumb,
 } from "@/components/product-pages/primitives";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
-import { APP_URL } from "@/lib/marketing/products";
 
 import {
   AUTHOR_COUNT,
@@ -44,7 +43,7 @@ export const ToolkitHero = () => (
     subtitle={`Every skill is written out on the page itself — what it does, who wrote it, and the author's own repository to install from — with a one-command install for the ${numberWord(
       MDN_COUNT
     )} we publish ourselves.`}
-    primaryCta={{ href: `${APP_URL}/toolkit`, label: "Browse the live directory →" }}
+    primaryCta={{ href: "#directory", label: "Browse the skill directory →" }}
     secondaryCta={{
       href: TOOLKIT_REPO,
       label: "The skills on GitHub",

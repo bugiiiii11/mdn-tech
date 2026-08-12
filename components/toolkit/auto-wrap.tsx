@@ -66,7 +66,7 @@ export const AutoWrap = () => (
           <h3 className="text-lg font-semibold text-white mb-2">
             What it buys you
           </h3>
-          <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+          <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             A session that ends deliberately instead of degrading. The wrap
             writes the state file and commits locally before the context gets
             expensive, so the next session starts small and the premium rate
@@ -80,7 +80,7 @@ export const AutoWrap = () => (
           <h3 className="text-lg font-semibold text-white mb-2">
             What it costs you
           </h3>
-          <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+          <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             Two dependencies and a manual step. The hooks are shell scripts:
             they need <Code>jq</Code> and bash, which on Windows means Git Bash.
             They are opt-in and separate — you copy the <Code>.sh</Code> files

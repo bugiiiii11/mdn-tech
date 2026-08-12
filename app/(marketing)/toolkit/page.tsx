@@ -189,7 +189,7 @@ const webPageSchema = {
 
 export default function ToolkitPage() {
   return (
-    <main className="h-full w-full overflow-x-hidden">
+    <main className="w-full">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}

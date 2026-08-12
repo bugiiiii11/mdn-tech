@@ -18,7 +18,7 @@ import { FEATURES, FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 const steps = [
   {
     title: "Feed it your content",
-    text: "Paste your docs, FAQs, or product info. ChatKit builds the knowledge base — no training runs, no code.",
+    text: "Paste your docs, FAQs, or product info and build the knowledge base entry by entry — no training runs, no code.",
   },
   {
     title: "Make it yours",
@@ -63,7 +63,7 @@ const addOns = [
   {
     title: "Weekly email reports",
     price: priceOf("reports"),
-    text: "Conversations, ratings, and top questions in your inbox every Monday.",
+    text: "Conversations, ratings, and top questions, run on demand — the designed cadence is a Monday morning email.",
   },
   {
     title: "Conversation viewer",
@@ -99,7 +99,7 @@ export const ChatKitSection = () => {
         variants={fadeUp(0)}
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        ChatKit: Your AI Chatbot, Trained on Your Content
+        ChatKit: Your AI Chatbot, Grounded in Your Content
       </motion.h2>
 
       <motion.p

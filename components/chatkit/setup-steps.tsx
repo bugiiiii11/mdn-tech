@@ -7,6 +7,7 @@ import {
   CtaButton,
   PROSE_LINK_CLASS,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
@@ -62,7 +63,7 @@ export const SetupSteps = () => (
       className="flex w-full max-w-3xl flex-col gap-9 list-none"
     >
       {steps.map((step, i) => (
-        <motion.li key={step.title} variants={fadeUp(0)} className="flex gap-5">
+        <motion.li key={step.title} variants={FADE_UP} className="flex gap-5">
           <span
             aria-hidden="true"
             className="flex-shrink-0 w-10 h-10 rounded-full border border-[#7042f88b] bg-[#7042f815] text-cyan-400 font-semibold flex items-center justify-center"
@@ -82,7 +83,7 @@ export const SetupSteps = () => (
 
       {/* Step 4 carries the code block, so it is written out rather than
           generated from the array above. */}
-      <motion.li variants={fadeUp(0)} className="flex gap-5">
+      <motion.li variants={FADE_UP} className="flex gap-5">
         <span
           aria-hidden="true"
           className="flex-shrink-0 w-10 h-10 rounded-full border border-[#7042f88b] bg-[#7042f815] text-cyan-400 font-semibold flex items-center justify-center"
@@ -109,10 +110,10 @@ export const SetupSteps = () => (
 
           <p className="mt-4 text-sm text-gray-400 leading-relaxed">
             It has to be a real script tag in your page HTML. Tag managers and
-            script injectors that add it dynamically are not supported, because
-            widget.js reads the tag it was loaded from —{" "}
-            <a href="#faq" className={`${PROSE_LINK_CLASS} font-medium`}>
-              the FAQ explains why
+            script injectors that add it dynamically are not supported or
+            tested —{" "}
+            <a href="#faq" className={PROSE_LINK_CLASS}>
+              the FAQ has the details
             </a>
             .
           </p>

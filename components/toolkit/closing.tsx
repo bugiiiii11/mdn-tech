@@ -22,7 +22,7 @@ export const ToolkitClosing = () => (
     <CtaBand
       title="Take what is useful, ignore the rest"
       body={`${LISTED_COUNT} skills listed on this page, each linking to the author who wrote it. Nothing to sign up for, nothing to cancel, and no command that makes you take the whole list.`}
-      primary={{ href: `${APP_URL}/toolkit`, label: "Browse the live directory →" }}
+      primary={{ href: "#directory", label: "Browse the skill directory →" }}
       secondary={{
         href: TOOLKIT_REPO,
         label: "The skills on GitHub",

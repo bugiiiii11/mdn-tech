@@ -43,10 +43,15 @@ export const CodeBlock = ({ code, label }: CodeBlockProps) => {
         <button
           type="button"
           onClick={handleCopy}
-          className="rounded px-2 py-1 -my-1 text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          className="rounded px-2 py-1 -my-1 text-xs font-medium text-cyan-400 transition-colors duration-300 hover:text-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
         >
           {copied ? "Copied" : "Copy"}
-          <span className="sr-only"> command to clipboard</span>
+          {/* Fold the label into the accessible name — a page with ~10 of
+              these must not expose ten controls all named identically. */}
+          <span className="sr-only">
+            {" "}
+            {label ?? "terminal"} command to clipboard
+          </span>
         </button>
         {/* The Copy -> Copied flip changes the button's own name mid-press,
             which screen readers do not re-announce. This live region says it
@@ -55,7 +60,14 @@ export const CodeBlock = ({ code, label }: CodeBlockProps) => {
           {copied ? "Command copied to clipboard" : ""}
         </span>
       </div>
-      <pre className="overflow-x-auto p-4">
+      {/* Scrollable region: focusable + named so keyboard users can scroll
+          long commands without a pointer. */}
+      <pre
+        tabIndex={0}
+        role="region"
+        aria-label={label ?? "terminal"}
+        className="overflow-x-auto p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+      >
         <code className="font-mono text-xs sm:text-sm leading-relaxed text-gray-200">
           {code}
         </code>

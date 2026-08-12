@@ -159,7 +159,7 @@ export const InstallSection = () => {
             ))}
           </ol>
 
-          <div className="mt-5">
+          <div id="generic-command" className="mt-5">
             <CodeBlock
               code={genericCommands[shell]}
               label={shellLabels[shell]}
@@ -168,10 +168,12 @@ export const InstallSection = () => {
 
           <p className="mt-5 text-sm md:text-base text-gray-400 leading-relaxed">
             That is all any Claude Code skill install is. There is no{" "}
-            <Code>claude skills install</Code>, no package manager and no central
-            registry — which is why the directory below links out to each
-            author&apos;s repository rather than installing anything on their
-            behalf.
+            <Code>claude skills install</Code>, no package manager and no
+            central registry for bare <Code>SKILL.md</Code> files — a few
+            catalogue entries ship as packaged plugins through the official
+            marketplace instead — which is why the directory below links out to
+            each author&apos;s repository rather than installing anything on
+            their behalf.
           </p>
         </div>
 
@@ -197,7 +199,9 @@ export const InstallSection = () => {
                   setDetected(false);
                 }}
                 aria-pressed={shell === tab.id}
-                aria-controls="install-commands"
+                // Every block the toggle swaps, not just the main install
+                // command — otherwise the other four change silently.
+                aria-controls="generic-command install-commands backup-command update-command uninstall-command"
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
                   shell === tab.id
                     ? "bg-[#7042f833] text-white"
@@ -213,11 +217,12 @@ export const InstallSection = () => {
           <div className="mb-4 rounded-lg border border-[#7042f88b] bg-[#7042f815] px-5 py-4">
             <p className="text-sm text-gray-300 leading-relaxed">
               <span className="font-semibold text-white">Read this first:</span>{" "}
-              the copy step replaces same-named skill directories without
-              prompting. If you already have skills, back them up before you
-              paste.
+              the copy step overwrites same-named files inside your existing
+              skill directories without prompting — and files an older version
+              left behind survive the merge. If you already have skills, back
+              them up before you paste.
             </p>
-            <div className="mt-3">
+            <div id="backup-command" className="mt-3">
               <CodeBlock
                 code={backupCommands[shell]}
                 label={`${shellLabels[shell]} — backup`}
@@ -252,7 +257,7 @@ export const InstallSection = () => {
               <h4 className="text-base font-semibold text-white mb-2">
                 What it writes
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-300 leading-relaxed">
                 A git clone in your current directory, plus files under{" "}
                 <Code>~/.claude/skills/</Code> — nothing else. The clone&apos;s{" "}
                 <Code>skills/</Code> directory is copied in — that is{" "}
@@ -280,7 +285,7 @@ export const InstallSection = () => {
               <h4 className="text-base font-semibold text-white mb-2">
                 Inspect before you run it
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-300 leading-relaxed">
                 Clone the repo, read{" "}
                 <Code>handoff/skills/handoff/SKILL.md</Code> — it is plain
                 Markdown, and it is the whole skill — then copy the folder
@@ -295,11 +300,13 @@ export const InstallSection = () => {
               <h4 className="text-base font-semibold text-white mb-2">
                 Updating
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Additive and idempotent — re-running the install command works
-                just as well.
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Pull the clone and re-copy — the command below does both.
+                Re-running the install command only works after you remove the
+                old clone: <Code>git clone</Code> refuses to write into a
+                directory that already exists.
               </p>
-              <div className="mt-3">
+              <div id="update-command" className="mt-3">
                 <CodeBlock
                   code={updateCommands[shell]}
                   label={shellLabels[shell]}
@@ -311,13 +318,13 @@ export const InstallSection = () => {
               <h4 className="text-base font-semibold text-white mb-2">
                 Uninstalling
               </h4>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-300 leading-relaxed">
                 Two removals: the skill directories under{" "}
                 <Code>~/.claude/skills/</Code>, and the clone the install step
                 left in your working directory. After that there is nothing
                 else to unwind.
               </p>
-              <div className="mt-3">
+              <div id="uninstall-command" className="mt-3">
                 <CodeBlock
                   code={uninstallCommands[shell]}
                   label={shellLabels[shell]}

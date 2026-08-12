@@ -67,9 +67,10 @@ export const WhatIsASkill = () => (
           <Code>~/.claude/skills/&lt;name&gt;/</Code>. Claude Code reads the
           directory, registers a <Code>/name</Code> slash command, and follows
           the instructions in the file when you invoke it. There is no plugin
-          runtime, no registry to publish to, no account, and no network call
-          involved in using one — the model is reading a file you can open in
-          any editor.
+          runtime, no account, and no network call involved in using one — and
+          no registry to publish a bare <Code>SKILL.md</Code> to, though
+          packaged plugins do have an official marketplace. The model is
+          reading a file you can open in any editor.
         </p>
         <p className="mt-4 text-sm text-gray-400 leading-relaxed">
           Anthropic documents the format in the{" "}

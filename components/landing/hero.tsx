@@ -49,7 +49,7 @@ export const LandingHero = () => {
             variants={slideInFromLeft(0.8)}
             className="text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
           >
-            An AI chatbot trained on your content, free Claude Code skills,
+            An AI chatbot grounded in your content, free Claude Code skills,
             and more — self-service tools that go live in minutes, no sales
             calls.
           </motion.p>

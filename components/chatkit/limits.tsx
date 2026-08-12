@@ -7,6 +7,7 @@ import {
   CtaButton,
   PROSE_LINK_CLASS,
   Section,
+  FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
 import { APP_URL } from "@/lib/marketing/products";
@@ -56,7 +57,7 @@ const limits = [
   },
   {
     title: "A real script tag, not a tag manager",
-    body: "The snippet must be in your page HTML. A copy injected dynamically by a tag manager or an async loader will not initialise, because the widget reads its chatbot id from the tag it was loaded from.",
+    body: "The snippet must be in your page HTML. Installing through a tag manager or an async loader is not supported or tested — if the widget misbehaves there, the fix is moving the tag back into the page HTML.",
   },
   {
     title: "Visitors do not rate answers",
@@ -86,7 +87,7 @@ export const Limits = () => (
       className="grid w-full max-w-5xl grid-cols-1 sm:grid-cols-2 gap-x-14 gap-y-9"
     >
       {limits.map((limit) => (
-        <motion.div key={limit.title} variants={fadeUp(0)}>
+        <motion.div key={limit.title} variants={FADE_UP}>
           <h3 className="text-base md:text-lg font-semibold text-white mb-2">
             {limit.title}
           </h3>
@@ -97,29 +98,29 @@ export const Limits = () => (
       ))}
 
       {/* Two limits carry links, so they are written out rather than mapped. */}
-      <motion.div variants={fadeUp(0)}>
+      <motion.div variants={FADE_UP}>
         <h3 className="text-base md:text-lg font-semibold text-white mb-2">
           Conversations are stored, not discarded
         </h3>
         <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-          Full transcripts, plus a random visitor id, the IP address the message
-          came from and the page the chat started on. That retention is what
+          Full transcripts, plus a random visitor id, the IP address the
+          conversation started from and the page the chat started on. That retention is what
           makes transcripts, exports and analytics possible. See also{" "}
-          <Link href="/privacy" className={`${PROSE_LINK_CLASS} font-medium`}>
+          <Link href="/privacy" className={PROSE_LINK_CLASS}>
             our privacy policy
           </Link>
           .
         </p>
       </motion.div>
 
-      <motion.div variants={fadeUp(0)}>
+      <motion.div variants={FADE_UP}>
         <h3 className="text-base md:text-lg font-semibold text-white mb-2">
           No certifications or uptime guarantee to quote
         </h3>
         <p className="text-sm md:text-base text-gray-300 leading-relaxed">
           We have no compliance badge to show you and we do not publish an
           uptime figure. What we do have are the named mechanisms in{" "}
-          <a href="#control" className={`${PROSE_LINK_CLASS} font-medium`}>
+          <a href="#control" className={PROSE_LINK_CLASS}>
             the previous section
           </a>
           .

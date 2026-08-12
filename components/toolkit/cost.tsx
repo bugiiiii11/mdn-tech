@@ -75,8 +75,9 @@ export const Cost = () => (
           Every new chatbot starts with {FREE_TRIAL_MESSAGES} free messages and
           no card, and an account includes {chatbotAllowanceLabel()}. After the
           trial, replies are metered at {creditsPerReplyLabel()}, and credits
-          are bought in packs starting at {CREDIT_PACKS[0].priceLabel}. There
-          is no subscription — when you stop buying, you stop spending.
+          are priced in packs starting at {CREDIT_PACKS[0].priceLabel}, with no
+          subscription. Payment is not live yet — no card is charged today —
+          and the full disclosure sits with the price list on the ChatKit page.
         </p>
         <p className="mt-4 text-sm text-gray-400 leading-relaxed">
           The full price list — every pack and every optional one-time unlock —

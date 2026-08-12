@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { Section } from "./primitives";
+import { PROSE_LINK_CLASS, Section } from "./primitives";
 
 // ONE FAQ accordion and ONE FAQPage schema builder for every product page.
 // Before this module the same <details> markup, the same plus-icon path and the
@@ -59,15 +59,12 @@ const AnswerLink = ({ link }: { link: FaqLink }) =>
       href={link.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-cyan-400 transition-colors duration-300 hover:text-cyan-300"
+      className={PROSE_LINK_CLASS}
     >
       {link.label}
     </a>
   ) : (
-    <Link
-      href={link.href}
-      className="text-cyan-400 transition-colors duration-300 hover:text-cyan-300"
-    >
+    <Link href={link.href} className={PROSE_LINK_CLASS}>
       {link.label}
     </Link>
   );
@@ -77,7 +74,7 @@ export const FaqAccordion = ({ faqs }: { faqs: readonly FaqEntry[] }) => (
   <div className="flex w-full max-w-3xl flex-col divide-y divide-white/[0.06] border-y border-white/[0.06]">
     {faqs.map((entry) => (
       <details key={entry.question} className="group py-5">
-        <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-white transition-colors duration-200 hover:text-cyan-400 [&::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer list-none items-start justify-between gap-6 rounded text-white transition-colors duration-200 hover:text-cyan-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 [&::-webkit-details-marker]:hidden">
           <h3 className="text-base md:text-lg font-medium">{entry.question}</h3>
           <span
             aria-hidden="true"
