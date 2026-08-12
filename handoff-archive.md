@@ -1,5 +1,14 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 54) -- /chatkit + /toolkit deep-dive pages built and reviewed (rotated 2026-08-13)
+
+- **29 new files**: `/chatkit` = 12 sections, `/toolkit` = 12 sections, shared shells in `components/product-pages/`. Committed mid-flight in `1cff9d6` while a 7-agent fix workflow was still running (auto-wrap fired at 39%).
+- Method worth repeating: **code truth-audit BEFORE writing copy** -- fact contract + forbidden-claims list from plans.ts/migrations/routes, copywriter forbidden to exceed it, 4 adversarial verifiers re-derived every claim.
+- First pass was green on `tsc`+`lint`+`build` with 66 claims verified -- and still had 5 critical + 6 high defects. A green build is not evidence the copy is true.
+- The 5 criticals: false free-tier-Claude-Code claim (in FAQPage JSON-LD); paid unlocks spread under a $0 schema Offer; "exactly what we store" citing a privacy policy that documents none of it; both pages orphaned (no sitemap entries, no internal links).
+- **Product bug found and FIXED (committed):** `message/route.ts` fetched the OLDEST 20 history rows (`ascending: true` + limit) -- past message 20 the model never saw recent turns. Now descending + reverse. Affects the live Royal Stroje widget.
+- **Open decision for Martin:** ChatKit stores transcripts + visitor IPs + source URLs; `/privacy` documents none of it. Needs a ChatKit privacy section before the pages go live.
+
 ## What Was Done (Session 53) -- Phase 1 live on prod; landing SEO rework v2.1 (rotated 2026-08-13)
 
 - **Phase 1 is now DEPLOYED** (`03c84d1` merged to main + pushed). Verified against live prod 12/12: Royal Stroje loads from both `royalstroje.sk` and `www.`, foreign origins 403 on config + message, single ACAO, CSP live without `unsafe-eval`, `/api/subscribe` + chat reject malformed input, cron 401s. Plus 4/4 regression: every owned bot with an empty allow-list still accepts any origin.
@@ -106,6 +115,7 @@
 | 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
+| 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
