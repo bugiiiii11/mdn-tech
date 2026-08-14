@@ -113,7 +113,11 @@ export const Footer = () => {
     { name: "GitHub", icon: RxGithubLogo, link: TOOLKIT_REPO },
   ];
 
-  const linkClass = "text-sm text-gray-400 hover:text-white transition-colors w-fit";
+  // max-w-full + break-words, not just w-fit: w-fit resolves to max-content, so
+  // a long unbreakable string (contact@mdntech.org) sized past the 320px column
+  // and was silently cut off by the footer's overflow-x-hidden.
+  const linkClass =
+    "text-sm text-gray-400 hover:text-white transition-colors w-fit max-w-full break-words";
   const headingClass =
     "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 
@@ -170,7 +174,9 @@ export const Footer = () => {
           </div>
 
           {/* Link columns */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+          {/* Narrower column gap below md: at 320px a 32px gap left each of the
+              two columns ~124px, one pixel-pass short of the contact email. */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-8 mb-10">
             {/* Products — generated from the landing lineup */}
             <div>
               <h4 className={headingClass}>Products</h4>
