@@ -1,5 +1,14 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 55) -- S54 fix pass completed + adversarial re-verify (rotated 2026-08-14)
+
+- **Task 0 executed.** Audited all 60 findings against code: the interrupted workflow had landed only shared infra (product-pages module split, faq/schema/CtaButton helpers, `lib/marketing/toolkit-catalogue.ts`) + the F6 route fix; ~45 findings and ALL call-site migrations were unapplied. The S54 workflow output file was empty -- current code was the only source of truth.
+- **Fix pass re-run and COMPLETED via 3 ownership-scoped agents** (shared files first, then chatkit + toolkit trees in parallel): all 60 findings + the 15 shared-file requests landed. Gate green: tsc, lint, build; both pages still prerender static; `/toolkit` bundle 10.2 -> 5.02 kB, `/chatkit` 18.5 -> 16.5 kB.
+- Highlights: pages de-orphaned (sitemap + nav + footer + landing links now point at `/chatkit` + `/toolkit`); `FEATURES` spread removed from the $0 Offer schema; free-tier claim fixed; "exactly what we store" downgraded; skill counts single-sourced at 18/2 (`components/toolkit/catalogue.tsx` is now a re-export of `lib/marketing/toolkit-catalogue.ts`); both trees consume shared `FaqSection`/`CtaButton`/`PageHero trail`; `chatkit-breadcrumb.tsx` deleted; `components/chatkit/closing.tsx` created (CtaBand).
+- **All 3 adversarial re-verify agents reported.** Honesty: ALL 7 standing constraints HOLD on the new pages. Design: contrast math, client boundaries, heading outline, SR names pass. Build+SEO (from built HTML): all 16 JSON-LD blocks parse, $0 Offer clean, FAQ parity 6/6, counts 18/2 everywhere, sitemap + internal links + og/twitter on both pages all PASS.
+- BUT 37 new findings (13 honesty, 19 design, 5 build/SEO) written to the session scratchpad `reverify-findings.md` -- consumed and applied in S56.
+- Hard auto-wrap at 17% forced the S55 wrap before the fix batch.
+
 ## What Was Done (Session 54) -- /chatkit + /toolkit deep-dive pages built and reviewed (rotated 2026-08-13)
 
 - **29 new files**: `/chatkit` = 12 sections, `/toolkit` = 12 sections, shared shells in `components/product-pages/`. Committed mid-flight in `1cff9d6` while a 7-agent fix workflow was still running (auto-wrap fired at 39%).
@@ -116,6 +125,7 @@
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 | 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
+| 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
