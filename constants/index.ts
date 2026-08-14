@@ -280,31 +280,16 @@ export const NAV_LINKS = [
 ] as const;
 
 
-export const TEAM_MEMBERS = [
-  {
-    name: "Martin Jeřábek",
-    role: "CEO",
-    image: "/team/1.jpg",
-    bio: "Martin is the first point of contact for every project at M.D.N Tech — responsible for client relationships, project lifecycle oversight, and delivery confirmation. With 10 years in the blockchain and Web3 space, he brings strategic depth to every engagement: from scoping the right technical approach to ensuring the final product lands exactly as agreed.",
-    // Placeholder links (linkedin.com, github.com) are a named anti-reference
-    // in PRODUCT.md — leave socials empty until real profiles are provided.
-    socials: {},
-  },
-  {
-    name: "Martin Hromek",
-    role: "CTO",
-    image: "/team/2.jpg",
-    bio: "20 years building enterprise systems. 5 years as a blockchain CTO. Martin has designed and delivered mission-critical infrastructure at a scale most engineers never encounter — and brings that depth to every project at M.D.N Tech. His focus: architecture that holds, infrastructure that scales, blockchain that works.",
-    socials: {},
-  },
-  {
-    name: "Eric Lukas",
-    role: "Full-Stack AI Engineer",
-    image: "/team/3.jpg",
-    bio: "Eric is a full-stack AI engineer with 8 years of experience shipping production web apps, mobile applications, and AI integrations. With over 30 projects delivered across industries — from healthcare and fintech to enterprise tooling — he brings the breadth to handle full product builds independently. He leads frontend, mobile, and AI integration work, turning complex requirements into clean, performant applications on web and native platforms.",
-    socials: {
-      linkedin: "https://www.linkedin.com/in/eric-lukas/",
-      github: "https://github.com/ericlukas",
-    },
-  },
-] as const;
+// Founder-forward roster (2026-08-14): one verifiable person beats a grid of
+// unverifiable cards. The wider team is described narratively in the Team
+// section ("five full-stack AI engineers, distributed") rather than invented
+// as individual profiles.
+export const FOUNDER = {
+  name: "Martin Jeřábek",
+  role: "Founder & CEO",
+  image: "/team/1.jpg",
+  bio: "Martin is the first point of contact for every project at M.D.N Tech — responsible for client relationships, project lifecycle oversight, and delivery confirmation. With 10 years in the blockchain and Web3 space, he brings strategic depth to every engagement: from scoping the right technical approach to ensuring the final product lands exactly as agreed.",
+  // Real profile URL only — placeholder links (linkedin.com/...) are a named
+  // anti-reference in PRODUCT.md. The LinkedIn button renders once this is set.
+  linkedin: "",
+};
