@@ -139,7 +139,7 @@ const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
             </p>
 
             {/* Bio */}
-            <p className="text-gray-400 text-sm leading-relaxed mb-4 min-h-[60px]">
+            <p className="text-gray-300 text-sm leading-relaxed mb-4 min-h-[60px]">
               {member.bio}
             </p>
 
@@ -235,7 +235,7 @@ export const Team = () => {
       <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
         <Image
           src="/world-map.svg"
-          alt="World Map"
+          alt=""
           width={1200}
           height={800}
           className="w-full h-full object-cover md:object-contain"
@@ -275,7 +275,7 @@ export const Team = () => {
             },
           },
         }}
-        className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-3xl"
+        className="relative z-10 text-lg text-gray-300 text-center mb-12 max-w-3xl"
       >
         Three senior engineers. Three decades of combined experience. We built careers leading enterprise projects, launching Web3 ecosystems, and shipping production apps — then came together to build a team that works the way modern development should: lean, fast, and fully accountable.
       </motion.p>

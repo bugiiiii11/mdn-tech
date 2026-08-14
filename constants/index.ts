@@ -286,21 +286,16 @@ export const TEAM_MEMBERS = [
     role: "CEO",
     image: "/team/1.jpg",
     bio: "Martin is the first point of contact for every project at M.D.N Tech — responsible for client relationships, project lifecycle oversight, and delivery confirmation. With 10 years in the blockchain and Web3 space, he brings strategic depth to every engagement: from scoping the right technical approach to ensuring the final product lands exactly as agreed.",
-    socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
-      twitter: "https://twitter.com",
-    },
+    // Placeholder links (linkedin.com, github.com) are a named anti-reference
+    // in PRODUCT.md — leave socials empty until real profiles are provided.
+    socials: {},
   },
   {
     name: "Martin Hromek",
     role: "CTO",
     image: "/team/2.jpg",
     bio: "20 years building enterprise systems. 5 years as a blockchain CTO. Martin has designed and delivered mission-critical infrastructure at a scale most engineers never encounter — and brings that depth to every project at M.D.N Tech. His focus: architecture that holds, infrastructure that scales, blockchain that works.",
-    socials: {
-      linkedin: "https://linkedin.com",
-      github: "https://github.com",
-    },
+    socials: {},
   },
   {
     name: "Eric Lukas",

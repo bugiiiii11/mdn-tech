@@ -89,9 +89,10 @@ export const ContactUs = () => {
     },
   ];
 
+  // GitHub row removed (S57): "https://github.com" was a placeholder — the
+  // named anti-reference in PRODUCT.md. Re-add only with a real org URL.
   const socialLinks = [
     { icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/", label: "LinkedIn" },
-    { icon: RxGithubLogo, link: "https://github.com", label: "GitHub" },
     { icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg", label: "Twitter" },
     { icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/", label: "Instagram" },
   ];
@@ -127,9 +128,9 @@ export const ContactUs = () => {
             transition: { duration: 0.5, delay: 0.2 },
           },
         }}
-        className="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-8 md:mb-12 text-center"
+        className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto mb-8 md:mb-12 text-center"
       >
-        Got an idea, a problem, or a half-finished product that needs a strong technical partner? We work with founders and product teams who want to move fast without sacrificing quality. Tell us what you&apos;re building.
+        Alongside our products, we take on a small number of custom development projects — this is where they start. Got an idea, a problem, or a half-finished product that needs a strong technical partner? Tell us what you&apos;re building.
       </motion.p>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -142,10 +143,12 @@ export const ContactUs = () => {
           className="space-y-8"
         >
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
+            {/* h3, not h2: this is a subsection of the "Start Your Project"
+                h2 — a sibling h2 here breaks the heading outline. */}
+            <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
               Let&apos;s Build Something That Matters
-            </h2>
-            <p className="text-gray-400 mb-6 leading-relaxed text-sm md:text-base">
+            </h3>
+            <p className="text-gray-300 mb-6 leading-relaxed text-sm md:text-base">
               Whether you are launching your first product or scaling an existing one — if you need a team that moves at the speed of your ambition, let&apos;s talk. No long procurement processes. No committees. Just a direct conversation with the engineers who will build it.
             </p>
           </div>

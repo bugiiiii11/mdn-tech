@@ -170,10 +170,12 @@ const FeatureCard = ({ item, index }: FeatureCardProps) => {
               {item.title}
             </h3>
 
+            {/* Legibility Floor: card body copy carries meaning — gray-300
+                base (#d1d5db), never gray-400. */}
             <motion.p
-              className="text-gray-400 leading-relaxed"
+              className="text-gray-300 leading-relaxed"
               animate={{
-                color: isHovered ? "#e5e7eb" : "#9ca3af",
+                color: isHovered ? "#e5e7eb" : "#d1d5db",
               }}
               transition={{ duration: 0.3 }}
             >
@@ -232,7 +234,7 @@ export const AboutUs = () => {
         }}
         className="flex flex-col items-center justify-center max-w-4xl w-full"
       >
-        <p className="text-lg text-gray-400 mb-16 text-center max-w-3xl leading-relaxed">
+        <p className="text-lg text-gray-300 mb-16 text-center max-w-3xl leading-relaxed">
           We combine years of full-stack experience with modern AI engineering practices — building faster, more securely, and with a level of ownership that traditional team structures simply cannot match.
         </p>
       </motion.div>
@@ -271,7 +273,9 @@ export const AboutUs = () => {
             },
             {
               title: "Production-Ready from Day One",
-              description: "We don't ship prototypes dressed as products. Every feature is tested, every endpoint is secured, and every deployment is validated before it goes live. The result is software that works at scale — from day one.",
+              // No "every X is Y" absolutes — S57 honesty pass: state the
+              // discipline without promising perfection.
+              description: "We don't ship prototypes dressed as products. Features are tested, endpoints are secured, and deployments are validated before they go live. The result is software that works at scale — from day one.",
               delay: 0.5,
               icon: FaShieldAlt,
             },

@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
+import { PROSE_LINK_CLASS } from "@/components/product-pages/static-primitives";
 import {
   slideInFromLeft,
   slideInFromRight,
@@ -40,9 +42,26 @@ export const HeroContent = () => {
 
         <motion.p
           variants={slideInFromLeft(0.9)}
-          className="text-base md:text-lg text-gray-400 my-2 max-w-[700px] text-center leading-relaxed"
+          className="text-base md:text-lg text-gray-300 my-2 max-w-[700px] text-center leading-relaxed"
         >
           We are a team of full-stack AI engineers — developers who have mastered every phase of the project lifecycle. We move fast without cutting corners: production-ready systems, in a fraction of the time and cost of traditional development.
+        </motion.p>
+
+        {/* Q3 decision (S57): the English site leads with the products; custom
+            work stays as an explicit, scoped secondary offer. */}
+        <motion.p
+          variants={slideInFromLeft(0.95)}
+          className="text-base md:text-lg text-gray-300 my-2 max-w-[700px] text-center leading-relaxed"
+        >
+          Most of our time now goes into our own self-service products —{" "}
+          <Link href="/chatkit" className={PROSE_LINK_CLASS}>
+            ChatKit
+          </Link>{" "}
+          and{" "}
+          <Link href="/toolkit" className={PROSE_LINK_CLASS}>
+            ToolKit
+          </Link>{" "}
+          — and we take on select custom development projects alongside them.
         </motion.p>
 
         <motion.div

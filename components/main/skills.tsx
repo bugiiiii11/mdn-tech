@@ -247,7 +247,7 @@ const ServiceCard = ({ icon, title, description, index }: ServiceCardProps) => {
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+        <p className="text-sm text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
           {description}
         </p>
       </div>
@@ -323,7 +323,7 @@ export const Skills = () => {
             transition: { duration: 0.5, delay: 0.2 },
           },
         }}
-        className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
+        className="text-lg text-gray-300 text-center mb-12 max-w-3xl"
       >
         We build across the full stack of modern product development. Whether you need an AI-powered platform, a Web3 system, a mobile app, or a production-ready web product — we have the depth to deliver it end to end.
       </motion.p>
