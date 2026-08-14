@@ -4,8 +4,8 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). Phase 0 + Phase 1 LIVE ON PROD. Website track: landing v2.1 + `/chatkit` + `/toolkit` built and QA'd (S57: sticky works, 320px clean); `/about` + blog honesty-polished (S57, uncommitted work now in `feat/landing-rebuild`). Remaining before pages go live: ChatKit privacy disclosure (0c) + merge decision. Then /sk alignment + SEO re-audit, and Phase 2 credit bank.
-- **Session count:** 57
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). Phase 0 + Phase 1 LIVE ON PROD. Website track: landing v2.1 + `/chatkit` + `/toolkit` built and QA'd; `/about` + blog honesty-polished (S57); all four hero sections rebuilt on one full-viewport shell (S58). Remaining before pages go live: ChatKit privacy disclosure (0c) + merge decision. Then /sk alignment + SEO re-audit, and Phase 2 credit bank.
+- **Session count:** 58
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
@@ -22,16 +22,7 @@
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
 | 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
 | 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
-
-## What Was Done (Session 56) -- S55 re-verify findings applied; branch pushed
-
-- **Applied 36/37 findings in one inline pass** (skipped A12 unverifiable-from-repo, B17 deferred pre-existing chrome, C5 info-only). C2 intent call answered by user: /toolkit hero + closing CTAs retargeted to on-page `#directory`, relabelled "Browse the skill directory".
-- **B1 landed at the right level this time:** `html`/`body` `overflow-x: clip` + `width: 100%` (was `hidden !important` + `100vw`), marketing wrapper `overflow-x-clip` only (dropped `overflow-y-auto`) -- sticky works again. NEEDS visual QA before merge (see next steps row 0).
-- Beyond the list: root metadata `config/index.ts` "trained on" -> "grounded in" (same A8 falsehood in the sitewide description/og/twitter strings).
-- Shared-system rules tightened: `PROSE_LINK_CLASS` now OWNS `font-medium` -- never append weight/colour to it (13 chatkit suffixes stripped); `fadeUp(0)` -> `FADE_UP` in 13 chatkit spots; skip link + `<div id="content">` wrapper added in the marketing layout.
-- og/twitter gotcha documented in the four fixed files: a page-level `openGraph`/`twitter` object REPLACES the root block wholesale (shallow merge) -- restate every field. Fixed on /blog, /privacy, /terms, /about.
-- Gate green (tsc/lint/build; both pages still static; `/toolkit` 5.29 kB). HIGH fixes verified in BUILT HTML: payment disclosure now in homepage FAQ JSON-LD; "Free forever", "every Monday", the false tag-manager mechanism and the idempotent-install claim are gone; /about og:url matches its canonical.
-- Commit `0c5bb96` PUSHED to `origin/feat/landing-rebuild` (pre-approved). Merge to main stays a separate decision; 0c privacy disclosure still blocks the pages going truly live.
+| 58 | 2026-08-14 | Hero rebuild: one full-viewport shell across /, /sk, /chatkit, /toolkit |
 
 ## What Was Done (Session 57) -- Task 0 visual QA + 0a /about + blog honesty polish
 
@@ -41,6 +32,17 @@
 - /about fixes: placeholder socials (linkedin.com/github.com/twitter.com) purged from `constants/index.ts` TEAM_MEMBERS + contact; "stack we reach for every day" -> career framing + honest daily core (Next.js/TS/Supabase/Vercel); "Development Speed Increase 10x" metric deleted; Legibility Floor gray-300 pass; reduced-motion guards on both bg videos; contact inner h2 -> h3; hero + contact intro carry the products-first/custom-work framing (PROSE_LINK_CLASS links to /chatkit + /toolkit).
 - Blog honesty: false "Claude Code free tier" claim fixed (verified vs API reference: Pro $20 / Max $100-200 / API, NO free tier); fabricated stats (4%-of-commits, 17.7M installs, 92%/12x/164% anecdotes, fake market-share precision) replaced with attributed or first-person claims incl. the METR slower-with-AI nuance; ToolKit mention (mdntech.org/toolkit) added. NOTE: blog renderer has NO link support -- plain-text URLs only.
 - Gate green; all fixes verified in BUILT HTML; hero visual-checked at 1280/320. S57 polish is uncommitted at wrap time -- committed by the wrap flow.
+
+## What Was Done (Session 58) -- Hero rebuild on one full-viewport shell
+
+- **`components/main/hero-shell.ts` is now THE hero contract** (section shell, blackhole framing, content wrapper, CTA sizing) and all four heroes compose it: `/`, `/sk`, and `/chatkit` + `/toolkit` via `PageHero`. Every hero is `min-h-[100svh]`, so no next section peeks above the fold at any size.
+- **Root cause of the mobile blackhole bug:** the video was sized `h-full` off the hero container, so any height change rescaled and re-anchored the ring. It is now sized by explicit height + the asset's true 16:9 aspect, independent of hero height. Desktop geometry is byte-identical to before (810px box at -340px = the approved 1440px ring); md/base tiers are new.
+- **TAILWIND GOTCHA (cost a full debug cycle):** `tailwind.config.ts` scans `./app`, `./components`, `./pages` ONLY. A class string placed in `lib/` generates no CSS and fails SILENTLY -- markup ships with classes matching nothing, hero renders unstyled at content height. That is why hero-shell.ts lives under `components/`, same reason as `PROSE_LINK_CLASS`. Do not move it.
+- Hero content is top-padded past the ring's glow on phones then centred in the space that remains (`items-center` + `pt-[195px]`); md+ centres against the viewport. Verified no headline-in-glow at 320/360/375/390.
+- Product-page heroes stripped to heading + lede + 2 buttons per user direction: eyebrow pills, visible breadcrumbs, reassurance notes and the 4 proof chips all removed. **The BreadcrumbList JSON-LD went with the visible trail** on both pages (`breadcrumbListSchema()` deleted from `schema.ts`, `Crumb` type gone) -- this site only emits breadcrumb schema for a trail a visitor can see. Trade-off flagged to user: no breadcrumb rich result in SERPs for /chatkit + /toolkit.
+- Two navbar defects fixed (both pre-existing): the centred 500px pill reached under the "M.D.N Tech" logo at 768-1023px -- it now sizes to content at md (text-sm, gap-4) and keeps the exact 500px/justify-between layout at lg; nav links got `whitespace-nowrap` because /sk's "Prečo my" wrapped and deformed the pill.
+- `CtaButton` gained `size="md"|"lg"`; hero CTAs run one step larger, held back until `sm:` so a long Slovak label still fits at 320px. /sk hero also swapped its raw `<video>` for `BlackholeVideo` (gains reduced-motion pause + poster + `preload="none"`).
+- Gate green (tsc/lint/build; all four routes still static). Verified in BUILT HTML: zero `BreadcrumbList`, zero `Welcome-box`, zero breadcrumb `<nav>`, exactly one h1 per product page, other schema nodes intact. Screenshot-verified on 4 pages x 9 viewports (320 -> 2560).
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
@@ -58,8 +60,8 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0 | **Merge decision** | Visual QA DONE (S57): sticky works, 320px clean everywhere. Decide merge `feat/landing-rebuild` -> main with Martin -- 0c privacy disclosure is the only remaining blocker for the pages going truly live. |
-| 0a | /sk alignment | /about + blog polish DONE (S57). Align /sk with the product-first story, THEN re-run the SEO audit -- `seo-audit/` is STALE (predates the rebuild). Target clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills" (low competition). |
+| 0 | **Merge decision** | Visual QA DONE (S57 + S58 hero pass). Decide merge `feat/landing-rebuild` -> main with Martin -- 0c privacy disclosure is the only remaining blocker for the pages going truly live. 8 unpushed commits on the branch. |
+| 0a | /sk alignment | /about + blog polish DONE (S57); /sk hero now matches EN (S58). Align the REST of /sk with the product-first story, THEN re-run the SEO audit -- `seo-audit/` is STALE (predates the rebuild). Target clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills" (low competition). Re-audit should confirm the S58 breadcrumb-schema removal is acceptable, or restore visible trails + schema together. |
 | 0c | **ChatKit privacy disclosure** | Blocking the pages going live: transcripts + visitor IPs + `source_url` are stored (`message/route.ts`), `/privacy` documents none of it. Needs a ChatKit section -- Martin's call on wording. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250), 3 mock-checkout routes collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" badge on Scale; 2.7 policy build (12-mo expiry + warning email, refund window, auto re-credit, chargeback clawback + auto-suspend, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Grant SELECT-only to `authenticated` on the ledger; all writes service-role. |
 | 3 | Phase 3.5 E2E + CI | Port the S51 + S52 probe scripts into a committed suite. Add GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
@@ -79,7 +81,8 @@
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
 | `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) |
 | `PRODUCT.md` / `DESIGN.md` | Brand register + "Event Horizon" visual system. Read BOTH before any design or copy work |
-| `components/product-pages/` | Shared shells, now the real system: `primitives.tsx` barrel over `motion-primitives` (PageHero+trail, Section, CtaBand, CtaButton, FADE_UP), `static-primitives` (GlassCard, StatChip, CheckItem, PROSE_LINK_CLASS -- owns font-medium, never append to it), `faq.tsx` (FaqSection + faqPageSchema -- ALL FAQ surfaces use it), `schema.ts` (@id refs), `code-block.tsx` |
+| `components/main/hero-shell.ts` | THE hero contract for /, /sk, /chatkit, /toolkit (full-viewport shell, blackhole framing, CTA sizes). MUST stay under `components/` -- Tailwind does not scan `lib/`, and the failure is silent |
+| `components/product-pages/` | Shared shells, now the real system: `primitives.tsx` barrel over `motion-primitives` (PageHero, Section, CtaBand, CtaButton+size, FADE_UP), `static-primitives` (GlassCard, StatChip, CheckItem, PROSE_LINK_CLASS -- owns font-medium, never append to it), `faq.tsx` (FaqSection + faqPageSchema -- ALL FAQ surfaces use it), `schema.ts` (@id refs), `code-block.tsx` |
 | `lib/marketing/toolkit-catalogue.ts` | THE single source for skill counts/groups (18 listed / 2 ours); `components/toolkit/catalogue.tsx` is a thin re-export |
 | `lib/portal/plans.ts` | Billing source of truth + `chatbotAllowanceLabel()`/`creditsPerReplyLabel()`. Never hard-code a price/count |
 | `lib/chat/rate-limit-rules.ts` | Client-safe limiter constants (20/min IP, 120/min bot) -- marketing copy interpolates from here |

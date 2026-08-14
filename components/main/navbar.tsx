@@ -35,13 +35,21 @@ export const Navbar = () => {
         </Link>
 
         {/* Web Navbar */}
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-[500px] h-full flex-row items-center justify-between">
-          <div className="flex items-center justify-between w-full h-auto border border-[rgba(112,66,248,0.38)] bg-[rgba(3,0,20,0.37)] px-[20px] py-[10px] rounded-full text-gray-200">
+        {/*
+          Desktop (lg+) is unchanged: a 500px pill, links spread by
+          justify-between. At md (768-1023px) that fixed width reaches back
+          under the logo — worse on /sk, whose five labels are longer — so the
+          pill sizes to its content there and drops to text-sm instead.
+        */}
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 h-full lg:w-[500px] flex-row items-center justify-center">
+          <div className="flex items-center gap-4 lg:gap-0 lg:justify-between w-auto lg:w-full h-auto border border-[rgba(112,66,248,0.38)] bg-[rgba(3,0,20,0.37)] px-[20px] py-[10px] rounded-full text-sm lg:text-base text-gray-200">
             {navLinks.map((link) => (
               <Link
                 key={link.title}
                 href={link.link}
-                className="cursor-pointer hover:text-[rgb(112,66,248)] transition"
+                // nowrap: /sk's "Prečo my" otherwise breaks over two lines and
+                // deforms the pill at md.
+                className="cursor-pointer whitespace-nowrap hover:text-[rgb(112,66,248)] transition"
               >
                 {link.title}
               </Link>

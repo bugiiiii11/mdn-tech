@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { AnswerBehaviour } from "@/components/chatkit/answer-behaviour";
 import { ChatKitFaq } from "@/components/chatkit/chatkit-faq";
-import { CHATKIT_TRAIL, ChatKitHero } from "@/components/chatkit/chatkit-hero";
+import { ChatKitHero } from "@/components/chatkit/chatkit-hero";
 import { ChatKitClosing } from "@/components/chatkit/closing";
 import { Control } from "@/components/chatkit/control";
 import { IncludedAndUnlocks } from "@/components/chatkit/included-and-unlocks";
@@ -13,7 +13,6 @@ import { SetupSteps } from "@/components/chatkit/setup-steps";
 import { UseCases } from "@/components/chatkit/use-cases";
 import { WidgetAnatomy } from "@/components/chatkit/widget-anatomy";
 import {
-  breadcrumbListSchema,
   organizationRef,
   websiteRef,
 } from "@/components/product-pages/schema";
@@ -155,10 +154,9 @@ const softwareSchema = {
   },
 };
 
-// Built from the same trail PageHero renders (CHATKIT_TRAIL in
-// chatkit-hero.tsx), so the schema cannot describe a trail the visitor
-// does not see.
-const breadcrumbSchema = breadcrumbListSchema(CHATKIT_TRAIL, PAGE_URL);
+// No BreadcrumbList node: the hero's visible trail was removed on 2026-08-14,
+// and this site only emits breadcrumb schema for a trail a visitor can see.
+// Restoring one means restoring the visible breadcrumb with it.
 
 // Connective only — adds no claim that could be false.
 const webPageSchema = {
@@ -185,10 +183,6 @@ export default function ChatKitPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <script
         type="application/ld+json"

@@ -29,6 +29,5 @@ export {
   PageHero,
   Section,
   fadeUp,
-  type Crumb,
   type CtaLink,
 } from "./motion-primitives";

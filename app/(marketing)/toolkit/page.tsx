@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import {
-  breadcrumbListSchema,
   organizationRef,
   websiteRef,
 } from "@/components/product-pages/schema";
@@ -10,7 +9,7 @@ import { ToolkitClosing } from "@/components/toolkit/closing";
 import { Cost } from "@/components/toolkit/cost";
 import { Directory } from "@/components/toolkit/directory";
 import { ToolkitFaq } from "@/components/toolkit/faq";
-import { TOOLKIT_TRAIL, ToolkitHero } from "@/components/toolkit/hero";
+import { ToolkitHero } from "@/components/toolkit/hero";
 import { InstallSection } from "@/components/toolkit/install-section";
 import { McpServers } from "@/components/toolkit/mcp-servers";
 import { MdnSkills } from "@/components/toolkit/mdn-skills";
@@ -93,9 +92,9 @@ export const metadata: Metadata = {
   },
 };
 
-// Built from the exact trail PageHero renders inside ToolkitHero, so the
-// schema can never describe a breadcrumb the visitor does not see.
-const breadcrumbSchema = breadcrumbListSchema(TOOLKIT_TRAIL, PAGE_URL);
+// No BreadcrumbList node: the hero's visible trail was removed on 2026-08-14,
+// and this site only emits breadcrumb schema for a trail a visitor can see.
+// Restoring one means restoring the visible breadcrumb with it.
 
 // SCOPED TO THE M.D.N TECH SKILLS, never to the directory. Describing the
 // catalogue as one application would force us to assert offers and licence
@@ -190,10 +189,6 @@ const webPageSchema = {
 export default function ToolkitPage() {
   return (
     <main className="w-full">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}

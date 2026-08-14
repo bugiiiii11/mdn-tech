@@ -1,5 +1,3 @@
-import type { Crumb } from "./motion-primitives";
-
 // Canonical JSON-LD entity ids for the site.
 //
 // app/layout.tsx emits ONE Organization node and ONE WebSite node for the whole
@@ -20,35 +18,7 @@ export const organizationRef = () => ({ "@id": ORGANIZATION_ID });
 /** Use for isPartOf on a WebPage or CollectionPage node. */
 export const websiteRef = () => ({ "@id": WEBSITE_ID });
 
-/**
- * BreadcrumbList built from the same `trail` array PageHero renders, so the
- * schema can never describe a trail the visitor cannot see.
- *
- * `currentUrl` is the absolute (or site-relative) URL of the page itself; it is
- * attached to the final crumb, which carries no href of its own.
- */
-export const breadcrumbListSchema = (
-  trail: readonly Crumb[],
-  currentUrl?: string
-) => ({
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: trail.map((crumb, index) => {
-    const href =
-      crumb.href ?? (index === trail.length - 1 ? currentUrl : undefined);
-
-    return {
-      "@type": "ListItem",
-      position: index + 1,
-      name: crumb.label,
-      ...(href ? { item: absoluteUrl(href) } : {}),
-    };
-  }),
-});
-
-function absoluteUrl(href: string): string {
-  if (/^https?:\/\//.test(href)) return href;
-  const path = href.startsWith("/") ? href : `/${href}`;
-  // "/" would otherwise produce a trailing slash the canonical does not use.
-  return path === "/" ? SITE_URL : `${SITE_URL}${path}`;
-}
+// breadcrumbListSchema() was removed on 2026-08-14 together with the product
+// pages' visible breadcrumb. The rule it encoded still stands: emit
+// BreadcrumbList only for a trail the page actually renders, built from the
+// same array, so the schema cannot describe navigation a visitor cannot see.

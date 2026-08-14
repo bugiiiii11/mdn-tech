@@ -12,6 +12,9 @@ import { useEffect, useRef } from "react";
 //
 // aria-hidden + pointer-events-none: it is scenery, never content.
 
+// Hero framing constants live in components/main/hero-shell.ts — this file stays
+// the video element alone.
+
 type Props = {
   className?: string;
   style?: React.CSSProperties;

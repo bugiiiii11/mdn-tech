@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 56) -- S55 re-verify findings applied; branch pushed (rotated 2026-08-14)
+
+- **Applied 36/37 findings in one inline pass** (skipped A12 unverifiable-from-repo, B17 deferred pre-existing chrome, C5 info-only). C2 intent call answered by user: /toolkit hero + closing CTAs retargeted to on-page `#directory`, relabelled "Browse the skill directory".
+- **B1 landed at the right level this time:** `html`/`body` `overflow-x: clip` + `width: 100%` (was `hidden !important` + `100vw`), marketing wrapper `overflow-x-clip` only (dropped `overflow-y-auto`) -- sticky works again.
+- Beyond the list: root metadata `config/index.ts` "trained on" -> "grounded in" (same A8 falsehood in the sitewide description/og/twitter strings).
+- Shared-system rules tightened: `PROSE_LINK_CLASS` now OWNS `font-medium` -- never append weight/colour to it (13 chatkit suffixes stripped); `fadeUp(0)` -> `FADE_UP` in 13 chatkit spots; skip link + `<div id="content">` wrapper added in the marketing layout.
+- og/twitter gotcha documented in the four fixed files: a page-level `openGraph`/`twitter` object REPLACES the root block wholesale (shallow merge) -- restate every field. Fixed on /blog, /privacy, /terms, /about.
+- Gate green (tsc/lint/build; both pages still static; `/toolkit` 5.29 kB). HIGH fixes verified in BUILT HTML: payment disclosure now in homepage FAQ JSON-LD; "Free forever", "every Monday", the false tag-manager mechanism and the idempotent-install claim are gone; /about og:url matches its canonical.
+- Commit `0c5bb96` PUSHED to `origin/feat/landing-rebuild` (pre-approved).
+
 ## What Was Done (Session 55) -- S54 fix pass completed + adversarial re-verify (rotated 2026-08-14)
 
 - **Task 0 executed.** Audited all 60 findings against code: the interrupted workflow had landed only shared infra (product-pages module split, faq/schema/CtaButton helpers, `lib/marketing/toolkit-catalogue.ts`) + the F6 route fix; ~45 findings and ALL call-site migrations were unapplied. The S54 workflow output file was empty -- current code was the only source of truth.
