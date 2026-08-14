@@ -1,5 +1,14 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 57) -- Task 0 visual QA + 0a /about + blog honesty polish (rotated 2026-08-14)
+
+- **Task 0 QA PASSED (Playwright on prod build):** /chatkit widget-anatomy sticky pins at exactly 112px through 677px of travel; 320/375px overflow clean on / + /chatkit + /toolkit + /about + /sk. QA gotcha: under `overflow-x: clip`, docScrollWidth/canScrollX are tautologically clean -- must measure per-element rects vs viewport and classify the absorbing ancestor (auto/scroll = reachable = fine; hidden/clip = silently cut off = defect). Framer slide-ins give phantom hits; measure settled, on-screen elements only.
+- One real defect found + fixed (`c8ba586`): footer email clipped at 320px -- `w-fit` = max-content sized past the column, footer's overflow-hidden ate the last char.
+- **0a scope decisions (user):** /about = content polish ONLY, all 8 sections stay; blog = keep all 3 articles, honesty fixes only, no new cluster articles; custom dev stays as a short products-first framing. Do not re-litigate.
+- /about fixes: placeholder socials (linkedin.com/github.com/twitter.com) purged from `constants/index.ts` TEAM_MEMBERS + contact; "stack we reach for every day" -> career framing + honest daily core (Next.js/TS/Supabase/Vercel); "Development Speed Increase 10x" metric deleted; Legibility Floor gray-300 pass; reduced-motion guards on both bg videos; contact inner h2 -> h3; hero + contact intro carry the products-first/custom-work framing (PROSE_LINK_CLASS links to /chatkit + /toolkit).
+- Blog honesty: false "Claude Code free tier" claim fixed (verified vs API reference: Pro $20 / Max $100-200 / API, NO free tier); fabricated stats (4%-of-commits, 17.7M installs, 92%/12x/164% anecdotes, fake market-share precision) replaced with attributed or first-person claims incl. the METR slower-with-AI nuance; ToolKit mention (mdntech.org/toolkit) added. NOTE: blog renderer has NO link support -- plain-text URLs only.
+- Gate green; all fixes verified in BUILT HTML; hero visual-checked at 1280/320. S57 polish is uncommitted at wrap time -- committed by the wrap flow.
+
 ## What Was Done (Session 56) -- S55 re-verify findings applied; branch pushed (rotated 2026-08-14)
 
 - **Applied 36/37 findings in one inline pass** (skipped A12 unverifiable-from-repo, B17 deferred pre-existing chrome, C5 info-only). C2 intent call answered by user: /toolkit hero + closing CTAs retargeted to on-page `#directory`, relabelled "Browse the skill directory".
@@ -136,6 +145,8 @@
 | 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
 | 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
 | 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
+| 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
+| 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
