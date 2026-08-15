@@ -1,294 +1,189 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useState, useRef } from "react";
-import { slideInFromTop } from "@/lib/motion";
-import { TEAM_MEMBERS } from "@/constants";
-import { RxLinkedinLogo, RxGithubLogo, RxTwitterLogo } from "react-icons/rx";
+import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
+import { RxLinkedinLogo } from "react-icons/rx";
 
-interface TeamMemberCardProps {
-  member: {
-    name: string;
-    role: string;
-    image: string;
-    bio: string;
-    socials: {
-      linkedin?: string;
-      github?: string;
-      twitter?: string;
-    };
-  };
-  index: number;
-}
+import { FOUNDER } from "@/constants";
+import {
+  FADE_UP,
+  PROSE_LINK_CLASS,
+  StatChip,
+  fadeUp,
+} from "@/components/product-pages/primitives";
 
-const TeamMemberCard = ({ member, index }: TeamMemberCardProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+// Growing-team framing (2026-08-14, user decision): the section tells the
+// honest story — five full-stack AI engineers, distributed, hiring as
+// contracts land — anchored by ONE verifiable founder card instead of a grid
+// of profiles nobody can check. The world map is the "B2B worldwide,
+// working internationally" backdrop, with a few decorative activity pulses.
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 500, damping: 100 });
-  const mouseYSpring = useSpring(y, { stiffness: 500, damping: 100 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7.5deg", "-7.5deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7.5deg", "7.5deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-
-    const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsHovered(false);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      variants={{
-        hidden: { y: 50, opacity: 0, scale: 0.9, rotateX: -15 },
-        visible: {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          rotateX: 0,
-          transition: {
-            delay: index * 0.1,
-            duration: 0.6,
-            ease: [0.16, 1, 0.3, 1],
-          },
-        },
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-      }}
-      className="group relative perspective-1000"
-    >
-      <div className="relative h-full transform-gpu">
-        {/* Main card */}
-        <div className="relative h-full p-6 rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm overflow-hidden transform-gpu">
-          {/* Glow effect that follows mouse */}
-          <motion.div
-            className="absolute w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300"
-            style={{
-              x: useTransform(mouseXSpring, [-0.5, 0.5], ["-50%", "50%"]),
-              y: useTransform(mouseYSpring, [-0.5, 0.5], ["-50%", "50%"]),
-            }}
-          />
-
-          {/* Content */}
-          <div className="relative z-10 transform-gpu flex flex-col items-center text-center">
-            {/* Avatar */}
-            <motion.div
-              className="relative w-32 h-32 mb-4 rounded-full overflow-hidden border-2 border-purple-500/30"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20"></div>
-              <Image
-                src={member.image}
-                alt={member.name}
-                width={128}
-                height={128}
-                className="w-full h-full object-cover relative z-10"
-              />
-              {/* Shine effect on hover */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent z-20"
-                initial={{ x: "-100%" }}
-                animate={{
-                  x: isHovered ? "100%" : "-100%",
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: isHovered ? Infinity : 0,
-                  repeatDelay: 1.5,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-
-            {/* Name and Role */}
-            <h3 className="text-xl font-semibold text-white mb-1">
-              {member.name}
-            </h3>
-            <p className="text-sm text-purple-400 mb-3 font-medium">
-              {member.role}
-            </p>
-
-            {/* Bio */}
-            <p className="text-gray-400 text-sm leading-relaxed mb-4 min-h-[60px]">
-              {member.bio}
-            </p>
-
-            {/* Social Links */}
-            {/* <div className="flex items-center gap-3 mt-auto">
-              {member.socials.linkedin && (
-                <motion.a
-                  href={member.socials.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.2, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="text-gray-400 hover:text-cyan-400 transition-colors"
-                >
-                  <RxLinkedinLogo className="w-5 h-5" />
-                </motion.a>
-              )}
-              {member.socials.github && (
-                <motion.a
-                  href={member.socials.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.2, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="text-gray-400 hover:text-cyan-400 transition-colors"
-                >
-                  <RxGithubLogo className="w-5 h-5" />
-                </motion.a>
-              )}
-              {member.socials.twitter && (
-                <motion.a
-                  href={member.socials.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.2, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="text-gray-400 hover:text-cyan-400 transition-colors"
-                >
-                  <RxTwitterLogo className="w-5 h-5" />
-                </motion.a>
-              )}
-            </div> */}
-          </div>
-
-          {/* Floating particles */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-0 group-hover:opacity-60"
-              style={{
-                left: `${20 + i * 15}%`,
-                top: `${10 + (i % 3) * 30}%`,
-              }}
-              animate={{
-                y: isHovered ? [0, -20, 0] : 0,
-                x: isHovered ? [0, 10, 0] : 0,
-                opacity: isHovered ? [0, 1, 0] : 0,
-                scale: isHovered ? [0, 1.5, 0] : 0,
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.2,
-                ease: "easeInOut",
-              }}
-            />
-          ))}
-
-          {/* Shine sweep effect */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-            initial={{ x: "-100%" }}
-            animate={{
-              x: isHovered ? "100%" : "-100%",
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: isHovered ? Infinity : 0,
-              repeatDelay: 2,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+// Percent positions inside the 21:10 map frame (world-map.svg viewBox is
+// 210x100). Decorative only — unlabeled, aria-hidden.
+const MAP_PULSES = [
+  { left: "52.5%", top: "24%", delay: 0 }, // Central Europe
+  { left: "62%", top: "41%", delay: 0.9 }, // Gulf / UAE
+  { left: "25%", top: "31%", delay: 1.7 }, // North America
+  { left: "77%", top: "47%", delay: 2.4 }, // Southeast Asia
+];
 
 export const Team = () => {
   return (
-    <section id="team" className="relative flex flex-col items-center justify-center py-20 px-4 md:px-20 overflow-hidden w-full max-w-full">
-      {/* World Map Background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none">
-        <Image
-          src="/world-map.svg"
-          alt="World Map"
-          width={1200}
-          height={800}
-          className="w-full h-full object-cover md:object-contain"
-          priority={false}
-        />
+    <section
+      id="team"
+      className="relative flex flex-col items-center justify-center py-20 px-4 md:px-20 overflow-hidden w-full max-w-full"
+    >
+      {/* World map backdrop — kept in its own 21:10 frame so the activity
+          pulses can be placed in percentages that always line up with the
+          artwork. min-w keeps the map readable on phones (section clips it). */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center opacity-50 pointer-events-none"
+      >
+        <div className="relative w-full min-w-[680px] max-w-6xl aspect-[21/10]">
+          <Image
+            src="/world-map.svg"
+            alt=""
+            width={1200}
+            height={571}
+            className="w-full h-full"
+            priority={false}
+          />
+          {MAP_PULSES.map(({ left, top, delay }) => (
+            <span
+              key={`${left}-${top}`}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left, top }}
+            >
+              <span
+                className="absolute inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400 opacity-60 motion-safe:animate-ping"
+                style={{ animationDelay: `${delay}s`, animationDuration: "2.8s" }}
+              />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400/70" />
+            </span>
+          ))}
+        </div>
       </div>
 
       <motion.h2
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={{
-          hidden: { opacity: 0, y: -20 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.5 },
-          },
-        }}
+        variants={FADE_UP}
         className="relative z-10 text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        Meet Our Team
+        A Growing Team of AI Engineers
       </motion.h2>
 
       <motion.p
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={{
-          hidden: { opacity: 0, y: -20 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-              delay: 0.2,
-              duration: 0.5,
-            },
-          },
-        }}
-        className="relative z-10 text-lg text-gray-400 text-center mb-12 max-w-3xl"
+        variants={fadeUp(0.1)}
+        className="relative z-10 text-lg text-gray-300 text-center mb-6 max-w-3xl leading-relaxed"
       >
-        Three senior engineers. Three decades of combined experience. We built careers leading enterprise projects, launching Web3 ecosystems, and shipping production apps — then came together to build a team that works the way modern development should: lean, fast, and fully accountable.
+        M.D.N Tech is a distributed team — five full-stack AI engineers today,
+        working across time zones for B2B clients worldwide. We built our
+        careers shipping enterprise systems, Web3 ecosystems and production
+        apps, then rebuilt the way we work around Claude Code — the same
+        expertise we publish as free skills in{" "}
+        <Link href="/toolkit" className={PROSE_LINK_CLASS}>
+          ToolKit
+        </Link>
+        .
       </motion.p>
 
-      {/* Team Grid */}
-      <div className="relative z-10 w-full max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {TEAM_MEMBERS.map((member, index) => (
-            <TeamMemberCard key={member.name} member={member} index={index} />
-          ))}
+      <motion.p
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp(0.18)}
+        className="relative z-10 text-lg text-gray-300 text-center mb-10 max-w-3xl leading-relaxed"
+      >
+        Every project is owned end to end by one engineer with full context.
+        And as new contracts land, the team grows — senior engineers, designers
+        and marketers who work the same way.
+      </motion.p>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp(0.25)}
+        className="relative z-10 flex flex-wrap items-center justify-center gap-3 mb-14"
+      >
+        <StatChip>Five full-stack AI engineers</StatChip>
+        <StatChip>Working across time zones</StatChip>
+        <StatChip>B2B clients worldwide</StatChip>
+      </motion.div>
+
+      {/* Founder card — the one human a visitor can verify. */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp(0.3)}
+        whileHover={{ y: -4 }}
+        className="relative z-10 w-full max-w-2xl"
+      >
+        <div className="relative overflow-hidden rounded-xl border border-[#7042f88b] bg-[#7042f815] backdrop-blur-sm p-6 sm:p-8 transition-colors hover:border-purple-500/70">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#7042f8] to-transparent"
+          />
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+            <div className="relative h-28 w-28 flex-shrink-0 rounded-full overflow-hidden border-2 border-purple-500/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20" />
+              <Image
+                src={FOUNDER.image}
+                alt={FOUNDER.name}
+                width={112}
+                height={112}
+                className="relative z-10 h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <h3 className="text-xl font-semibold text-white">
+                {FOUNDER.name}
+              </h3>
+              <p className="mt-1 text-sm font-medium text-purple-400">
+                {FOUNDER.role}
+              </p>
+              <p className="mt-3 text-sm text-gray-300 leading-relaxed">
+                {FOUNDER.bio}
+              </p>
+
+              {FOUNDER.linkedin ? (
+                <a
+                  href={FOUNDER.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#7042f88b] bg-[#7042f815] px-4 py-2 text-sm font-medium text-gray-300 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors"
+                >
+                  <RxLinkedinLogo className="h-4 w-4" aria-hidden="true" />
+                  Connect on LinkedIn
+                </a>
+              ) : null}
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
+
+      <motion.p
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeUp(0.35)}
+        className="relative z-10 mt-8 text-sm text-gray-400 text-center"
+      >
+        Think you would fit in?{" "}
+        <a href="#contact-us" className={PROSE_LINK_CLASS}>
+          Say hello
+        </a>
+        .
+      </motion.p>
     </section>
   );
 };
-

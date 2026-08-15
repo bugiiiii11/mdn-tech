@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 
+import { APP_LIVE, isAppHref } from "@/lib/marketing/products";
 import type { MarketingProduct, ProductStatus } from "@/lib/marketing/products";
 
 // Inline stroke icons keyed by MarketingProduct.icon — same pattern as the
@@ -90,6 +91,10 @@ interface ProductCardProps {
 export const ProductCard = ({ product, status, index }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const isLive = status === "live";
+  // A live product can still be unreachable: its CTA points at the portal and
+  // the portal is closed (APP_LIVE). The card keeps its copy — the product is
+  // real and described honestly — but the CTA states that, instead of linking.
+  const portalClosed = !APP_LIVE && isAppHref(product.href);
 
   return (
     <motion.div
@@ -224,7 +229,19 @@ export const ProductCard = ({ product, status, index }: ProductCardProps) => {
           {product.description}
         </p>
 
-        {isLive ? (
+        {/* Live products link into the app. Unreleased ones get no CTA at all
+            — nothing to click through to yet; the coming-soon section explains
+            them and the footer newsletter captures interest. */}
+        {isLive && portalClosed && (
+          <span
+            aria-disabled="true"
+            className="mt-5 inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"
+          >
+            Coming soon
+          </span>
+        )}
+
+        {isLive && !portalClosed && (
           <a
             href={product.href}
             className="mt-5 inline-flex items-center gap-2 text-cyan-400 text-sm font-semibold group-hover:gap-3 transition-all duration-300"
@@ -242,27 +259,6 @@ export const ProductCard = ({ product, status, index }: ProductCardProps) => {
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </a>
-        ) : (
-          <a
-            href={`mailto:contact@mdntech.org?subject=Notify me: ${product.name}`}
-            className="mt-5 inline-flex items-center gap-2 text-gray-500 text-sm font-semibold hover:text-gray-300 transition-colors duration-300"
-          >
-            Notify me
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
               />
             </svg>
           </a>

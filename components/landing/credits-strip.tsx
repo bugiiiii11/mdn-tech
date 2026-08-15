@@ -2,10 +2,16 @@
 
 import { motion } from "framer-motion";
 
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 
 // Credits value-prop strip — deliberately NOT a pricing table. No prices, no
-// packages, no gateway mention; concrete packages + checkout arrive in Phase F.
+// packages, no gateway mention.
+//
+// HONESTY CONSTRAINT (do not regress): credits live on `chatbots`
+// (credits_purchased, migration 007), so today the balance is PER CHATBOT and
+// only ChatKit spends it. The account-level shared ledger is Phase 2 work.
+// Until it ships, this strip must not promise "one balance across all
+// products" — say what is true now (buy as you go, no subscription).
 export const CreditsStrip = () => {
   return (
     <section className="relative py-10 px-4 md:px-20 w-full max-w-full flex justify-center">
@@ -27,23 +33,35 @@ export const CreditsStrip = () => {
 
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 p-8">
           <div className="text-center md:text-left">
-            <h3 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-2">
-              One account. One credit balance. All products.
-            </h3>
-            <p className="text-sm md:text-base text-gray-400 leading-relaxed">
-              Buy credits once, spend them across every M.D.N Tech tool. No
-              per-product subscriptions to juggle.
+            <h2 className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-2">
+              One account. Credits, not subscriptions.
+            </h2>
+            <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+              Top up when you need to, spend only what you use, and cancel
+              nothing when you stop. Every tool you unlock lives under the same
+              login.
             </p>
           </div>
 
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            href={APP_URL}
-            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold whitespace-nowrap flex-shrink-0"
-          >
-            Open the App →
-          </motion.a>
+          {/* Inert while the portal is closed (APP_LIVE) — same footprint so
+              the strip does not reflow when the flag flips. */}
+          {APP_LIVE ? (
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href={APP_URL}
+              className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold whitespace-nowrap flex-shrink-0"
+            >
+              Open the App →
+            </motion.a>
+          ) : (
+            <span
+              aria-disabled="true"
+              className="py-3 px-8 text-center rounded-lg font-semibold whitespace-nowrap flex-shrink-0 border border-white/[0.12] bg-white/[0.04] text-gray-400 cursor-not-allowed"
+            >
+              Coming soon
+            </span>
+          )}
         </div>
       </motion.div>
     </section>

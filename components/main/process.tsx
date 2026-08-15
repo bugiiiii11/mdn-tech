@@ -173,9 +173,9 @@ const ProcessStepCard = ({ step, index, isLast }: ProcessStepProps) => {
                 {step.items.map((item, i) => (
                   <motion.li
                     key={i}
-                    className="flex items-start gap-3 text-gray-400"
+                    className="flex items-start gap-3 text-gray-300"
                     animate={{
-                      color: isHovered ? "#e5e7eb" : "#9ca3af",
+                      color: isHovered ? "#e5e7eb" : "#d1d5db",
                     }}
                     transition={{ duration: 0.3, delay: i * 0.05 }}
                   >
@@ -288,7 +288,7 @@ export const Process = () => {
             },
           },
         }}
-        className="text-lg text-gray-400 text-center mb-16 max-w-3xl"
+        className="text-lg text-gray-300 text-center mb-16 max-w-3xl"
       >
         Five phases. Full documentation. No phase begins until the previous one is approved — by our engineers and by you. We built this process to eliminate surprises, protect timelines, and ensure the final product matches what was agreed from day one.
       </motion.p>

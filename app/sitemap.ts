@@ -36,6 +36,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/about`,
       lastModified: new Date("2026-07-16"),
     },
+    // Product deep-dives. English-only pages, so no `alternates` block here:
+    // there is no Slovak twin, and cross-linking them to /sk would lie to
+    // crawlers about a translation that does not exist.
+    {
+      url: `${baseUrl}/chatkit`,
+      lastModified: new Date("2026-08-12"),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/toolkit`,
+      lastModified: new Date("2026-08-12"),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
     {
       url: `${baseUrl}/sk`,
       lastModified: new Date("2026-06-08"),

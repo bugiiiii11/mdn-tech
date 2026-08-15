@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import {
+  ORGANIZATION_ID,
+  WEBSITE_ID,
+} from "@/components/product-pages/schema";
 import { siteConfig } from "@/config";
+import { APP_LIVE } from "@/lib/marketing/products";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -8,9 +13,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = siteConfig;
 
+// These two nodes are the site's ONLY Organization and WebSite declarations.
+// The @id on each is what every other page references (author, publisher,
+// isPartOf) instead of re-declaring an anonymous copy of the same company —
+// see components/product-pages/schema.ts for the shared references.
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": ORGANIZATION_ID,
   name: "M.D.N Tech FZE",
   alternateName: "M.D.N Tech",
   url: "https://mdntech.org",
@@ -50,23 +60,27 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": WEBSITE_ID,
   name: "M.D.N Tech",
   url: "https://mdntech.org",
   description:
     "Self-service AI developer tools, built by engineers — ChatKit chatbots, free Claude Code skills, and more.",
   inLanguage: ["en", "sk"],
-  publisher: {
-    "@type": "Organization",
-    name: "M.D.N Tech FZE",
-  },
+  publisher: { "@id": ORGANIZATION_ID },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://app.mdntech.org" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://app.mdntech.org" />
+        {/* Warms the cross-host hop to the portal — pointless while nothing on
+            the site links there (APP_LIVE), so it goes with the links. */}
+        {APP_LIVE && (
+          <>
+            <link rel="preconnect" href="https://app.mdntech.org" crossOrigin="anonymous" />
+            <link rel="dns-prefetch" href="https://app.mdntech.org" />
+          </>
+        )}
         <link rel="preconnect" href="https://mdntech.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://mdntech.org" />
         <script

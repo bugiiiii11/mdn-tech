@@ -1,5 +1,78 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 57) -- Task 0 visual QA + 0a /about + blog honesty polish (rotated 2026-08-14)
+
+- **Task 0 QA PASSED (Playwright on prod build):** /chatkit widget-anatomy sticky pins at exactly 112px through 677px of travel; 320/375px overflow clean on / + /chatkit + /toolkit + /about + /sk. QA gotcha: under `overflow-x: clip`, docScrollWidth/canScrollX are tautologically clean -- must measure per-element rects vs viewport and classify the absorbing ancestor (auto/scroll = reachable = fine; hidden/clip = silently cut off = defect). Framer slide-ins give phantom hits; measure settled, on-screen elements only.
+- One real defect found + fixed (`c8ba586`): footer email clipped at 320px -- `w-fit` = max-content sized past the column, footer's overflow-hidden ate the last char.
+- **0a scope decisions (user):** /about = content polish ONLY, all 8 sections stay; blog = keep all 3 articles, honesty fixes only, no new cluster articles; custom dev stays as a short products-first framing. Do not re-litigate.
+- /about fixes: placeholder socials (linkedin.com/github.com/twitter.com) purged from `constants/index.ts` TEAM_MEMBERS + contact; "stack we reach for every day" -> career framing + honest daily core (Next.js/TS/Supabase/Vercel); "Development Speed Increase 10x" metric deleted; Legibility Floor gray-300 pass; reduced-motion guards on both bg videos; contact inner h2 -> h3; hero + contact intro carry the products-first/custom-work framing (PROSE_LINK_CLASS links to /chatkit + /toolkit).
+- Blog honesty: false "Claude Code free tier" claim fixed (verified vs API reference: Pro $20 / Max $100-200 / API, NO free tier); fabricated stats (4%-of-commits, 17.7M installs, 92%/12x/164% anecdotes, fake market-share precision) replaced with attributed or first-person claims incl. the METR slower-with-AI nuance; ToolKit mention (mdntech.org/toolkit) added. NOTE: blog renderer has NO link support -- plain-text URLs only.
+- Gate green; all fixes verified in BUILT HTML; hero visual-checked at 1280/320. S57 polish is uncommitted at wrap time -- committed by the wrap flow.
+
+## What Was Done (Session 56) -- S55 re-verify findings applied; branch pushed (rotated 2026-08-14)
+
+- **Applied 36/37 findings in one inline pass** (skipped A12 unverifiable-from-repo, B17 deferred pre-existing chrome, C5 info-only). C2 intent call answered by user: /toolkit hero + closing CTAs retargeted to on-page `#directory`, relabelled "Browse the skill directory".
+- **B1 landed at the right level this time:** `html`/`body` `overflow-x: clip` + `width: 100%` (was `hidden !important` + `100vw`), marketing wrapper `overflow-x-clip` only (dropped `overflow-y-auto`) -- sticky works again.
+- Beyond the list: root metadata `config/index.ts` "trained on" -> "grounded in" (same A8 falsehood in the sitewide description/og/twitter strings).
+- Shared-system rules tightened: `PROSE_LINK_CLASS` now OWNS `font-medium` -- never append weight/colour to it (13 chatkit suffixes stripped); `fadeUp(0)` -> `FADE_UP` in 13 chatkit spots; skip link + `<div id="content">` wrapper added in the marketing layout.
+- og/twitter gotcha documented in the four fixed files: a page-level `openGraph`/`twitter` object REPLACES the root block wholesale (shallow merge) -- restate every field. Fixed on /blog, /privacy, /terms, /about.
+- Gate green (tsc/lint/build; both pages still static; `/toolkit` 5.29 kB). HIGH fixes verified in BUILT HTML: payment disclosure now in homepage FAQ JSON-LD; "Free forever", "every Monday", the false tag-manager mechanism and the idempotent-install claim are gone; /about og:url matches its canonical.
+- Commit `0c5bb96` PUSHED to `origin/feat/landing-rebuild` (pre-approved).
+
+## What Was Done (Session 55) -- S54 fix pass completed + adversarial re-verify (rotated 2026-08-14)
+
+- **Task 0 executed.** Audited all 60 findings against code: the interrupted workflow had landed only shared infra (product-pages module split, faq/schema/CtaButton helpers, `lib/marketing/toolkit-catalogue.ts`) + the F6 route fix; ~45 findings and ALL call-site migrations were unapplied. The S54 workflow output file was empty -- current code was the only source of truth.
+- **Fix pass re-run and COMPLETED via 3 ownership-scoped agents** (shared files first, then chatkit + toolkit trees in parallel): all 60 findings + the 15 shared-file requests landed. Gate green: tsc, lint, build; both pages still prerender static; `/toolkit` bundle 10.2 -> 5.02 kB, `/chatkit` 18.5 -> 16.5 kB.
+- Highlights: pages de-orphaned (sitemap + nav + footer + landing links now point at `/chatkit` + `/toolkit`); `FEATURES` spread removed from the $0 Offer schema; free-tier claim fixed; "exactly what we store" downgraded; skill counts single-sourced at 18/2 (`components/toolkit/catalogue.tsx` is now a re-export of `lib/marketing/toolkit-catalogue.ts`); both trees consume shared `FaqSection`/`CtaButton`/`PageHero trail`; `chatkit-breadcrumb.tsx` deleted; `components/chatkit/closing.tsx` created (CtaBand).
+- **All 3 adversarial re-verify agents reported.** Honesty: ALL 7 standing constraints HOLD on the new pages. Design: contrast math, client boundaries, heading outline, SR names pass. Build+SEO (from built HTML): all 16 JSON-LD blocks parse, $0 Offer clean, FAQ parity 6/6, counts 18/2 everywhere, sitemap + internal links + og/twitter on both pages all PASS.
+- BUT 37 new findings (13 honesty, 19 design, 5 build/SEO) written to the session scratchpad `reverify-findings.md` -- consumed and applied in S56.
+- Hard auto-wrap at 17% forced the S55 wrap before the fix batch.
+
+## What Was Done (Session 54) -- /chatkit + /toolkit deep-dive pages built and reviewed (rotated 2026-08-13)
+
+- **29 new files**: `/chatkit` = 12 sections, `/toolkit` = 12 sections, shared shells in `components/product-pages/`. Committed mid-flight in `1cff9d6` while a 7-agent fix workflow was still running (auto-wrap fired at 39%).
+- Method worth repeating: **code truth-audit BEFORE writing copy** -- fact contract + forbidden-claims list from plans.ts/migrations/routes, copywriter forbidden to exceed it, 4 adversarial verifiers re-derived every claim.
+- First pass was green on `tsc`+`lint`+`build` with 66 claims verified -- and still had 5 critical + 6 high defects. A green build is not evidence the copy is true.
+- The 5 criticals: false free-tier-Claude-Code claim (in FAQPage JSON-LD); paid unlocks spread under a $0 schema Offer; "exactly what we store" citing a privacy policy that documents none of it; both pages orphaned (no sitemap entries, no internal links).
+- **Product bug found and FIXED (committed):** `message/route.ts` fetched the OLDEST 20 history rows (`ascending: true` + limit) -- past message 20 the model never saw recent turns. Now descending + reverse. Affects the live Royal Stroje widget.
+- **Open decision for Martin:** ChatKit stores transcripts + visitor IPs + source URLs; `/privacy` documents none of it. Needs a ChatKit privacy section before the pages go live.
+
+## What Was Done (Session 53) -- Phase 1 live on prod; landing SEO rework v2.1 (rotated 2026-08-13)
+
+- **Phase 1 is now DEPLOYED** (`03c84d1` merged to main + pushed). Verified against live prod 12/12: Royal Stroje loads from both `royalstroje.sk` and `www.`, foreign origins 403 on config + message, single ACAO, CSP live without `unsafe-eval`, `/api/subscribe` + chat reject malformed input, cron 401s. Plus 4/4 regression: every owned bot with an empty allow-list still accepts any origin.
+- **Test gotcha:** zod runs at `message/route.ts:70`, BEFORE the domain check at :101. A domain-binding probe with a schema-invalid body 400s and proves nothing -- it must send a valid `visitorId`. Carry into the Phase 3.5 E2E port.
+- **Landing rework `6572531`** (branch-only): ~300 -> ~1200 words, business-first positioning. New sections: chatkit-section, toolkit-section, coming-soon (no CTAs), why-us, faq. FAQ renders 10 Q&As and builds FAQPage JSON-LD from the SAME array (10/10 text parity verified).
+- **A 63-agent adversarial review caught 4 FALSE claims in the new copy** -- now HONESTY CONSTRAINTS in component headers: (1) trial does NOT include every feature (`feature_unlocks` defaults `'{}'`, migration 017) -- paid unlocks split out with prices from `plans.ts`; (2) ToolKit is a CURATED DIRECTORY, only a minority of skills are ours, no licence field exists -- never "our MIT skills"; (3) "one credit balance across all products" false until Phase 2 ledger (credits live on `chatbots.credits_purchased`); (4) domain allow-list starts EMPTY (= allow any), opt-in not automatic.
+- A11y: `MotionConfig reducedMotion="user"` over marketing tree; `BlackholeVideo` pauses under reduced motion (WCAG 2.2.2) with 48KB poster; footer gray-500 -> gray-400; `noscript` fallback (framer SSRs `opacity:0`, page was BLANK without JS).
+- Added `PRODUCT.md` + `DESIGN.md`: brand register, users, anti-references, "Event Horizon" visual system (Bent Light, Gradient Crown, Legibility Floor, Glow-Not-Shadow). Read before design/copy work.
+- Safety hook false positives x2 flagged (git push `--ff-only` matched force-push pattern; `curl.*\|.*sh` matched "ship" in echo) -- pattern fixes proposed, not yet applied.
+- 38 lower-severity review findings left unfixed (mostly pre-existing): gradient taglines on `<p>`, placeholder team links, no SoftwareApplication schema on landing, products grid empty cell.
+
+## What Was Done (Session 52) -- Phase 0 merged to main; Phase 1 hardening 1.1-1.6 (rotated 2026-08-12)
+
+- Phase 0.2-0.5 code merged to `main` + pushed (`7328d97`) -- the S51 shipping gap is closed; the `/api/infrastructure` guard and CC staff gate are live in prod alongside migration 020.
+- **Phase 1 CLOSED in one commit `b9aab5b` (branch-only -- NOT deployed).** Migration `021_chatkit_hardening.sql` APPLIED to prod and verified. 021 alone changes nothing in prod: no deployed code reads the new column/table, so there is no repeat of the S51 gap -- but the protections only go live on the next merge to main.
+- 1.1 domain binding: `chatbots.allowed_domains` (hostnames, `*.` wildcard) enforced server-side in both `/api/chat` routes + field in `WidgetConfigForm`. Empty = allow-any so no customer widget broke. The blanket CORS `*` block was REMOVED from `next.config.js` -- it would have emitted a second, conflicting ACAO alongside the per-request one and browsers reject that.
+- 1.2: the only owner-less bot is a REAL live client widget (Royal Stroje). Rather than break it, its allow-list was seeded in the migration from observed `chat_conversations.source_url` traffic (`royalstroje.sk`). Internal bots: empty allow-list is now a hard DENY (not allow-all), 500 msg/day cap, and `messages_used` ticks for them too.
+- 1.3 rate limiting is **Postgres-backed, not Upstash** as the plan said -- Upstash needs an account + env vars from Martin and the whole point of the Phase 1 block was that it is unblocked. `rate_limits` table + `rate_limit_hit()` RPC, atomic, cross-lambda, per-IP + per-bot in ONE round trip, daily purge cron. It **fails open** on DB error by design (every request still has to clear the credit check before it can cost anything). Swap to Upstash later is a one-file change in `lib/chat/rate-limit.ts`.
+- Two flaws found while building, both fixed: the limiter originally sat AFTER the chatbot+KB queries (so unlimited 404s could still hammer Postgres -- moved before), and a supplied `conversationId` was never scoped to its chatbot (one bot could append to another's conversation).
+- 1.4: zod on the chat routes; `/api/subscribe` was an open unvalidated pipe into the Brevo list -- now validated + 5/hour. NOTE: zod v4 `.uuid()` is strict about version/variant bits; hand-written test uuids must be well-formed v4 or they 404 before reaching any logic.
+- 1.5: CSP on every page (no `unsafe-eval` in prod, `upgrade-insecure-requests` prod-only -- it breaks http://localhost navigation in dev); timing-safe cron secret compare in `lib/auth/cron.ts`, shared by both cron routes.
+- 1.6: visitor text is neutralized + framed as untrusted data in the KB-drafting prompt; suspicious drafts get `flagged`/`flag_reason`, a portal warning, and a two-click confirm enforced in the API (not just the UI). Ratings are owner-only, which was already a real gate.
+- Verified: domain binding 7/7, input validation 8/8, limiter blocks at exactly limit+1 with correct Retry-After, sanitizer 22/22, cron compare 8/8, 0 CSP violations across 7 pages in a PRODUCTION build (Playwright). tsc + lint + build green. Probe scripts are in the session scratchpad only -- Phase 3.5 should port them.
+
+## What Was Done (Session 51) -- Security fix-pack: 6 confirmed prod exploits closed (Phase 0.2-0.5) (rotated 2026-08-12)
+
+- **Exploits PROVEN against live prod first, then re-run after the fix: 6/7 -> 0/7.** Before: a signup that simply omitted `account_type: 'customer'` got a `team_members` row with `role='admin'` (pre-email-confirmation, and every `is_admin()` RLS policy trusted it); a customer could PATCH their own bot to `credits_purchased=999999`, flip all four paid `feature_unlocks` on, zero `messages_used`, set `extra_chatbot_slots=99`, and INSERT a bot pre-loaded with credits -- all straight against PostgREST, no app route involved.
+- Root cause of the self-grant class: RLS policies constrain WHICH ROW you touch, never WHICH COLUMN, and `authenticated` held table-wide UPDATE/INSERT. Fix (migration `020_security_fixpack.sql`, APPLIED + verified): table grants revoked and replaced with explicit column grants. Off-limits to clients now: `chatbots.credits_purchased / messages_used / feature_unlocks / owner_id(update)`, `customers.extra_chatbot_slots` + `subscription_*`/`stripe_*`, `team_members.role / is_active`. `anon` lost INSERT/UPDATE/DELETE on all three tables.
+- Admin escalation fix: `handle_new_user()` no longer reads `account_type`/`role` from user metadata at all -- default is `customers` (fail closed). Staff exist ONLY via the new `team_invites` allow-list (service-role/admin insert, single-use, role taken from the invite row). `search_path` pinned on all four security-definer functions.
+- Chatbot limit moved out of the page component into the DB: `chatbots_enforce_limit` BEFORE INSERT trigger + `pg_advisory_xact_lock` per owner (also closes the parallel-request race). Mirrors `BASE_CHATBOT_LIMIT` in `plans.ts` -- keep the two in sync.
+- 0.4: new `lib/auth/team.ts` (`getTeamIdentity` / `requireAdmin`) resolves staff from the DB, NOT from `user_metadata` -- which a user can rewrite themself via `auth.updateUser`. Guards `/api/infrastructure` and `app/command-center/layout.tsx` (non-staff sees an Access-denied screen; login page still loads for signed-out users). Needed a new self-select RLS policy so a non-admin member can read their own row.
+- Two extras found in the same auth path and fixed: an infinite redirect loop in `lib/supabase/middleware.ts` (customer on admin host -> admin login -> `/` -> repeat; now goes to the portal host), and `team_members` self-promotion (the update policy had no `WITH CHECK`, so an engineer could set their own role to admin).
+- Verification: exploit suite 0/7; legitimate-path regression 22/22 (create+edit bot, widget config, service-role billing writes, paid slot unlocks the 2nd bot, profile edit, invite flow, RLS visibility); `/api/infrastructure` 401 anon / 403 customer / 403 forged `account_type=team` / 200 invited admin; CC gate 4/4. All throwaway accounts deleted, DB confirmed clean. tsc + lint + build green.
+- Test scripts live in the session scratchpad only (not committed) -- Phase 3.5 should port them into the CI E2E suite.
+- SHIPPING GAP: migration 020 is live on PROD (DB-side exploits are closed everywhere), but the code half (`d3acf72`) is pushed only to `feat/landing-rebuild`. Until it merges to `main`, prod `/api/infrastructure` still admits any signed-in account and the Command Center staff gate is not deployed. Merge early next session.
+
 ## What Was Done (Session 50) -- Credit system + payments locked; launch plan re-baselined; merged to main (rotated 2026-08-07)
 
 - Universal credit system DECIDED (2026-08-06): account-level append-only ledger; Stripe sells ONLY credit packs; everything else (unlocks, future image/video gen) = internal ledger spend. Packs unchanged ($29/500 - $99/2.5k - $299/10k; Scale gets "Best value" badge) + hidden Enterprise $999/40k prepared later; unlocks re-priced to credits @ Growth reference ~4c: conversations 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250.
@@ -69,6 +142,11 @@
 |---|------|-------|
 | 41 | 2026-07-15 | MarketKit B3 Dub tracked links (code-complete, go-live pending) |
 | 44 | 2026-07-17 | Handoff v3 -- /handoff skill, real-usage auto-wrap hooks, handoff cap |
+| 45 | 2026-07-17 | ToolKit gallery refresh -- 9 market-top skills + real MCP section |
+| 46 | 2026-07-17 | Phase B verified complete + ChatKit tier gates wired (prio 2) |
+| 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
+| 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
+| 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

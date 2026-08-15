@@ -3,10 +3,12 @@ import type { Metadata } from "next";
 import { LandingHero } from "@/components/landing/hero";
 import { LegacyHashRedirect } from "@/components/landing/legacy-hash-redirect";
 import { Products } from "@/components/landing/products";
-import { FreeTools } from "@/components/landing/free-tools";
+import { ChatKitSection } from "@/components/landing/chatkit-section";
+import { ToolKitSection } from "@/components/landing/toolkit-section";
+import { ComingSoon } from "@/components/landing/coming-soon";
+import { WhyUs } from "@/components/landing/why-us";
+import { Faq } from "@/components/landing/faq";
 import { CreditsStrip } from "@/components/landing/credits-strip";
-import { TrustBar } from "@/components/landing/trust-bar";
-import { BlogPreview } from "@/components/landing/blog-preview";
 
 // Reciprocal hreflang cluster so the EN home and /sk point at each other.
 export const metadata: Metadata = {
@@ -20,9 +22,15 @@ export const metadata: Metadata = {
   },
 };
 
-// Product-first landing (website-rebuild v2.0). The previous agency landing
-// moves wholesale to /about (Phase A2). Section ids: home / products /
-// free-tools / blog — the 7 legacy ids stay reserved for /about.
+// Product-first landing (website-rebuild v2.1 — SEO depth pass).
+//
+// Structure: overview grid -> one deep section per LIVE product -> upcoming
+// products (no CTAs) -> credibility -> FAQ -> closing CTA. The blog preview
+// and avatar trust bar were removed: /blog and /about are both in the navbar,
+// so the landing stays strictly about the products.
+//
+// Section ids: home / products / chatkit / toolkit / coming-soon / why / faq.
+// The 7 legacy ids stay reserved for /about (see LegacyHashRedirect).
 export default function Home() {
   return (
     <main className="h-full w-full overflow-x-hidden">
@@ -30,10 +38,12 @@ export default function Home() {
         <LegacyHashRedirect />
         <LandingHero />
         <Products />
-        <FreeTools />
+        <ChatKitSection />
+        <ToolKitSection />
+        <ComingSoon />
+        <WhyUs />
+        <Faq />
         <CreditsStrip />
-        <TrustBar />
-        <BlogPreview />
       </div>
     </main>
   );

@@ -11,15 +11,17 @@ export const Products = () => {
   const mode = getLandingMode();
   const products = visibleProducts(mode);
 
+  // No "one shared credit balance" claim here — credits are per-chatbot today
+  // (see credits-strip.tsx). One account is true; one balance is Phase 2.
   const subtitle =
     mode === "full"
-      ? "Five tools. One account. One credit balance."
-      : "Two tools live today. Three more on the way. One account.";
+      ? "Five tools, one account, no subscriptions — every product below is live."
+      : "ChatKit and ToolKit are live today. SignaKit, MarketKit, and TechKit are on the way — all under one account, with no subscription to any of them.";
 
   return (
     <section
       id="products"
-      className="flex flex-col items-center justify-center gap-3 h-full relative overflow-hidden py-20 px-4 md:px-20 w-full max-w-full"
+      className="flex flex-col items-center justify-center gap-3 scroll-mt-24 h-full relative overflow-hidden py-20 px-4 md:px-20 w-full max-w-full"
     >
       <motion.h2
         initial="hidden"
@@ -35,7 +37,7 @@ export const Products = () => {
         }}
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-10 text-center"
       >
-        What We Build
+        One Platform. Five AI Tools.
       </motion.h2>
 
       <motion.p

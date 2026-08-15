@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface TechResultProps {
   icon: string;
@@ -136,9 +136,9 @@ const TechResultCard = ({ icon, category, results, index }: TechResultProps) => 
               {results.map((result, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <motion.span
-                    className="text-gray-400 text-sm"
+                    className="text-gray-300 text-sm"
                     animate={{
-                      color: isHovered ? "#e5e7eb" : "#9ca3af",
+                      color: isHovered ? "#e5e7eb" : "#d1d5db",
                     }}
                     transition={{ duration: 0.3 }}
                   >
@@ -214,10 +214,11 @@ const techResults = [
   {
     icon: "/icons/AI.svg",
     category: "AI & Agent Systems",
+    // "Development Speed Increase 10×" removed (S57): a multiplier presented
+    // as a metric is unfalsifiable — the named anti-reference in PRODUCT.md.
     results: [
       { metric: "AI-Powered Apps Built", value: "5+" },
       { metric: "Automated Workflows Deployed", value: "25+" },
-      { metric: "Development Speed Increase", value: "10×" },
       { metric: "Full Project Lifecycles Delivered", value: "30+" },
     ],
   },
@@ -236,6 +237,17 @@ const techResults = [
 
 
 export const Projects = () => {
+  // Pause the ambient scenery video under reduced motion — raw <video
+  // autoPlay> is outside the ReducedMotionProvider's reach.
+  const reducedMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (reducedMotion) video.pause();
+    else video.play().catch(() => {});
+  }, [reducedMotion]);
+
   return (
     <section
       id="projects"
@@ -270,7 +282,7 @@ export const Projects = () => {
             transition: { duration: 0.5, delay: 0.2 },
           },
         }}
-        className="text-lg text-gray-400 text-center mb-12 max-w-2xl"
+        className="text-lg text-gray-300 text-center mb-12 max-w-2xl"
       >
         Years of combined experience — now under one roof.
       </motion.p>
@@ -294,12 +306,13 @@ export const Projects = () => {
       <div className="w-full h-full absolute -z-10 pointer-events-none">
         <div className="w-full h-full opacity-30 absolute flex items-center justify-center bg-cover">
           <video
+            ref={videoRef}
             className="w-full h-auto"
             preload="none"
             playsInline
             loop
             muted
-            autoPlay
+            autoPlay={!reducedMotion}
           >
             <source src="/videos/skills-bg.webm" type="video/webm" />
           </video>

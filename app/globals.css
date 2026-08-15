@@ -61,17 +61,24 @@
   display: none;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* overflow-x: clip, never hidden: hidden turns html/body into a scrollport
+   and silently disables position:sticky everywhere on the page. */
 html {
-  scroll-behavior: smooth;
-  overflow-x: hidden !important;
-  width: 100vw;
-  max-width: 100vw;
+  overflow-x: clip !important;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
-  overflow-x: hidden !important;
-  width: 100vw;
-  max-width: 100vw;
+  overflow-x: clip !important;
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   padding: 0;
 }

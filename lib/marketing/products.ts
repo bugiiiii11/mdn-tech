@@ -13,12 +13,49 @@ export interface MarketingProduct {
   tagline: string; // gradient one-liner
   description: string;
   icon: string; // icon id, rendered by ProductIcon in product-card.tsx
-  href: string; // app.mdntech.org target (live products only)
+  href: string; // link target — marketing page ("/toolkit") or app.mdntech.org
   cta: string; // "Try Free", "Browse Skills" — never payment language
   status: Record<LandingMode, ProductStatus>;
 }
 
 export const APP_URL = "https://app.mdntech.org";
+
+// THE PORTAL GATE (2026-08-15). The customer portal is not open to the public
+// yet, so no surface on this site may walk a visitor into it. While APP_LIVE is
+// false every CTA that would point at app.mdntech.org renders as an inert
+// "Coming soon" control instead of a link, and the prose links that lead there
+// either drop or fall back to an internal page.
+//
+// Same fail-safe shape as getLandingMode(): Production has no var, so the
+// default is CLOSED and the portal can only be revealed deliberately. To open
+// it, set NEXT_PUBLIC_APP_LIVE=true in Vercel (Production) and redeploy — no
+// code change, one flag, every CTA comes back at once.
+//
+// Consumers: appCta() below, ProductCard, the navbar/footer, the landing hero +
+// credits strip, and every /chatkit + /toolkit CTA. Grep APP_LIVE before adding
+// a new link to the app.
+export const APP_LIVE = process.env.NEXT_PUBLIC_APP_LIVE === "true";
+
+/**
+ * A CTA that targets the portal. Returns the real link when the portal is open
+ * and a disabled "Coming soon" button otherwise, so call sites carry no
+ * conditional of their own. Shape matches CtaLink in
+ * components/product-pages/motion-primitives.tsx.
+ *
+ * No class strings here on purpose — this file lives under lib/, which Tailwind
+ * does not scan (see components/main/hero-shell.ts for what that costs).
+ */
+export function appCta(
+  path: string,
+  label: string
+): { href: string; label: string; disabled?: boolean } {
+  return APP_LIVE
+    ? { href: `${APP_URL}${path}`, label }
+    : { href: "", label: "Coming soon", disabled: true };
+}
+
+/** True for a link that would leave the site for the portal. */
+export const isAppHref = (href: string): boolean => href.startsWith(APP_URL);
 
 export const MARKETING_PRODUCTS: MarketingProduct[] = [
   {
@@ -34,11 +71,11 @@ export const MARKETING_PRODUCTS: MarketingProduct[] = [
   {
     id: "toolkit",
     name: "ToolKit",
-    tagline: "Claude Code superpowers. Free forever.",
+    tagline: "Claude Code superpowers. Free today.",
     description:
-      "Production-tested Claude Code skills and safety hooks — session continuity (/start, /wrap), guarded automation, one-line install. MIT licensed.",
+      "Production-tested Claude Code skills and safety hooks — session continuity (/handoff start, /handoff wrap), guarded automation, a paste-and-go install. The two published skills are MIT licensed.",
     icon: "wrench",
-    href: `${APP_URL}/toolkit`,
+    href: "/toolkit",
     cta: "Browse Skills",
     status: { mvp: "live", full: "live" },
   },

@@ -1,19 +1,33 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 // import Image from "next/image"; // Uncomment when restoring lock icon section
 
 import { slideInFromTop, slideInFromLeft, slideInFromRight } from "@/lib/motion";
 
 export const Encryption = () => {
+  // Raw <video autoPlay> ignores the OS reduced-motion setting, and the
+  // marketing tree's ReducedMotionProvider only covers framer animations —
+  // pause the scenery explicitly (DESIGN.md: every video needs a pause path).
+  const reducedMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (reducedMotion) video.pause();
+    else video.play().catch(() => {});
+  }, [reducedMotion]);
+
   return (
     <section id="security" className="flex flex-row relative items-center justify-center min-h-screen w-full max-w-full h-full py-20 px-4 md:px-20 overflow-hidden">
       {/* Background Video */}
       <div className="w-full max-w-full flex items-start justify-center absolute -z-10 overflow-hidden">
         <video
+          ref={videoRef}
           loop
           muted
-          autoPlay
+          autoPlay={!reducedMotion}
           playsInline
           preload="none"
           className="w-full max-w-full h-auto opacity-30"
@@ -53,9 +67,9 @@ export const Encryption = () => {
               transition: { duration: 0.5, delay: 0.2 },
             },
           }}
-          className="text-lg text-gray-400 text-center mb-12 max-w-3xl"
+          className="text-lg text-gray-300 text-center mb-12 max-w-3xl"
         >
-          A modern, production-tested stack — chosen for performance, reliability, and the ability to move fast without creating technical debt.
+          The technologies our engineers have shipped production systems with across their careers — and the core stack we build on every day.
         </motion.p>
 
         {/* Lock Icon Section - Hidden for now, uncomment to restore
@@ -158,7 +172,7 @@ export const Encryption = () => {
               className="p-6 rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
             >
               <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
+              <p className="text-sm text-gray-300 leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -171,8 +185,10 @@ export const Encryption = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <p className="text-base text-gray-400 max-w-3xl leading-relaxed">
-            This is the stack we reach for every day — but our tools never stand still. We continuously evaluate and adopt the latest technologies as they emerge.
+          {/* S57 honesty fix: the daily core is Next.js/TypeScript/Supabase/
+              Vercel — the wider grid is career experience, not daily use. */}
+          <p className="text-base text-gray-300 max-w-3xl leading-relaxed">
+            Our daily core is Next.js, TypeScript, Supabase, and Vercel — the rest is experience we draw on when a project calls for it. The stack never stands still: we evaluate and adopt new technology as it earns its place.
           </p>
         </motion.div>
       </div>

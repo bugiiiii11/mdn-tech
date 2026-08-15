@@ -12,6 +12,33 @@ export type SkillCategory =
   | 'productivity'
   | 'creative'
 
+/**
+ * Display labels for the category union — the ONE home for these strings.
+ *
+ * Two copies used to exist (a module-private map in
+ * components/portal/handoff/ThirdPartySkills.tsx and a re-declared one in the
+ * marketing catalogue) and they had already drifted in casing. Both surfaces
+ * now import this map; lib/marketing/toolkit-catalogue.ts re-exports it so the
+ * marketing pages get it alongside the derived counts.
+ *
+ * Sentence case is the stored form: the portal gallery uppercases its label in
+ * CSS, the marketing directory prints it as written.
+ */
+export const CATEGORY_LABELS: Record<SkillCategory, string> = {
+  'session-management': 'Session management',
+  marketing: 'Marketing',
+  testing: 'Testing & QA',
+  safety: 'Safety & validation',
+  design: 'Design',
+  seo: 'SEO',
+  infrastructure: 'Infrastructure',
+  development: 'Development',
+  security: 'Security',
+  documents: 'Documents',
+  productivity: 'Productivity',
+  creative: '3D & creative',
+}
+
 export interface ToolkitSkill {
   id: string
   name: string

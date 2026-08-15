@@ -114,10 +114,11 @@ const renderContent = (block: ContentBlock, index: number) => {
       );
 
     case "quote":
+      // Legibility Floor: quotes carry meaning — gray-300, not gray-400.
       return (
         <blockquote
           key={index}
-          className="mb-6 pl-4 border-l-2 border-cyan-500 italic text-gray-400"
+          className="mb-6 pl-4 border-l-2 border-cyan-500 italic text-gray-300"
         >
           {block.content}
         </blockquote>
