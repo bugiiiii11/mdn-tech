@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 59) -- /about + /blog on the hero shell; founder-forward team (rotated 2026-08-15)
+
+- `/about` + `/blog` now open on the shared full-viewport hero shell -- all six marketing heroes compose `components/main/hero-shell.ts`. Old `components/main/hero.tsx` + `components/sub/hero-content.tsx` DELETED (the pre-rebuild landing hero /about had inherited).
+- **User decisions (do not re-litigate):** team section is founder-forward -- ONLY Martin Jerabek's card, Hromek + Lukas removed; top nav stays FLAT (Products dropdown rejected until a 3rd product page ships); Blog STAYS in the main nav.
+- **`FOUNDER.linkedin` in `constants/index.ts` is EMPTY** -- the card's LinkedIn button renders only when set (never a placeholder). Waiting on Martin's personal URL; a real photo to replace the AI-avatar `public/team/1.jpg` also invited.
+- Team section: growing-team story (five engineers, distributed, Claude Code -> ToolKit receipt, hiring as contracts land) + world map in a fixed 21:10 frame so the 4 cyan activity pulses stay on land at any width.
+- Blog banners are deterministic constellation SVGs seeded from post id (`components/blog/constellation.tsx`) -- `public/blog/` raster covers do not exist; the seeded PRNG keeps server/client HTML identical (no hydration mismatch).
+- Gotcha: a taller hero content block centers UP into the ring glow -- the blog hero (featured post in the fold) needed `md:pt-24`. Check headline clearance whenever hero content grows.
+- Blog index is now a server component (metadata already lived in `blog/layout.tsx`); 4.24 kB, still static. Card fixes: titles solid white->cyan (Gradient Crown Rule), excerpts gray-300 (Legibility Floor).
+- Gate green; settled-overflow QA clean at 1280/375/320 on both pages (emulate reduced motion or framer slide-ins give phantom hits). `/blog/[slug]` article pages untouched -- still the old design, future polish candidate.
+
 ## What Was Done (Session 58) -- Hero rebuild on one full-viewport shell (rotated 2026-08-15)
 
 - **`components/main/hero-shell.ts` is now THE hero contract** (section shell, blackhole framing, content wrapper, CTA sizing) and all four heroes compose it: `/`, `/sk`, and `/chatkit` + `/toolkit` via `PageHero`. Every hero is `min-h-[100svh]`, so no next section peeks above the fold at any size.
@@ -158,6 +169,7 @@
 | 47 | 2026-07-17 | ChatKit credits-only pivot + PlanKit removal + Blender skills (migration 017 applied) |
 | 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
 | 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
+| 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

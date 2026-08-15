@@ -170,22 +170,22 @@ export const SK_WHY_US = [
 
 export const SK_PORTFOLIO = [
   {
-    name: "Kúrenie Turiec",
-    domain: "kurenieturiec.sk",
-    href: "https://kurenieturiec.sk",
-    image: "/portfolio/kurenieturiec.jpg",
-    description:
-      "Web a lokálne SEO pre kúrenársku a inštalatérsku firmu z regiónu Turiec — pripravený nosiť zákazníkov z Googlu.",
-    tags: ["Web", "Lokálne SEO", "Biznis analýza"],
-  },
-  {
     name: "Royal Stroje",
     domain: "royalstroje.sk",
     href: "https://royalstroje.sk",
     image: "/portfolio/royalstroje.jpg",
     description:
       "Web pre požičovňu náradia a stavebnej techniky v Senci — s automatizáciou procesov a prístupom k databáze cez admin portál.",
-    tags: ["Web", "Lokálne SEO", "Command Center"],
+    tags: ["Web", "Lokálne SEO", "CRM"],
+  },
+  {
+    name: "Royal Works",
+    domain: "royalworks.sk",
+    href: "https://royalworks.sk",
+    image: "/portfolio/royalworks.jpg",
+    description:
+      "Web pre firmu na údržbu pozemkov, výrub stromov a opravy kanalizácie v Bratislave a okolí — osem oblastí služieb prehľadne na jednom mieste.",
+    tags: ["Web", "Lokálne SEO", "Dizajn na mieru"],
   },
   {
     name: "Good Hair by Zane",
@@ -195,6 +195,15 @@ export const SK_PORTFOLIO = [
     description:
       "Web pre kadernícky salón špecializovaný na predlžovanie vlasov a regeneračné kúry — elegantný, rýchly a plný atmosféry.",
     tags: ["Web", "SEO", "Dizajn na mieru"],
+  },
+  {
+    name: "Kúrenie Turiec",
+    domain: "kurenieturiec.sk",
+    href: "https://kurenieturiec.sk",
+    image: "/portfolio/kurenieturiec.jpg",
+    description:
+      "Web a lokálne SEO pre kúrenársku a inštalatérsku firmu z regiónu Turiec — pripravený nosiť zákazníkov z Googlu.",
+    tags: ["Web", "Lokálne SEO", "Biznis analýza"],
   },
 ] as const;
 

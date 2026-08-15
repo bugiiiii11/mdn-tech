@@ -9,7 +9,8 @@ import { APP_LIVE, APP_URL, getLandingMode, isAppHref, visibleProducts } from "@
 import type { MarketingProduct } from "@/lib/marketing/products";
 import { NewsletterForm } from "@/components/main/newsletter-form";
 import { BlackholeVideo } from "@/components/main/blackhole-video";
-import { TOOLKIT_REPO } from "@/lib/marketing/links";
+import { COMPANY_LEGAL_LINE, TOOLKIT_REPO } from "@/lib/marketing/links";
+import { SK_NAP, SK_NAV_LINKS } from "@/constants/sk";
 
 // Products with an indexable marketing deep-dive get the internal route in
 // the footer instead of product.href (the app host is noindex, so sending
@@ -20,6 +21,14 @@ const MARKETING_ROUTES: Partial<Record<MarketingProduct["id"], string>> = {
   chatkit: "/chatkit",
   toolkit: "/toolkit",
 };
+
+// max-w-full + break-words, not just w-fit: w-fit resolves to max-content, so
+// a long unbreakable string (contact@mdntech.org) sized past the 320px column
+// and was silently cut off by the footer's overflow-x-hidden.
+const linkClass =
+  "text-sm text-gray-400 hover:text-white transition-colors w-fit max-w-full break-words";
+const headingClass =
+  "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 
 // Shared blackhole bookend above the footer. BlackholeVideo carries the
 // reduced-motion + poster handling (WCAG 2.2.2).
@@ -32,66 +41,136 @@ const FooterBookend = () => (
   </div>
 );
 
-// SK footer — unchanged from the pre-rebuild version (DO NOT TOUCH /sk).
-const SkFooter = () => (
-  <>
-    <FooterBookend />
-    <footer className="w-full max-w-full relative bg-[#050518] overflow-hidden" style={{ zIndex: 11 }}>
-      <div className="max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-4 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-6">
-          {/* Brand + description */}
-          <div className="max-w-[280px]">
-            <Link href="/sk#domov" className="inline-flex items-center gap-2.5 mb-3">
-              <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
-              <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
-            </Link>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              Web, SEO, biznis analýza a automatizácia procesov pre slovenské firmy — moderné digitálne riešenia od jedného partnera.
-            </p>
+// SK footer — same shell as the EN footer below (deep #010109 panel, violet
+// horizon hairline, uppercase column heads) with Slovak copy and the /sk
+// anchor set. The newsletter slot is a consultation CTA instead: /sk already
+// closes on its own contact form, and the newsletter copy is English-only.
+const SkFooter = () => {
+  const skSocials = [
+    { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
+    { name: "X", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
+    { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
+  ];
+
+  return (
+    <>
+      <FooterBookend />
+      <footer
+        className="w-full max-w-full relative bg-[#010109] overflow-hidden border-t border-[#7042f833]"
+        style={{ zIndex: 11 }}
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-px left-1/2 -translate-x-1/2 h-px w-[70%] bg-gradient-to-r from-transparent via-purple-500/60 to-transparent"
+        />
+
+        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-14 pb-6 relative z-10">
+          {/* Brand + consultation band */}
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10 pb-10 mb-10 border-b border-white/[0.06]">
+            <div className="max-w-sm">
+              <Link href="/sk#domov" className="inline-flex items-center gap-2.5 mb-3">
+                <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
+                <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
+              </Link>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Web, SEO, biznis analýza a automatizácia procesov pre slovenské
+                firmy — moderné digitálne riešenia od jedného partnera.
+              </p>
+              <div className="flex items-center gap-1 mt-5 -ml-2">
+                {skSocials.map(({ name, icon: Icon, link }) => (
+                  <Link
+                    key={name}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-white/5 transition-colors"
+                    aria-label={name}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full max-w-sm lg:flex-shrink-0">
+              <h4 className={headingClass}>Máte projekt?</h4>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Napíšte nám a ozveme sa do 24 hodín. Prvá konzultácia a biznis
+                analýza sú zdarma a nezáväzné.
+              </p>
+              <Link
+                href="/sk#kontakt"
+                className="mt-5 inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 transition-colors"
+              >
+                Nezáväzná konzultácia
+              </Link>
+            </div>
           </div>
 
-          {/* Pages */}
-          <div>
-            <h4 className="text-white text-sm font-medium mb-3">Stránky</h4>
-            <nav className="flex flex-col gap-2">
-              <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                Obchodné podmienky
-              </Link>
-              <Link href="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
+          {/* Link columns */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-8 mb-10">
+            <div>
+              <h4 className={headingClass}>Navigácia</h4>
+              <nav className="flex flex-col gap-2.5">
+                {SK_NAV_LINKS.map(({ title, link }) => (
+                  <Link key={link} href={link} className={linkClass}>
+                    {title}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div>
+              <h4 className={headingClass}>Zdroje</h4>
+              <nav className="flex flex-col gap-2.5">
+                <Link href="/blog" className={linkClass}>
+                  Blog
+                </Link>
+                <Link href="/" className={linkClass} hrefLang="en">
+                  English
+                </Link>
+              </nav>
+            </div>
+
+            <div>
+              <h4 className={headingClass}>Kontakt</h4>
+              <div className="flex flex-col gap-2.5">
+                <a href={SK_NAP.phoneHref} className={linkClass}>
+                  {SK_NAP.phoneDisplay}
+                </a>
+                <a
+                  href={SK_NAP.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  WhatsApp {SK_NAP.whatsappDisplay}
+                </a>
+                <a href={SK_NAP.emailHref} className={linkClass}>
+                  {SK_NAP.email}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom line */}
+          <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
+            <p className="leading-relaxed">{COMPANY_LEGAL_LINE}</p>
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <Link href="/privacy" className="hover:text-gray-300 transition-colors">
                 Ochrana súkromia
               </Link>
-              <Link href="/blog" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                Blog
+              <Link href="/terms" className="hover:text-gray-300 transition-colors">
+                Obchodné podmienky
               </Link>
-            </nav>
-          </div>
-
-          {/* Contact */}
-          <div className="max-w-[280px]">
-            <h4 className="text-white text-sm font-medium mb-3">Kontakt</h4>
-            <div className="flex flex-col gap-2">
-              <a href="tel:+421904904091" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                0904 904 091
-              </a>
-              <a href="mailto:contact@mdntech.org" className="text-sm text-gray-400 hover:text-white transition-colors w-fit">
-                contact@mdntech.org
-              </a>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Recká cesta 182,<br />925 26 Senec-Boldog
-              </p>
+              <span>© 2026 M.D.N TECH</span>
             </div>
           </div>
         </div>
-
-        {/* Bottom line */}
-        <div className="pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-gray-500">
-          <p className="leading-relaxed">M.D.N Tech — Váš digitálny partner</p>
-          <p>© 2026 M.D.N TECH</p>
-        </div>
-      </div>
-    </footer>
-  </>
-);
+      </footer>
+    </>
+  );
+};
 
 export const Footer = () => {
   const pathname = usePathname();
@@ -113,14 +192,6 @@ export const Footer = () => {
     { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
     { name: "GitHub", icon: RxGithubLogo, link: TOOLKIT_REPO },
   ];
-
-  // max-w-full + break-words, not just w-fit: w-fit resolves to max-content, so
-  // a long unbreakable string (contact@mdntech.org) sized past the 320px column
-  // and was silently cut off by the footer's overflow-x-hidden.
-  const linkClass =
-    "text-sm text-gray-400 hover:text-white transition-colors w-fit max-w-full break-words";
-  const headingClass =
-    "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 
   return (
     <>
@@ -276,9 +347,7 @@ export const Footer = () => {
 
           {/* Bottom line */}
           <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
-            <p className="leading-relaxed">
-              M.D.N Tech FZE · Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone, Umm Al Quwain, U.A.E. · License 7813
-            </p>
+            <p className="leading-relaxed">{COMPANY_LEGAL_LINE}</p>
             <div className="flex items-center gap-4 flex-shrink-0">
               <Link href="/privacy" className="hover:text-gray-300 transition-colors">
                 Privacy

@@ -33,7 +33,7 @@ const PortfolioCard = ({ item, index }: { item: PortfolioItem; index: number }) 
             src={item.image}
             alt={`Náhľad webu ${item.name} (${item.domain})`}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
             loading="lazy"
             onError={() => setImgError(true)}
             className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
@@ -98,7 +98,9 @@ export const SkPortfolio = () => {
         Pozrite si živé weby, ktoré sme vytvorili pre našich slovenských partnerov. 
       </motion.p>
 
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Two-up above md: with four sites a 3-col grid leaves an orphan, and a
+          4-col row shrinks the previews past legibility. */}
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
         {SK_PORTFOLIO.map((item, index) => (
           <PortfolioCard key={item.domain} item={item} index={index} />
         ))}

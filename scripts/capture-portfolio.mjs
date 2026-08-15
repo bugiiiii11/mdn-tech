@@ -18,10 +18,38 @@ const outDir = path.resolve(__dirname, "../public/portfolio");
 const sites = [
   { name: "kurenieturiec", url: "https://kurenieturiec.sk" },
   { name: "royalstroje", url: "https://royalstroje.sk" },
+  { name: "royalworks", url: "https://royalworks.sk" },
   { name: "goodhairbyzane", url: "https://goodhairbyzane.com" },
 ];
 
 const VIEWPORT = { width: 1280, height: 800 };
+
+// Cookie banners sit on top of the hero and would end up baked into the card
+// preview. Decline (never accept — we do not want to opt these captures into
+// the client's analytics), then let the banner animate out.
+const CONSENT_LABELS = [
+  "Odmietnuť",
+  "Odmietam",
+  "Iba nevyhnutné",
+  "Len nevyhnutné",
+  "Decline",
+  "Reject all",
+  "Reject",
+];
+
+async function dismissConsent(page) {
+  for (const label of CONSENT_LABELS) {
+    const button = page.getByRole("button", { name: label, exact: false }).first();
+    try {
+      if (await button.isVisible({ timeout: 500 })) {
+        await button.click({ timeout: 2000 });
+        await page.waitForTimeout(800);
+        return label;
+      }
+    } catch {}
+  }
+  return null;
+}
 
 // optional CLI filter: `node scripts/capture-portfolio.mjs kurenieturiec`
 const only = process.argv[2];
@@ -49,17 +77,30 @@ async function run() {
       try {
         await page.waitForLoadState("networkidle", { timeout: 15000 });
       } catch {}
+      const declined = await dismissConsent(page);
       await page.evaluate(() => window.scrollTo(0, 600));
       await page.waitForTimeout(1200);
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(3500);
+      // Chat bubbles load late and float over the bottom-right corner.
+      await page.addStyleTag({
+        content: `
+          [class*="chat-widget"], [id*="chat-widget"],
+          [class*="chatkit"], [id*="chatkit"],
+          [class*="smartsupp"], [id*="smartsupp"],
+          [class*="tawk"], [id*="tawk"] { display: none !important; }
+        `,
+      });
+      await page.waitForTimeout(400);
       await page.screenshot({
         path: outFile,
         type: "jpeg",
         quality: 82,
         clip: { x: 0, y: 0, ...VIEWPORT },
       });
-      console.log(`✓ ${site.name} -> ${outFile}`);
+      console.log(
+        `✓ ${site.name} -> ${outFile}${declined ? ` (consent: "${declined}")` : ""}`
+      );
     } catch (err) {
       console.error(`✗ ${site.name} (${site.url}): ${err.message}`);
     } finally {
