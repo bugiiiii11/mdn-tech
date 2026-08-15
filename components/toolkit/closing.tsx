@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CtaBand, PROSE_LINK_CLASS } from "@/components/product-pages/primitives";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 
 import { LISTED_COUNT } from "./catalogue";
 
@@ -30,11 +30,21 @@ export const ToolkitClosing = () => (
       }}
     />
 
+    {/* While the portal is closed (APP_LIVE) the ChatKit clause points at the
+        indexable /chatkit page instead of the app — the sentence keeps its job
+        (here is where that knowledge base can go) without promising a signup
+        nobody can complete. */}
     <p className="-mt-10 px-4 pb-16 text-center text-sm text-gray-400">
       Built a knowledge base with Build KB?{" "}
-      <a href={`${APP_URL}/chatkit`} className={PROSE_LINK_CLASS}>
-        Start a chatbot free
-      </a>
+      {APP_LIVE ? (
+        <a href={`${APP_URL}/chatkit`} className={PROSE_LINK_CLASS}>
+          Start a chatbot free
+        </a>
+      ) : (
+        <Link href="/chatkit" className={PROSE_LINK_CLASS}>
+          See what ChatKit does with it
+        </Link>
+      )}
       . Otherwise, there is{" "}
       <Link href="/blog" className={PROSE_LINK_CLASS}>
         more engineering writing

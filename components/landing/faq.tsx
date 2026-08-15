@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import {
   CREDIT_PACKS,
   CREDITS_PER_MESSAGE,
@@ -193,15 +193,25 @@ export const Faq = () => {
         ))}
       </div>
 
+      {/* The "Try it free" clause is dropped, not disabled, while the portal is
+          closed (APP_LIVE): a dead phrase mid-sentence reads as a broken link,
+          and the sentence stands on its own without it. */}
       <p className="text-sm text-gray-400 mt-10 text-center">
         Still deciding?{" "}
-        <a
-          href={`${APP_URL}/chatkit`}
-          className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
-        >
-          Try it free
-        </a>{" "}
-        — or read how we handle your data in our{" "}
+        {APP_LIVE ? (
+          <>
+            <a
+              href={`${APP_URL}/chatkit`}
+              className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"
+            >
+              Try it free
+            </a>{" "}
+            — or read
+          </>
+        ) : (
+          "Read"
+        )}{" "}
+        how we handle your data in our{" "}
         <Link
           href="/privacy"
           className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-medium"

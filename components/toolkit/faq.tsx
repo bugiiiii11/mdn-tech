@@ -1,6 +1,6 @@
 import { FaqSection, type FaqEntry } from "@/components/product-pages/faq";
 import { TOOLKIT_REPO } from "@/lib/marketing/links";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 import { LISTED_COUNT, MDN_COUNT, MDN_SKILLS, numberWord } from "./catalogue";
@@ -104,7 +104,12 @@ const FAQS: FaqEntry[] = [
   {
     question: "How do I turn my codebase into a chatbot knowledge base?",
     answer: `Install Build KB and run it. It reads the user-facing content already in your repository and writes one knowledge-base.md organised into fixed sections, skipping any section the repo has no source for rather than inventing one. Paste the result into any chatbot you like, including ChatKit, where a new chatbot gets ${FREE_TRIAL_MESSAGES} free messages and asks for no card.`,
-    link: { href: `${APP_URL}/signup`, label: "Create an account", external: true },
+    // No link at all while the portal is closed (APP_LIVE) — faqAnswerText()
+    // folds the label into the FAQPage schema, so a dead link here would put a
+    // dead invitation in the structured data too.
+    link: APP_LIVE
+      ? { href: `${APP_URL}/signup`, label: "Create an account", external: true }
+      : undefined,
   },
 ];
 

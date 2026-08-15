@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 
 // Credits value-prop strip — deliberately NOT a pricing table. No prices, no
 // packages, no gateway mention.
@@ -43,14 +43,25 @@ export const CreditsStrip = () => {
             </p>
           </div>
 
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            href={APP_URL}
-            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold whitespace-nowrap flex-shrink-0"
-          >
-            Open the App →
-          </motion.a>
+          {/* Inert while the portal is closed (APP_LIVE) — same footprint so
+              the strip does not reflow when the flag flips. */}
+          {APP_LIVE ? (
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href={APP_URL}
+              className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold whitespace-nowrap flex-shrink-0"
+            >
+              Open the App →
+            </motion.a>
+          ) : (
+            <span
+              aria-disabled="true"
+              className="py-3 px-8 text-center rounded-lg font-semibold whitespace-nowrap flex-shrink-0 border border-white/[0.12] bg-white/[0.04] text-gray-400 cursor-not-allowed"
+            >
+              Coming soon
+            </span>
+          )}
         </div>
       </motion.div>
     </section>

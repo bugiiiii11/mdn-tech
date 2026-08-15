@@ -10,7 +10,7 @@ import {
   FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import { appCta } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 // "Add an AI chatbot to your website in four steps" — the depth answer to the
@@ -141,9 +141,7 @@ export const SetupSteps = () => (
     >
       {/* Shared CtaButton — the short label stays on one line at 360px, and
           the note underneath carries the trial size instead. */}
-      <CtaButton
-        cta={{ href: `${APP_URL}/chatkit`, label: "Create your chatbot free" }}
-      />
+      <CtaButton cta={appCta("/chatkit", "Create your chatbot free")} />
       <p className="text-sm text-gray-400">
         {FREE_TRIAL_MESSAGES} free messages — no credit card, nothing to cancel.
       </p>

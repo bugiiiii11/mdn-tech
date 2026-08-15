@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import { FEATURES, FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 // ChatKit deep-dive — the conversion workhorse of the landing page. Everything
@@ -264,14 +264,25 @@ export const ChatKitSection = () => {
         variants={fadeUp(0.15)}
         className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-5 mt-12"
       >
-        <motion.a
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          href={`${APP_URL}/chatkit`}
-          className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
-        >
-          Start Free →
-        </motion.a>
+        {/* Inert while the portal is closed (APP_LIVE); the trial terms below
+            still describe what lands when it opens. */}
+        {APP_LIVE ? (
+          <motion.a
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            href={`${APP_URL}/chatkit`}
+            className="py-3 px-8 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
+          >
+            Start Free →
+          </motion.a>
+        ) : (
+          <span
+            aria-disabled="true"
+            className="py-3 px-8 text-center rounded-lg font-semibold border border-white/[0.12] bg-white/[0.04] text-gray-400 cursor-not-allowed"
+          >
+            Coming soon
+          </span>
+        )}
         <p className="text-sm text-gray-400">
           {FREE_TRIAL_MESSAGES} free messages · no credit card · nothing to
           cancel

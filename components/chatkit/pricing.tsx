@@ -12,7 +12,7 @@ import {
   FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL, appCta } from "@/lib/marketing/products";
 import {
   CREDITS_PER_MESSAGE,
   CREDIT_PACKS,
@@ -191,10 +191,10 @@ export const Pricing = () => (
       className="mt-14"
     >
       <CtaButton
-        cta={{
-          href: `${APP_URL}/chatkit`,
-          label: `Start with ${FREE_TRIAL_MESSAGES} free messages`,
-        }}
+        cta={appCta(
+          "/chatkit",
+          `Start with ${FREE_TRIAL_MESSAGES} free messages`
+        )}
       />
     </motion.div>
 
@@ -205,17 +205,29 @@ export const Pricing = () => (
       variants={fadeUp(0.1)}
       className="mt-6 max-w-3xl text-center text-sm text-gray-400 leading-relaxed"
     >
-      Prices are listed here so you can budget before you start. Payment is not
-      live yet: while checkout is being set up, credits are granted from inside
-      the app, and no card is charged today. Sign-up and the free trial need no
-      card either, and current prices and availability always live{" "}
-      <a
-        href={`${APP_URL}/chatkit`}
-        className={PROSE_LINK_CLASS}
-      >
-        in the app
-      </a>
-      .{" "}
+      {/* Two truthful versions of the same disclosure. While the portal is
+          closed (APP_LIVE) the live one would be wrong twice over — it points
+          at an app nobody can open, and it implies you can get credits today. */}
+      {APP_LIVE ? (
+        <>
+          Prices are listed here so you can budget before you start. Payment is
+          not live yet: while checkout is being set up, credits are granted from
+          inside the app, and no card is charged today. Sign-up and the free
+          trial need no card either, and current prices and availability always
+          live{" "}
+          <a href={`${APP_URL}/chatkit`} className={PROSE_LINK_CLASS}>
+            in the app
+          </a>
+          .{" "}
+        </>
+      ) : (
+        <>
+          Prices are listed here so you can budget before you start. Neither
+          payment nor the app itself is open yet: nothing is charged today, and
+          when ChatKit opens, sign-up and the free trial will need no card.
+          Prices and availability may change before then.{" "}
+        </>
+      )}
       <Link href="/terms" className={PROSE_LINK_CLASS}>
         Terms of service
       </Link>

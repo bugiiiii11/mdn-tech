@@ -3,11 +3,12 @@
 import { motion } from "framer-motion";
 
 import { slideInFromLeft } from "@/lib/motion";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import { BlackholeVideo } from "@/components/main/blackhole-video";
 import {
   HERO_BLACKHOLE_CLASS,
   HERO_CONTENT_CLASS,
+  HERO_CTA_DISABLED_CLASS,
   HERO_CTA_PRIMARY_CLASS,
   HERO_CTA_SECONDARY_CLASS,
   HERO_SECTION_CLASS,
@@ -55,14 +56,24 @@ export const LandingHero = () => {
             variants={slideInFromLeft(0.75)}
             className="flex flex-col sm:flex-row gap-4 mt-8 items-center justify-center"
           >
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href={APP_URL}
-              className={HERO_CTA_PRIMARY_CLASS}
-            >
-              Start Free
-            </motion.a>
+            {/* "Start Free" goes to the portal, so it becomes an inert state
+                while the portal is closed (APP_LIVE). The secondary button
+                keeps the fold actionable — it leads to the product sections,
+                which is where a visitor can still do something today. */}
+            {APP_LIVE ? (
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href={APP_URL}
+                className={HERO_CTA_PRIMARY_CLASS}
+              >
+                Start Free
+              </motion.a>
+            ) : (
+              <span aria-disabled="true" className={HERO_CTA_DISABLED_CLASS}>
+                Coming soon
+              </span>
+            )}
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

@@ -1,5 +1,5 @@
 import { CtaBand } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import { appCta } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 // Closing band — the page's terminal CTA, in the same shared CtaBand /toolkit
@@ -16,7 +16,7 @@ export const ChatKitClosing = () => (
   <CtaBand
     title="Try it on your own content"
     body={`${FREE_TRIAL_MESSAGES} free messages, no card and nothing to cancel — enough to write the knowledge base, style the widget, embed it on your site and watch real answers come back before you spend anything.`}
-    primary={{ href: `${APP_URL}/chatkit`, label: "Create your chatbot free" }}
+    primary={appCta("/chatkit", "Create your chatbot free")}
     secondary={{ href: "#pricing", label: "See what it costs" }}
   />
 );

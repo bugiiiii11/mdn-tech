@@ -43,3 +43,8 @@ export const HERO_CTA_SIZE_CLASS =
 export const HERO_CTA_PRIMARY_CLASS = `${HERO_CTA_SIZE_CLASS} button-primary text-center text-white cursor-pointer rounded-lg font-semibold`;
 
 export const HERO_CTA_SECONDARY_CLASS = `${HERO_CTA_SIZE_CLASS} text-center text-white cursor-pointer rounded-lg font-semibold border border-[#7042f88b] bg-[#7042f815] hover:bg-[#7042f825] transition-colors`;
+
+// A hero CTA whose destination is closed (the portal, while APP_LIVE is false).
+// Same footprint as the primary so the fold does not reflow when the flag
+// flips, but drained of every affordance: no gradient, no cursor, no hover.
+export const HERO_CTA_DISABLED_CLASS = `${HERO_CTA_SIZE_CLASS} text-center rounded-lg font-semibold border border-white/[0.12] bg-white/[0.04] text-gray-400 cursor-not-allowed`;

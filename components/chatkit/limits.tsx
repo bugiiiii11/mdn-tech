@@ -10,7 +10,7 @@ import {
   FADE_UP,
   fadeUp,
 } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import { appCta } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 // "Honest limits: what ChatKit does not do" — the page's structural moat.
@@ -141,9 +141,7 @@ export const Limits = () => (
       </p>
       {/* Shared CtaButton; the short label stays on one line at 360px, and
           the sentence above already carries the trial size. */}
-      <CtaButton
-        cta={{ href: `${APP_URL}/chatkit`, label: "Create your chatbot free" }}
-      />
+      <CtaButton cta={appCta("/chatkit", "Create your chatbot free")} />
     </motion.div>
   </Section>
 );

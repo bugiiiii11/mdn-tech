@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 
+import { APP_LIVE, isAppHref } from "@/lib/marketing/products";
 import type { MarketingProduct, ProductStatus } from "@/lib/marketing/products";
 
 // Inline stroke icons keyed by MarketingProduct.icon — same pattern as the
@@ -90,6 +91,10 @@ interface ProductCardProps {
 export const ProductCard = ({ product, status, index }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const isLive = status === "live";
+  // A live product can still be unreachable: its CTA points at the portal and
+  // the portal is closed (APP_LIVE). The card keeps its copy — the product is
+  // real and described honestly — but the CTA states that, instead of linking.
+  const portalClosed = !APP_LIVE && isAppHref(product.href);
 
   return (
     <motion.div
@@ -227,7 +232,16 @@ export const ProductCard = ({ product, status, index }: ProductCardProps) => {
         {/* Live products link into the app. Unreleased ones get no CTA at all
             — nothing to click through to yet; the coming-soon section explains
             them and the footer newsletter captures interest. */}
-        {isLive && (
+        {isLive && portalClosed && (
+          <span
+            aria-disabled="true"
+            className="mt-5 inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"
+          >
+            Coming soon
+          </span>
+        )}
+
+        {isLive && !portalClosed && (
           <a
             href={product.href}
             className="mt-5 inline-flex items-center gap-2 text-cyan-400 text-sm font-semibold group-hover:gap-3 transition-all duration-300"

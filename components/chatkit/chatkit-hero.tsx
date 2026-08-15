@@ -1,5 +1,5 @@
 import { PageHero } from "@/components/product-pages/primitives";
-import { APP_URL } from "@/lib/marketing/products";
+import { appCta } from "@/lib/marketing/products";
 
 // /chatkit hero — the page's ONLY h1 (PageHero renders it), in the same
 // full-viewport shell as the homepage: blackhole overhead, heading, lede, two
@@ -23,12 +23,10 @@ export const ChatKitHero = () => (
   <PageHero
     title="An AI Chatbot for Your Website That Answers Only From Your Content"
     subtitle="Write your knowledge base, pick a colour, paste one script tag. ChatKit answers your visitors from what you wrote — in their language — and says the fallback line you chose when the answer is not there."
-    primaryCta={{
-      href: `${APP_URL}/chatkit`,
-      // Short enough to stay on one line inside the pill at 360px — the
-      // pricing section carries the trial size.
-      label: "Create your chatbot free",
-    }}
+    // Short enough to stay on one line inside the pill at 360px — the pricing
+    // section carries the trial size. Falls back to an inert "Coming soon"
+    // while the portal is closed (appCta / APP_LIVE).
+    primaryCta={appCta("/chatkit", "Create your chatbot free")}
     secondaryCta={{ href: "#pricing", label: "See what it costs" }}
   />
 );

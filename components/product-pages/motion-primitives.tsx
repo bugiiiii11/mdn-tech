@@ -43,6 +43,12 @@ export type CtaLink = {
   href: string;
   label: string;
   external?: boolean;
+  /**
+   * Renders an inert control instead of a link — no href, no hover gesture, no
+   * keyboard focus. Produced by appCta() in lib/marketing/products.ts while the
+   * customer portal is closed (APP_LIVE=false); never set it by hand.
+   */
+  disabled?: boolean;
 };
 
 const PRIMARY_CTA_CLASS =
@@ -50,6 +56,12 @@ const PRIMARY_CTA_CLASS =
 
 const SECONDARY_CTA_CLASS =
   "text-center text-white cursor-pointer rounded-lg font-semibold border border-[#7042f88b] bg-[#7042f815] hover:bg-[#7042f825] transition-colors";
+
+// Reads as a state, not an invitation: no gradient, no cyan, no cursor change.
+// Shares HERO_CTA_DISABLED_CLASS's palette so the hero and in-page versions of
+// a closed CTA look like the same thing.
+const DISABLED_CTA_CLASS =
+  "text-center rounded-lg font-semibold border border-white/[0.12] bg-white/[0.04] text-gray-400 cursor-not-allowed";
 
 // In-page buttons hold the default size; the hero runs one step larger, from
 // the same constant the / and /sk heroes use.
@@ -73,22 +85,33 @@ export const CtaButton = ({
   variant?: "primary" | "secondary";
   size?: "md" | "lg";
   className?: string;
-}) => (
-  <motion.a
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    href={cta.href}
-    target={cta.external ? "_blank" : undefined}
-    rel={cta.external ? "noopener noreferrer" : undefined}
-    className={cn(
-      CTA_SIZE_CLASS[size],
-      variant === "primary" ? PRIMARY_CTA_CLASS : SECONDARY_CTA_CLASS,
-      className
-    )}
-  >
-    {cta.label}
-  </motion.a>
-);
+}) =>
+  cta.disabled ? (
+    // A <span>, not a disabled <button>: there is no action to perform, so it
+    // stays out of the tab order entirely rather than sitting in it as a dead
+    // stop. aria-disabled still names the state for anyone who lands on it.
+    <span
+      aria-disabled="true"
+      className={cn(CTA_SIZE_CLASS[size], DISABLED_CTA_CLASS, className)}
+    >
+      {cta.label}
+    </span>
+  ) : (
+    <motion.a
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      href={cta.href}
+      target={cta.external ? "_blank" : undefined}
+      rel={cta.external ? "noopener noreferrer" : undefined}
+      className={cn(
+        CTA_SIZE_CLASS[size],
+        variant === "primary" ? PRIMARY_CTA_CLASS : SECONDARY_CTA_CLASS,
+        className
+      )}
+    >
+      {cta.label}
+    </motion.a>
+  );
 
 type PageHeroProps = {
   /** Anchor id, so the footer/nav can link back to the top of the page. */

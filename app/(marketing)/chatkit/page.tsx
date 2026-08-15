@@ -16,7 +16,7 @@ import {
   organizationRef,
   websiteRef,
 } from "@/components/product-pages/schema";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 
 // /chatkit — the ChatKit product page. Targets the "AI chatbot for website"
@@ -132,7 +132,12 @@ const softwareSchema = {
   operatingSystem: "Web browser",
   url: PAGE_URL,
   description: META_DESCRIPTION,
-  installUrl: `${APP_URL}/chatkit`,
+  // installUrl points at the portal. While the portal is closed (APP_LIVE) the
+  // node omits it rather than handing a crawler — or a visitor following a rich
+  // result — the one address this site is deliberately not linking. The Offer's
+  // availability drops with it below, for the same reason: "InStock" is a
+  // machine-readable claim that you can start today, and you cannot.
+  ...(APP_LIVE ? { installUrl: `${APP_URL}/chatkit` } : {}),
   author: organizationRef(),
   publisher: organizationRef(),
   featureList: [
@@ -150,7 +155,7 @@ const softwareSchema = {
     price: "0",
     priceCurrency: "USD",
     description: `${FREE_TRIAL_MESSAGES} free messages per chatbot, no credit card required`,
-    availability: "https://schema.org/InStock",
+    ...(APP_LIVE ? { availability: "https://schema.org/InStock" } : {}),
   },
 };
 

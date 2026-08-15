@@ -4,6 +4,7 @@ import {
   WEBSITE_ID,
 } from "@/components/product-pages/schema";
 import { siteConfig } from "@/config";
+import { APP_LIVE } from "@/lib/marketing/products";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -72,8 +73,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://app.mdntech.org" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://app.mdntech.org" />
+        {/* Warms the cross-host hop to the portal — pointless while nothing on
+            the site links there (APP_LIVE), so it goes with the links. */}
+        {APP_LIVE && (
+          <>
+            <link rel="preconnect" href="https://app.mdntech.org" crossOrigin="anonymous" />
+            <link rel="dns-prefetch" href="https://app.mdntech.org" />
+          </>
+        )}
         <link rel="preconnect" href="https://mdntech.org" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://mdntech.org" />
         <script

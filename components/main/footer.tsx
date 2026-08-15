@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { RxTwitterLogo, RxLinkedinLogo, RxInstagramLogo, RxGithubLogo } from "react-icons/rx";
 
-import { APP_URL, getLandingMode, visibleProducts } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL, getLandingMode, isAppHref, visibleProducts } from "@/lib/marketing/products";
 import type { MarketingProduct } from "@/lib/marketing/products";
 import { NewsletterForm } from "@/components/main/newsletter-form";
 import { BlackholeVideo } from "@/components/main/blackhole-video";
@@ -14,7 +14,8 @@ import { TOOLKIT_REPO } from "@/lib/marketing/links";
 // Products with an indexable marketing deep-dive get the internal route in
 // the footer instead of product.href (the app host is noindex, so sending
 // every sitewide footer link there wastes the strongest internal-link slot).
-// The Connect column keeps "Open the App" for people who want the portal.
+// The Connect column carries "Open the App" for people who want the portal —
+// but only while APP_LIVE says the portal is open to the public.
 const MARKETING_ROUTES: Partial<Record<MarketingProduct["id"], string>> = {
   chatkit: "/chatkit",
   toolkit: "/toolkit",
@@ -182,7 +183,14 @@ export const Footer = () => {
               <h4 className={headingClass}>Products</h4>
               <nav className="flex flex-col gap-2.5">
                 {products.map((product) => {
-                  if (product.status[mode] !== "live") {
+                  const marketingHref = MARKETING_ROUTES[product.id];
+                  // A live product whose ONLY destination is the portal reads
+                  // as "Soon" while the portal is closed (APP_LIVE). ChatKit
+                  // and ToolKit are unaffected — they have marketing routes,
+                  // and those pages stay live and indexable.
+                  const portalOnly =
+                    !marketingHref && !APP_LIVE && isAppHref(product.href);
+                  if (product.status[mode] !== "live" || portalOnly) {
                     return (
                       <Link
                         key={product.id}
@@ -194,7 +202,6 @@ export const Footer = () => {
                       </Link>
                     );
                   }
-                  const marketingHref = MARKETING_ROUTES[product.id];
                   return marketingHref ? (
                     <Link key={product.id} href={marketingHref} className={linkClass}>
                       {product.name}
@@ -252,9 +259,11 @@ export const Footer = () => {
             <div>
               <h4 className={headingClass}>Connect</h4>
               <div className="flex flex-col gap-2.5">
-                <a href={APP_URL} className={linkClass}>
-                  Open the App
-                </a>
+                {APP_LIVE && (
+                  <a href={APP_URL} className={linkClass}>
+                    Open the App
+                  </a>
+                )}
                 <a href="mailto:contact@mdntech.org" className={linkClass}>
                   contact@mdntech.org
                 </a>

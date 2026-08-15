@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { NAV_LINKS, SOCIALS } from "@/constants";
 import { SK_NAV_LINKS } from "@/constants/sk";
-import { APP_URL } from "@/lib/marketing/products";
+import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,8 +57,13 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Open App CTA (EN only — /sk chrome stays untouched) */}
-        {!isSk && (
+        {/*
+          Open App CTA (EN only — /sk chrome stays untouched). Dropped entirely
+          rather than disabled while the portal is closed (APP_LIVE): the site
+          chrome is the wrong place for a dead button, and the centred pill is
+          absolutely positioned, so removing this leaves the nav balanced.
+        */}
+        {!isSk && APP_LIVE && (
           <a
             href={APP_URL}
             className="hidden md:block py-2 px-5 button-primary text-center text-white cursor-pointer rounded-lg text-sm font-semibold flex-shrink-0"
@@ -126,8 +131,8 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Open App CTA (EN only) */}
-            {!isSk && (
+            {/* Open App CTA (EN only, portal open only — see the desktop one) */}
+            {!isSk && APP_LIVE && (
               <a
                 href={APP_URL}
                 className="block w-full py-3 px-4 mb-6 button-primary text-center text-white cursor-pointer rounded-lg font-semibold"
