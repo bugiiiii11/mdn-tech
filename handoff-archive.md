@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 58) -- Hero rebuild on one full-viewport shell (rotated 2026-08-15)
+
+- **`components/main/hero-shell.ts` is now THE hero contract** (section shell, blackhole framing, content wrapper, CTA sizing) and all four heroes compose it: `/`, `/sk`, and `/chatkit` + `/toolkit` via `PageHero`. Every hero is `min-h-[100svh]`, so no next section peeks above the fold at any size.
+- **Root cause of the mobile blackhole bug:** the video was sized `h-full` off the hero container, so any height change rescaled and re-anchored the ring. It is now sized by explicit height + the asset's true 16:9 aspect, independent of hero height. Desktop geometry is byte-identical to before (810px box at -340px = the approved 1440px ring); md/base tiers are new.
+- **TAILWIND GOTCHA (cost a full debug cycle):** `tailwind.config.ts` scans `./app`, `./components`, `./pages` ONLY. A class string placed in `lib/` generates no CSS and fails SILENTLY -- markup ships with classes matching nothing, hero renders unstyled at content height. That is why hero-shell.ts lives under `components/`, same reason as `PROSE_LINK_CLASS`. Do not move it.
+- Hero content is top-padded past the ring's glow on phones then centred in the space that remains (`items-center` + `pt-[195px]`); md+ centres against the viewport. Verified no headline-in-glow at 320/360/375/390.
+- Product-page heroes stripped to heading + lede + 2 buttons per user direction: eyebrow pills, visible breadcrumbs, reassurance notes and the 4 proof chips all removed. **The BreadcrumbList JSON-LD went with the visible trail** on both pages (`breadcrumbListSchema()` deleted from `schema.ts`, `Crumb` type gone) -- this site only emits breadcrumb schema for a trail a visitor can see. Trade-off flagged to user: no breadcrumb rich result in SERPs for /chatkit + /toolkit.
+- Two navbar defects fixed (both pre-existing): the centred 500px pill reached under the "M.D.N Tech" logo at 768-1023px -- it now sizes to content at md (text-sm, gap-4) and keeps the exact 500px/justify-between layout at lg; nav links got `whitespace-nowrap` because /sk's "Prečo my" wrapped and deformed the pill.
+- `CtaButton` gained `size="md"|"lg"`; hero CTAs run one step larger, held back until `sm:` so a long Slovak label still fits at 320px. /sk hero also swapped its raw `<video>` for `BlackholeVideo` (gains reduced-motion pause + poster + `preload="none"`).
+- Gate green (tsc/lint/build; all four routes still static). Verified in BUILT HTML: zero `BreadcrumbList`, zero `Welcome-box`, zero breadcrumb `<nav>`, exactly one h1 per product page, other schema nodes intact. Screenshot-verified on 4 pages x 9 viewports (320 -> 2560).
+
 ## What Was Done (Session 57) -- Task 0 visual QA + 0a /about + blog honesty polish (rotated 2026-08-14)
 
 - **Task 0 QA PASSED (Playwright on prod build):** /chatkit widget-anatomy sticky pins at exactly 112px through 677px of travel; 320/375px overflow clean on / + /chatkit + /toolkit + /about + /sk. QA gotcha: under `overflow-x: clip`, docScrollWidth/canScrollX are tautologically clean -- must measure per-element rects vs viewport and classify the absorbing ancestor (auto/scroll = reachable = fine; hidden/clip = silently cut off = defect). Framer slide-ins give phantom hits; measure settled, on-screen elements only.
