@@ -216,7 +216,12 @@ const payload = {
   allowed_domains: ALLOWED_DOMAINS,
   widget_config: {
     greeting: "Dobrý deň! Spýtajte sa ma na weby, CRM, chatboty alebo ceny.",
+    // Event Horizon branding (DESIGN.md): Nebula Violet -> Ion Cyan gradient
+    // on the bubble, white logo mark inside it.
     primary_color: "#7042f8",
+    secondary_color: "#06b6d4",
+    launcher_icon: "https://www.mdntech.org/logo.png",
+    input_placeholder: "Napíšte správu...",
     system_prompt: systemPrompt,
     fallback_message: `Toto zatiaľ neviem zodpovedať. Napíšte nám na ${SK_NAP.email} a ozveme sa.`,
   },

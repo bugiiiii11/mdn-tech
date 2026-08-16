@@ -62,11 +62,36 @@ export async function GET(
     disabled = !allowed
   }
 
+  // Optional branding, validated here because the widget concatenates these
+  // into CSS / an img src: colours must be hex literals, the icon an https
+  // URL. Anything else is dropped, never passed through.
+  const primaryColor =
+    typeof config.primary_color === 'string' &&
+    /^#[0-9a-fA-F]{3,8}$/.test(config.primary_color)
+      ? config.primary_color
+      : '#7c3aed'
+  const secondaryColor =
+    typeof config.secondary_color === 'string' &&
+    /^#[0-9a-fA-F]{3,8}$/.test(config.secondary_color)
+      ? config.secondary_color
+      : undefined
+  const launcherIcon =
+    typeof config.launcher_icon === 'string' &&
+    /^https:\/\/[^\s"'<>]+$/.test(config.launcher_icon)
+      ? config.launcher_icon
+      : undefined
+
   return NextResponse.json({
     name: chatbot.name,
     clientName: chatbot.client_name,
     greeting: config.greeting || `Hi! I'm ${chatbot.name}. How can I help you?`,
-    primaryColor: config.primary_color || '#7c3aed',
+    inputPlaceholder:
+      typeof config.input_placeholder === 'string' && config.input_placeholder
+        ? config.input_placeholder
+        : undefined,
+    primaryColor,
+    secondaryColor,
+    launcherIcon,
     position: config.position || 'bottom-right',
     disabled,
   }, { headers: cors })

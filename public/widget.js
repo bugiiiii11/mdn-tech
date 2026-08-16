@@ -62,10 +62,12 @@
     .mdn-bubble:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,0,0,0.4); }\
     .mdn-bubble.hidden { transform: scale(0); opacity: 0; pointer-events: none; }\
     .mdn-bubble svg { width: 26px; height: 26px; fill: white; }\
+    .mdn-bubble img { width: 64%; height: 64%; object-fit: contain; pointer-events: none; }\
     .mdn-panel { position: fixed; bottom: 88px; right: 20px; width: 380px; max-height: 520px; border-radius: 16px; background: #0d0d20; box-shadow: 0 8px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; z-index: 2147483647; transform: translateY(16px) scale(0.95); opacity: 0; pointer-events: none; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease; }\
     .mdn-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }\
     .mdn-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; }\
     .mdn-header-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; animation: mdnPulse 2s infinite; }\
+    .mdn-header-icon { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }\
     @keyframes mdnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }\
     .mdn-header-name { color: #fff; font-weight: 600; font-size: 14px; flex: 1; }\
     .mdn-header-tag { font-size: 10px; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 10px; }\
@@ -110,6 +112,12 @@
     CONFIG = config;
     var color = config.primaryColor || '#7c3aed';
     var borderColor = color;
+    // Optional premium branding, both per-bot config: a two-colour gradient
+    // for the bubble + send button, and a logo image inside the bubble.
+    // Absent -> the flat colour and generic chat glyph every bot ships with.
+    var fill = config.secondaryColor
+      ? 'linear-gradient(135deg, ' + color + ' 0%, ' + config.secondaryColor + ' 100%)'
+      : color;
 
     var container = document.createElement('div');
     container.id = 'mdn-chat-widget';
@@ -129,8 +137,20 @@
     // Bubble
     var bubble = document.createElement('button');
     bubble.className = 'mdn-bubble';
-    bubble.style.background = color;
-    bubble.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>';
+    bubble.style.background = fill;
+    var BUBBLE_SVG = '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg>';
+    bubble.innerHTML = BUBBLE_SVG;
+    if (config.launcherIcon) {
+      // Element + src property, never string-concatenated into innerHTML:
+      // the URL comes from per-bot config and must not be able to inject
+      // markup into the host page's shadow tree.
+      var bubbleIcon = document.createElement('img');
+      bubbleIcon.src = config.launcherIcon;
+      bubbleIcon.alt = '';
+      bubbleIcon.onerror = function () { bubble.innerHTML = BUBBLE_SVG; };
+      bubble.textContent = '';
+      bubble.appendChild(bubbleIcon);
+    }
     shadow.appendChild(bubble);
 
     // Panel
@@ -145,8 +165,8 @@
       </div>\
       <div class="mdn-messages"></div>\
       <div class="mdn-input-row">\
-        <input class="mdn-input" placeholder="Type a message..." autocomplete="off" />\
-        <button class="mdn-send" style="background:' + color + '">\
+        <input class="mdn-input" autocomplete="off" />\
+        <button class="mdn-send" style="background:' + fill + '">\
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>\
         </button>\
       </div>\
@@ -154,8 +174,24 @@
     ';
     shadow.appendChild(panel);
 
+    // With a logo configured, the header shows it in place of the pulse dot
+    // so bubble and panel read as one brand mark.
+    if (config.launcherIcon) {
+      var headerIcon = document.createElement('img');
+      headerIcon.className = 'mdn-header-icon';
+      headerIcon.src = config.launcherIcon;
+      headerIcon.alt = '';
+      var headerDot = panel.querySelector('.mdn-header-dot');
+      headerIcon.onerror = function () { headerIcon.replaceWith(headerDot); };
+      headerDot.replaceWith(headerIcon);
+    }
+
     var messagesEl = panel.querySelector('.mdn-messages');
     var input = panel.querySelector('.mdn-input');
+    // Property assignment, not attribute concatenation: config strings must
+    // never be spliced into the innerHTML template (esc() covers element
+    // text, not attribute contexts).
+    input.placeholder = config.inputPlaceholder || 'Type a message...';
     var sendBtn = panel.querySelector('.mdn-send');
     var closeBtn = panel.querySelector('.mdn-header-close');
 

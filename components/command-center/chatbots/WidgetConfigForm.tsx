@@ -7,10 +7,19 @@ import { normalizeDomain } from '@/lib/chat/cors'
 
 const inp = 'w-full bg-[#0a0a1a] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50 transition-colors'
 
+// handleSave writes widget_config WHOLESALE — every field the widget can
+// consume must exist here and in the form state, or saving this form
+// silently erases it from the bot.
 type WidgetConfig = {
   greeting?: string
   system_prompt?: string
   primary_color?: string
+  /** Optional second gradient stop for the bubble + send button. Empty = flat. */
+  secondary_color?: string
+  /** Optional https image URL shown inside the launcher bubble + header. */
+  launcher_icon?: string
+  /** Input placeholder text, for non-English bots. Empty = "Type a message..." */
+  input_placeholder?: string
   fallback_message?: string
 }
 
@@ -43,6 +52,9 @@ export function WidgetConfigForm({
     greeting: config.greeting ?? '',
     system_prompt: config.system_prompt ?? '',
     primary_color: config.primary_color ?? '#7c3aed',
+    secondary_color: config.secondary_color ?? '',
+    launcher_icon: config.launcher_icon ?? '',
+    input_placeholder: config.input_placeholder ?? '',
     fallback_message: config.fallback_message ?? '',
   })
   const [domains, setDomains] = useState(allowedDomains.join('\n'))
@@ -121,6 +133,38 @@ export function WidgetConfigForm({
           </div>
         </div>
         <div>
+          <label className="text-xs text-gray-400 block mb-1">Secondary color (gradient)</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={form.secondary_color || '#06b6d4'}
+              onChange={e => setForm({ ...form, secondary_color: e.target.value })}
+              className="w-8 h-8 rounded cursor-pointer border border-white/10 bg-transparent"
+            />
+            <input
+              className={inp}
+              placeholder="Empty = flat color"
+              value={form.secondary_color}
+              onChange={e => setForm({ ...form, secondary_color: e.target.value })}
+              maxLength={7}
+            />
+          </div>
+          <p className="text-[10px] text-gray-600 mt-1">Bubble + send button become a primary-to-secondary gradient. Clear to keep a flat color.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs text-gray-400 block mb-1">Launcher icon URL</label>
+          <input
+            className={inp}
+            placeholder="https://yoursite.com/logo.png"
+            value={form.launcher_icon}
+            onChange={e => setForm({ ...form, launcher_icon: e.target.value })}
+          />
+          <p className="text-[10px] text-gray-600 mt-1">Shown inside the chat bubble and panel header instead of the generic icon. Transparent PNG/SVG, https only.</p>
+        </div>
+        <div>
           <label className="text-xs text-gray-400 block mb-1">Fallback message</label>
           <input
             className={inp}
@@ -129,6 +173,17 @@ export function WidgetConfigForm({
             onChange={e => setForm({ ...form, fallback_message: e.target.value })}
           />
         </div>
+      </div>
+
+      <div>
+        <label className="text-xs text-gray-400 block mb-1">Input placeholder</label>
+        <input
+          className={inp}
+          placeholder="Type a message..."
+          value={form.input_placeholder}
+          onChange={e => setForm({ ...form, input_placeholder: e.target.value })}
+        />
+        <p className="text-[10px] text-gray-600 mt-1">Text shown in the empty message box — set it for non-English bots.</p>
       </div>
 
       <div>

@@ -141,6 +141,7 @@ Technical: own metadata (title "Prípadová štúdia: Royal Stroje — web, CRM 
 | C4 | LinkedIn URLs: claim `/company/mdntech` custom URL, then verify `sameAs` constant matches reality; add Martin's personal LinkedIn to SkAbout | see LinkedIn guide in Mind Palace |
 | C5 | `mdntech.sk` domain: purchase + 301 → mdntech.org/sk | closes old task 0c; DNS/redirect outside repo, note only |
 | C6 | Run `/seo-audit` on mdntech.org after deploy | fix-list becomes follow-up tasks |
+| C7 | Roll out redrawn logo from `public/brand/` (see its README) | replace navbar/footer mark (mono, currentColor), regenerate favicons + apple-icon from `mdn-mark-simple.svg`, OG images from `mdn-mark.svg`; applies site-wide (EN + /sk) |
 
 ## Acceptance criteria
 
