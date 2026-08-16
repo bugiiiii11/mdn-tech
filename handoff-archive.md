@@ -1,5 +1,13 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 62) -- ChatKit privacy disclosure (task 0c) (rotated 2026-08-16)
+
+- **`/privacy` gained Section 3 "ChatKit Chat Widget"** (`app/(marketing)/privacy/page.tsx`), the last blocker on 0d besides Phase 2. Discloses what `message/route.ts` actually writes: full transcripts, the localStorage visitor ID, `visitor_ip`, `source_url`, and optional feedback ratings -- none of which the policy had mentioned.
+- **The controller/processor split is the substantive call (3.4):** on a CUSTOMER's site the customer is data controller and we are processor, so visitor rights requests go to the site they chatted on and we assist. On our own site we are controller. This is what makes the widget sellable to EU SMEs -- do not water it down without thinking it through.
+- **Retention = "life of the service" (user decision, deliberate).** A fixed rolling window (12/24mo) was offered and REJECTED: it would have committed us to a cleanup cron that does not exist. Nothing auto-deletes today and the policy now matches that truthfully.
+- Also states Anthropic does not train on the data, that site owners can read/export their own bot's conversations, that auto-learning reviews transcripts + ratings, and that IP rate-limit counters expire within 24h. Railway is GONE from the policy (hosts nothing); Anthropic + Resend added as sub-processors. Sections renumbered 1-15.
+- **NOT legal-reviewed.** Drafted by Claude from the code, not by counsel. Worth a pass from Martin or Filip before the portal opens. Policy still says "Google Analytics (when implemented)" -- true today, revisit in MarketKit B1.
+
 ## What Was Done (Session 61) -- /sk realizacie refresh + SK footer on the EN shell (rotated 2026-08-16)
 
 - **Realizacie is now four projects**, user-ordered: Royal Stroje, Royal Works, Good Hair by Zane, Kurenie Turiec (`SK_PORTFOLIO` order IS the render order -- reorder there, nowhere else). `royalworks.sk` is new; Royal Stroje's third tag is now "CRM" (was "Command Center" -- read as our internal product, not the client's).
@@ -193,6 +201,7 @@
 | 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
 | 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 | 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
+| 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

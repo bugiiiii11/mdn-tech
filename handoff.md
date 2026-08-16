@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). Website rebuild LIVE on prod (S60). **Task 0a /sk rework BUILT (S63): SK-A + SK-B complete on `feat/sk-rework`, UNMERGED + UNPUSHED -- user decides preview vs merge.** Portal still gated behind `APP_LIVE`. Next: /sk merge decision + SK-C leftovers, SEO re-audit, Phase 2 credit bank.
-- **Session count:** 63
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **Website rebuild + /sk rework LIVE on prod (S64): SK-A/SK-B merged, C2 chatbot LIVE on /sk with branded widget, C3 attribution shipped.** Portal still gated behind `APP_LIVE`. Next: SEO re-audit (0a2, now unblocked), SK-C leftovers (C4 LinkedIn slug, C5 mdntech.sk, C7 logo rollout), Phase 2 credit bank.
+- **Session count:** 64
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
 | 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
 | 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
@@ -22,14 +21,17 @@
 | 61 | 2026-08-15 | /sk realizacie refresh (4 projects, fresh captures) + SK footer on the EN shell |
 | 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 | 63 | 2026-08-16 | /sk rework built: CRM flagship + Kto sme + FAQ + Royal Stroje case study (feat/sk-rework, unmerged) |
+| 64 | 2026-08-16 | /sk rework merged + LIVE; C3 UTM attribution; C2 SK chatbot live with branded widget |
 
-## What Was Done (Session 62) -- ChatKit privacy disclosure (task 0c)
+## What Was Done (Session 64) -- /sk live on prod: merge, C3 attribution, C2 branded chatbot
 
-- **`/privacy` gained Section 3 "ChatKit Chat Widget"** (`app/(marketing)/privacy/page.tsx`), the last blocker on 0d besides Phase 2. Discloses what `message/route.ts` actually writes: full transcripts, the localStorage visitor ID, `visitor_ip`, `source_url`, and optional feedback ratings -- none of which the policy had mentioned.
-- **The controller/processor split is the substantive call (3.4):** on a CUSTOMER's site the customer is data controller and we are processor, so visitor rights requests go to the site they chatted on and we assist. On our own site we are controller. This is what makes the widget sellable to EU SMEs -- do not water it down without thinking it through.
-- **Retention = "life of the service" (user decision, deliberate).** A fixed rolling window (12/24mo) was offered and REJECTED: it would have committed us to a cleanup cron that does not exist. Nothing auto-deletes today and the policy now matches that truthfully.
-- Also states Anthropic does not train on the data, that site owners can read/export their own bot's conversations, that auto-learning reviews transcripts + ratings, and that IP rate-limit counters expire within 24h. Railway is GONE from the policy (hosts nothing); Anthropic + Resend added as sub-processors. Sections renumbered 1-15.
-- **NOT legal-reviewed.** Drafted by Claude from the code, not by counsel. Worth a pass from Martin or Filip before the portal opens. Policy still says "Google Analytics (when implemented)" -- true today, revisit in MarketKit B1.
+- **/sk rework merged to main and LIVE** (ff-merge, then `12e3942` + `19628de` pushed). Merge-to-main was the user's explicit call over a preview branch, with FAQ #4/#5 still awaiting Filip -- campaign send stays gated, the deploy does not.
+- **C3 attribution is FIRST-TOUCH via sessionStorage** (`lib/marketing/attribution.ts`): the capture is mounted in the MARKETING LAYOUT, not the forms -- the campaign lands on the case-study page which has no form, and a form-level capture recorded those visitors as "direct" (caught by probe). sessionStorage deliberately: not a cookie, so /privacy stays truthful. **GAP: EmailJS template must gain a `{{attribution}}` line or the data never reaches the inbox** -- Martin task.
+- **C2 chatbot LIVE on /sk + case study** (bot `46ef0a99`, owner-less BY DESIGN: owner-less = internal = metered by `INTERNAL_BOT_DAILY_RULE` instead of customer credits; `allowed_domains` is then the only theft guard -- never leave it empty). `NEXT_PUBLIC_SK_CHATBOT_ID` set via Vercel API (production+preview); widget renders nothing without it.
+- **KB anti-drift contract:** `scripts/seed-sk-chatbot.mjs` REBUILDS the whole KB from `constants/sk.ts` -- Command Center KB edits are wiped by a re-run. Lasting copy changes go in constants + re-seed; `--dry` prints without writing.
+- **Widget branding is per-bot config, sellable to customers:** `launcher_icon` (https img in bubble + header), `secondary_color` (gradient), `input_placeholder` (non-EN bots). Config route validates all three (hex/https) because the widget splices them into CSS/img src; `primary_color` was passed through RAW before -- now validated too. Placeholder set as DOM property, never concatenated (esc() covers element text, not attributes).
+- **`WidgetConfigForm` saves `widget_config` WHOLESALE** -- any new widget field must be added to the form state or saving the form silently erases it. Rule now documented in the form.
+- User dropped redrawn logo vectors in `public/brand/` (see its README) + added plan task C7: roll out sitewide. Widget keeps white `logo.png` -- the new gradient mark would vanish on the purple bubble; C7 needs a white variant for the widget.
 
 ## What Was Done (Session 63) -- /sk rework: CRM flagship + trust + Royal Stroje case study
 
@@ -43,6 +45,7 @@
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
+0. **EmailJS template: add attribution (5 min, blocks C3 payoff):** emailjs.com -> the contact template -> add a line `Zdroj: {{attribution}}` (optionally also `{{form_id}}`, `{{landing_page}}`). Until then the forms SEND the UTM data but the inbox never shows it. Also: review the SK chatbot's answers at admin.mdntech.org/chatbots/46ef0a99... -- it is LIVE on /sk now; KB edits that should persist belong in `constants/sk.ts` + re-run `scripts/seed-sk-chatbot.mjs` (Command Center edits are wiped by a re-seed).
 1. **Stripe UAE activation (CRITICAL PATH, start this week):** dashboard.stripe.com -> create account for the FZE: trade license 7813, Emirates ID + residence visa, Wio account details. Verification takes 1-2 weeks and gates Phase 2 payments.
 2. **Supabase auth email templates (10 min):** project `ijfgwzacaabzeknlpaff` -> Authentication -> Emails: copy each file from `supabase/email-templates/` (5 files) into the matching template Source, Save. Then URL Configuration: Site URL `https://app.mdntech.org`; Redirect URLs `https://app.mdntech.org/auth/callback` + `http://localhost:3000/auth/callback`.
 3. **ChatKit cron secret + Resend key (5 min):** random 32+ char string -> Vercel env `CHATKIT_CRON_SECRET` (Production) + redeploy; confirm `RESEND_API_KEY` listed. Supabase SQL: `select vault.create_secret('<value>', 'chatkit_cron_secret');`
@@ -60,8 +63,8 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0a | **/sk rework: merge/push decision + SK-C leftovers** | SK-A+SK-B BUILT on `feat/sk-rework` (`7eab7b4`), unpushed -- push for a Vercel preview or merge to main (user call). Then SK-C: C2 ChatKit widget on /sk (do not block on it), C3 UTM->lead payload, C5 mdntech.sk purchase + 301, C6 /seo-audit after deploy. Campaign gate: live + founder/Filip inputs resolved BEFORE the ~150 partner emails (early September). |
-| 0a2 | SEO re-audit (after /sk deploys) | `seo-audit/` is STALE (predates the rebuild). Clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills". Confirm S58 breadcrumb-schema removal is acceptable (case study now HAS a visible trail + schema -- the pattern to copy), re-check S60 `installUrl`/`availability` omissions. Queue `/blog/[slug]` redesign. |
+| 0a | **SK-C leftovers** | C2+C3 DONE and live (S64). Remaining: C4 LinkedIn vanity slug (Martin), C5 mdntech.sk purchase + 301, C6 /seo-audit (= 0a2), C7 redrawn-logo rollout from `public/brand/` (see its README; widget needs a white variant). Campaign gate: founder/Filip inputs resolved BEFORE the ~150 partner emails (early September). |
+| 0a2 | SEO re-audit (UNBLOCKED -- /sk is live) | `seo-audit/` is STALE (predates the rebuild). Clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills". Confirm S58 breadcrumb-schema removal is acceptable (case study now HAS a visible trail + schema -- the pattern to copy), re-check S60 `installUrl`/`availability` omissions. Queue `/blog/[slug]` redesign. |
 | 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. 0c DONE (S62); remaining gate is Phase 2 checkout + human legal read of /privacy. Verify built HTML has app links back, no "Coming soon" survives. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250); 3 mock-checkout routes (`app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/`) collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" on Scale; 2.7 policy build (12-mo expiry, refund window, chargeback clawback, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Ledger: SELECT-only to `authenticated`, writes service-role; read migration 020 first. |
 | 3 | Phase 3.5 E2E + CI | Port S51+S52 probe scripts into a committed suite; GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
@@ -81,9 +84,9 @@
 | `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) |
 | `PRODUCT.md` / `DESIGN.md` | Brand register + "Event Horizon" visual system. Read BOTH before any design or copy work |
 | `lib/marketing/products.ts` | THE portal gate: `APP_LIVE` (default CLOSED), `appCta()`, `isAppHref()` -- grep APP_LIVE before adding any link to app.mdntech.org |
-| `components/product-pages/` | Shared shells: primitives barrel, `faq.tsx` (FaqSection + faqPageSchema + NEW `bullets` -- ALL FAQ surfaces incl. /sk use it), `schema.ts` (@id refs + breadcrumb honesty rule) |
-| `constants/sk.ts` | ALL /sk copy + data (now incl. SK_CRM, SK_ABOUT, SK_FAQ). `SK_PORTFOLIO` order = render order; `SK_NAP` + `SK_NAV_LINKS` feed navbar + SK footer. Previews: `node scripts/capture-portfolio.mjs [name]` |
-| `constants/sk-case-studies.ts` | Royal Stroje case study copy + HONESTY GATE comment -- founder numbers/quote land here |
-| `command-center/mdntech-sk-rework.md` | The /sk rework plan v1.0 -- SK-A+SK-B done (S63), SK-C remainder + acceptance criteria |
+| `constants/sk.ts` + `sk-case-studies.ts` | ALL /sk copy + data; `SK_PORTFOLIO` order = render order; case study carries the HONESTY GATE (founder numbers land there). ALSO the chatbot KB source -- edit here, then re-run the seed script |
+| `scripts/seed-sk-chatbot.mjs` | Rebuilds the LIVE /sk bot (46ef0a99) KB from constants -- WIPES Command Center KB edits; `--dry` to preview |
+| `lib/marketing/attribution.ts` | First-touch UTM capture (C3). sessionStorage on purpose (no cookie banner) -- do not move to localStorage/cookies without updating /privacy |
+| `command-center/mdntech-sk-rework.md` | The /sk rework plan v1.0 -- done through C3 (S64); C4-C7 remain + acceptance criteria |
 | NEVER hard-code these | `lib/portal/plans.ts` (prices/allowances), `lib/marketing/toolkit-catalogue.ts` (skill counts), `lib/chat/rate-limit-rules.ts` (limiter numbers), `lib/marketing/links.ts` (`COMPANY_LEGAL_LINE`). Marketing copy interpolates from all four |
 | `supabase/migrations/{020_security_fixpack,021_chatkit_hardening}.sql` | Security model. Read 020 before touching billing columns |
