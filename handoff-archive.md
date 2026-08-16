@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 61) -- /sk realizacie refresh + SK footer on the EN shell (rotated 2026-08-16)
+
+- **Realizacie is now four projects**, user-ordered: Royal Stroje, Royal Works, Good Hair by Zane, Kurenie Turiec (`SK_PORTFOLIO` order IS the render order -- reorder there, nowhere else). `royalworks.sk` is new; Royal Stroje's third tag is now "CRM" (was "Command Center" -- read as our internal product, not the client's).
+- **Royal Works tags are UNCONFIRMED** -- shipped as Web / Lokalne SEO / Dizajn na mieru, inferred from the live site, not from the actual engagement. Ask Martin to confirm or correct.
+- All four previews re-captured from the live sites. `scripts/capture-portfolio.mjs` now declines cookie banners before shooting (clicks Odmietnut/Reject -- NEVER accept, the captures must not opt into a client's analytics) and hides late-loading chat bubbles. Two shots previously shipped with a consent overlay baked in.
+- CAPTURE GOTCHA: the first page render after a fresh capture shows blank/old previews because next/image is generating the optimization on demand. Re-shoot before concluding the cache is stale -- it is not, and `rm -rf .next/cache/images` is unnecessary (it also trips the `rm -rf \.` safety hook).
+- Grid went 3-col -> `md:grid-cols-2` inside `max-w-5xl`: four cards in three columns left an orphan and 4-across shrank previews past legibility. `sizes` moved 33vw -> 50vw to match.
+- **SK footer rebuilt on the EN footer's shell** (#010109 panel, violet horizon hairline, uppercase column heads, social row, same bottom bar). Newsletter slot became a consultation CTA instead -- /sk closes on its own contact form and the newsletter copy is English-only. Columns render from `SK_NAV_LINKS` + `SK_NAP` so they cannot drift from the page. The old "DO NOT TOUCH /sk" comment on that component is gone.
+- **`COMPANY_LEGAL_LINE` in `lib/marketing/links.ts` is the single legal footprint** both footers render. The Slovak postal address (Recka cesta 182, Senec-Boldog) is deleted sitewide -- zero hits in the build. `SK_NAP` never carried an address, so no JSON-LD change was needed.
+- Gate green; overflowX=0 at 1280 + 375; screenshot-verified. Pushed straight to `main` (prod) at user request.
+
 ## What Was Done (Session 60) -- APP_LIVE portal gate + merge to main (rotated 2026-08-16)
 
 - **`feat/landing-rebuild` MERGED into `main` and PUSHED** (`ad2e4f1`, 99 files, +7602/-1350; `7f8cf98` is the gate itself). The rebuild is live on mdntech.org. main and the branch have identical trees.
@@ -181,6 +192,7 @@
 | 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
 | 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
 | 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
+| 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
