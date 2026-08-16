@@ -24,7 +24,11 @@ export const visitorIdSchema = z
 export const chatMessageSchema = z.object({
   message: z.string().trim().min(1, 'message is required').max(2000),
   visitorId: visitorIdSchema,
-  conversationId: UUID.optional(),
+  // nullish, not optional: the widget sends an explicit `null` on the first
+  // message of a session (there is no conversation yet), and `.optional()`
+  // rejects null -- which 400'd every opening message. Old widget.js copies
+  // sit cached in visitors' browsers, so the server must keep accepting null.
+  conversationId: UUID.nullish(),
   sourceUrl: z
     .string()
     .trim()

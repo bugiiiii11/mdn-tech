@@ -268,7 +268,7 @@
           body: JSON.stringify({
             message: text,
             visitorId: STATE.visitorId,
-            conversationId: STATE.conversationId,
+            conversationId: STATE.conversationId || undefined,
             sourceUrl: window.location.href,
           }),
         });
