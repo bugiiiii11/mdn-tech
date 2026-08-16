@@ -46,11 +46,12 @@ export function PortalTopBar({ user, showMarketkit = false }: Props) {
           className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 min-w-0"
         >
           <Image
-            src="/logo.png"
+            src="/brand/logo-final-white.svg"
             alt="M.D.N Tech"
-            width={32}
-            height={32}
-            className="w-7 h-7 md:w-8 md:h-8 flex-shrink-0"
+            width={1000}
+            height={589}
+            unoptimized
+            className="h-5 md:h-6 w-auto flex-shrink-0"
           />
           <div className="font-bold text-gray-300 text-sm md:text-base whitespace-nowrap">
             M.D.N Tech

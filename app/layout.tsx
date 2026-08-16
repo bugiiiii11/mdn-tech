@@ -24,7 +24,10 @@ const organizationSchema = {
   name: "M.D.N Tech FZE",
   alternateName: "M.D.N Tech",
   url: "https://mdntech.org",
-  logo: "https://mdntech.org/logo.png",
+  // The white-on-black plate, not a transparent mark: search and social
+  // surfaces composite this onto backgrounds we do not control, and a bare
+  // white mark disappears on every light one.
+  logo: "https://mdntech.org/brand/png/logo-final-white-on-black-1000.png",
   description:
     "UAE-based team building self-service AI developer tools — ChatKit, ToolKit, and more — plus select custom AI, Web3, and full-stack development.",
   foundingDate: "2024-01-01",

@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       name: "M.D.N Tech FZE",
       logo: {
         "@type": "ImageObject",
-        url: "https://mdntech.org/logo.png",
+        url: "https://mdntech.org/brand/png/logo-final-white-on-black-1000.png",
       },
     },
     mainEntityOfPage: {

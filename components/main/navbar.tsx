@@ -24,12 +24,17 @@ export const Navbar = () => {
           href={logoHref}
           className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 min-w-0"
         >
+          {/* unoptimized: Next's image optimizer rejects SVG unless
+              dangerouslyAllowSVG is on, and a 3.5 KB vector needs no pipeline.
+              Sized by height with width auto -- the mark is ~1.7:1, so fixing
+              both axes squashes it. */}
           <Image
-            src="/logo.png"
+            src="/brand/logo-final-white.svg"
             alt="M.D.N Tech"
-            width={32}
-            height={32}
-            className="w-7 h-7 md:w-8 md:h-8 flex-shrink-0"
+            width={1000}
+            height={589}
+            unoptimized
+            className="h-5 md:h-6 w-auto flex-shrink-0"
           />
           <div className="font-bold text-gray-300 text-sm md:text-base whitespace-nowrap overflow-hidden text-ellipsis">M.D.N Tech</div>
         </Link>

@@ -69,7 +69,7 @@ const SkFooter = () => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10 pb-10 mb-10 border-b border-white/[0.06]">
             <div className="max-w-sm">
               <Link href="/sk#domov" className="inline-flex items-center gap-2.5 mb-3">
-                <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
+                <Image src="/brand/logo-final-white.svg" alt="M.D.N Tech logo" width={1000} height={589} unoptimized className="h-6 w-auto opacity-90" />
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed">
@@ -212,7 +212,7 @@ export const Footer = () => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10 pb-10 mb-10 border-b border-white/[0.06]">
             <div className="max-w-sm">
               <Link href="/#home" className="inline-flex items-center gap-2.5 mb-3">
-                <Image src="/logo.png" alt="M.D.N Tech logo" width={32} height={32} className="w-8 h-8 opacity-90" />
+                <Image src="/brand/logo-final-white.svg" alt="M.D.N Tech logo" width={1000} height={589} unoptimized className="h-6 w-auto opacity-90" />
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed">

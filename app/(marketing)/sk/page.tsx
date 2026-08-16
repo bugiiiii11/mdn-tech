@@ -33,7 +33,9 @@ export const metadata: Metadata = {
     siteName: "M.D.N Tech",
     images: [
       {
-        url: "/og-image.png",
+        // The Slovak card -- same artwork, Slovak strapline. Both are built by
+        // scripts/generate-og-images.mjs; edit the copy there, not here.
+        url: "/og-image-sk.png",
         width: 1200,
         height: 630,
         alt: "M.D.N Tech — digitálny partner pre slovenské firmy",
@@ -44,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SK_SITE.title,
     description: SK_SITE.description,
-    images: ["/og-image.png"],
+    images: ["/og-image-sk.png"],
   },
   robots: {
     index: true,
