@@ -34,17 +34,19 @@ const logo = `data:image/png;base64,${readFileSync(join(ROOT, 'public/logo.png')
 
 const TARGETS = [
   // 32 covers the 16 px tab slot (browsers downscale it) and the 32 px bookmark slot.
-  { file: 'app/icon.png', size: 32 },
+  { file: 'app/icon.png', size: 32, rounded: true },
   // Bookmark tiles, Android home screen, PWA install prompt.
-  { file: 'app/icon1.png', size: 192 },
-  // iOS home screen. Opaque anyway, which this design already is.
-  { file: 'app/apple-icon.png', size: 180 },
+  { file: 'app/icon1.png', size: 192, rounded: true },
+  // iOS home screen. Deliberately a full-bleed square: iOS applies its own
+  // squircle mask, so shipping our own rounded corners would either double up
+  // or leave the mask clipping into the artwork.
+  { file: 'app/apple-icon.png', size: 180, rounded: false },
 ]
 
-const tile = (size) => `<!doctype html>
-<style>html,body{margin:0;padding:0}</style>
+const tile = (size, rounded) => `<!doctype html>
+<style>html,body{margin:0;padding:0;background:transparent}</style>
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" rx="${size * RADIUS}" fill="${BG}"/>
+  <rect width="${size}" height="${size}" rx="${rounded ? size * RADIUS : 0}" fill="${BG}"/>
   <image href="${logo}"
          x="${(size * (1 - LOGO)) / 2}" y="${(size * (1 - LOGO)) / 2}"
          width="${size * LOGO}" height="${size * LOGO}"/>
@@ -53,10 +55,12 @@ const tile = (size) => `<!doctype html>
 const browser = await chromium.launch({ channel: 'chrome' })
 const page = await browser.newPage()
 
-for (const { file, size } of TARGETS) {
+for (const { file, size, rounded } of TARGETS) {
   await page.setViewportSize({ width: size, height: size })
-  await page.setContent(tile(size))
-  const buf = await page.screenshot({ type: 'png' })
+  await page.setContent(tile(size, rounded))
+  // omitBackground or the page's white paints INTO the rounded corners, which
+  // is what shipped the first time -- white notches on every tab.
+  const buf = await page.screenshot({ type: 'png', omitBackground: true })
   writeFileSync(join(ROOT, file), buf)
   console.log(`${file}  ${size}x${size}  ${buf.length} B`)
 }
