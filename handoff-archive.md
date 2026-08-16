@@ -1,5 +1,14 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 63) -- /sk rework: CRM flagship + trust + Royal Stroje case study (rotated 2026-08-17)
+
+- **Task 0a built and committed on `feat/sk-rework` (`7eab7b4`), gate green -- NOT merged, NOT pushed.** SK-A AND SK-B from `command-center/mdntech-sk-rework.md` v1.0 in one pass: SkCrm (#crm), SkAbout (#kto-sme), SkFaq (#faq, 8 entries), CRM in title/description/keywords/hero/serviceType, nav = Sluzby/CRM/Referencie/Kto sme/FAQ/Kontakt, RS portfolio card -> flagship linking to the new `/sk/referencie/royal-stroje` page (static, Article + BreadcrumbList from the visible trail, in sitemap).
+- **"Smart Drobne" is BANNED from all copy (user decision 2026-08-16).** Approved framing: "projektovy manazer v CSOB banke v oblasti mobilneho bankovnictva" (SkAbout + FAQ #1). Name spelled "Martin Jerabek" with hacek (matches /about) even though the plan wrote it unaccented.
+- **Case study honesty gate:** Vysledky + founder quote sections deliberately ABSENT -- they land in `constants/sk-case-studies.ts` (gate comment there) once the RS founder supplies numbers, quote and photo/logo consent. Zadanie copy is goal-framed to avoid asserting the client's prior state; still confirm with the founder before the campaign.
+- FAQ #4 (hosting/GDPR) + #5 (contract) ship the plan's safe draft -- **Filip must confirm wording before the ~150 partner emails go out (early September)**. Shared `FaqEntry` gained optional `bullets` (rendered + folded into `faqAnswerText()` per the anti-drift contract) for the VAT-payer/non-payer invoicing answer.
+- **All `linkedin.com/company/mdntech/` links were DEAD (slug never claimed) -- replaced sitewide** (EN+SK footers, contact, org schema, llms.txt, /sk schema) with the real `/company/111977261`. Swap back only after Martin claims the vanity slug (plan C4).
+- QA: overflowX=0 at 1280+375 on both pages, one h1 each, zero console errors, FAQPage/Article/BreadcrumbList all emitted (probe script pattern: temp copy into `scripts/` so ESM finds playwright, `channel: "chrome"`).
+
 ## What Was Done (Session 62) -- ChatKit privacy disclosure (task 0c) (rotated 2026-08-16)
 
 - **`/privacy` gained Section 3 "ChatKit Chat Widget"** (`app/(marketing)/privacy/page.tsx`), the last blocker on 0d besides Phase 2. Discloses what `message/route.ts` actually writes: full transcripts, the localStorage visitor ID, `visitor_ip`, `source_url`, and optional feedback ratings -- none of which the policy had mentioned.
@@ -202,6 +211,7 @@
 | 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 | 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
 | 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
+| 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
