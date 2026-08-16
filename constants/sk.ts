@@ -3,6 +3,8 @@
 // react-icons components locally, so this file is safe to import from the
 // server component at app/(marketing)/sk/page.tsx (metadata + JSON-LD).
 
+import type { FaqEntry } from "@/components/product-pages/faq";
+
 // --- Brand / SEO ---------------------------------------------------------
 
 export const SK_SITE = {
@@ -11,13 +13,20 @@ export const SK_SITE = {
   url: "https://mdntech.org/sk",
   // Brand suffix is appended by the root metadata title template (`%s | M.D.N Tech`),
   // so it is intentionally omitted here to avoid a doubled suffix in <title>.
-  title: "Tvorba webu, SEO a automatizácia pre slovenské firmy",
+  title: "Tvorba webu, CRM systémov a AI chatbotov pre firmy",
   description:
-    "Expandujte svoj biznis online. Web, SEO, biznis analýza a automatizácia procesov pre slovenské firmy — moderné digitálne riešenia od jedného partnera. Web do týždňa, bezplatná biznis analýza.",
+    "Tvorba webov, CRM systémov na mieru a AI chatbotov pre slovenské firmy. Bezplatná biznis analýza, dodanie v rekordnom čase, živé referencie ako royalstroje.sk.",
   keywords: [
     "tvorba webu Slovensko",
     "tvorba web stránok",
     "web na mieru",
+    "CRM systém na mieru",
+    "tvorba CRM",
+    "CRM pre malé firmy",
+    "AI chatbot pre firmy",
+    "chatbot na webstránku",
+    "systém pre požičovňu",
+    "evidencia zákaziek",
     "SEO Slovensko",
     "SEO optimalizácia",
     "biznis analýza",
@@ -26,7 +35,6 @@ export const SK_SITE = {
     "web pre firmy",
     "klientsky portál",
     "rezervačný systém",
-    "chatbot pre firmy",
     "Google Moja Firma",
     "lokálne SEO",
   ],
@@ -50,9 +58,10 @@ export const SK_NAP = {
 
 export const SK_NAV_LINKS = [
   { title: "Služby", link: "/sk#sluzby" },
-  { title: "Prečo my", link: "/sk#preco-my" },
-  { title: "Realizácie", link: "/sk#realizacie" },
-  { title: "Postup", link: "/sk#ako-to-funguje" },
+  { title: "CRM", link: "/sk#crm" },
+  { title: "Referencie", link: "/sk#realizacie" },
+  { title: "Kto sme", link: "/sk#kto-sme" },
+  { title: "FAQ", link: "/sk#faq" },
   { title: "Kontakt", link: "/sk#kontakt" },
 ] as const;
 
@@ -62,7 +71,7 @@ export const SK_HERO = {
   titleLine1: "Expandujte",
   titleLine2: "svoj biznis online.",
   subtitle:
-    "Web · SEO · biznis analýza · automatizácia — digitálne riešenia pre slovenských podnikateľov.",
+    "Web · CRM systémy · AI chatboty · SEO — digitálne riešenia pre slovenské firmy.",
   ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "#kontakt" },
   ctaSecondary: { label: "Pozrite realizácie", href: "#realizacie" },
 } as const;
@@ -117,9 +126,9 @@ export const SK_VALUE_LADDER = [
   {
     icon: "automation",
     step: "04",
-    title: "Automatizácia a systémy na mieru",
+    title: "CRM a systémy na mieru",
     description:
-      "Objednávkový systém, tvorba faktúr, databázy, chatbot 24/7, automatické notifikácie, klientský, či admin portál — operatíva, ktorá šetrí čas a peniaze.",
+      "Evidencia zákazníkov a zákaziek, správa strojov či inventára, automatické podklady k fakturácii a prehľady na jeden klik. K tomu objednávkové systémy, chatbot 24/7 a klientske či admin portály — operatíva, ktorá šetrí čas a peniaze.",
     price: "od 3 000 € · cena na mieru",
     highlight: false,
   },
@@ -175,8 +184,11 @@ export const SK_PORTFOLIO = [
     href: "https://royalstroje.sk",
     image: "/portfolio/royalstroje.jpg",
     description:
-      "Web pre požičovňu náradia a stavebnej techniky v Senci — s automatizáciou procesov a prístupom k databáze cez admin portál.",
-    tags: ["Web", "Lokálne SEO", "CRM"],
+      "Web, CRM na mieru a AI chatbot pre požičovňu náradia a stavebnej techniky v Senci — katalóg strojov, evidencia zákaziek a asistent, ktorý odpovedá 24/7.",
+    tags: ["Web", "CRM", "AI chatbot"],
+    // Flagship reference: the card links to the case study instead of the
+    // live site (the live-site link moves into the case study itself).
+    caseStudyHref: "/sk/referencie/royal-stroje",
   },
   {
     name: "Royal Works",
@@ -252,3 +264,106 @@ export const SK_PRICING = {
   ],
   note: "Finálna cena vždy po nezáväznej konzultácii. Pri väčšej objednávke zľava.",
 } as const;
+
+// --- CRM (flagship service, anchor #crm) ---------------------------------
+
+export const SK_CRM = {
+  title: "CRM systém presne pre vašu firmu",
+  intro:
+    "Excel a papierové zošity fungujú — kým firma nerastie. Postavíme vám CRM presne podľa vašich procesov: evidencia zákazníkov a zákaziek, správa strojov či inventára, automatické podklady k fakturácii, prehľady na jeden klik.",
+  benefits: [
+    "Na mieru vašim procesom — žiadne ohýbanie firmy podľa softvéru",
+    "Prístup z mobilu aj z kancelárie",
+    "Napojenie na web, e-mail a chatbota",
+    "Odovzdanie so zaškolením, podpora po spustení",
+  ],
+  reference: {
+    eyebrow: "Referencia",
+    name: "royalstroje.sk",
+    description:
+      "Web, CRM na správu požičovne a AI chatbot pre jedného klienta.",
+    image: "/portfolio/royalstroje.jpg",
+    caseStudy: {
+      label: "Pozrite si prípadovú štúdiu",
+      href: "/sk/referencie/royal-stroje",
+    },
+  },
+  cta: { label: "Chcem nezáväznú konzultáciu k CRM", href: "#kontakt" },
+} as const;
+
+// --- Kto sme (founder trust section, anchor #kto-sme) --------------------
+// Positioning (rework plan v1.0): "slovenský founder, medzinárodná firma" —
+// the UAE entity is transparent but never the headline. ČSOB reference only,
+// no internal project names (user decision 2026-08-16).
+
+export const SK_ABOUT = {
+  title: "Kto stojí za M.D.N Tech",
+  founder: {
+    name: "Martin Jeřábek",
+    role: "Founder & CEO",
+    image: "/team/1.jpg",
+  },
+  paragraphs: [
+    "M.D.N Tech založil Martin Jeřábek, slovenský developer a projektový manažér. Predtým pôsobil ako projektový manažér v ČSOB banke v oblasti mobilného bankovníctva. Dnes s tímom dodáva weby, CRM systémy a AI chatboty pre firmy na Slovensku aj v zahraničí.",
+    "Sídlo máme v Spojených arabských emirátoch, vývoj a komunikácia prebieha v slovenčine. Medzinárodná štruktúra nám umožňuje dodávať klientom po celom svete — pre vás sa nič nekomplikuje: slovenský kontakt, slovenská podpora, zmluva a faktúra bez prekvapení (podrobnosti vo FAQ nižšie).",
+  ],
+  companyLinkedIn: {
+    label: "M.D.N Tech na LinkedIn",
+    // Numeric company URL — the /company/mdntech vanity slug is not claimed
+    // yet. Swap once Martin claims it (rework plan C4).
+    href: "https://www.linkedin.com/company/111977261",
+  },
+} as const;
+
+// --- FAQ (anchor #faq, rendered via components/product-pages/faq.tsx) ----
+// The invoicing answer (#3) is the trust weapon of the page — reverse-charge
+// explained plainly, not hidden in fine print. FAQ #4 (hosting/GDPR) and #5
+// (contract) await Filip's confirmation of the exact legal wording — the
+// current text is the safe draft from the rework plan.
+
+export const SK_FAQ = [
+  {
+    question: "Kto je M.D.N Tech?",
+    answer:
+      "Technologická firma založená slovenským developerom Martinom Jeřábkom, predtým projektovým manažérom v ČSOB banke. Dodávame weby, CRM systémy, AI chatboty a automatizáciu pre firmy na Slovensku aj v zahraničí. Komunikácia, dodanie aj podpora prebiehajú v slovenčine.",
+  },
+  {
+    question: "Prečo má firma sídlo v Spojených arabských emirátoch?",
+    answer:
+      "Pôsobíme medzinárodne a UAE štruktúra nám umožňuje dodávať klientom po celom svete. Pre vás sa tým nič nemení — kontakt, komunikácia a dodanie sú slovenské a fakturácia je jednoduchá (pozrite nasledujúcu otázku).",
+  },
+  {
+    question: "Ako funguje fakturácia? Nebude s tým problém v účtovníctve?",
+    answer:
+      "Faktúru vystavujeme bez DPH a DPH si vysporiadate na Slovensku tzv. samozdanením — štandardný postup pri službách zo zahraničia, ktorý každý účtovník pozná. Do zmluvy aj ponuky vám všetko rozpíšeme vopred.",
+    bullets: [
+      "Ak ste platiteľ DPH: DPH si priznáte a zároveň odpočítate — výsledný efekt je nulový, žiadny náklad navyše.",
+      "Ak nie ste platiteľ DPH: pred prvou faktúrou sa jednorazovo zaregistrujete podľa §7a zákona o DPH (vybavíme spolu, je to formulár) a DPH odvediete — v súčte zaplatíte rovnako, ako keby ste nakúpili od slovenskej agentúry s DPH.",
+    ],
+  },
+  {
+    question: "Kde budú naše dáta a systém?",
+    answer:
+      "Ostrá prevádzka vášho webu či CRM beží na hostingu v Európskej únii (alebo na vašom vlastnom hostingu) — v súlade s GDPR. Vývojové a testovacie prostredie prevádzkujeme na vlastnej infraštruktúre, bez reálnych osobných údajov. Súčasťou zmluvy je aj dohoda o spracúvaní osobných údajov (DPA).",
+  },
+  {
+    question: "Akú zmluvu podpisujeme?",
+    answer:
+      "Na každý projekt podpisujeme písomnú zmluvu s jasným rozsahom prác, pevnou cenou, termínmi a zárukami. Ak systém pracuje s osobnými údajmi, súčasťou je aj dohoda o ich spracúvaní (DPA).",
+  },
+  {
+    question: "Ako prebieha spolupráca?",
+    answer:
+      "1) Bezplatná biznis analýza — pochopíme vašu firmu a navrhneme, čo má zmysel. 2) Ponuka s pevnou cenou. 3) Dodanie po etapách, priebežne vidíte výsledok. 4) Odovzdanie so zaškolením a podpora po spustení.",
+  },
+  {
+    question: "Koľko to stojí?",
+    answer:
+      "Analýza je zdarma. Web od 1 000 €, SEO od 500 €, CRM a systémy na mieru podľa rozsahu — po analýze dostanete pevnú ponuku. Bez skrytých poplatkov.",
+  },
+  {
+    question: "Kto bude na projekte reálne pracovať?",
+    answer:
+      "Projekt vedie priamo Martin. Na väčších dodávkach spolupracujeme s overenými špecialistami pod jeho vedením — zodpovednosť za výsledok nesie vždy M.D.N Tech.",
+  },
+] as const satisfies readonly FaqEntry[];

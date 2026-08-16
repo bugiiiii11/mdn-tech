@@ -99,7 +99,9 @@ export const SOCIALS = [
   {
     name: "LinkedIn",
     icon: RxLinkedinLogo,
-    link: "https://www.linkedin.com/company/mdntech/",
+    // Numeric company URL — the /company/mdntech vanity slug is not claimed
+    // yet; swap once Martin claims it (sk-rework plan C4).
+    link: "https://www.linkedin.com/company/111977261",
   },
 ] as const;
 

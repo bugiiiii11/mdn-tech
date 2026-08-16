@@ -92,7 +92,7 @@ export const ContactUs = () => {
   // GitHub row removed (S57): "https://github.com" was a placeholder — the
   // named anti-reference in PRODUCT.md. Re-add only with a real org URL.
   const socialLinks = [
-    { icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/", label: "LinkedIn" },
+    { icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/111977261", label: "LinkedIn" },
     { icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg", label: "Twitter" },
     { icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/", label: "Instagram" },
   ];

@@ -47,7 +47,7 @@ const FooterBookend = () => (
 // closes on its own contact form, and the newsletter copy is English-only.
 const SkFooter = () => {
   const skSocials = [
-    { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
+    { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/111977261" },
     { name: "X", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
     { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
   ];
@@ -73,8 +73,8 @@ const SkFooter = () => {
                 <span className="text-xl font-semibold text-white tracking-tight">M.D.N Tech</span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Web, SEO, biznis analýza a automatizácia procesov pre slovenské
-                firmy — moderné digitálne riešenia od jedného partnera.
+                Web, CRM systémy, AI chatboty a SEO pre slovenské firmy —
+                moderné digitálne riešenia od jedného partnera.
               </p>
               <div className="flex items-center gap-1 mt-5 -ml-2">
                 {skSocials.map(({ name, icon: Icon, link }) => (
@@ -187,7 +187,7 @@ export const Footer = () => {
   const products = visibleProducts(mode);
 
   const socials = [
-    { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/mdntech/" },
+    { name: "LinkedIn", icon: RxLinkedinLogo, link: "https://www.linkedin.com/company/111977261" },
     { name: "X", icon: RxTwitterLogo, link: "https://x.com/MDNTechOrg" },
     { name: "Instagram", icon: RxInstagramLogo, link: "https://www.instagram.com/mdntechorg/" },
     { name: "GitHub", icon: RxGithubLogo, link: TOOLKIT_REPO },

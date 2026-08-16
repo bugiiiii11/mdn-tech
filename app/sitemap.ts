@@ -53,8 +53,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/sk`,
-      lastModified: new Date("2026-06-08"),
+      lastModified: new Date("2026-08-16"),
       alternates: languageAlternates,
+    },
+    // Slovak-only case study — no EN twin, so no `alternates` block (same
+    // reasoning as the English-only product pages above).
+    {
+      url: `${baseUrl}/sk/referencie/royal-stroje`,
+      lastModified: new Date("2026-08-16"),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,

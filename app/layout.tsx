@@ -45,7 +45,7 @@ const organizationSchema = {
   sameAs: [
     "https://www.instagram.com/mdntechorg/",
     "https://x.com/MDNTechOrg",
-    "https://www.linkedin.com/company/mdntech/",
+    "https://www.linkedin.com/company/111977261",
   ],
   knowsAbout: [
     "Artificial Intelligence",

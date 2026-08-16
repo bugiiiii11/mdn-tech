@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { SkHero } from "@/components/sk/SkHero";
 import { SkForWhom } from "@/components/sk/SkForWhom";
 import { SkValueLadder } from "@/components/sk/SkValueLadder";
+import { SkCrm } from "@/components/sk/SkCrm";
 import { SkWhyUs } from "@/components/sk/SkWhyUs";
 import { SkPortfolio } from "@/components/sk/SkPortfolio";
+import { SkAbout } from "@/components/sk/SkAbout";
 import { SkProcess } from "@/components/sk/SkProcess";
+import { SkFaq } from "@/components/sk/SkFaq";
 import { SkContact } from "@/components/sk/SkContact";
 import { SK_SITE, SK_NAP } from "@/constants/sk";
 
@@ -66,6 +69,8 @@ const professionalServiceSchema = {
   telephone: SK_NAP.phoneIntl,
   serviceType: [
     "Tvorba webových stránok",
+    "CRM systémy na mieru",
+    "AI chatboty",
     "SEO optimalizácia",
     "Biznis analýza",
     "Automatizácia procesov",
@@ -74,7 +79,9 @@ const professionalServiceSchema = {
   sameAs: [
     "https://www.instagram.com/mdntechorg/",
     "https://x.com/MDNTechOrg",
-    "https://www.linkedin.com/company/mdntech/",
+    // Numeric company URL — the /company/mdntech vanity slug is not claimed
+    // yet (rework plan C4); the schema must reference the page that exists.
+    "https://www.linkedin.com/company/111977261",
   ],
   contactPoint: {
     "@type": "ContactPoint",
@@ -95,13 +102,19 @@ export default function SkLandingPage() {
           __html: JSON.stringify(professionalServiceSchema),
         }}
       />
+      {/* Section order (rework plan v1.0): services → CRM flagship → proof
+          (references) → who we are → process → FAQ → contact. Trust builds
+          top-down; the invoicing FAQ sits right before the form. */}
       <div className="flex flex-col gap-10 md:gap-16 max-w-full">
         <SkHero />
         <SkForWhom />
         <SkValueLadder />
-        <SkWhyUs />
+        <SkCrm />
         <SkPortfolio />
+        <SkWhyUs />
+        <SkAbout />
         <SkProcess />
+        <SkFaq />
         <SkContact />
       </div>
     </main>

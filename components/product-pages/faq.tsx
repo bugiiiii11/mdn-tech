@@ -36,11 +36,24 @@ export type FaqEntry = {
    * links simply omit it.
    */
   link?: FaqLink;
+  /**
+   * Optional bullet list rendered after the answer paragraph — for answers
+   * that split into cases (e.g. /sk's VAT-payer / non-payer invoicing FAQ).
+   * Folded into the schema text by faqAnswerText(), per the anti-drift
+   * contract above.
+   */
+  bullets?: readonly string[];
 };
 
 /** Exactly the text a visitor reads, so the schema cannot drift from the page. */
-export const faqAnswerText = (entry: FaqEntry): string =>
-  entry.link ? `${entry.answer} ${entry.link.label}.` : entry.answer;
+export const faqAnswerText = (entry: FaqEntry): string => {
+  const paragraph = entry.link
+    ? `${entry.answer} ${entry.link.label}.`
+    : entry.answer;
+  return entry.bullets?.length
+    ? `${paragraph} ${entry.bullets.join(" ")}`
+    : paragraph;
+};
 
 /** FAQPage JSON-LD for a list of entries. Stringify it into a ld+json script. */
 export const faqPageSchema = (faqs: readonly FaqEntry[]) => ({
@@ -107,6 +120,16 @@ export const FaqAccordion = ({ faqs }: { faqs: readonly FaqEntry[] }) => (
             </>
           ) : null}
         </p>
+        {entry.bullets?.length ? (
+          <ul className="mt-3 pr-11 flex flex-col gap-2 text-sm md:text-base text-gray-300 leading-relaxed">
+            {entry.bullets.map((bullet) => (
+              <li key={bullet} className="flex gap-3">
+                <span aria-hidden="true" className="mt-[0.6em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-400/70" />
+                {bullet}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </details>
     ))}
   </div>
