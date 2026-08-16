@@ -9,6 +9,7 @@ import { SkAbout } from "@/components/sk/SkAbout";
 import { SkProcess } from "@/components/sk/SkProcess";
 import { SkFaq } from "@/components/sk/SkFaq";
 import { SkContact } from "@/components/sk/SkContact";
+import { SkChatWidget } from "@/components/sk/SkChatWidget";
 import { SK_SITE, SK_NAP } from "@/constants/sk";
 
 export const metadata: Metadata = {
@@ -117,6 +118,7 @@ export default function SkLandingPage() {
         <SkFaq />
         <SkContact />
       </div>
+      <SkChatWidget />
     </main>
   );
 }

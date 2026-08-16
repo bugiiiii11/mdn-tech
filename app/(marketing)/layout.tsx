@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { Cedarville_Cursive, Inter } from "next/font/google";
+import { AttributionCapture } from "@/components/main/attribution-fields";
 import { Footer } from "@/components/main/footer";
 import { Navbar } from "@/components/main/navbar";
 import { ReducedMotionProvider } from "@/components/main/reduced-motion-provider";
@@ -49,6 +50,7 @@ export default function MarketingLayout({ children }: PropsWithChildren) {
       {/* One provider covers every framer-motion animation on the marketing
           tree: with reducedMotion="user", transform/opacity animations are
           skipped when the visitor asks the OS for reduced motion. */}
+      <AttributionCapture />
       <ReducedMotionProvider>
         <StarsCanvas />
         <Navbar />

@@ -15,6 +15,7 @@ import {
   RxInstagramLogo
 } from "react-icons/rx";
 import { slideInFromTop, slideInFromLeft, slideInFromRight } from "@/lib/motion";
+import { AttributionFields } from "@/components/main/attribution-fields";
 
 export const ContactUs = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -217,6 +218,7 @@ export const ContactUs = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-xl blur-xl -z-10"></div>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+              <AttributionFields formId="en-contact" />
               {/* Name Field */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

@@ -6,14 +6,18 @@ import { FiDatabase, FiExternalLink, FiGlobe, FiMessageCircle } from "react-icon
 
 import { CtaBand } from "@/components/product-pages/primitives";
 import { organizationRef, SITE_URL } from "@/components/product-pages/schema";
+import { SkChatWidget } from "@/components/sk/SkChatWidget";
 import { SK_CS_ROYAL_STROJE as CS } from "@/constants/sk-case-studies";
 
 // Case study + campaign landing (rework plan v1.0, SK-B): the Royal Stroje
 // partner emails (~150 warm contacts) land here, so the page is a static
 // server component — every word reaches the visitor and the crawler without
-// JavaScript. UTM query params are ignored by design; the canonical below
-// keeps them out of the index. Navbar/footer switch to the SK chrome via the
-// pathname.startsWith("/sk") branch in components/main.
+// JavaScript. The page itself never branches on UTM params and the canonical
+// below keeps them out of the index — but they are not lost: a visitor who
+// lands here from the campaign carries first-touch attribution through to the
+// /sk form via lib/marketing/attribution.ts (rework plan C3). Navbar/footer
+// switch to the SK chrome via the pathname.startsWith("/sk") branch in
+// components/main.
 
 export const metadata: Metadata = {
   title: CS.metaTitle,
@@ -221,6 +225,7 @@ export default function RoyalStrojeCaseStudyPage() {
         primary={CS.cta.primary}
         secondary={CS.cta.secondary}
       />
+      <SkChatWidget />
     </main>
   );
 }

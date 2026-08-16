@@ -6,6 +6,7 @@ import emailjs from "@emailjs/browser";
 import { FiPhone, FiMail } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { slideInFromLeft, slideInFromRight } from "@/lib/motion";
+import { AttributionFields } from "@/components/main/attribution-fields";
 import { SK_NAP } from "@/constants/sk";
 
 export const SkContact = () => {
@@ -182,6 +183,7 @@ export const SkContact = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-xl blur-xl -z-10" />
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+              <AttributionFields formId="sk-kontakt" />
               <div>
                 <label
                   htmlFor="sk-name"
