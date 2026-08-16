@@ -30,10 +30,11 @@ export const siteConfig: Metadata = {
   authors: [{ name: "M.D.N Tech FZE", url: siteUrl }],
   creator: "M.D.N Tech FZE",
   publisher: "M.D.N Tech FZE",
-  icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
-  },
+  // No `icons` here on purpose. Icons come from the app/ file convention
+  // (icon.svg + icon.png + apple-icon.png), which Next emits for every route
+  // in the app -- marketing, /portal (app.mdntech.org) and /command-center
+  // (admin.mdntech.org) alike. Re-adding a hand-written `icons` block here
+  // does not replace those files, it appends a second, competing <link>.
   openGraph: {
     type: "website",
     locale: "en_US",

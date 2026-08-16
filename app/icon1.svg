@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!--
+    Site-wide favicon. Root-level file convention, so every surface inherits it:
+    mdntech.org, app.mdntech.org (/portal) and admin.mdntech.org (/command-center)
+    are one Next app with one root layout, and no sub-layout overrides `icons`.
+
+    Source: public/brand/mdn-mark-simple.svg (no core — the photon-ring gap
+    closes into mud below ~32 px, which is the only size that matters here).
+    The wide 1.93:1 mark is scaled to 72% of the canvas and centred, per the
+    brand README's rule for square containers.
+
+    Black as asked, flipping to the brand off-white in dark mode: a browser in
+    dark theme paints the tab strip near-black, where a black mark is a hole.
+    Chrome and Firefox honour this media query in SVG favicons; Safari ignores
+    SVG favicons entirely and falls back to icon.png, which is black.
+
+    Named icon1.svg, not icon.svg, for two reasons: Next allows only ONE file
+    per `icon` basename (an icon.svg next to an icon.png is silently dropped),
+    and the numeric suffix orders the <link> tags png-then-svg -- the canonical
+    order, where modern browsers take the SVG and old ones stop at the PNG.
+  -->
+  <style>
+    path { fill: #000000; }
+    @media (prefers-color-scheme: dark) { path { fill: #F4F2FF; } }
+  </style>
+  <svg viewBox="6 36 228 118" x="36" y="80.4" width="184" height="95.2">
+    <path d="M 62 96 A 59 59 0 0 1 178 96 A 76 76 0 0 0 62 96 Z"/>
+    <path d="M 12 104 Q 120 93 228 104 C 196 117 155 143 120 143 C 85 143 44 117 12 104 Z"/>
+  </svg>
+</svg>
