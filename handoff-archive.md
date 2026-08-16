@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 60) -- APP_LIVE portal gate + merge to main (rotated 2026-08-16)
+
+- **`feat/landing-rebuild` MERGED into `main` and PUSHED** (`ad2e4f1`, 99 files, +7602/-1350; `7f8cf98` is the gate itself). The rebuild is live on mdntech.org. main and the branch have identical trees.
+- **THE PORTAL GATE -- `APP_LIVE` in `lib/marketing/products.ts`.** User decision: while the portal is not ready, NO surface on the marketing site may walk a visitor to app.mdntech.org. One build-time flag drives all 15 entry points. `NEXT_PUBLIC_APP_LIVE` is unset in Production -> default CLOSED (deliberate fail-safe, same shape as `getLandingMode`). To open the portal: set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. No code change, every CTA returns at once.
+- Three treatments, chosen per surface: **chrome drops** (navbar "Open App" desktop + mobile, footer "Open the App" -- a dead button in site chrome reads as broken), **buttons go inert** (`appCta()` -> `{href:"", label:"Coming soon", disabled:true}`, rendered by `CtaButton`/`HERO_CTA_DISABLED_CLASS` as an `aria-disabled` span OUT of the tab order), **prose adapts** (landing FAQ drops its "Try it free" clause; /toolkit closing falls back to the internal /chatkit page; /chatkit pricing has a whole second truthful disclosure paragraph).
+- Machine-readable claims went with the links: `SoftwareApplication.installUrl` and `Offer.availability` are omitted while closed (InStock is a claim you can start today, and you cannot), the /toolkit FAQ signup link drops out of the FAQPage JSON-LD via `faqAnswerText()`, and the app preconnect/dns-prefetch leaves `app/layout.tsx`.
+- Verified in the BUILT HTML: **zero `app.mdntech.org` across every static page**, then re-verified on PROD after deploy. Gate green; screenshots at 1280 + 375 on / and /chatkit, overflowX=0 everywhere.
+- **The host itself is untouched** -- app.mdntech.org still answers if typed directly (it is already noindex). Deliberate: blocking it would also block Martin's own E2E pass (task 5).
+- 0c (ChatKit privacy disclosure) did NOT block the merge: no ChatKit widget runs on the marketing site and no new visitor can sign up while the gate is closed, so this deploy starts no new data collection. It is still required before the portal opens. [DONE in S62.]
+
 ## What Was Done (Session 59) -- /about + /blog on the hero shell; founder-forward team (rotated 2026-08-15)
 
 - `/about` + `/blog` now open on the shared full-viewport hero shell -- all six marketing heroes compose `components/main/hero-shell.ts`. Old `components/main/hero.tsx` + `components/sub/hero-content.tsx` DELETED (the pre-rebuild landing hero /about had inherited).
@@ -170,6 +180,7 @@
 | 48 | 2026-07-17 | Prio 7 auth flow UIs + prio 3 Auto-learning shipped (migration 018 applied) |
 | 49 | 2026-07-17 | Prio 4 Weekly reports shipped (migration 019 applied) -- Phase C build-complete |
 | 51 | 2026-08-07 | Security fix-pack 0.2-0.5 -- 6 confirmed prod exploits closed (migration 020 applied) |
+| 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

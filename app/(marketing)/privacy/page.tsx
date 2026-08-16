@@ -18,7 +18,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-lg text-gray-400">
-            Last Updated: January 20, 2026
+            Last Updated: August 16, 2026
           </p>
         </motion.div>
 
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
                     <h3 className="text-xl font-semibold text-purple-400 mb-3">2.3 Information from Third Parties</h3>
                     <p className="text-gray-300 mb-2">We may receive information from:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
-                      <li><span className="font-semibold">Hosting Providers:</span> Vercel (frontend hosting) and Railway (backend hosting)</li>
+                      <li><span className="font-semibold">Hosting Providers:</span> Vercel (hosting) and Supabase (database and authentication)</li>
                       <li><span className="font-semibold">Communication Tools:</span> Email service providers</li>
                       <li><span className="font-semibold">Business Partners:</span> Referral partners or collaborators with your consent</li>
                     </ul>
@@ -94,17 +94,66 @@ export default function PrivacyPage() {
                 </div>
               </section>
 
+              {/* ChatKit Chat Widget */}
+              <section className="mb-12">
+                <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
+                  3. ChatKit Chat Widget (AI Chat Assistant)
+                </h2>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.1 What ChatKit Is</h3>
+                    <p className="text-gray-300">
+                      ChatKit is our embeddable AI chat widget that businesses install on their websites to answer visitor questions. When you chat with a ChatKit widget, whether on our website or on a customer&apos;s website, the conversation is processed and stored on our infrastructure as described below.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.2 Data Collected When You Chat</h3>
+                    <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
+                      <li><span className="font-semibold">Chat Transcripts:</span> The full content of your conversation, including every message you send and every AI reply</li>
+                      <li><span className="font-semibold">Visitor Identifier:</span> A randomly generated ID stored in your browser&apos;s local storage so your conversation can continue across page loads. It is not linked to your identity and is not used for cross-site tracking</li>
+                      <li><span className="font-semibold">IP Address:</span> Collected for abuse prevention and rate limiting</li>
+                      <li><span className="font-semibold">Page URL:</span> The address of the page where you opened the widget</li>
+                      <li><span className="font-semibold">Feedback:</span> Optional ratings you give to AI replies</li>
+                    </ul>
+                    <p className="text-gray-300 mt-3">
+                      Please do not share sensitive personal data (such as health, financial, or identification details) in chat conversations.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.3 How Chat Data Is Used</h3>
+                    <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
+                      <li><span className="font-semibold">Generating Replies:</span> Your messages are sent to Anthropic PBC (the Claude API) to generate the AI response. Anthropic does not use this data to train its models</li>
+                      <li><span className="font-semibold">Access by the Site Owner:</span> The business that installed the widget can view and export the conversations held with its own chatbot, and receives aggregated usage statistics in periodic reports</li>
+                      <li><span className="font-semibold">Service Improvement:</span> Conversations and feedback ratings may be reviewed to improve that specific chatbot&apos;s answers</li>
+                      <li><span className="font-semibold">Abuse Prevention:</span> IP-based rate limiting uses short-lived counters that expire within 24 hours</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.4 Who Is Responsible for Your Chat Data</h3>
+                    <p className="text-gray-300">
+                      When you chat with a ChatKit widget on a customer&apos;s website, that business acts as the data controller and we process the conversation on its behalf as a data processor. Please direct any privacy request about such a conversation to the website you were chatting on; we will assist that business in fulfilling it. When you chat with a widget on our own website, we are the data controller and you can contact us directly as described in Section 7.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.5 Retention of Chat Data</h3>
+                    <p className="text-gray-300">
+                      Chat transcripts and the associated visitor data are retained for the life of the service: they are stored while the chatbot exists and are deleted when the site owner deletes the conversation or the chatbot, or when the associated customer account is closed.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
               {/* How We Use Your Information */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  3. How We Use Your Information
+                  4. How We Use Your Information
                 </h2>
                 <p className="text-gray-300 mb-6">
                   We use your personal data for the following purposes:
                 </p>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.1 Service Delivery</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.1 Service Delivery</h3>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Providing IT services including AI/ML development, blockchain solutions, full-stack development, mobile app development, UI/UX design, and game development</li>
                       <li>Managing client accounts and project portals</li>
@@ -113,7 +162,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.2 Business Operations</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.2 Business Operations</h3>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Processing invoices and managing payments</li>
                       <li>Communicating about projects, updates, and service-related matters</li>
@@ -122,7 +171,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.3 Legal Compliance</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.3 Legal Compliance</h3>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Complying with UAE legal obligations and UAQ Free Zone regulations</li>
                       <li>Maintaining records for tax and accounting purposes</li>
@@ -131,7 +180,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.4 Service Improvement</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.4 Service Improvement</h3>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Analyzing website usage to improve user experience</li>
                       <li>Understanding client needs and preferences</li>
@@ -140,7 +189,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">3.5 Marketing (with your consent)</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.5 Marketing (with your consent)</h3>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Sending newsletters about our services and industry insights</li>
                       <li>Providing information about new offerings</li>
@@ -162,15 +211,15 @@ export default function PrivacyPage() {
               {/* Data Storage and Security */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  4. Data Storage and Security
+                  5. Data Storage and Security
                 </h2>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.1 Where We Store Your Data</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.1 Where We Store Your Data</h3>
                     <p className="text-gray-300 mb-2">Your data is stored on secure servers located in:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li><span className="font-semibold">Frontend Hosting:</span> Vercel&apos;s global infrastructure</li>
-                      <li><span className="font-semibold">Backend Hosting:</span> Railway&apos;s secure cloud environment</li>
+                      <li><span className="font-semibold">Database and Authentication:</span> Supabase&apos;s secure cloud environment</li>
                       <li><span className="font-semibold">Development Environments:</span> Secure, isolated instances for active projects</li>
                       <li><span className="font-semibold">Document Storage:</span> Encrypted cloud storage for business documents</li>
                     </ul>
@@ -179,7 +228,7 @@ export default function PrivacyPage() {
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.2 Security Measures</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.2 Security Measures</h3>
                     <p className="text-gray-300 mb-2">We implement industry-standard security measures including:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li><span className="font-semibold">Encryption:</span> Data encrypted in transit (TLS/SSL) and at rest</li>
@@ -191,13 +240,14 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">4.3 Data Retention</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.3 Data Retention</h3>
                     <p className="text-gray-300 mb-2">We retain your personal data only as long as necessary:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li><span className="font-semibold">Active Projects:</span> Duration of the project plus 2 years for warranty and support purposes</li>
                       <li><span className="font-semibold">Business Records:</span> 7 years as required by UAE commercial law</li>
                       <li><span className="font-semibold">Marketing Data:</span> Until you withdraw consent or request deletion</li>
                       <li><span className="font-semibold">Website Analytics:</span> Anonymized after 26 months (Google Analytics default)</li>
+                      <li><span className="font-semibold">ChatKit Conversations:</span> For the life of the service (see Section 3.5)</li>
                     </ul>
                     <p className="text-gray-300 mt-3">
                       When data is no longer needed, it is securely deleted or anonymized.
@@ -209,18 +259,19 @@ export default function PrivacyPage() {
               {/* Sharing Your Information */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  5. Sharing Your Information
+                  6. Sharing Your Information
                 </h2>
                 <p className="text-gray-300 mb-6">
                   We do not sell, rent, or trade your personal information. We may share your data only in the following circumstances:
                 </p>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.1 Service Providers</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.1 Service Providers</h3>
                     <p className="text-gray-300 mb-2">We may share data with trusted third parties who assist in:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
-                      <li><span className="font-semibold">Hosting Services:</span> Vercel and Railway for infrastructure</li>
-                      <li><span className="font-semibold">Communication:</span> Email service providers for business correspondence</li>
+                      <li><span className="font-semibold">Hosting and Database:</span> Vercel and Supabase for infrastructure</li>
+                      <li><span className="font-semibold">AI Processing:</span> Anthropic PBC (Claude API) for generating ChatKit chatbot replies</li>
+                      <li><span className="font-semibold">Communication:</span> Resend and other email service providers for business correspondence and reports</li>
                       <li><span className="font-semibold">Payment Processing:</span> Payment processors for invoice payments (when implemented)</li>
                     </ul>
                     <p className="text-gray-300 mt-3">
@@ -228,7 +279,7 @@ export default function PrivacyPage() {
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.2 Legal Requirements</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.2 Legal Requirements</h3>
                     <p className="text-gray-300 mb-2">We may disclose information when required by:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>UAE law or UAQ Free Trade Zone regulations</li>
@@ -238,13 +289,13 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.3 Business Transfers</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.3 Business Transfers</h3>
                     <p className="text-gray-300">
                       In the event of a merger, acquisition, or sale of assets, your data may be transferred to the acquiring entity, subject to the same privacy protections.
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">5.4 With Your Consent</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.4 With Your Consent</h3>
                     <p className="text-gray-300">
                       We may share information for purposes not listed here with your explicit consent.
                     </p>
@@ -255,11 +306,11 @@ export default function PrivacyPage() {
               {/* Your Rights */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  6. Your Rights
+                  7. Your Rights
                 </h2>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.1 Rights Under GDPR (for EU/EEA Users)</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.1 Rights Under GDPR (for EU/EEA Users)</h3>
                     <p className="text-gray-300 mb-2">You have the right to:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li><span className="font-semibold">Access:</span> Request a copy of your personal data</li>
@@ -273,7 +324,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.2 Rights Under UAE Law</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.2 Rights Under UAE Law</h3>
                     <p className="text-gray-300 mb-2">Under UAE data protection regulations, you have the right to:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Access your personal information</li>
@@ -283,7 +334,7 @@ export default function PrivacyPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">6.3 Exercising Your Rights</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.3 Exercising Your Rights</h3>
                     <p className="text-gray-300 mb-2">To exercise any of these rights, please contact us at:</p>
                     <div className="bg-[#7042f810] p-6 rounded-lg border border-purple-500/20">
                       <p className="text-gray-300 mb-1"><span className="font-semibold text-white">Email:</span> contact@mdntech.org</p>
@@ -299,17 +350,17 @@ export default function PrivacyPage() {
               {/* Cookies and Tracking */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  7. Cookies and Tracking Technologies
+                  8. Cookies and Tracking Technologies
                 </h2>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.1 What Are Cookies?</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">8.1 What Are Cookies?</h3>
                     <p className="text-gray-300">
                       Cookies are small text files stored on your device that help us provide and improve our services.
                     </p>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.2 Types of Cookies We Use</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">8.2 Types of Cookies We Use</h3>
                     <div className="space-y-4">
                       <div>
                         <p className="font-semibold text-cyan-400 mb-2">Essential Cookies (Always Active):</p>
@@ -327,6 +378,13 @@ export default function PrivacyPage() {
                         </ul>
                       </div>
                       <div>
+                        <p className="font-semibold text-cyan-400 mb-2">Local Storage (ChatKit widget):</p>
+                        <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
+                          <li>A randomly generated visitor ID and conversation ID that keep your chat session continuous across page loads</li>
+                          <li>Not used for advertising or cross-site tracking; removed when you clear your browser data</li>
+                        </ul>
+                      </div>
+                      <div>
                         <p className="font-semibold text-cyan-400 mb-2">Future Cookies:</p>
                         <p className="text-gray-300 mb-2">As we implement additional features, we may use:</p>
                         <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
@@ -337,7 +395,7 @@ export default function PrivacyPage() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-400 mb-3">7.3 Managing Cookies</h3>
+                    <h3 className="text-xl font-semibold text-purple-400 mb-3">8.3 Managing Cookies</h3>
                     <p className="text-gray-300 mb-2">
                       You can control cookies through your browser settings. Note that disabling essential cookies may affect website functionality.
                     </p>
@@ -351,7 +409,7 @@ export default function PrivacyPage() {
               {/* International Data Transfers */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  8. International Data Transfers
+                  9. International Data Transfers
                 </h2>
                 <p className="text-gray-300 mb-4">
                   As we serve clients internationally, including in the European Union, your data may be transferred across borders. We ensure such transfers comply with:
@@ -369,7 +427,7 @@ export default function PrivacyPage() {
               {/* Children's Privacy */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  9. Children&apos;s Privacy
+                  10. Children&apos;s Privacy
                 </h2>
                 <p className="text-gray-300">
                   Our services are not directed to individuals under 18 years of age. We do not knowingly collect personal information from children. If you believe we have collected data from a minor, please contact us immediately.
@@ -379,7 +437,7 @@ export default function PrivacyPage() {
               {/* Third-Party Links */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  10. Third-Party Links
+                  11. Third-Party Links
                 </h2>
                 <p className="text-gray-300">
                   Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external sites. We encourage you to review their privacy policies.
@@ -389,7 +447,7 @@ export default function PrivacyPage() {
               {/* Data Breach Notification */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  11. Data Breach Notification
+                  12. Data Breach Notification
                 </h2>
                 <p className="text-gray-300 mb-4">
                   In the unlikely event of a data breach that poses a risk to your rights and freedoms, we will:
@@ -405,7 +463,7 @@ export default function PrivacyPage() {
               {/* Changes to Privacy Policy */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  12. Changes to This Privacy Policy
+                  13. Changes to This Privacy Policy
                 </h2>
                 <p className="text-gray-300 mb-4">
                   We may update this Privacy Policy periodically to reflect changes in our practices, new legal requirements, service improvements or new features.
@@ -423,7 +481,7 @@ export default function PrivacyPage() {
               {/* Contact Us */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  13. Contact Us
+                  14. Contact Us
                 </h2>
                 <p className="text-gray-300 mb-6">
                   For questions, concerns, or requests regarding this Privacy Policy or your personal data:
@@ -442,7 +500,7 @@ export default function PrivacyPage() {
               {/* Supervisory Authority */}
               <section className="mb-12">
                 <h2 className="text-3xl font-semibold text-white mb-6 border-b border-purple-500/30 pb-3">
-                  14. Supervisory Authority
+                  15. Supervisory Authority
                 </h2>
                 <div className="space-y-4">
                   <div>

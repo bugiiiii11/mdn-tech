@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). Phase 0 + Phase 1 LIVE ON PROD. **The website rebuild is MERGED AND LIVE on mdntech.org (S60, merge `ad2e4f1`)** -- `feat/landing-rebuild` is fully in `main`. The customer portal is gated behind `APP_LIVE` (see below), so the live site links to app.mdntech.org nowhere. Next: 0c privacy disclosure, /sk alignment + SEO re-audit, Phase 2 credit bank.
-- **Session count:** 61
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). Phase 0 + Phase 1 LIVE ON PROD. **The website rebuild is MERGED AND LIVE on mdntech.org (S60, merge `ad2e4f1`)** -- `feat/landing-rebuild` is fully in `main`. The customer portal is gated behind `APP_LIVE` (see below), so the live site links to app.mdntech.org nowhere. 0c privacy disclosure DONE (S62). Next: **/sk rework (S63, plan committed)**, then SEO re-audit + Phase 2 credit bank.
+- **Session count:** 62
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 52 | 2026-08-07 | Phase 0 merged to main + Phase 1 hardening 1.1-1.6 (migration 021 applied) |
 | 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
 | 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
@@ -22,16 +21,7 @@
 | 59 | 2026-08-14 | /about + /blog on hero shell; founder-forward team; constellation blog cards |
 | 60 | 2026-08-15 | APP_LIVE portal gate + merge to main; website rebuild live on prod |
 | 61 | 2026-08-15 | /sk realizacie refresh (4 projects, fresh captures) + SK footer on the EN shell |
-
-## What Was Done (Session 60) -- APP_LIVE portal gate + merge to main
-
-- **`feat/landing-rebuild` MERGED into `main` and PUSHED** (`ad2e4f1`, 99 files, +7602/-1350; `7f8cf98` is the gate itself). The rebuild is live on mdntech.org. main and the branch have identical trees.
-- **THE PORTAL GATE -- `APP_LIVE` in `lib/marketing/products.ts`.** User decision: while the portal is not ready, NO surface on the marketing site may walk a visitor to app.mdntech.org. One build-time flag drives all 15 entry points. `NEXT_PUBLIC_APP_LIVE` is unset in Production -> default CLOSED (deliberate fail-safe, same shape as `getLandingMode`). To open the portal: set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. No code change, every CTA returns at once.
-- Three treatments, chosen per surface: **chrome drops** (navbar "Open App" desktop + mobile, footer "Open the App" -- a dead button in site chrome reads as broken), **buttons go inert** (`appCta()` -> `{href:"", label:"Coming soon", disabled:true}`, rendered by `CtaButton`/`HERO_CTA_DISABLED_CLASS` as an `aria-disabled` span OUT of the tab order), **prose adapts** (landing FAQ drops its "Try it free" clause; /toolkit closing falls back to the internal /chatkit page; /chatkit pricing has a whole second truthful disclosure paragraph).
-- Machine-readable claims went with the links: `SoftwareApplication.installUrl` and `Offer.availability` are omitted while closed (InStock is a claim you can start today, and you cannot), the /toolkit FAQ signup link drops out of the FAQPage JSON-LD via `faqAnswerText()`, and the app preconnect/dns-prefetch leaves `app/layout.tsx`.
-- Verified in the BUILT HTML: **zero `app.mdntech.org` across every static page**, then re-verified on PROD after deploy. Gate green; screenshots at 1280 + 375 on / and /chatkit, overflowX=0 everywhere.
-- **The host itself is untouched** -- app.mdntech.org still answers if typed directly (it is already noindex). Deliberate: blocking it would also block Martin's own E2E pass (task 5).
-- 0c (ChatKit privacy disclosure) did NOT block the merge: no ChatKit widget runs on the marketing site and no new visitor can sign up while the gate is closed, so this deploy starts no new data collection. It is still required before the portal opens.
+| 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 
 ## What Was Done (Session 61) -- /sk realizacie refresh + SK footer on the EN shell
 
@@ -43,6 +33,16 @@
 - **SK footer rebuilt on the EN footer's shell** (#010109 panel, violet horizon hairline, uppercase column heads, social row, same bottom bar). Newsletter slot became a consultation CTA instead -- /sk closes on its own contact form and the newsletter copy is English-only. Columns render from `SK_NAV_LINKS` + `SK_NAP` so they cannot drift from the page. The old "DO NOT TOUCH /sk" comment on that component is gone.
 - **`COMPANY_LEGAL_LINE` in `lib/marketing/links.ts` is the single legal footprint** both footers render. The Slovak postal address (Recka cesta 182, Senec-Boldog) is deleted sitewide -- zero hits in the build. `SK_NAP` never carried an address, so no JSON-LD change was needed.
 - Gate green; overflowX=0 at 1280 + 375; screenshot-verified. Pushed straight to `main` (prod) at user request.
+
+## What Was Done (Session 62) -- ChatKit privacy disclosure (task 0c)
+
+- **`/privacy` gained Section 3 "ChatKit Chat Widget"** (`app/(marketing)/privacy/page.tsx`), the last blocker on 0d besides Phase 2. Discloses what `message/route.ts` actually writes: full transcripts, the localStorage visitor ID, `visitor_ip`, `source_url`, and optional feedback ratings -- none of which the policy had mentioned.
+- **The controller/processor split is the substantive call (3.4):** on a CUSTOMER's site the customer is data controller and we are processor, so visitor rights requests go to the site they chatted on and we assist. On our own site we are controller. This is what makes the widget sellable to EU SMEs -- do not water it down without thinking it through.
+- **Retention = "life of the service" (user decision, deliberate).** Deleted when the conversation, the chatbot, or the account goes. A fixed rolling window (12/24mo) was offered and REJECTED: it would have committed us to a cleanup cron that does not exist. Nothing auto-deletes today and the policy now matches that truthfully.
+- Also states Anthropic does not train on the data, that site owners can read/export their own bot's conversations, that auto-learning reviews transcripts + ratings, and that IP rate-limit counters expire within 24h. Plus a "do not share sensitive data in chat" advisory.
+- **Stale-processor cleanup in the same pass: Railway is GONE from the policy** (sections 2.3, 5.1, 6.1) -- it hosts nothing anymore; replaced with Supabase. Anthropic + Resend added as sub-processors, ChatKit row added to the retention list, and the widget's localStorage got its own entry in the cookies section.
+- Sections renumbered 1-15 (ChatKit inserted at 3), "Last Updated" -> 2026-08-16. ESLint clean; `/terms` has no cross-references to the old numbers. Gate still green -- no app.mdntech.org link added.
+- **NOT legal-reviewed.** Drafted by Claude from the code, not by counsel. Worth a pass from Martin or Filip (already holds compliance question SS2.0b) before the portal opens. Note the policy still says "Google Analytics (when implemented)" -- true today, revisit in MarketKit B1.
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
@@ -62,9 +62,9 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0a | /sk alignment | /about + /blog rebuilt (S59); /sk hero matches EN (S58); realizacie + footer done (S61). REMAINING: align the /sk services + value-ladder copy with the product-first story, THEN re-run the SEO audit -- `seo-audit/` is STALE (predates the rebuild). Target clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills" (low competition). Re-audit should confirm the S58 breadcrumb-schema removal is acceptable, or restore visible trails + schema together, and re-check the S60 `installUrl`/`availability` omissions. Also queue: `/blog/[slug]` article-page redesign to match the new index. |
-| 0c | **ChatKit privacy disclosure** | No longer blocks the marketing pages (S60 gate closed the funnel) but BLOCKS opening the portal: transcripts + visitor IPs + `source_url` are stored (`message/route.ts`), `/privacy` documents none of it. Needs a ChatKit section -- Martin's call on wording. |
-| 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. Do this ONLY after 0c and Phase 2 checkout. Verify afterwards that the built HTML has app links back and that no "Coming soon" span survives. |
+| 0a | **/sk REWORK -- NEXT SESSION (S63)** | Plan committed: `command-center/mdntech-sk-rework.md` (v1.0, 171 lines) -- READ IT FIRST, it has the audited current state, target section order and the Slovak copy already drafted. Scope: trust (new `SkAbout` "Kto sme" founder section + FAQ w/ FAQPage schema), CRM elevated to flagship service, new `/sk/referencie/royal-stroje` case study. Driver: Royal Stroje partner email campaign (~150 warm contacts, early September) lands on this page. Positioning: "slovensky founder, medzinarodna firma" -- UAE entity transparent but NOT the headline; invoicing FAQ is a trust weapon. Copy lives in `constants/sk.ts`. Open item in the plan: LinkedIn `sameAs` slug `/company/mdntech/` is NOT claimed yet (real page is `/company/111977261`) -- claim it or fix the constant. |
+| 0a2 | SEO re-audit (after /sk) | `seo-audit/` is STALE (predates the rebuild). Target clusters: /chatkit = "AI chatbot for website"; /toolkit = "Claude Code skills" (low competition). Re-audit should confirm the S58 breadcrumb-schema removal is acceptable, or restore visible trails + schema together, and re-check the S60 `installUrl`/`availability` omissions. Also queue: `/blog/[slug]` article-page redesign to match the new index. |
+| 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. 0c is DONE (S62), so the remaining gate is Phase 2 checkout. Verify afterwards that the built HTML has app links back and that no "Coming soon" span survives. Get `/privacy` a human legal read before flipping it. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250), 3 mock-checkout routes collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" badge on Scale; 2.7 policy build (12-mo expiry + warning email, refund window, auto re-credit, chargeback clawback + auto-suspend, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Grant SELECT-only to `authenticated` on the ledger; all writes service-role. |
 | 3 | Phase 3.5 E2E + CI | Port the S51 + S52 probe scripts into a committed suite. Add GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
 | 4 | Widen the Phase 1 controls | Authenticated portal routes still unlimited; nonce-based CSP via middleware is the follow-up. |
@@ -87,6 +87,8 @@
 | `components/main/hero-shell.ts` | THE hero contract for /, /sk, /chatkit, /toolkit (full-viewport shell, blackhole framing, CTA sizes). MUST stay under `components/` -- Tailwind does not scan `lib/`, and the failure is silent |
 | `components/product-pages/` | Shared shells, now the real system: `primitives.tsx` barrel over `motion-primitives` (PageHero, Section, CtaBand, CtaButton+size, FADE_UP), `static-primitives` (GlassCard, StatChip, CheckItem, PROSE_LINK_CLASS -- owns font-medium, never append to it), `faq.tsx` (FaqSection + faqPageSchema -- ALL FAQ surfaces use it), `schema.ts` (@id refs), `code-block.tsx` |
 | `constants/sk.ts` | ALL /sk copy + data. `SK_PORTFOLIO` order = render order; `SK_NAP` + `SK_NAV_LINKS` feed the SK footer. Re-shoot previews with `node scripts/capture-portfolio.mjs [name]` |
+| `command-center/mdntech-sk-rework.md` | THE /sk rework plan (v1.0) -- next session's brief. Slovak copy drafted, section order decided |
+| `app/(marketing)/privacy/page.tsx` | Privacy policy. Section 3 = ChatKit (what the widget stores, controller/processor split, life-of-service retention). Update it whenever chat data handling changes |
 | NEVER hard-code these | `lib/portal/plans.ts` (prices/allowances), `lib/marketing/toolkit-catalogue.ts` (skill counts), `lib/chat/rate-limit-rules.ts` (limiter numbers), `lib/marketing/links.ts` (`COMPANY_LEGAL_LINE` -- the one legal footprint both footers render). Marketing copy interpolates from all four |
 | `app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/` | The 3 mock checkout routes -- collapse into one credit purchase + ledger spends (Phase 2) |
 | `supabase/migrations/{020_security_fixpack,021_chatkit_hardening}.sql` | Security model. Read 020 before touching billing columns |
