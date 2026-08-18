@@ -29,7 +29,7 @@ import { FREE_TRIAL_MESSAGES } from "@/lib/portal/plans";
 // The literal embed, exactly as EmbedSnippet produces it, with an obviously
 // fake id. This is real content a visitor needs to read — NOT aria-hidden.
 const EMBED_SNIPPET =
-  '<script src="https://www.mdntech.org/widget.js" data-chatbot-id="your-chatbot-id"></script>';
+  '<script src="https://mdntech.org/widget.js" data-chatbot-id="your-chatbot-id"></script>';
 
 const steps = [
   {

@@ -18,6 +18,12 @@ import Script from "next/script";
  * `afterInteractive` deliberately: the widget must never compete with the
  * hero for main-thread time on a mobile connection — LCP on /sk is the
  * number the campaign is judged on.
+ *
+ * The src is RELATIVE on purpose. Customer sites load this from an absolute
+ * URL, but our own pages run under `script-src 'self'` (next.config.js), and
+ * www.mdntech.org is a separate origin as far as CSP is concerned — an
+ * absolute www URL here is blocked outright and the widget never appears.
+ * Same-origin also keeps the API calls inside `connect-src 'self'`.
  */
 export const SkChatWidget = () => {
   const chatbotId = process.env.NEXT_PUBLIC_SK_CHATBOT_ID;
@@ -25,7 +31,7 @@ export const SkChatWidget = () => {
 
   return (
     <Script
-      src="https://www.mdntech.org/widget.js"
+      src="/widget.js"
       data-chatbot-id={chatbotId}
       strategy="afterInteractive"
     />

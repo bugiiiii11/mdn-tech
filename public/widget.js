@@ -7,7 +7,20 @@
   var chatbotId = script.getAttribute('data-chatbot-id');
   if (!chatbotId) return console.warn('[MDN Chat] Missing data-chatbot-id');
 
-  var baseUrl = script.src.replace(/\/widget\.js.*$/, '').replace('://mdntech.org', '://www.mdntech.org');
+  // Normalise the API base onto the APEX, never www.
+  //
+  // www.mdntech.org is a 308 redirect to mdntech.org, and browsers refuse to
+  // follow redirects on a CORS preflight. The message POST sends
+  // Content-Type: application/json, which forces a preflight -- so any embed
+  // that resolved its base to www failed every send with an opaque CORS error.
+  // This used to rewrite in the opposite direction, from before the apex
+  // became canonical.
+  //
+  // Snippets already pasted into customer sites still say www, so the rewrite
+  // (rather than just trusting script.src) is what repairs them without anyone
+  // having to touch their HTML: the script tag follows the redirect and gets
+  // this file, which then points itself back at the apex.
+  var baseUrl = script.src.replace(/\/widget\.js.*$/, '').replace('://www.mdntech.org', '://mdntech.org');
   var CONFIG = null;
   var STATE = {
     open: false,

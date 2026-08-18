@@ -220,7 +220,10 @@ const payload = {
     // on the bubble, white logo mark inside it.
     primary_color: "#7042f8",
     secondary_color: "#06b6d4",
-    launcher_icon: "https://www.mdntech.org/brand/png/logo-final-white-500.png",
+    // Apex, not www: www is a 308 redirect, and this is fetched on every
+    // widget render. The config route only accepts https URLs, so it must stay
+    // absolute even though the widget now runs same-origin on our own pages.
+    launcher_icon: "https://mdntech.org/brand/png/logo-final-white-500.png",
     input_placeholder: "Napíšte správu...",
     system_prompt: systemPrompt,
     fallback_message: `Toto zatiaľ neviem zodpovedať. Napíšte nám na ${SK_NAP.email} a ozveme sa.`,

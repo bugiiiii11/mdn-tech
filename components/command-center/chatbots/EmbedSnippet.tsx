@@ -5,7 +5,10 @@ import { Copy, Check } from 'lucide-react'
 
 export function EmbedSnippet({ chatbotId }: { chatbotId: string }) {
   const [copied, setCopied] = useState(false)
-  const snippet = `<script src="https://www.mdntech.org/widget.js" data-chatbot-id="${chatbotId}"></script>`
+  // Apex, not www: www.mdntech.org is a 308 redirect, and a preflighted
+  // request cannot follow one. widget.js normalises www -> apex for snippets
+  // already pasted into customer sites, but new ones should not need it.
+  const snippet = `<script src="https://mdntech.org/widget.js" data-chatbot-id="${chatbotId}"></script>`
 
   function copy() {
     navigator.clipboard.writeText(snippet)
