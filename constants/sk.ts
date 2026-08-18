@@ -147,7 +147,7 @@ export const SK_WHY_US = [
     icon: "gift",
     title: "Bezplatná biznis analýza",
     description:
-      "Ku každému webu pridávame biznis analýzu, ktorá odhalí príležitosti rastu vášho podnikaniana a eliminuje slabé stránky.",
+      "Ku každému webu pridávame biznis analýzu, ktorá odhalí príležitosti rastu vášho podnikania a eliminuje slabé stránky.",
   },
   {
     icon: "layers",

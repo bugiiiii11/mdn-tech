@@ -29,6 +29,18 @@ const csp = [
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
+// mdntech.sk is a redirect-only domain: it exists so Slovak prospects can be
+// handed a .sk address, and it lands them on the Slovak page rather than the
+// English homepage. Vercel's own "Redirect to" domain setting cannot do that
+// -- it only maps a host to the SAME path on another host -- so the mapping
+// lives here instead, and both .sk hosts are added to the project as normal
+// domains. Redirects run before middleware, so .sk traffic never pays for a
+// Supabase session refresh.
+//
+// Query strings are forwarded automatically, which is what keeps campaign UTMs
+// (lib/marketing/attribution.ts) alive across the hop.
+const SK_DOMAIN_HOSTS = ["mdntech.sk", "www.mdntech.sk"];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -42,6 +54,25 @@ const nextConfig = {
       "/command-center/knowledge": ["./command-center/knowledge/**/*.md"],
       "/command-center/knowledge/*": ["./command-center/knowledge/**/*.md"],
     },
+  },
+  async redirects() {
+    // Order matters: "/" is also matched by "/:path*" (zero segments), so the
+    // root rule has to come first for each host or the bare domain would land
+    // on the English homepage.
+    return SK_DOMAIN_HOSTS.flatMap((host) => [
+      {
+        source: "/",
+        has: [{ type: "host", value: host }],
+        destination: "https://mdntech.org/sk",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: host }],
+        destination: "https://mdntech.org/:path*",
+        permanent: true,
+      },
+    ]);
   },
   async headers() {
     return [
