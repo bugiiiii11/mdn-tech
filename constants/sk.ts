@@ -350,7 +350,13 @@ export const SK_CRM_SCREENSHOT: {
   src: string;
   alt: string;
   caption: string;
-} | null = null;
+} | null = {
+  // 1920x1080, exactly the 16:9 the section renders, so nothing is cropped.
+  src: "/portfolio/royal-crm-katalog.png",
+  alt: "Katalóg zariadení v CRM systéme Command Center — zoznam strojov s kategóriou, cenou za deň a dostupnosťou",
+  caption:
+    "Command Center, ktorý denne používa Royal Stroje — katalóg strojov s kategóriami, cenami a dostupnosťou.",
+};
 
 // --- Kto sme (founder trust section, anchor #kto-sme) --------------------
 // Positioning (rework plan v1.0): "slovenský founder, medzinárodná firma" —
