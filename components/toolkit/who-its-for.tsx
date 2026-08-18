@@ -73,8 +73,9 @@ export const WhoItsFor = () => (
           <CheckItem title="Your Claude Code bill climbs on long sessions">
             {skillName("caveman")} strips narration and filler from responses —
             the author reports roughly a 65% cut in output tokens — and the
-            auto-wrap thresholds keep the prompt side under the long-context
-            premium rate. Two different halves of the same bill.
+            auto-wrap thresholds keep the prompt side small, which matters
+            because every request re-bills the entire prompt. Two different
+            halves of the same bill.
           </CheckItem>
 
           <CheckItem title="You need a chatbot knowledge base from a codebase">

@@ -69,8 +69,8 @@ export const toolkitSkills: ToolkitSkill[] = [
     verified: true,
     installationUrl: 'https://github.com/bugiiiii11/handoff/blob/main/skills/handoff/SKILL.md',
     details:
-      'One skill, four subcommands. start reads a hard-capped handoff.md and briefs the session; wrap updates docs, rotates history to an archive, and commits locally (never pushes unasked); save is a fire-exit snapshot before context runs out; docs refreshes documentation without a commit. Ships with optional hooks that measure real context usage from the transcript and nudge a wrap at 15% / 17% of the window.',
-    useCases: ['Session briefing', 'Context persistence', 'Auto-wrap before the long-context price cliff'],
+      'One skill, four subcommands. start reads a hard-capped handoff.md and briefs the session; wrap updates docs, rotates history to an archive, and commits locally (never pushes unasked); save is a fire-exit snapshot before context runs out; docs refreshes documentation without a commit. Ships with optional hooks that measure real context usage from the transcript: at 20% of the window they ask for a checkpoint that keeps the session going, at 22% for the full wrap.',
+    useCases: ['Session briefing', 'Context persistence', 'Checkpoint before long context degrades answers'],
   },
   {
     id: 'cmo',

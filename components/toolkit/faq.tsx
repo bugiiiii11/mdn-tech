@@ -86,9 +86,9 @@ const FAQS: FaqEntry[] = [
     },
   },
   {
-    question: "Why do the auto-wrap hooks nudge at 15% of the context window?",
+    question: "Why do the auto-wrap hooks nudge at 20% of the context window?",
     answer:
-      "To keep the session under Claude's long-context premium rate. Wrapping early costs a commit; wrapping late costs every subsequent request. The soft threshold, the hard threshold and the assumed window size are all environment variables, so if your model or your budget is different you can move all three.",
+      "For answer quality, not for price — there is no long-context surcharge on current Claude models, which bill one flat rate across the whole window. What does change is recall: the longer the prompt, the vaguer the answers, and by the time you notice it has been happening for a while. The nudge is early so the state file gets written while the model is still summarising well. The two thresholds do different things — 20% asks for a checkpoint that writes the state file and keeps working, 22% asks for the full wrap that ends the session. Both thresholds and the assumed window size are environment variables, so you can move all three.",
   },
   {
     question: "Do these work on Windows?",

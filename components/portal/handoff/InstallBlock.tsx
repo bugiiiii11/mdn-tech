@@ -173,11 +173,15 @@ export function InstallBlock() {
           <div className="mt-3 px-5 py-4 bg-white/[0.02] border border-white/10 rounded-lg space-y-3 text-sm text-gray-300">
             <p>
               Two small bash scripts read the <span className="text-white">real context size</span> from
-              the session transcript and nudge a{' '}
+              the session transcript. At 20% of the window they ask for a{' '}
+              <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
+                /handoff docs
+              </code>{' '}
+              checkpoint and you keep working; at 22% they ask for the full{' '}
               <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">
                 /handoff wrap
               </code>{' '}
-              at 15% of the window (hard nudge at 17%) — before long-context premium pricing kicks in.
+              — early enough that state gets written before long context starts blurring the answers.
               Requires <code className="font-mono text-purple-300 text-xs bg-white/5 px-1.5 py-0.5 rounded">jq</code>{' '}
               and bash (Git Bash on Windows works).
             </p>
