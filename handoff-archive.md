@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 64) -- /sk live on prod: merge, C3 attribution, C2 branded chatbot (rotated 2026-08-18)
+
+- **/sk rework merged to main and LIVE** (ff-merge, then `12e3942` + `19628de` pushed). Merge-to-main was the user's explicit call over a preview branch, with FAQ #4/#5 still awaiting Filip -- campaign send stays gated, the deploy does not.
+- **C3 attribution is FIRST-TOUCH via sessionStorage** (`lib/marketing/attribution.ts`): the capture is mounted in the MARKETING LAYOUT, not the forms -- the campaign lands on the case-study page which has no form, and a form-level capture recorded those visitors as "direct" (caught by probe). sessionStorage deliberately: not a cookie, so /privacy stays truthful. **GAP: EmailJS template must gain a `{{attribution}}` line or the data never reaches the inbox** -- Martin task.
+- **C2 chatbot LIVE on /sk + case study** (bot `46ef0a99`, owner-less BY DESIGN: owner-less = internal = metered by `INTERNAL_BOT_DAILY_RULE` instead of customer credits; `allowed_domains` is then the only theft guard -- never leave it empty). `NEXT_PUBLIC_SK_CHATBOT_ID` set via Vercel API (production+preview); widget renders nothing without it.
+- **KB anti-drift contract:** `scripts/seed-sk-chatbot.mjs` REBUILDS the whole KB from `constants/sk.ts` -- Command Center KB edits are wiped by a re-run. Lasting copy changes go in constants + re-seed; `--dry` prints without writing.
+- **Widget branding is per-bot config, sellable to customers:** `launcher_icon` (https img in bubble + header), `secondary_color` (gradient), `input_placeholder` (non-EN bots). Config route validates all three (hex/https) because the widget splices them into CSS/img src; `primary_color` was passed through RAW before -- now validated too. Placeholder set as DOM property, never concatenated (esc() covers element text, not attributes).
+- **`WidgetConfigForm` saves `widget_config` WHOLESALE** -- any new widget field must be added to the form state or saving the form silently erases it. Rule now documented in the form.
+- User dropped redrawn logo vectors in `public/brand/` (see its README) + added plan task C7: roll out sitewide. Widget keeps white `logo.png` -- the new gradient mark would vanish on the purple bubble; C7 needs a white variant for the widget.
+
 ## What Was Done (Session 63) -- /sk rework: CRM flagship + trust + Royal Stroje case study (rotated 2026-08-17)
 
 - **Task 0a built and committed on `feat/sk-rework` (`7eab7b4`), gate green -- NOT merged, NOT pushed.** SK-A AND SK-B from `command-center/mdntech-sk-rework.md` v1.0 in one pass: SkCrm (#crm), SkAbout (#kto-sme), SkFaq (#faq, 8 entries), CRM in title/description/keywords/hero/serviceType, nav = Sluzby/CRM/Referencie/Kto sme/FAQ/Kontakt, RS portfolio card -> flagship linking to the new `/sk/referencie/royal-stroje` page (static, Article + BreadcrumbList from the visible trail, in sitemap).
@@ -212,6 +222,7 @@
 | 53 | 2026-08-12 | Phase 1 deployed + verified on prod; landing SEO rework v2.1 + 4 false claims fixed |
 | 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
+| 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
