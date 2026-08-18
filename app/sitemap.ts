@@ -71,11 +71,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...blogUrls,
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date("2026-01-20"),
+      lastModified: new Date("2026-08-18"),
     },
     {
       url: `${baseUrl}/terms`,
       lastModified: new Date("2026-01-20"),
+    },
+    // Slovak translations of the two legal pages. No `alternates` block yet:
+    // hreflang has to be declared on BOTH sides to count, and the English
+    // originals are client components that cannot export metadata. Pairing
+    // them up is queued with the SEO re-audit.
+    {
+      url: `${baseUrl}/sk/ochrana-osobnych-udajov`,
+      lastModified: new Date("2026-08-18"),
+    },
+    {
+      url: `${baseUrl}/sk/obchodne-podmienky`,
+      lastModified: new Date("2026-08-18"),
     },
   ];
 }

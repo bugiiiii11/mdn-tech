@@ -185,7 +185,7 @@ export const SK_PORTFOLIO = [
     image: "/portfolio/royalstroje.jpg",
     description:
       "Web, CRM na mieru a AI chatbot pre požičovňu náradia a stavebnej techniky v Senci — katalóg strojov, evidencia zákaziek a asistent, ktorý odpovedá 24/7.",
-    tags: ["Web", "CRM", "AI chatbot"],
+    tags: ["Web", "CRM", "Lokálne SEO", "AI chatbot"],
     // Flagship reference: the card links to the case study instead of the
     // live site (the live-site link moves into the case study itself).
     caseStudyHref: "/sk/referencie/royal-stroje",
@@ -270,7 +270,51 @@ export const SK_PRICING = {
 export const SK_CRM = {
   title: "CRM systém presne pre vašu firmu",
   intro:
-    "Excel a papierové zošity fungujú — kým firma nerastie. Postavíme vám CRM presne podľa vašich procesov: evidencia zákazníkov a zákaziek, správa strojov či inventára, automatické podklady k fakturácii, prehľady na jeden klik.",
+    "Excel a papierové zošity fungujú — kým firma nerastie. Postavíme vám vlastný systém, ktorý pokryje celú operatívu: klientov, stroje či produkty, faktúry, termíny aj prehľady. Nie krabicový softvér, do ktorého sa musíte vtesnať, ale systém postavený na vašich procesoch.",
+  // The six modules are the ones we actually build and hand over — they map
+  // 1:1 onto the menu of a delivered system, so a prospect who later sees a
+  // demo recognises every item. Adding an aspirational module here would
+  // break that, and the chatbot repeats this list verbatim from the seed
+  // script.
+  modulesTitle: "Čo taký systém bežne obsahuje",
+  modules: [
+    {
+      icon: "dashboard",
+      title: "Dashboard",
+      description:
+        "Čísla, ktoré potrebujete vidieť ráno ako prvé — otvorené zákazky, dnešné vrátenia, stav faktúr. Jedna obrazovka namiesto piatich tabuliek.",
+    },
+    {
+      icon: "clients",
+      title: "Databáza klientov",
+      description:
+        "Kompletná história každého zákazníka na jednom mieste: kontakty, zákazky, doklady. Kto si čo požičal a kedy — bez hľadania v e-mailoch.",
+    },
+    {
+      icon: "catalogue",
+      title: "Katalóg produktov a strojov",
+      description:
+        "Evidencia strojov, náradia alebo tovaru s parametrami, kategóriami a dostupnosťou. Ten istý katalóg viete napojiť priamo na web.",
+    },
+    {
+      icon: "invoice",
+      title: "Tvorba faktúr",
+      description:
+        "Faktúra vznikne priamo zo zákazky na pár klikov — bez prepisovania údajov medzi systémami a bez preklepov v sumách.",
+    },
+    {
+      icon: "calendar",
+      title: "Kalendár a úlohy",
+      description:
+        "Termíny, vrátenia a servis zapíšete rovno do kalendára. Tím vidí, čo sa deje dnes a čo je na budúci týždeň.",
+    },
+    {
+      icon: "reports",
+      title: "Manažment faktúr a reporty",
+      description:
+        "Prehľad vystavených, uhradených a faktúr po splatnosti. Viete presne, kto ešte nezaplatil, bez toho, aby ste si to museli pamätať.",
+    },
+  ],
   benefits: [
     "Na mieru vašim procesom — žiadne ohýbanie firmy podľa softvéru",
     "Prístup z mobilu aj z kancelárie",
@@ -281,8 +325,7 @@ export const SK_CRM = {
     eyebrow: "Referencia",
     name: "royalstroje.sk",
     description:
-      "Web, CRM na správu požičovne a AI chatbot pre jedného klienta.",
-    image: "/portfolio/royalstroje.jpg",
+      "Web s katalógom strojov, CRM na správu požičovne, lokálne SEO a AI chatbot — pre jedného klienta.",
     caseStudy: {
       label: "Pozrite si prípadovú štúdiu",
       href: "/sk/referencie/royal-stroje",
@@ -290,6 +333,24 @@ export const SK_CRM = {
   },
   cta: { label: "Chcem nezáväznú konzultáciu k CRM", href: "#kontakt" },
 } as const;
+
+/**
+ * Screenshot of a real delivered Command Center, shown in the CRM section.
+ *
+ * NULL-GATED ON PURPOSE, the same rule the case-study results follow: the
+ * section is written to read completely without it, so it can never ship a
+ * broken image while we wait for an export. Flip it on by setting `src` once
+ * the file exists in public/.
+ *
+ * Whatever is captured must contain NO client-identifying data -- no customer
+ * names, no revenue, no invoice totals. The equipment catalogue qualifies
+ * because every machine on it is already public on the client's own website.
+ */
+export const SK_CRM_SCREENSHOT: {
+  src: string;
+  alt: string;
+  caption: string;
+} | null = null;
 
 // --- Kto sme (founder trust section, anchor #kto-sme) --------------------
 // Positioning (rework plan v1.0): "slovenský founder, medzinárodná firma" —

@@ -157,10 +157,13 @@ const SkFooter = () => {
           <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
             <p className="leading-relaxed">{COMPANY_LEGAL_LINE}</p>
             <div className="flex items-center gap-4 flex-shrink-0">
-              <Link href="/privacy" className="hover:text-gray-300 transition-colors">
+              {/* Slovak translations, not the English originals — these
+                  labels pointed at /privacy and /terms and dropped a Slovak
+                  visitor into an English legal document. */}
+              <Link href="/sk/ochrana-osobnych-udajov" className="hover:text-gray-300 transition-colors">
                 Ochrana súkromia
               </Link>
-              <Link href="/terms" className="hover:text-gray-300 transition-colors">
+              <Link href="/sk/obchodne-podmienky" className="hover:text-gray-300 transition-colors">
                 Obchodné podmienky
               </Link>
               <span>© 2026 M.D.N TECH</span>

@@ -385,6 +385,13 @@ export default function PrivacyPage() {
                         </ul>
                       </div>
                       <div>
+                        <p className="font-semibold text-cyan-400 mb-2">Session Storage (campaign attribution):</p>
+                        <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
+                          <li>When you arrive from a marketing campaign, we keep the referral source in your browser&apos;s session storage so we know where an enquiry came from</li>
+                          <li>It is not a cookie, never leaves your device except as part of a form you choose to submit, and is discarded when you close the tab</li>
+                        </ul>
+                      </div>
+                      <div>
                         <p className="font-semibold text-cyan-400 mb-2">Future Cookies:</p>
                         <p className="text-gray-300 mb-2">As we implement additional features, we may use:</p>
                         <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">

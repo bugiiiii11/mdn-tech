@@ -109,6 +109,9 @@ const entries = [
       ``,
       SK_CRM.intro,
       ``,
+      `## ${SK_CRM.modulesTitle}`,
+      titled(SK_CRM.modules, "title", "description"),
+      ``,
       `## Čo z toho firma má`,
       bullets(SK_CRM.benefits),
       ``,
@@ -146,6 +149,13 @@ const entries = [
       `**${CS.brief.title}:** ${CS.brief.body}`,
       `**${CS.solution.title}:** ${CS.solution.intro}`,
       titled(CS.solution.blocks, "title", "description"),
+      ``,
+      `**${CS.localSeo.title}**`,
+      CS.localSeo.intro,
+      titled(CS.localSeo.items, "title", "description"),
+      // Same rule as the results section below: describe the work, never the
+      // rankings. The note carries that boundary into the bot's answers.
+      CS.localSeo.note,
       ``,
       `Celá štúdia: ${CS.url}`,
       ``,

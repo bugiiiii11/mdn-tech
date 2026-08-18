@@ -16,12 +16,12 @@ export const SK_CS_ROYAL_STROJE = {
   // Root metadata template appends "| M.D.N Tech".
   metaTitle: "Prípadová štúdia: Royal Stroje — web, CRM a chatbot",
   metaDescription:
-    "Ako sme požičovni náradia a stavebnej techniky v Senci postavili web s katalógom strojov, CRM na mieru a AI chatbota, ktorý odpovedá 24/7.",
+    "Ako sme požičovni náradia a stavebnej techniky v Senci postavili web s katalógom strojov, lokálne SEO, CRM na mieru a AI chatbota, ktorý odpovedá 24/7.",
   datePublished: "2026-08-16",
 
   hero: {
     title: "Royal Stroje: web, CRM a AI chatbot pre požičovňu stavebných strojov",
-    lede: "Jedna firma, jeden dodávateľ, jeden systém: web s katalógom strojov, CRM presne podľa procesov požičovne a chatbot, ktorý odpovedá aj mimo otváracích hodín.",
+    lede: "Jedna firma, jeden dodávateľ, jeden systém: web s katalógom strojov postavený na lokálne vyhľadávanie, CRM presne podľa procesov požičovne a chatbot, ktorý odpovedá aj mimo otváracích hodín.",
     image: "/portfolio/royalstroje.jpg",
     imageAlt: "Náhľad webu royalstroje.sk",
     ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "/sk#kontakt" },
@@ -51,7 +51,13 @@ export const SK_CS_ROYAL_STROJE = {
         icon: "globe",
         title: "Web royalstroje.sk",
         description:
-          "Prehľadný katalóg náradia a techniky s jasným kontaktom na jeden klik, postavený na lokálne SEO — aby požičovňu našli zákazníci zo Senca a okolia.",
+          "Prehľadný katalóg náradia a techniky s jasným kontaktom na jeden klik — zákazník si ponuku prezrie sám, bez telefonátu.",
+      },
+      {
+        icon: "search",
+        title: "Lokálne SEO",
+        description:
+          "Web stavaný na to, aby požičovňu našli ľudia zo Senca a okolia — štruktúrované dáta o firme, obsah na lokálne dopyty a jednotné kontaktné údaje.",
       },
       {
         icon: "database",
@@ -66,6 +72,47 @@ export const SK_CS_ROYAL_STROJE = {
           "Vyškolený na obsahu webu, odpovedá návštevníkom na otázky o strojoch a požičaní 24/7 — aj mimo otváracích hodín.",
       },
     ],
+  },
+
+  // Local SEO gets its own section because it is the part of the work a
+  // prospect cannot see by visiting the site -- every item below is verifiable
+  // in the page source of royalstroje.sk today.
+  //
+  // HONESTY GATE applies here too: this describes what was BUILT, never where
+  // the site ranks. Positions move week to week and we have no Search Console
+  // export to stand behind, so the closing note says so plainly rather than
+  // reaching for "popredné pozície".
+  localSeo: {
+    title: "Lokálne SEO: aby firmu našli ľudia zo Senca",
+    intro:
+      "Požičovňu si nikto nevyberá podľa toho, kto má najkrajší web — ale podľa toho, kto sa zobrazí, keď v Senci niekto hľadá „požičovňa náradia“. Web sme preto od začiatku stavali na lokálne vyhľadávanie, nie až dodatočne.",
+    items: [
+      {
+        icon: "map",
+        title: "Štruktúrované dáta o firme",
+        description:
+          "Adresa, GPS súradnice a otváracie hodiny sú v kóde webu v strojovo čitateľnej podobe (LocalBusiness). Google ich nemusí hádať z textu a vie firmu spoľahlivo priradiť ku konkrétnemu mestu.",
+      },
+      {
+        icon: "search",
+        title: "Obsah stavaný na lokálne dopyty",
+        description:
+          "Titulok, popis aj texty pracujú s tým, ako ľudia naozaj hľadajú — „požičovňa náradia Senec“, nie všeobecné frázy bez mesta, o ktoré súperí celé Slovensko.",
+      },
+      {
+        icon: "faq",
+        title: "Časté otázky vo výsledkoch vyhľadávania",
+        description:
+          "Sekcia s otázkami je označená markupom FAQPage, takže odpovede o cenách, dovoze či dostupnosti sa môžu zobraziť priamo vo vyhľadávaní — ešte pred klikom na web.",
+      },
+      {
+        icon: "phone",
+        title: "Jednotné kontaktné údaje",
+        description:
+          "Názov, adresa a telefón sú naprieč webom v jednom presnom tvare. Rozhádzané údaje sú jeden z najčastejších dôvodov, prečo sa firme lokálne výsledky nehnú.",
+      },
+    ],
+    note: "Konkrétne pozície vo vyhľadávaní sem doplníme, až keď ich budeme vedieť doložiť dátami — rovnako ako čísla v sekcii výsledkov.",
   },
 
   cta: {

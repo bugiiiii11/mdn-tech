@@ -348,7 +348,7 @@ export default function TermsPage() {
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Company processes Client data in accordance with our Privacy Policy</li>
                       <li>Company implements appropriate technical and organizational security measures</li>
-                      <li>Client data is stored securely on Vercel and Railway infrastructure</li>
+                      <li>Client data is stored securely on Vercel and Supabase infrastructure</li>
                     </ul>
                   </div>
                   <div>
@@ -466,7 +466,7 @@ export default function TermsPage() {
                     <p className="text-gray-300 mb-2">Company is not liable for:</p>
                     <ul className="list-disc list-inside ml-4 space-y-1 text-gray-300">
                       <li>Performance or availability of third-party services</li>
-                      <li>Actions of hosting providers (Vercel, Railway)</li>
+                      <li>Actions of hosting providers (Vercel, Supabase)</li>
                       <li>Third-party API or service failures</li>
                       <li>Issues with Client&apos;s infrastructure or systems</li>
                     </ul>

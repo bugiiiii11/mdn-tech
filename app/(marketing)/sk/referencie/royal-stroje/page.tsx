@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import type { IconType } from "react-icons";
-import { FiDatabase, FiExternalLink, FiGlobe, FiMessageCircle } from "react-icons/fi";
+import {
+  FiDatabase,
+  FiExternalLink,
+  FiGlobe,
+  FiHelpCircle,
+  FiMapPin,
+  FiMessageCircle,
+  FiPhone,
+  FiSearch,
+} from "react-icons/fi";
 
 import { CtaBand } from "@/components/product-pages/primitives";
 import { organizationRef, SITE_URL } from "@/components/product-pages/schema";
@@ -83,8 +92,16 @@ const caseStudySchema = {
 
 const SOLUTION_ICONS: Record<string, IconType> = {
   globe: FiGlobe,
+  search: FiSearch,
   database: FiDatabase,
   chat: FiMessageCircle,
+};
+
+const LOCAL_SEO_ICONS: Record<string, IconType> = {
+  map: FiMapPin,
+  search: FiSearch,
+  faq: FiHelpCircle,
+  phone: FiPhone,
 };
 
 const GLASS_CARD_CLASS =
@@ -194,7 +211,7 @@ export default function RoyalStrojeCaseStudyPage() {
           {CS.solution.intro}
         </p>
 
-        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {CS.solution.blocks.map((block) => {
             const Icon = SOLUTION_ICONS[block.icon];
             return (
@@ -212,6 +229,43 @@ export default function RoyalStrojeCaseStudyPage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Lokálne SEO — the half of the work that is invisible from the front
+          end. Every claim here is checkable in the page source of the live
+          site; rankings deliberately are not claimed. */}
+      <section className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 md:px-8">
+        <h2 className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text py-6 text-center text-3xl font-semibold text-transparent md:text-4xl">
+          {CS.localSeo.title}
+        </h2>
+        <p className="mx-auto mb-10 max-w-3xl text-center text-base text-gray-400 md:text-lg">
+          {CS.localSeo.intro}
+        </p>
+
+        <ul className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
+          {CS.localSeo.items.map((item) => {
+            const Icon = LOCAL_SEO_ICONS[item.icon];
+            return (
+              <li key={item.title} className={`p-6 ${GLASS_CARD_CLASS}`}>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-purple-500/30 bg-gradient-to-br from-purple-500/20 to-cyan-500/20">
+                  {Icon ? (
+                    <Icon aria-hidden="true" className="h-6 w-6 text-cyan-400" />
+                  ) : null}
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-white">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-400">
+                  {item.description}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-500">
+          {CS.localSeo.note}
+        </p>
       </section>
 
       {/* Výsledky + founder quote land here once Royal Stroje confirms real
