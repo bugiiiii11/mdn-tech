@@ -18,6 +18,9 @@ const PortfolioCard = ({ item, index }: { item: PortfolioItem; index: number }) 
   // (internal), everything else keeps linking to the live site (external).
   const caseStudyHref =
     "caseStudyHref" in item ? item.caseStudyHref : undefined;
+  // Founder pull-quote — flagship card only (full testimonial lives in the
+  // case study).
+  const quote = "quote" in item ? item.quote : undefined;
 
   const inner = (
     <>
@@ -57,6 +60,16 @@ const PortfolioCard = ({ item, index }: { item: PortfolioItem; index: number }) 
         <p className="text-sm text-gray-400 leading-relaxed mb-4 flex-1">
           {item.description}
         </p>
+        {quote ? (
+          <figure className="mb-4 border-l-2 border-cyan-400/40 pl-3">
+            <blockquote className="text-sm italic leading-relaxed text-gray-300">
+              &bdquo;{quote.text}&ldquo;
+            </blockquote>
+            <figcaption className="mt-1 text-xs text-gray-400">
+              {quote.author}
+            </figcaption>
+          </figure>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           {item.tags.map((tag) => (
             <span

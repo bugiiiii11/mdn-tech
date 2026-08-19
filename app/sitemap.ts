@@ -73,7 +73,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // reasoning as the English-only product pages above).
     {
       url: `${baseUrl}/sk/referencie/royal-stroje`,
-      lastModified: new Date("2026-08-18"),
+      // 2026-08-19: story/results/founder-quote sections (honesty gate opened).
+      lastModified: new Date("2026-08-19"),
     },
     {
       url: `${baseUrl}/blog`,

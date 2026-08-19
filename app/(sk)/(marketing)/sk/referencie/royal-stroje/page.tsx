@@ -72,7 +72,7 @@ const caseStudySchema = {
       image: `${SITE_URL}${CS.hero.image}`,
       inLanguage: "sk",
       datePublished: CS.datePublished,
-      dateModified: CS.datePublished,
+      dateModified: CS.dateModified,
       author: organizationRef(),
       publisher: organizationRef(),
       mainEntityOfPage: CS.url,
@@ -236,6 +236,45 @@ export default function RoyalStrojeCaseStudyPage() {
         </div>
       </section>
 
+      {/* Priebeh — the founder's narrative retold as a timeline. Facts and
+          order come from his written account (rendered verbatim in the quote
+          section below); rankings stay out of our voice here. */}
+      <section className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 md:px-8">
+        <h2 className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text py-6 text-center text-3xl font-semibold text-transparent md:text-4xl">
+          {CS.story.title}
+        </h2>
+        <p className="mx-auto mb-12 max-w-3xl text-center text-base text-gray-400 md:text-lg">
+          {CS.story.intro}
+        </p>
+
+        <ol className="relative mx-auto w-full max-w-3xl border-l border-[#7042f88b] pl-8 md:pl-10">
+          {CS.story.milestones.map((milestone, index) => {
+            const isLast = index === CS.story.milestones.length - 1;
+            return (
+              <li
+                key={milestone.title}
+                className={`relative ${isLast ? "" : "pb-10"}`}
+              >
+                {/* Cyan marker: milestones are receipts (Bent Light Rule). */}
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[39px] top-1 h-3 w-3 rounded-full bg-cyan-400/90 ring-4 ring-cyan-400/15 md:-left-[47px]"
+                />
+                <p className="text-xs font-medium uppercase tracking-wider text-cyan-400/80">
+                  {milestone.period}
+                </p>
+                <h3 className="mt-1 text-lg font-bold text-white md:text-xl">
+                  {milestone.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-300 md:text-base">
+                  {milestone.description}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
       {/* Lokálne SEO — the half of the work that is invisible from the front
           end. Every claim here is checkable in the page source of the live
           site; rankings deliberately are not claimed. */}
@@ -268,14 +307,72 @@ export default function RoyalStrojeCaseStudyPage() {
           })}
         </ul>
 
-        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-500">
+        {/* gray-400, not 500: the note carries the honesty boundary, so it
+            sits ON the legibility floor, not under it. */}
+        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-400">
           {CS.localSeo.note}
         </p>
       </section>
 
-      {/* Výsledky + founder quote land here once Royal Stroje confirms real
-          numbers and wording — see the honesty gate in
-          constants/sk-case-studies.ts. Nothing invented ships before that. */}
+      {/* Výsledky — the honesty gate opened 2026-08-19: every figure is the
+          founder's own (see constants/sk-case-studies.ts), and the note below
+          the cards says exactly that. */}
+      <section className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 md:px-8">
+        <h2 className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text py-6 text-center text-3xl font-semibold text-transparent md:text-4xl">
+          {CS.results.title}
+        </h2>
+
+        <div className="mt-4 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+          {CS.results.stats.map((stat) => (
+            <div
+              key={stat.value}
+              className={`flex flex-col items-center p-6 text-center sm:p-8 ${GLASS_CARD_CLASS}`}
+            >
+              {/* Cyan figures: numbers are proof (Bent Light Rule). */}
+              <p className="text-3xl font-bold text-cyan-400 md:text-4xl">
+                {stat.value}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-gray-300">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-400">
+          {CS.results.note}
+        </p>
+      </section>
+
+      {/* Slovami majiteľa — the centrepiece testimonial. Visible quote only:
+          NO Review/aggregateRating schema (first-party reviews are
+          self-serving per Google; audit guardrail). */}
+      <section className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 md:px-8">
+        <h2 className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text py-6 text-center text-3xl font-semibold text-transparent md:text-4xl">
+          {CS.quote.title}
+        </h2>
+
+        <figure
+          className={`relative mx-auto mt-4 w-full max-w-3xl p-8 md:p-12 ${GLASS_CARD_CLASS}`}
+        >
+          {/* Decorative mark — violet, structural, never carries meaning. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-6 top-2 select-none text-7xl font-bold leading-none text-purple-500/30 md:left-8"
+          >
+            &bdquo;
+          </span>
+          <blockquote className="relative">
+            <p className="text-base leading-relaxed text-gray-200 md:text-lg">
+              &bdquo;{CS.quote.text}&ldquo;
+            </p>
+          </blockquote>
+          <figcaption className="mt-6 flex flex-col items-start gap-1 border-t border-[#7042f855] pt-5">
+            <span className="font-semibold text-white">{CS.quote.author}</span>
+            <span className="text-sm text-gray-400">{CS.quote.role}</span>
+          </figcaption>
+        </figure>
+      </section>
 
       <CtaBand
         id="konzultacia"

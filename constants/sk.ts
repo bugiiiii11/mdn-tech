@@ -200,6 +200,12 @@ export const SK_PORTFOLIO = [
     // Flagship reference: the card links to the case study instead of the
     // live site (the live-site link moves into the case study itself).
     caseStudyHref: "/sk/referencie/royal-stroje",
+    // One-line pull from the founder's testimonial (full quote + consent
+    // 2026-08-19 lives in constants/sk-case-studies.ts `quote`).
+    quote: {
+      text: "Služby M.D.N Tech odporúčam všetkými desiatimi.",
+      author: "Peter Krivosudský, majiteľ",
+    },
   },
   {
     name: "Royal Works",

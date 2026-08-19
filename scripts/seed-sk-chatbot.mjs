@@ -149,16 +149,25 @@ const entries = [
       `**${CS.localSeo.title}**`,
       CS.localSeo.intro,
       titled(CS.localSeo.items, "title", "description"),
-      // Same rule as the results section below: describe the work, never the
-      // rankings. The note carries that boundary into the bot's answers.
+      // Describe the work, never rankings in our voice — the note carries
+      // that boundary into the bot's answers; rankings appear only inside
+      // the owner's attributed quote below.
       CS.localSeo.note,
       ``,
-      `Celá štúdia: ${CS.url}`,
+      `**${CS.story.title}**`,
+      titled(CS.story.milestones, "title", "description"),
       ``,
-      // The results section is deliberately absent from the page until the
-      // client confirms numbers — the bot must not invent them either.
-      `Konkrétne merateľné výsledky zatiaľ nezverejňujeme — dopĺňame ich po`,
-      `potvrdení klientom. Ak sa na ne niekto pýta, povedz to takto otvorene.`,
+      // Founder-supplied numbers (honesty gate opened 2026-08-19). The note
+      // travels with them so the bot attributes the figures to the owner.
+      `**${CS.results.title}**`,
+      CS.results.stats.map((stat) => `- ${stat.value} — ${stat.label}`).join("\n"),
+      CS.results.note,
+      ``,
+      `**Referencia majiteľa (cituj presne, neuprav ani neskracuj čísla):**`,
+      `„${CS.quote.text}“`,
+      `— ${CS.quote.author}, ${CS.quote.role}`,
+      ``,
+      `Celá štúdia: ${CS.url}`,
     ].join("\n"),
   },
   {
