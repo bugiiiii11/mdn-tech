@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 65) -- chatbot 400 fix + final logo rolled out sitewide (C7) (rotated 2026-08-19)
+
+- **The SK chatbot never answered a single message, and it was not Claude.** `widget.js` sends `conversationId: null` on the first message; the schema had `UUID.optional()`, and zod `.optional()` rejects `null` -> 400 before the bot lookup. No conversation was ever created, so the id stayed null forever. Fixed server-side with `.nullish()` (cached widget.js copies in visitors' browsers keep sending null) plus the widget. Confirmed against prod. **Lesson: C2 shipped in S64 without one end-to-end conversation being clicked through.**
+- **Favicon rebuilt twice before it was right.** First attempt used the S64 mark's simple variant (two disconnected arcs at 16px) on a TRANSPARENT background -- a dark mark sinks into a dark tab strip. A transparent favicon inherits whatever the browser paints behind it, so no single mark colour survives both light and dark chrome: the tile must be baked in. Second bug: `screenshot()` paints the page background unless `omitBackground: true`, which shipped white notches in the rounded corners.
+- **User replaced the whole mark mid-session** (`public/brand/logo-final*.svg` + 27 PNG exports): the ORIGINAL logo vectorized, inner circle removed, mirrored L-R. The 2026-08-16 black-hole redesign is REJECTED (`mdn-mark*.svg` kept only for the record). Rolled out everywhere -- favicons (gradient on `#0B0A14` tile), OG cards (white), navbar/both footers/portal top bar, schema.org org logo (white-on-black plate, because search composites it onto backgrounds we do not control), widget `launcher_icon`.
+- **New mark is ~1.7:1, not square.** Every old call site pinned 32x32 and would have squashed it -- all are now sized by height with `width: auto`. `next/image` needs `unoptimized` for SVG (the optimizer refuses it without `dangerouslyAllowSVG`).
+- **New OG link-preview cards, EN + SK** (`scripts/generate-og-images.mjs`, seeded star field so the PNG is byte-stable across runs). Ring geometry is derived from `hero-shell.ts`, but the vertical offset deliberately does NOT follow the hero: the disk line sits flush with the top edge so only the lower bowl shows (user's call, cleaner at thumbnail size).
+- **`public/logo.png` is now a copy of the new white export.** Nothing in the app reads it; it stays current because the LIVE chatbot's stored `widget_config` and external links still point there.
+- Gotchas: two Next processes cannot share `.next/` (SOLVED in S67 -- `NEXT_DIST_DIR` in next.config.js); the production CSP's `upgrade-insecure-requests` breaks `next start` over http://localhost, so local visual QA needs the CSP header stripped in Playwright.
+
 ## What Was Done (Session 64) -- /sk live on prod: merge, C3 attribution, C2 branded chatbot (rotated 2026-08-18)
 
 - **/sk rework merged to main and LIVE** (ff-merge, then `12e3942` + `19628de` pushed). Merge-to-main was the user's explicit call over a preview branch, with FAQ #4/#5 still awaiting Filip -- campaign send stays gated, the deploy does not.
@@ -223,6 +233,7 @@
 | 54 | 2026-08-12 | /chatkit + /toolkit pages built (29 files) + 60-finding review; fix pass in flight |
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
 | 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
+| 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
