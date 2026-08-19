@@ -1,503 +1,161 @@
-# Technical SEO Audit Report - mdntech.com
+# Technical SEO Audit — mdntech.org
 
-**Audit Date:** March 17, 2026
-**Audited Domain:** https://mdntech.com
-**Framework:** Next.js 14.2.15 (App Router)
-**Hosting:** Vercel
-**Overall Technical SEO Score: 72/100**
+**Audit date:** 2026-08-19
+**Property:** https://mdntech.org (Next.js 15, Vercel, apex domain)
+**Method:** Live crawl of all 14 indexable pages (HTML + response headers), robots.txt, sitemap.xml, live redirect tests via curl, cross-checked against repo source.
+**Overall Technical SEO Score: 81/100**
 
 ---
 
 ## Executive Summary
 
-The site has a solid foundation with proper Next.js App Router conventions, good structured data implementation, and strong security headers. However, there are several issues that need attention: missing canonical tags on subpages, excessive client-side rendering, a Three.js background canvas that harms Core Web Vitals, missing `not-found.tsx` custom 404, missing AI crawler management in robots.txt, and no image optimization on the LCP-critical hero section.
+The site is in solid technical shape: every page returns 200 with a correct, absolute, self-referential canonical on the apex; unique titles and meta descriptions everywhere (including /privacy and /terms, which get their metadata from server `layout.tsx` files despite the pages being client components); full security header set including CSP and 2-year preload HSTS; clean single-hop 308 redirects for www, http, and both .sk domains with query strings preserved; real lastmod dates in the sitemap; and all critical content present in the server-rendered HTML.
+
+No Critical issues found. The main gaps are international: the EN/SK legal page pairs have **no hreflang anywhere** (neither in-page nor in the sitemap), and **all four Slovak pages are served with `<html lang="en">`**. On performance, a 667 KB (uncompressed) three.js chunk ships on every marketing page for a decorative star background, and the entire above-the-fold content (including the H1/LCP element) is server-rendered at `opacity:0`, gating LCP on JS hydration.
+
+Finding counts: **Critical 0 · High 4 · Medium 4 · Low 5**
 
 ---
 
-## 1. Crawlability
+## Mandatory Checks (from handoff)
 
-**Status: PASS (with issues)**
-
-### 1.1 robots.txt
-
-**File:** `app/robots.ts` (Next.js dynamic generation)
-
-```
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /_next/
-Sitemap: https://mdntech.com/sitemap.xml
-```
-
-**Assessment:**
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| robots.txt exists | PASS | Generated via Next.js MetadataRoute |
-| Allow root | PASS | `Allow: /` present |
-| Disallow private routes | PASS | `/api/` and `/_next/` blocked |
-| Sitemap reference | PASS | Points to correct sitemap URL |
-| AI crawler management | FAIL | No rules for GPTBot, ClaudeBot, Bytespider, CCBot, Google-Extended, Applebot-Extended, Meta-ExternalAgent, PerplexityBot, AmazonBot |
-
-**Critical Issue - Missing AI Crawler Directives:**
-The site has no rules for AI training crawlers. If the business does not want its content used for AI training, explicit Disallow rules should be added. If it does want AI visibility, this is fine but should be a deliberate decision.
-
-### 1.2 Sitemap
-
-**File:** `app/sitemap.ts` (Next.js dynamic generation)
-
-**Pages included:**
-- `/` (priority 1.0, weekly)
-- `/team` (priority 0.8, monthly)
-- `/blog` (priority 0.8, weekly)
-- `/blog/[slug]` (dynamic, priority 0.6-0.8, monthly)
-- `/privacy` (priority 0.3, yearly)
-- `/terms` (priority 0.3, yearly)
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Sitemap exists | PASS | Dynamic generation via Next.js |
-| All pages included | PASS | Main pages + dynamic blog posts |
-| Priority values | PASS | Logical hierarchy |
-| changeFrequency set | PASS | Appropriate values |
-| lastModified | MEDIUM | Uses `new Date()` - always returns current date, not actual modification date |
-
-**Medium Issue:** `lastModified` is set to `new Date()` for all entries. This means every time the sitemap is generated, all pages report as freshly modified. Search engines may learn to ignore this signal. Use actual file/content modification dates instead.
-
-### 1.3 Crawlability Issues
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Custom 404 page | FAIL | No `app/not-found.tsx` found |
-| Internal link integrity | PASS | Navigation uses Next.js `Link` component |
-| Hash-based navigation | MEDIUM | Homepage uses `/#home`, `/#contact-us` - fragment links are not crawlable as separate pages |
-| Deep linking | PASS | Blog posts have clean `/blog/[slug]` URLs |
+| # | Check | Verdict | Evidence |
+|---|-------|---------|----------|
+| 1 | hreflang for legal page pairs | **FAIL** | `/privacy`, `/terms`, `/sk/ochrana-osobnych-udajov`, `/sk/obchodne-podmienky`: zero `<link rel="alternate" hreflang>` tags in live HTML; sitemap.xml declares `xhtml:link` alternates only on the `/` and `/sk` entries. The `/` <-> `/sk` pair itself is correctly bidirectional (both pages carry the full sk/en/x-default set in-page, and both sitemap entries repeat it). |
+| 2 | /privacy and /terms metadata despite "use client" | **PASS** | Live HTML: `<title>Privacy Policy \| M.D.N Tech</title>`, unique meta description, `<link rel="canonical" href="https://mdntech.org/privacy"/>`, page-specific OG/Twitter. Same for /terms. Source: server components `app/(marketing)/privacy/layout.tsx` and `app/(marketing)/terms/layout.tsx` export full `metadata` incl. `alternates.canonical` — the "use client" `page.tsx` is irrelevant to metadata. Legal body text confirmed present in server HTML ("Last Updated: August 16, 2026"). |
+| 3 | Redirect hygiene | **PASS** | `https://www.mdntech.org/` → 308 → `https://mdntech.org/` (single hop). `http://mdntech.org/` → 308 → `https://mdntech.org/` (single hop, straight to https apex). `https://mdntech.sk/?utm_source=test` → 308 → `https://mdntech.org/sk?utm_source=test` (query preserved). `https://www.mdntech.sk/` → 308 → `https://mdntech.org/sk` (single hop). `mdntech.com` is a **third-party domain** (AWS ELB, forwards to mdntech.ca) — not part of this property, no action possible or needed. Only imperfection: `http://www.mdntech.org` takes 2 hops (http://www → https://www → apex), which is normal and fine. |
+| 4 | Canonicals on every page | **PASS** | All 14 pages have exactly one canonical: present, absolute, self-referential, `https://mdntech.org/...` (never www, never .sk, no trailing slashes). Home canonical `https://mdntech.org` matches the sitemap `<loc>`. |
+| 5 | Trailing slash / duplicate URLs | **PASS** | `https://mdntech.org/sk/` → 308 → `/sk`; `/about/` → 308 → `/about`. Uppercase variants (`/ABOUT`) return 404, so no case-duplicate URLs. Query-string variants serve 200 but carry the clean static canonical, so UTM URLs consolidate correctly. |
 
 ---
 
-## 2. Indexability
+## Findings
 
-**Status: PASS (with issues)**
+### Critical
 
-### 2.1 Meta Tags & Titles
+None. No noindex leaks (no `X-Robots-Tag` header on any response, all pages `<meta name="robots" content="index, follow">`), no broken canonicals, no blocked resources, no soft-404s (unknown URLs return real HTTP 404 via `app/(marketing)/not-found.tsx`).
 
-| Page | Title | Description | Status |
-|------|-------|-------------|--------|
-| `/` | "M.D.N Tech \| AI & Full-Stack Development Agency \| UAE" | Present, 156 chars | PASS |
-| `/team` | "Our Team \| M.D.N Tech" | Present, descriptive | PASS |
-| `/blog` | "Blog \| M.D.N Tech" | Present, descriptive | PASS |
-| `/blog/[slug]` | "[Post Title] \| M.D.N Tech Blog" | Dynamic with metaDescription | PASS |
-| `/privacy` | "Privacy Policy \| M.D.N Tech" | Present | PASS |
-| `/terms` | "Terms & Conditions \| M.D.N Tech" | Present | PASS |
+### High
 
-**Title template system:** Uses Next.js `title.template: "%s | M.D.N Tech"` - well implemented.
+**H1. EN/SK legal page pairs have no hreflang at all**
+- Evidence: `/privacy` <-> `/sk/ochrana-osobnych-udajov` and `/terms` <-> `/sk/obchodne-podmienky` are translations of each other, but neither side declares the other — no in-page `<link rel="alternate" hreflang>` (confirmed in all four live HTML files) and no `xhtml:link` entries in sitemap.xml (only `/` and `/sk` have them). hreflang only counts when declared bidirectionally, so Google treats these as four unrelated pages and may serve the wrong language in SERPs (e.g. the EN privacy policy to Slovak searchers).
+- Fix: add `alternates.languages` to all four pages' metadata. The SK legal pages already have `alternates.canonical` in `app/(marketing)/sk/ochrana-osobnych-udajov/page.tsx` and `.../obchodne-podmienky/page.tsx`; extend to the pattern already used in `app/(marketing)/sk/page.tsx`:
+  ```ts
+  alternates: {
+    canonical: "/sk/ochrana-osobnych-udajov",
+    languages: {
+      sk: "https://mdntech.org/sk/ochrana-osobnych-udajov",
+      en: "https://mdntech.org/privacy",
+      "x-default": "https://mdntech.org/privacy",
+    },
+  },
+  ```
+  Mirror it in `privacy/layout.tsx` and `terms/layout.tsx`, and add matching `xhtml:link` blocks to both entries of each pair in `app/sitemap.ts`. Optionally also add a visible language-switch link on /privacy and /terms (currently /sk/ochrana-osobnych-udajov links to /privacy, but /privacy has zero links to the SK version).
 
-### 2.2 Canonical Tags
+**H2. All four Slovak pages are served with `<html lang="en">`**
+- Evidence: `page_sk.html`, `page_sk_referencie_royal-stroje.html`, `page_sk_ochrana-osobnych-udajov.html`, `page_sk_obchodne-podmienky.html` all open with `<html lang="en">`. Root cause: single root layout `app/layout.tsx:77` hardcodes `lang="en"` for every route.
+- Impact: contradicts the hreflang sk annotation and the `og:locale=sk_SK` on /sk; wrong screen-reader pronunciation; Bing and other engines weigh the lang attribute more than Google.
+- Fix: per-locale `lang`. Cleanest in App Router: split into two route groups with their own root layouts (`app/(en)/layout.tsx` with `lang="en"`, `app/(sk)/layout.tsx` with `lang="sk"`), or read the pathname in the root layout via headers/middleware and set `lang` dynamically. Verify the fix on all four /sk URLs.
 
-| Page | Canonical Set | Status |
-|------|---------------|--------|
-| `/` (root layout) | `https://mdntech.com` via `alternates.canonical` | PASS |
-| `/blog/[slug]` | `https://mdntech.com/blog/[slug]` via layout.tsx | PASS |
-| `/team` | MISSING | FAIL |
-| `/blog` | MISSING | FAIL |
-| `/privacy` | MISSING | FAIL |
-| `/terms` | MISSING | FAIL |
+**H3. 667 KB three.js chunk ships on every marketing page for a decorative background**
+- Evidence: homepage loads 17 JS files totalling ~1.47 MB uncompressed; the largest, `/_next/static/chunks/b536a0f1-0bc70055616c4f4d.js` (667,777 bytes), contains `WebGLRenderer`/`THREE.` — it drives the single decorative `<canvas>` star background. It is referenced from the shared `(marketing)/layout` bundle, so every page pays for it.
+- Impact: main-thread parse/compile cost delays hydration (which H4 makes LCP-blocking) and degrades INP on low-end mobiles; the canvas render loop competes with user input.
+- Fix: load the stars canvas with `next/dynamic(() => import(...), { ssr: false })` and mount it after first paint (`requestIdleCallback` or an `IntersectionObserver`), or replace with a CSS/static-image starfield. Also consider dropping the 112 KB `polyfills-*.js` by raising `browserslist` targets — modern-only targets make Next skip legacy polyfills.
 
-**High Issue:** Four subpages lack explicit canonical tags. While Next.js may generate a self-referencing canonical from `metadataBase`, this is implicit and should be made explicit in each page's layout metadata to prevent potential duplicate content issues (especially with query parameter variants like `?ref=` or UTM tracking).
+**H4. Entire above-the-fold content (including the H1/LCP element) is served at `opacity:0`**
+- Evidence: homepage H1 renders as `<h1 ... style="opacity:0;transform:translateX(-100px) translateZ(0)">` (framer-motion SSR initial state); 62 elements on `/`, 55 on `/sk`, 79 on `/chatkit`, 77 on `/about` carry `style="opacity:0..."`.
+- Impact: the browser cannot paint the hero until React hydrates and the entrance animation runs, so LCP is gated on the full JS payload from H3 (Good LCP threshold: <2.5 s — hydration-gated paint on mid-range mobile will routinely miss it). If JS fails, the page appears blank even though the text exists in the HTML (text extraction by non-JS crawlers such as GPTBot/ClaudeBot still works, which limits the GEO damage).
+- Fix: for above-the-fold elements, render visible by default and animate only the transform, or use framer-motion's `initial={false}` on first paint / CSS-only entrance animations gated by `@media (prefers-reduced-motion: no-preference)`. At minimum, exempt the H1 and hero copy from opacity-0 initial states.
 
-### 2.3 Meta Robots
+### Medium
 
-| Page | index/follow | Status |
-|------|--------------|--------|
-| `/` (global) | `index: true, follow: true` | PASS |
-| `/privacy` | `index: true, follow: true` | PASS |
-| `/terms` | `index: true, follow: true` | PASS |
-| GoogleBot directives | `max-video-preview: -1, max-image-preview: large, max-snippet: -1` | PASS |
+**M1. SK legal pages inherit the root Open Graph block (wrong og:title, og:url, og:locale)**
+- Evidence: `/sk/obchodne-podmienky` and `/sk/ochrana-osobnych-udajov` serve `og:title="M.D.N Tech | AI Chatbot for Your Website & Free AI Tools"`, `og:url="https://mdntech.org"`, `og:locale="en_US"`, `og:image=/og-image.png` — the root defaults — while their `<title>`/description/canonical are correct. Cause: their `page.tsx` metadata omits `openGraph`, and Next's shallow merge pulls the root object in whole. `og:url` pointing at the homepage is also a weak conflicting canonicalization hint.
+- Fix: add full `openGraph` (and `twitter`) blocks to both SK legal pages, restating url/title/description/locale (`sk_SK`) — same pattern (and same warning comment) already used in `privacy/layout.tsx` and `terms/layout.tsx`.
 
-### 2.4 Duplicate Metadata Conflict
+**M2. mdntech.sk deep paths redirect into 404s**
+- Evidence: `https://mdntech.sk/referencie/royal-stroje` → 308 → `https://mdntech.org/referencie/royal-stroje` → **404** (correct page lives at `/sk/referencie/royal-stroje`). Cause: the catch-all in `next.config.js:76-80` maps `/:path*` on .sk hosts to `https://mdntech.org/:path*` — the English namespace — while only the bare root maps to `/sk`.
+- Impact: any shared, printed, or typed deep .sk URL dead-ends; link equity from .sk backlinks to inner pages is lost.
+- Fix: in the .sk redirect block, map the known Slovak routes first (`/referencie/:path*` → `/sk/referencie/:path*`, `/ochrana-osobnych-udajov` → `/sk/ochrana-osobnych-udajov`, `/obchodne-podmienky` → `/sk/obchodne-podmienky`), or change the catch-all destination to `https://mdntech.org/sk/:path*` and keep explicit exceptions for shared assets if any.
 
-**Medium Issue:** `app/blog/[slug]/page.tsx` and `app/blog/[slug]/layout.tsx` both export `generateMetadata`. Next.js will merge these, but having two competing metadata generators creates maintenance risk and potential conflicts. The layout sets canonical via `alternates.canonical`, while the page sets OpenGraph and Twitter cards. Consolidate into one location.
+**M3. Invalid `article:published_time` format on all three blog posts**
+- Evidence: `/blog/claude-code-complete-guide` serves `<meta property="article:published_time" content="March 13, 2026"/>`; the other two posts serve "March 10, 2026" and "March 1, 2026". The OG protocol requires ISO 8601 datetimes; human-readable strings are ignored by parsers. (The JSON-LD `datePublished`/`dateModified` are correct ISO — `2026-03-13T00:00:00.000Z` — so impact is limited to OG consumers.)
+- Fix: in the blog post metadata generation, pass the raw ISO date to `openGraph.publishedTime` instead of the display-formatted string.
 
----
+**M4. CSP relies on `'unsafe-inline'` in script-src with no nonces**
+- Evidence: every response carries `Content-Security-Policy: ... script-src 'self' 'unsafe-inline'; ...`. Already documented as known debt in `next.config.js` comments (Next inline bootstrap scripts). Everything else is well locked down (`frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'self'`, no `unsafe-eval` in prod).
+- Impact: `'unsafe-inline'` neutralizes most of CSP's XSS protection; an injected script would run. Not a direct ranking factor, but script injection is an SEO catastrophe when it happens.
+- Fix: move to nonce-based CSP via middleware (`strict-dynamic` + per-request nonce) as already planned. Not urgent; scheduled work.
 
-## 3. Security
+### Low
 
-**Status: PASS**
+**L1. /favicon.ico returns 404**
+- Evidence: `https://mdntech.org/favicon.ico` → 404 (Next serves `icon.png` 32x32/`icon1.png` 192x192/`apple-icon.png` via link tags, which covers modern browsers and Google). Some crawlers and older agents request `/favicon.ico` blindly, polluting logs with 404s.
+- Fix: add `app/favicon.ico` (Next serves it at the root automatically).
 
-### 3.1 Security Headers (from next.config.js)
+**L2. `Access-Control-Allow-Origin: *` on all HTML page responses**
+- Evidence: present on all 14 crawled pages and confirmed live on `/` and `/about`. Not set in `next.config.js` (the old `/api/chat/*` CORS block was removed) or `middleware.ts` — likely a Vercel project-level setting.
+- Impact: minimal for public HTML (ACAO `*` forbids credentialed requests), but it is unnecessary surface and its source is untracked.
+- Fix: locate and remove the setting (check Vercel dashboard project settings); CORS for the widget API is already owned by `lib/chat/cors.ts`.
 
-| Header | Value | Status |
-|--------|-------|--------|
-| Strict-Transport-Security | `max-age=63072000; includeSubDomains; preload` | PASS (2-year HSTS) |
-| X-Frame-Options | `DENY` | PASS |
-| X-Content-Type-Options | `nosniff` | PASS |
-| Referrer-Policy | `strict-origin-when-cross-origin` | PASS |
-| Permissions-Policy | `camera=(), microphone=(), geolocation=()` | PASS |
-| X-DNS-Prefetch-Control | `on` | PASS |
-| Content-Security-Policy | MISSING | MEDIUM |
-| X-XSS-Protection | MISSING | LOW (deprecated but still useful for older browsers) |
+**L3. Royal Stroje og:image is a 586 KB JPEG**
+- Evidence: `https://mdntech.org/portfolio/royalstroje.jpg` = 586,313 bytes, referenced as `og:image` on `/sk/referencie/royal-stroje`. In-page use goes through the `_next/image` optimizer (with `fetchPriority="high"` — good), but social scrapers fetch the raw file.
+- Fix: export a ~1200x630 version around 100-200 KB for the OG tag.
 
-**Medium Issue:** No Content-Security-Policy (CSP) header is configured. While not directly an SEO factor, CSP protects against XSS attacks which could lead to site defacement or malicious redirect injection -- both of which destroy SEO.
+**L4. Sitemap fields are inconsistent across entries**
+- Evidence: `/chatkit`, `/toolkit`, `/sk/referencie/royal-stroje` have `changefreq`/`priority`; the other 11 entries do not. Google ignores both fields, so this is cosmetic only. lastmod values are real per-page dates (good — this was fixed since the previous audit).
+- Fix (optional): drop `changefreq`/`priority` everywhere for consistency.
 
-### 3.2 HTTPS
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| HTTPS configured | PASS | All URLs use `https://mdntech.com` |
-| Vercel auto-HTTPS | PASS | Vercel provides automatic SSL/TLS |
-| Mixed content risk | LOW | External font loaded via `https://fonts.googleapis.com` |
-
----
-
-## 4. URL Structure
-
-**Status: PASS**
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Clean URLs | PASS | `/team`, `/blog`, `/privacy`, `/terms` |
-| Lowercase URLs | PASS | All routes use lowercase |
-| No trailing slashes | PASS | Next.js default behavior |
-| Blog slug structure | PASS | `/blog/claude-code-complete-guide` - descriptive, hyphenated |
-| No file extensions | PASS | Clean paths without `.html` |
-| URL depth | PASS | Maximum 2 levels (`/blog/[slug]`) |
-
-### 4.1 Redirect Chain Analysis
-
-| Test | Expected Behavior | Notes |
-|------|-------------------|-------|
-| http -> https | Vercel handles automatically | PASS |
-| www -> non-www | Vercel handles automatically | PASS (assuming Vercel domain config is correct) |
-| Trailing slash removal | Next.js default | PASS |
-
-**Note:** Could not perform live redirect chain testing due to network restrictions. Vercel typically handles these redirects with a single 301 hop, which is optimal.
+**L5. Minor redirect/markup notes (informational)**
+- `http://www.mdntech.org` resolves in 2 hops (http://www → https://www → apex). Normal; HSTS preload (`includeSubDomains`) makes the first hop vanish for returning browsers. No action.
+- In-page hreflang attributes render as `hrefLang="sk"` (camelCase) in the raw HTML. HTML attributes are case-insensitive; parsers and Google read it fine. No action.
+- FAQPage JSON-LD on /, /sk, /chatkit, /toolkit will not produce rich results (Google restricted FAQ rich results to government/health sites in 2023), but it is harmless and useful for AI answer engines. Keep.
 
 ---
 
-## 5. Mobile Optimization
+## Category Detail
 
-**Status: PASS (with minor issues)**
+**1. Crawlability — PASS (95/100).** robots.txt allows all, blocks `/api/` and `/_next/`, references the sitemap, and explicitly allows GPTBot, ClaudeBot, Google-Extended, PerplexityBot, Applebot-Extended, CCBot, AmazonBot (deliberate GEO posture). Sitemap covers all 14 pages with real lastmod dates. Custom 404 exists and returns true HTTP 404.
 
-### 5.1 Viewport Meta
+**2. Indexability — PASS (95/100).** Unique titles (17-96 chars) and descriptions on all 14 pages; `index, follow` everywhere; no X-Robots-Tag headers; canonicals perfect (see mandatory check 4). Blog post titles run long (83-96 chars, will truncate in SERPs) — cosmetic.
 
-```typescript
-export const viewport: Viewport = {
-  themeColor: "#030014",
-};
-```
+**3. International / hreflang — FAIL (55/100).** `/` <-> `/sk` pair correct and bidirectional (in-page + sitemap, with x-default). Legal pairs entirely unannotated (H1); Slovak pages declare `lang="en"` (H2); SK legal OG inherits English root block (M1). `/sk/referencie/royal-stroje` correctly has no hreflang (no EN equivalent exists).
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Viewport meta tag | PASS | Next.js auto-generates `<meta name="viewport" content="width=device-width, initial-scale=1">` |
-| Theme color | PASS | Set to `#030014` |
-| User-scalable restriction | PASS | Not restricted (good for accessibility) |
+**4. Security — PASS (85/100).** HSTS 2-year with preload + includeSubDomains, X-Frame-Options DENY plus `frame-ancestors 'none'`, nosniff, Referrer-Policy, Permissions-Policy, CSP on every response. Debits: `'unsafe-inline'` script-src (M4), stray ACAO `*` (L2).
 
-### 5.2 Responsive Design
+**5. URL Structure & Redirects — PASS (85/100).** Clean lowercase hyphenated URLs, max depth 3, no extensions; single-hop 308s for www/http/.sk with query preservation; trailing slashes normalized via 308; no case-duplicates. Debit: .sk deep-path 404s (M2).
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Responsive breakpoints | PASS | Uses Tailwind `md:`, `lg:` breakpoints throughout |
-| Mobile menu | PASS | Hamburger menu with `md:hidden` toggle |
-| Touch targets | PASS | Mobile menu items have `py-3` padding (48px+ targets) |
-| `overflow-x: hidden` | MEDIUM | Applied to `html`, `body`, and `#__next` - can mask horizontal overflow issues |
-| Font sizing | PASS | Responsive text sizes (`text-sm md:text-base`, `text-3xl md:text-4xl`) |
+**6. Mobile — PASS (95/100).** `width=device-width, initial-scale=1` viewport on every page, no user-scalable restriction, theme-color set, Tailwind responsive classes throughout, self-hosted preloaded woff2 fonts (no third-party font chain — the old Google Fonts @import is gone).
 
-### 5.3 Hamburger Menu Accessibility
+**7. Core Web Vitals — NEEDS IMPROVEMENT (55/100).** LCP: hydration-gated hero (H4) + ~1.47 MB uncompressed JS incl. three.js (H3); mitigations already in place: hero videos use `preload="none"` + poster (fixed since last audit), fonts preloaded, LCP image on royal-stroje uses `fetchPriority="high"`. CLS: low risk — fixed navbar, dimensioned images, `data-nimg` fill wrappers. INP: three.js render loop + heavy framer-motion usage on low-end devices. (INP thresholds: Good <200 ms; FID is dead — removed from Chrome tooling Sept 2024.)
 
-**Low Issue:** The hamburger button uses a Unicode character (`&#9776;`) instead of an SVG with proper `aria-label`. This should have `aria-label="Open menu"` and `aria-expanded` attributes for screen readers.
+**8. Structured Data — PASS (85/100).** Organization + WebSite on all pages; FAQPage on 4 pages; SoftwareApplication + Offer on /chatkit and /toolkit; ItemList (18 CreativeWorks) on /toolkit; ProfessionalService with Country areaServed on /sk; BlogPosting + BreadcrumbList + correct ISO dates on posts; Article + BreadcrumbList on the royal-stroje case study. All schema URLs use the apex. Debit: OG article timestamp format (M3).
+
+**9. JS Rendering — PASS (80/100).** All content — nav, H1s, body copy, legal text, blog articles, FAQ answers — is present in the server HTML (verified per page); "use client" pages are still SSR'd. Debit: content is visually hidden until hydration (H4), a resilience rather than indexing problem for Google, but the visible-paint dependency matters.
 
 ---
 
-## 6. Core Web Vitals
-
-**Status: NEEDS IMPROVEMENT**
-
-### 6.1 LCP (Largest Contentful Paint)
-
-**Risk Level: HIGH**
-
-| Factor | Impact | Details |
-|--------|--------|---------|
-| Hero video element | HIGH | `<video autoPlay muted loop>` loading `/videos/blackhole.webm` is likely the LCP element. No `poster` attribute means the browser must download and decode video before displaying anything |
-| No hero image priority | HIGH | No `priority` prop on any above-the-fold image. The hero section relies on a video background with no fallback |
-| Three.js Canvas | HIGH | `StarsCanvas` renders a WebGL canvas on every page load before any content is visible. This blocks the main thread during initialization |
-| Google Fonts external CSS | MEDIUM | `@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap")` in globals.css creates a render-blocking request chain. Should use `next/font` (already used for Inter, but Cedarville Cursive is loaded via CSS @import) |
-| Logo image | LOW | Navbar logo (32x32) is small, not an LCP concern |
-
-**Recommendations:**
-1. Add a `poster` attribute to the hero video element
-2. Add `priority` to the hero section's main visual element
-3. Convert the Cedarville Cursive font import to use `next/font/google`
-4. Consider lazy-loading the Three.js star background (defer initialization)
-
-### 6.2 INP (Interaction to Next Paint)
-
-**Risk Level: MEDIUM**
-
-| Factor | Impact | Details |
-|--------|--------|---------|
-| Framer Motion animations | MEDIUM | Heavy use of `framer-motion` across all pages. Each `motion.div` adds event listeners and animation frame callbacks |
-| Three.js `useFrame` loop | MEDIUM | Continuous animation loop (`useFrame`) runs on every frame, competing with user interactions for main thread time |
-| Mouse-tracking animations | MEDIUM | Team page cards track mouse position with spring physics (`useMotionValue`, `useSpring`, `useTransform`) - this runs calculations on every mousemove event |
-| Client-side rendering | LOW | Most interactive components are marked `"use client"` which is appropriate |
-
-**Recommendations:**
-1. Throttle/debounce mouse-tracking handlers on team page cards
-2. Consider reducing Three.js particle count on mobile (currently 1000 particles)
-3. Use `will-change: transform` sparingly (21 occurrences found -- overuse can cause memory issues)
-
-### 6.3 CLS (Cumulative Layout Shift)
-
-**Risk Level: MEDIUM**
-
-| Factor | Impact | Details |
-|--------|--------|---------|
-| Next.js Image component | PASS | Used correctly with explicit `width`/`height` props |
-| Fixed navbar | PASS | `fixed top-0` with explicit `h-[65px]` prevents layout shift |
-| Font loading | MEDIUM | Cedarville Cursive loaded via CSS @import with `display=swap` - will cause FOIT/FOUT on pages using this font |
-| Framer Motion initial states | MEDIUM | Many elements start with `opacity: 0, y: 50` and animate in. While `whileInView` prevents them from being counted as CLS (they start below fold), any above-the-fold usage would cause shift |
-| `backdrop-blur` on navbar | LOW | 14 instances of `backdrop-blur` found in components - these are GPU-composited but can cause visual repaints |
-| Video element | MEDIUM | The hero video has no explicit dimensions set via CSS, relying on `object-contain`. If it loads slowly, it could cause content reflow |
-
----
-
-## 7. Structured Data
-
-**Status: PASS**
-
-### 7.1 Organization Schema (Root Layout)
-
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "M.D.N Tech FZE",
-  "url": "https://mdntech.com",
-  "logo": "https://mdntech.com/logo.png",
-  "foundingDate": "2024",
-  "address": { "@type": "PostalAddress", ... },
-  "contactPoint": { "@type": "ContactPoint", ... },
-  "sameAs": ["instagram", "twitter/x", "linkedin"]
-}
-```
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Valid @context | PASS | |
-| Organization type | PASS | |
-| Logo URL | PASS | Absolute URL |
-| Contact info | PASS | Email + contact type |
-| Social profiles | PASS | 3 sameAs links |
-| Address | PASS | Full postal address |
-
-### 7.2 WebSite Schema (Root Layout)
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| WebSite type | PASS | |
-| Publisher reference | PASS | Links to Organization |
-| SearchAction | MISSING | LOW - No site search, so not needed |
-
-### 7.3 Article Schema (Blog Posts)
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| Article type | PASS | |
-| headline | PASS | From post title |
-| datePublished/Modified | PASS | ISO format |
-| author | PASS | Organization type |
-| publisher + logo | PASS | |
-| mainEntityOfPage | PASS | |
-| keywords | PASS | From tags |
-
-### 7.4 BreadcrumbList Schema (Blog Posts)
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| BreadcrumbList type | PASS | Home > Blog > [Post Title] |
-| 3-level hierarchy | PASS | |
-| Absolute URLs | PASS | |
-
-### 7.5 Missing Structured Data
-
-| Schema Type | Applicable Page | Priority |
-|-------------|----------------|----------|
-| `FAQPage` | Homepage (if FAQ exists) | LOW |
-| `Service` | Homepage services section | MEDIUM |
-| `Person` | Team page members | LOW |
-
----
-
-## 8. JavaScript Rendering & Client-Side Concerns
-
-**Status: NEEDS IMPROVEMENT**
-
-### 8.1 Server vs Client Components
-
-| Component | Rendering | SEO Impact |
-|-----------|-----------|------------|
-| Root Layout (`layout.tsx`) | Server | PASS - Structured data rendered server-side |
-| Homepage (`page.tsx`) | Server | PASS - Imports server components |
-| Blog index (`blog/page.tsx`) | Client (`"use client"`) | HIGH - Blog listing rendered entirely client-side |
-| Blog post (`blog/[slug]/page.tsx`) | Server | PASS - `generateStaticParams` enables SSG |
-| Team page (`team/page.tsx`) | Client (`"use client"`) | HIGH - Team content rendered client-side |
-| Privacy page | Client (`"use client"`) | MEDIUM - Legal content rendered client-side |
-| Terms page | Client (`"use client"`) | MEDIUM - Legal content rendered client-side |
-| All main components | Client (`"use client"`) | HIGH - 13 components are client-only |
-
-**Critical Issue:** The blog listing page, team page, privacy page, and terms page are all marked `"use client"`. While Next.js can still SSR these components, the `"use client"` directive means:
-1. The full component code is shipped to the browser (larger JS bundle)
-2. Hydration must complete before the page is interactive
-3. If JavaScript fails or is delayed, the content may not be visible to crawlers using limited JS execution
-
-**Key Concern:** The blog page calls `getAllPosts()` on the client side. This function imports from `@/data/blog-posts` which is a static data file, so it will work, but it means the entire blog post dataset is included in the client bundle.
-
-### 8.2 Heavy Dependencies
-
-| Package | Size Impact | Purpose |
-|---------|-------------|---------|
-| `@react-three/fiber` + `three` | ~500KB+ | Star background animation on EVERY page |
-| `framer-motion` | ~120KB | Animations throughout |
-| `swiper` | ~40KB | Project carousel |
-| `@react-three/drei` | ~200KB | Three.js helpers |
-
-**Critical Issue:** Three.js and related packages add 700KB+ to the JavaScript bundle and are loaded on every page for a decorative star background. This is the single largest performance bottleneck.
-
-### 8.3 Static Generation
-
-| Page | Generation Strategy | Status |
-|------|---------------------|--------|
-| `/` | Static (SSG) | PASS |
-| `/team` | Static (SSG) | PASS |
-| `/blog` | Static (SSG) | PASS |
-| `/blog/[slug]` | Static (SSG via `generateStaticParams`) | PASS |
-| `/privacy` | Static (SSG) | PASS |
-| `/terms` | Static (SSG) | PASS |
-
-All pages can be statically generated at build time, which is excellent for SEO.
-
----
-
-## 9. Open Graph & Social
-
-**Status: PASS**
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| og:type | PASS | `website` (homepage), `article` (blog posts) |
-| og:title | PASS | All pages |
-| og:description | PASS | All pages |
-| og:image | PASS | `/og-image.png` (1200x630) |
-| og:locale | PASS | `en_US` |
-| og:site_name | PASS | "M.D.N Tech" |
-| twitter:card | PASS | `summary_large_image` |
-| twitter:creator | PASS | `@MDNTechOrg` |
-| Blog article OG | PASS | `publishedTime`, `authors`, `tags` set |
-
----
-
-## 10. Additional Issues
-
-### 10.1 Domain Inconsistency
-
-**High Issue:** The privacy policy page references `www.mdntech.org` multiple times as the company website, while the actual site is hosted at `mdntech.com`. The structured data and sitemap correctly use `mdntech.com`, but the privacy/terms content references `.org`. This is confusing for users and potentially for search engines if they encounter both domains.
-
-Occurrences found:
-- Privacy page: "visit our website www.mdntech.org"
-- Privacy page: contact@mdntech.org (email - this may be intentional)
-- Terms page: similar references
-
-### 10.2 Missing favicon.ico
-
-**Low Issue:** The site uses `/favicon.png` and `/favicon1.png` but there is no standard `favicon.ico` file. Some older crawlers and browsers specifically look for `favicon.ico` at the root.
-
-### 10.3 External Font Loading
-
-**Medium Issue:** Cedarville Cursive font is loaded via CSS `@import` in `globals.css`:
-```css
-@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap");
-```
-This creates a render-blocking chain: HTML -> CSS -> Google Fonts CSS -> Font file. The Inter font correctly uses `next/font/google` which inlines the CSS. Cedarville Cursive should also use `next/font/google`.
-
----
-
-## Prioritized Action Items
-
-### Critical (Fix Immediately)
-
-1. **Add poster attribute to hero video** - The hero video is likely the LCP element and has no poster/fallback image. Add `poster="/hero-poster.webp"` to prevent blank LCP.
-
-2. **Lazy-load Three.js star background** - Loading Three.js, @react-three/fiber, and @react-three/drei on every page adds 700KB+ to the bundle. Use `next/dynamic` with `ssr: false` and defer loading until after the page is interactive, or replace with a CSS-only star animation.
-
-3. **Fix blog page client rendering** - The blog listing page (`app/blog/page.tsx`) should not be a client component. Extract the `getAllPosts()` call to a server component wrapper and pass data to a client `BlogCard` component. The same pattern should be applied to `team/page.tsx`.
-
-### High Priority
-
-4. **Add canonical tags to all subpages** - Add `alternates: { canonical: "https://mdntech.com/[path]" }` to the metadata in `/team/layout.tsx`, `/blog/layout.tsx`, `/privacy/layout.tsx`, and `/terms/layout.tsx`.
-
-5. **Fix domain inconsistency** - Update privacy policy and terms page content to reference `mdntech.com` instead of `mdntech.org`, or ensure `mdntech.org` properly redirects to `mdntech.com`.
-
-6. **Create custom 404 page** - Add `app/not-found.tsx` with proper SEO metadata and helpful navigation. This helps retain users who land on broken links and provides a better crawl signal.
-
-7. **Consolidate duplicate generateMetadata** - `app/blog/[slug]/page.tsx` and `app/blog/[slug]/layout.tsx` both export `generateMetadata`. Remove the metadata from one of them (preferably keep it in `page.tsx` since it handles the Article schema).
-
-### Medium Priority
-
-8. **Convert Cedarville Cursive to next/font** - Replace the CSS `@import` with `next/font/google` to eliminate the render-blocking font chain.
-
-9. **Add AI crawler rules to robots.txt** - Make a deliberate decision about AI crawlers (GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended, Meta-ExternalAgent, PerplexityBot, AmazonBot, Bytespider) and add explicit Allow or Disallow rules.
-
-10. **Fix sitemap lastModified dates** - Replace `new Date()` with actual content modification dates. For static content, use a fixed date string. For blog posts, use the post's date field.
-
-11. **Add Content-Security-Policy header** - Configure CSP in `next.config.js` to protect against XSS injection.
-
-12. **Reduce will-change usage** - 21 occurrences of `will-change`/`transform-gpu` found. Each creates a new compositor layer and consumes GPU memory. Limit to elements that actually animate.
-
-### Low Priority
-
-13. **Add aria-label to hamburger menu** - The mobile menu button uses a Unicode character. Add `aria-label="Open navigation menu"` and `aria-expanded={isMobileMenuOpen}`.
-
-14. **Add Service structured data** - Add `Service` schema markup to the homepage services section for rich results.
-
-15. **Add favicon.ico** - Generate a standard `favicon.ico` from the existing PNG.
-
-16. **Convert privacy/terms to server components** - These pages are static legal text and do not need `"use client"`. The only client dependency is `framer-motion` for entrance animations, which could be wrapped in a small client component while keeping the text content server-rendered.
-
----
-
-## Score Breakdown
+## Score
 
 | Category | Score | Weight | Weighted |
 |----------|-------|--------|----------|
-| Crawlability | 80/100 | 15% | 12.0 |
-| Indexability | 70/100 | 15% | 10.5 |
-| Security | 85/100 | 10% | 8.5 |
-| URL Structure | 95/100 | 10% | 9.5 |
-| Mobile | 85/100 | 10% | 8.5 |
-| Core Web Vitals | 50/100 | 20% | 10.0 |
-| Structured Data | 85/100 | 10% | 8.5 |
-| JS Rendering | 55/100 | 10% | 5.5 |
-| **Total** | | **100%** | **72/100** |
+| Crawlability | 95 | 15% | 14.25 |
+| Indexability | 95 | 15% | 14.25 |
+| International / hreflang | 55 | 10% | 5.50 |
+| Security | 85 | 10% | 8.50 |
+| URL Structure & Redirects | 85 | 10% | 8.50 |
+| Mobile | 95 | 10% | 9.50 |
+| Core Web Vitals | 55 | 15% | 8.25 |
+| Structured Data | 85 | 5% | 4.25 |
+| JS Rendering | 80 | 10% | 8.00 |
+| **Total** | | **100%** | **81/100** |
 
----
+## Recommended Fix Order
 
-## Files Analyzed
-
-- `app/robots.ts` - robots.txt generation
-- `app/sitemap.ts` - sitemap generation
-- `app/layout.tsx` - root layout with structured data
-- `app/page.tsx` - homepage
-- `app/team/page.tsx` and `app/team/layout.tsx` - team page
-- `app/blog/page.tsx` and `app/blog/layout.tsx` - blog listing
-- `app/blog/[slug]/page.tsx` and `app/blog/[slug]/layout.tsx` - blog post pages
-- `app/privacy/page.tsx` and `app/privacy/layout.tsx` - privacy policy
-- `app/terms/page.tsx` and `app/terms/layout.tsx` - terms and conditions
-- `app/globals.css` - global styles
-- `config/index.ts` - site metadata configuration
-- `next.config.js` - Next.js configuration with security headers
-- `package.json` - dependencies analysis
-- `components/main/hero.tsx` - hero section
-- `components/main/navbar.tsx` - navigation
-- `components/main/star-background.tsx` - Three.js star background
-- `data/blog-posts.ts` - blog post data structure
+1. H1 — hreflang for legal pairs (metadata `alternates.languages` + `app/sitemap.ts`), ~1 hour, pure win.
+2. M1 — OG blocks on SK legal pages (same files, same PR as H1).
+3. H2 — `lang="sk"` on Slovak pages (root layout split).
+4. M2 — .sk deep-path redirect mapping in `next.config.js`.
+5. M3 — ISO `article:published_time` on blog posts.
+6. H4 + H3 — hero visibility and three.js deferral (biggest CWV lever; needs design sign-off on animation behavior).
+7. L1-L3 — favicon.ico, ACAO source hunt, OG image resize.

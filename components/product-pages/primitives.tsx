@@ -28,6 +28,7 @@ export {
   FADE_UP,
   PageHero,
   Section,
+  enterDelay,
   fadeUp,
   type CtaLink,
 } from "./motion-primitives";

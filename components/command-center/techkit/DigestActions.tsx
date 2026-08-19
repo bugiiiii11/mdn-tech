@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { generateDigestNow } from '@/app/command-center/techkit/actions'
+import { generateDigestNow } from '@/app/(en)/command-center/techkit/actions'
 
 // Runs task=digest on demand. The poller upserts on week_start, so repeated
 // clicks on the same day replace the same row instead of piling up digests.

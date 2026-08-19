@@ -2,9 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-.cursive {
-  font-family: var(--font-cedarville-cursive), cursive;
+/* Hero entrances (S68 LCP fix). The framer-motion versions server-rendered
+   their `hidden` state as inline opacity:0, so nothing above the fold painted
+   until the whole JS bundle hydrated -- LCP sat at 3.9-4.5s on a 60ms TTFB.
+   These run as pure CSS from the first frame instead: same grammar
+   (slide-left on / and /sk, fade-up on the other heroes), same 0.5s.
+   Stagger via --enter-delay. fill-mode is `backwards`, NOT `both`: the final
+   keyframe equals the element's natural state, and a forwards fill would
+   pin `transform` forever and eat framer-motion hover gestures on the same
+   element (the /blog featured card lifts on hover). */
+.hero-enter-left,
+.hero-enter-up {
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: backwards;
+  animation-delay: var(--enter-delay, 0s);
 }
+.hero-enter-left {
+  animation-name: hero-enter-left;
+}
+.hero-enter-up {
+  animation-name: hero-enter-up;
+}
+@keyframes hero-enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter-left,
+  .hero-enter-up {
+    animation: none;
+  }
+}
+
 .Welcome-text {
   background: linear-gradient(
       0deg,

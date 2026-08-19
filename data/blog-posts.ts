@@ -18,7 +18,13 @@ export interface BlogPost {
   metaDescription: string;
   image: string;
   category: string;
+  /** Display string ("March 13, 2026") — UI only. Machine dates below. */
   date: string;
+  /** ISO publication date — feeds datePublished + article:published_time. */
+  published: string;
+  /** ISO date of the last substantive edit — feeds dateModified + sitemap
+   *  lastmod. Without it, lastmod is structurally stuck at publication. */
+  updated?: string;
   readTime: string;
   author: string;
   authorRole?: string;
@@ -35,6 +41,8 @@ export const BLOG_POSTS: BlogPost[] = [
     image: "/blog/claude-code-guide.jpg",
     category: "AI & Engineering",
     date: "March 13, 2026",
+    published: "2026-03-13",
+    updated: "2026-08-14",
     readTime: "15 min read",
     author: "M.D.N Tech Team",
     authorRole: "Engineering Team",
@@ -389,6 +397,8 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt: "From single-task assistants to multi-agent swarms — explore the architecture, protocols, and real-world adoption of agentic AI systems reshaping how businesses operate.",
     metaDescription: "Complete guide to agentic AI systems in 2026. Learn about multi-agent architectures, MCP and A2A protocols, enterprise adoption rates, and how autonomous AI agents are transforming industries.",
     image: "/blog/agentic-ai-systems.jpg",
+    published: "2026-03-10",
+    updated: "2026-08-14",
     category: "AI & Engineering",
     date: "March 10, 2026",
     readTime: "16 min read",
@@ -842,6 +852,8 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt: "Master EVM smart contract development with this comprehensive guide covering ERC-20, ERC-721, ERC-1155 standards, security best practices, and Chainlink VRF for provably fair randomness.",
     metaDescription: "Complete guide to EVM smart contract development. Learn ERC-20, ERC-721, ERC-1155 standards, security best practices, Chainlink VRF integration, and lessons from 50+ deployments.",
     image: "/blog/smart-contracts-guide.jpg",
+    published: "2026-03-01",
+    updated: "2026-08-14",
     category: "Blockchain & Web3",
     date: "March 1, 2026",
     readTime: "18 min read",

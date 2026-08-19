@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 
-import { slideInFromLeft } from "@/lib/motion";
 import { APP_LIVE, APP_URL } from "@/lib/marketing/products";
 import { BlackholeVideo } from "@/components/main/blackhole-video";
 import {
@@ -14,24 +14,26 @@ import {
   HERO_SECTION_CLASS,
 } from "@/components/main/hero-shell";
 
+const delay = (s: number) => ({ "--enter-delay": `${s}s` }) as CSSProperties;
+
 // Product-first hero (website-rebuild v2.1). Shape, framing and button sizing
 // all come from components/main/hero-shell.ts, which /sk, /chatkit and /toolkit
 // share — see that file for why the blackhole is sized independently of the
 // hero. Keeps id="home" (footer logo links to /#home).
+//
+// Entrance is CSS (.hero-enter-left in globals.css), not framer-motion: this
+// text is the LCP element, and a framer entrance server-renders it at
+// opacity:0 until hydration. framer stays only for the CTA hover gestures.
 export const LandingHero = () => {
   return (
     <div id="home" className={HERO_SECTION_CLASS}>
       <BlackholeVideo className={HERO_BLACKHOLE_CLASS} />
 
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        className={HERO_CONTENT_CLASS}
-      >
+      <div className={HERO_CONTENT_CLASS}>
         <div className="w-full flex flex-col items-center gap-5 justify-center text-start">
-          <motion.h1
-            variants={slideInFromLeft(0.3)}
-            className="flex flex-col gap-6 text-4xl md:text-6xl lg:text-7xl text-white w-full max-w-full"
+          <h1
+            className="hero-enter-left flex flex-col gap-6 text-4xl md:text-6xl lg:text-7xl text-white w-full max-w-full"
+            style={delay(0.3)}
           >
             <span className="text-center break-words">
               <span className="text-transparent bg-clip-text font-bold bg-gradient-to-r from-purple-500 to-cyan-500">
@@ -41,20 +43,20 @@ export const LandingHero = () => {
                 with AI.
               </span>
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            variants={slideInFromLeft(0.55)}
-            className="text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
+          <p
+            className="hero-enter-left text-xl md:text-2xl text-gray-300 my-5 max-w-[700px] text-center font-medium"
+            style={delay(0.55)}
           >
             An AI chatbot grounded in your content, free Claude Code skills,
             and more — self-service tools that go live in minutes, no sales
             calls.
-          </motion.p>
+          </p>
 
-          <motion.div
-            variants={slideInFromLeft(0.75)}
-            className="flex flex-col sm:flex-row gap-4 mt-8 items-center justify-center"
+          <div
+            className="hero-enter-left flex flex-col sm:flex-row gap-4 mt-8 items-center justify-center"
+            style={delay(0.75)}
           >
             {/* "Start Free" goes to the portal, so it becomes an inert state
                 while the portal is closed (APP_LIVE). The secondary button
@@ -82,9 +84,9 @@ export const LandingHero = () => {
             >
               Explore the Tools
             </motion.a>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

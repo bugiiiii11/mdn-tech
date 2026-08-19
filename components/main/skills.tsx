@@ -2,9 +2,18 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { CosmicNebula } from "./cosmic-nebula";
+
+// Dynamic, ssr:false: the nebula is the only three.js consumer besides the
+// starfield, and a static import would pull the ~786 KB three/r3f graph back
+// into this page's blocking bundle (S68 LCP fix). It is decorative and below
+// the fold, so there is nothing to server-render anyway.
+const CosmicNebula = dynamic(
+  () => import("./cosmic-nebula").then((m) => m.CosmicNebula),
+  { ssr: false }
+);
 
 interface ServiceCardProps {
   icon: string;

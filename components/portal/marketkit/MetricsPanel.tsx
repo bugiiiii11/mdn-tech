@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ImageUp, Loader2, Plus, Trash2, MousePointerClick } from 'lucide-react'
 import { Pill } from './ui'
 import { JobRunner } from './JobRunner'
-import { addManualMetric, deleteMetric } from '@/app/portal/marketkit/actions'
+import { addManualMetric, deleteMetric } from '@/app/(en)/portal/marketkit/actions'
 import type { MkMetricSnapshot, MkLink, JobStatus } from '@/lib/marketkit/types'
 
 // B2 metrics ingestion: screenshot → storage → metrics_screenshot job → Claude

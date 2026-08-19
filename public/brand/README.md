@@ -59,6 +59,7 @@ source of truth — regenerate the PNGs rather than editing them.
 |---|---|---|
 | Favicons (`app/icon.png`, `app/icon1.png`, `app/apple-icon.png`) | `logo-final-gradient.svg` on a `#0B0A14` rounded tile | `node scripts/generate-favicons.mjs` |
 | Link previews (`public/og-image.png`, `og-image-sk.png`) | `logo-final-white.svg` | `node scripts/generate-og-images.mjs` |
+| Blog cards (`public/blog/*.jpg` — BlogPosting image + per-post og:image) | `logo-final-white.svg` | `node scripts/generate-blog-images.mjs` |
 | Navbar, footers, portal top bar | `logo-final-white.svg` via `next/image` (`unoptimized`) | — |
 | schema.org Organization logo | `png/logo-final-white-on-black-1000.png` | — |
 | Chat widget bubble (`launcher_icon`) | `png/logo-final-white-500.png` | re-run `scripts/seed-sk-chatbot.mjs` |

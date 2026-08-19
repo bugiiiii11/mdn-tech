@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { BlackholeVideo } from "@/components/main/blackhole-video";
 import {
@@ -22,6 +22,10 @@ import { cn } from "@/lib/utils";
 // the product pages only supply copy and data. Nothing here holds product copy,
 // prices or counts: those stay in lib/portal/plans.ts,
 // lib/marketing/toolkit-catalogue.ts and lib/marketing/* and arrive as props.
+
+/** Inline stagger for the CSS hero entrances (.hero-enter-* in globals.css). */
+export const enterDelay = (s: number) =>
+  ({ "--enter-delay": `${s}s` }) as CSSProperties;
 
 export const fadeUp = (delay = 0): Variants => ({
   hidden: { opacity: 0, y: 20 },
@@ -140,40 +144,39 @@ export const PageHero = ({
   primaryCta,
   secondaryCta,
 }: PageHeroProps) => (
+  // Entrance is CSS (.hero-enter-up in globals.css), not framer-motion: the
+  // h1 here is the page's LCP element, and a framer entrance server-renders
+  // it at opacity:0 until hydration.
   <div id={id} className={HERO_SECTION_CLASS}>
     <BlackholeVideo className={HERO_BLACKHOLE_CLASS} />
 
-    <motion.section
-      initial="hidden"
-      animate="visible"
-      className={HERO_CONTENT_CLASS}
-    >
+    <section className={HERO_CONTENT_CLASS}>
       <div className="flex w-full flex-col items-center">
-        <motion.h1
-          variants={fadeUp(0.05)}
-          className="max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+        <h1
+          className="hero-enter-up max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+          style={enterDelay(0.05)}
         >
           {title}
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          variants={fadeUp(0.3)}
-          className="mt-6 max-w-3xl text-center text-lg md:text-xl text-gray-300 leading-relaxed"
+        <p
+          className="hero-enter-up mt-6 max-w-3xl text-center text-lg md:text-xl text-gray-300 leading-relaxed"
+          style={enterDelay(0.3)}
         >
           {subtitle}
-        </motion.p>
+        </p>
 
-        <motion.div
-          variants={fadeUp(0.5)}
-          className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+        <div
+          className="hero-enter-up mt-10 flex flex-col sm:flex-row items-center gap-4"
+          style={enterDelay(0.5)}
         >
           <CtaButton cta={primaryCta} variant="primary" size="lg" />
           {secondaryCta ? (
             <CtaButton cta={secondaryCta} variant="secondary" size="lg" />
           ) : null}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   </div>
 );
 

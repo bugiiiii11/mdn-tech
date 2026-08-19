@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { checkEndpointNow, deleteEndpoint, toggleEndpoint } from '@/app/command-center/techkit/actions'
+import { checkEndpointNow, deleteEndpoint, toggleEndpoint } from '@/app/(en)/command-center/techkit/actions'
 
 export function EndpointRowActions({ id, isActive }: { id: string; isActive: boolean }) {
   const [pending, startTransition] = useTransition()

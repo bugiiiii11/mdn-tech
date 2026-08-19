@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { Check, Copy, SkipForward, CheckCheck, MousePointerClick } from 'lucide-react'
 import { Pill } from './ui'
 import { JobRunner } from './JobRunner'
-import { setActionStatus } from '@/app/portal/marketkit/actions'
+import { setActionStatus } from '@/app/(en)/portal/marketkit/actions'
 import { mondayOfWeek, type MkAction, type MkLink, type JobStatus, type ActionStatus } from '@/lib/marketkit/types'
 
 // Weekly sprint loop UI (BRIEF §3.4 / backlog B4): actions grouped by sprint week,

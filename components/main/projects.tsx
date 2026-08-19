@@ -227,7 +227,7 @@ const techResults = [
     category: "Enterprise Track Record",
     results: [
       { metric: "Enterprise Systems Built", value: "20+" },
-      { metric: "Years Delivering For Corporates", value: "30+" },
+      { metric: "Years Delivering For Corporates", value: "20+" },
       { metric: "Corporate Clients Served", value: "8" },
       { metric: "Enterprise Mobile Projects", value: "10+" },
     ],

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Check, X } from 'lucide-react'
-import { answerQuestion, dismissQuestion } from '@/app/portal/marketkit/actions'
+import { answerQuestion, dismissQuestion } from '@/app/(en)/portal/marketkit/actions'
 import type { MkFounderQuestion } from '@/lib/marketkit/types'
 
 function QuestionRow({ q }: { q: MkFounderQuestion }) {

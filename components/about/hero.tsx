@@ -12,7 +12,7 @@ import {
   HERO_SECTION_CLASS,
 } from "@/components/main/hero-shell";
 import { PROSE_LINK_CLASS } from "@/components/product-pages/static-primitives";
-import { fadeUp } from "@/components/product-pages/primitives";
+import { enterDelay } from "@/components/product-pages/primitives";
 
 // /about hero on THE shared full-viewport shell (see hero-shell.ts). Replaces
 // the pre-rebuild landing hero this page inherited ("Build Smarter. Ship
@@ -24,31 +24,29 @@ export const AboutHero = () => (
   <div id="home" className={HERO_SECTION_CLASS}>
     <BlackholeVideo className={HERO_BLACKHOLE_CLASS} />
 
-    <motion.section
-      initial="hidden"
-      animate="visible"
-      className={HERO_CONTENT_CLASS}
-    >
+    {/* Entrance is CSS (.hero-enter-up) — the h1 is this page's LCP element
+        and must paint before hydration; framer stays for the CTA gestures. */}
+    <section className={HERO_CONTENT_CLASS}>
       <div className="flex w-full flex-col items-center">
-        <motion.h1
-          variants={fadeUp(0.05)}
-          className="max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+        <h1
+          className="hero-enter-up max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+          style={enterDelay(0.05)}
         >
           The Team Behind the Tools
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          variants={fadeUp(0.3)}
-          className="mt-6 max-w-3xl text-center text-xl md:text-2xl font-medium text-gray-300"
+        <p
+          className="hero-enter-up mt-6 max-w-3xl text-center text-xl md:text-2xl font-medium text-gray-300"
+          style={enterDelay(0.3)}
         >
           Full-stack AI engineers who own every phase of the project lifecycle
           — from idea to production-ready systems, faster and more secure than
           traditional development.
-        </motion.p>
+        </p>
 
-        <motion.p
-          variants={fadeUp(0.45)}
-          className="mt-6 max-w-2xl text-center text-base md:text-lg text-gray-300 leading-relaxed"
+        <p
+          className="hero-enter-up mt-6 max-w-2xl text-center text-base md:text-lg text-gray-300 leading-relaxed"
+          style={enterDelay(0.45)}
         >
           Most of our time goes into our own self-service products —{" "}
           <Link href="/chatkit" className={PROSE_LINK_CLASS}>
@@ -59,11 +57,11 @@ export const AboutHero = () => (
             ToolKit
           </Link>{" "}
           — and we take on select custom development projects alongside them.
-        </motion.p>
+        </p>
 
-        <motion.div
-          variants={fadeUp(0.6)}
-          className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+        <div
+          className="hero-enter-up mt-10 flex flex-col sm:flex-row items-center gap-4"
+          style={enterDelay(0.6)}
         >
           <motion.a
             whileHover={{ scale: 1.05 }}
@@ -81,8 +79,8 @@ export const AboutHero = () => (
           >
             See How We Build
           </motion.a>
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   </div>
 );

@@ -9,7 +9,7 @@ import {
   HERO_CONTENT_CLASS,
   HERO_SECTION_CLASS,
 } from "@/components/main/hero-shell";
-import { fadeUp } from "@/components/product-pages/primitives";
+import { enterDelay } from "@/components/product-pages/primitives";
 import type { BlogPost } from "@/data/blog-posts";
 
 import { BANNER_BG, Constellation, DEFAULT_BANNER_BG } from "./constellation";
@@ -27,36 +27,36 @@ export const BlogHero = ({ featured }: { featured: BlogPost }) => (
   <div id="blog-top" className={HERO_SECTION_CLASS}>
     <BlackholeVideo className={HERO_BLACKHOLE_CLASS} />
 
-    <motion.section
-      initial="hidden"
-      animate="visible"
-      className={HERO_CONTENT_CLASS}
-    >
+    {/* Entrance is CSS (.hero-enter-up) — the h1 is this page's LCP element
+        and must paint before hydration; framer stays for the hover lift. */}
+    <section className={HERO_CONTENT_CLASS}>
       {/* md:pt-24 — this hero's content block is taller than the others
           (featured panel), so pure centering pushes the h1 up into the ring's
           glow at desktop heights; the padding buys the headline clear space. */}
       <div className="flex w-full max-w-4xl flex-col items-center md:pt-24">
-        <motion.h1
-          variants={fadeUp(0.05)}
-          className="max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+        <h1
+          className="hero-enter-up max-w-4xl break-words text-center text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500"
+          style={enterDelay(0.05)}
         >
           AI Engineering, In Practice
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          variants={fadeUp(0.3)}
-          className="mt-6 max-w-3xl text-center text-lg md:text-xl text-gray-300 leading-relaxed"
+        <p
+          className="hero-enter-up mt-6 max-w-3xl text-center text-lg md:text-xl text-gray-300 leading-relaxed"
+          style={enterDelay(0.3)}
         >
           Deep guides on Claude Code, agentic systems and smart-contract
           engineering — field notes from a team that ships with these tools
           every day.
-        </motion.p>
+        </p>
 
-        {/* Featured: the latest article, inside the fold. */}
+        {/* Featured: the latest article, inside the fold. The CSS entrance
+            fill-mode is `backwards` precisely so this element's framer hover
+            transform works once the entrance has finished. */}
         <motion.div
-          variants={fadeUp(0.5)}
           whileHover={{ y: -4 }}
-          className="group mt-12 w-full"
+          className="hero-enter-up group mt-12 w-full"
+          style={enterDelay(0.5)}
         >
           <h2 className="sr-only">Featured article</h2>
           <Link
@@ -122,6 +122,6 @@ export const BlogHero = ({ featured }: { featured: BlogPost }) => (
           </Link>
         </motion.div>
       </div>
-    </motion.section>
+    </section>
   </div>
 );

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { addManualCost, deleteCost } from '@/app/command-center/techkit/actions'
+import { addManualCost, deleteCost } from '@/app/(en)/command-center/techkit/actions'
 
 const PROVIDER_SUGGESTIONS = ['railway', 'anthropic', 'vercel', 'supabase', 'domains', 'other']
 

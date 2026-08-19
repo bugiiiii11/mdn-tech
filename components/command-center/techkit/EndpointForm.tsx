@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { saveEndpoint, type EndpointInput } from '@/app/command-center/techkit/actions'
+import { saveEndpoint, type EndpointInput } from '@/app/(en)/command-center/techkit/actions'
 
 interface ProjectOption {
   id: string

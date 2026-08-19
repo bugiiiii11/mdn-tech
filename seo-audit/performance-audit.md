@@ -1,424 +1,167 @@
-# Performance Audit: mdntech.com
+# Performance Audit: mdntech.org
 
-**Date:** 2026-03-17
-**Framework:** Next.js 14.2.15 (React 18)
-**Hosting:** Likely Vercel (based on Next.js setup)
-
----
-
-## Executive Summary
-
-The site carries an extremely heavy JavaScript footprint due to Three.js, React Three Fiber, Framer Motion, and Swiper loaded on the homepage. Multiple autoplay videos, a persistent WebGL canvas, and excessive Framer Motion animations across every section compound the problem. The homepage is essentially a single-page application with 8 above-the-fold sections, all client-rendered with `"use client"` directives.
-
-**Estimated Performance Score:** 25-40/100 (Lighthouse)
-**Core Web Vitals Prediction:** FAILING on all three metrics
-
-| Metric | Predicted | Threshold | Status |
-|--------|-----------|-----------|--------|
-| LCP | 5-8s | <=2.5s | POOR |
-| INP | 300-600ms | <=200ms | POOR |
-| CLS | 0.15-0.35 | <=0.1 | POOR |
+**Date:** 2026-08-19
+**Framework:** Next.js 15 (App Router, RSC), Vercel hosting
+**Scope:** 14 prerendered pages; deep-dive on `/`, `/sk`, `/chatkit`, `/toolkit`, `/blog/claude-code-complete-guide`
+**Supersedes:** the 2026-03-17 audit of the pre-rebuild site (mdntech.com). Several of its P0 items were fixed in the rebuild (posters + `preload="none"` on videos, next/font, image dimensions, resource hints). One P0 item was NOT fixed -- see Critical #1.
 
 ---
 
-## CRITICAL: JavaScript Bundle Weight
+## Method
 
-### Heavy Dependencies (estimated uncompressed sizes)
+What was **measured** vs what was **statically analyzed**:
 
-| Package | Estimated Size (minified) | Used Where |
-|---------|---------------------------|------------|
-| three | ~650 KB | star-background.tsx (layout - every page) |
-| @react-three/fiber | ~180 KB | star-background.tsx (layout - every page) |
-| @react-three/drei | ~300 KB (tree-shakeable) | star-background.tsx (layout - every page) |
-| framer-motion | ~140 KB | Every single component |
-| swiper | ~140 KB | projects.tsx (currently commented out, but imported) |
-| react-icons | Variable (~20-40 KB) | about-us, team, contact-us, footer, navbar |
-| @emailjs/browser | ~15 KB | contact-us.tsx |
-| @heroicons/react | ~25 KB | contact-us.tsx |
-| maath | ~15 KB | star-background.tsx |
-
-**Total estimated JS payload: ~1.2-1.5 MB+ (minified, before gzip)**
-
-This is catastrophic for performance. The recommended total JS budget for a performant site is under 300 KB compressed.
-
-### Why This Matters
-
-- Three.js alone (~650 KB) is loaded on EVERY page because `StarsCanvas` is in `layout.tsx`
-- The WebGL context initializes immediately on page load, competing with LCP rendering
-- Framer Motion is imported in every `"use client"` component (11 components total)
-- All components use `"use client"` -- nothing is server-rendered beyond the initial layout shell
+- **PageSpeed Insights API:** attempted keyless for `/` and `/sk` -- returned HTTP 429 (shared anonymous daily quota exhausted). **No PSI lab data and no CrUX field data (LCP/INP/CLS) were retrieved.** Nothing below is field data; INP is assessed via its lab proxy TBT.
+- **Local Lighthouse 12.8.2** (Chrome headless, default mobile emulation: moto-G-class device, 4x CPU throttle, slow-4G network throttle) run against production for the 5 key pages. Caveat: Lighthouse flagged the host CPU as slower than its reference on one run, so **TBT values are inflated and scores are somewhat pessimistic** -- treat absolute numbers as directional; the bottleneck attribution (long tasks, LCP phases, request weights) is robust.
+- **Static analysis** of the fetched HTML + response headers for all 14 pages, plus direct fetches of the production JS/CSS/font/video assets to get real compressed transfer sizes and identify libraries inside chunks.
 
 ---
 
-## Issue #1: Three.js WebGL Canvas in Layout (CRITICAL - LCP, INP)
+## Lab Metrics (local Lighthouse, mobile emulation)
 
-**File:** `components/main/star-background.tsx`
-**Location:** `app/layout.tsx` line 95
+| Page | Score | FCP | LCP | TBT | CLS | Speed Index | LCP element |
+|------|-------|-----|-----|-----|-----|-------------|-------------|
+| `/` | 57 | 1.6 s | 3.9 s | 3,360 ms | **0** | 2.8 s | hero `<video>` (blackhole poster) |
+| `/sk` | 51 | 2.0 s | 4.5 s | 2,890 ms | **0** | 4.5 s | hero `<video>` (blackhole poster) |
+| `/toolkit` | 56 | 1.7 s | 4.1 s | 1,690 ms | **0** | 4.9 s | hero `<p>` text |
+| `/chatkit` | 57 | 1.7 s | 4.3 s | 1,420 ms | **0** | 4.5 s | hero container |
+| `/blog/claude-code-complete-guide` | 61 | 1.5 s | 4.0 s | 1,400 ms | **0** | 2.2 s | intro `<p>` text |
 
-```tsx
-<StarsCanvas />  // Loaded in root layout = every page
-```
+**Core Web Vitals status (lab assessment, thresholds: LCP <=2.5s, INP <=200ms, CLS <=0.1):**
 
-The `StarsCanvas` component renders a full-screen Three.js `<Canvas>` with 1000 animated particles using `useFrame()` which runs every animation frame. This:
+| Metric | Status | Evidence |
+|--------|--------|----------|
+| LCP | **FAIL** (lab 3.9-4.5 s, needs-improvement/poor band) | Render delay is 2.2-3.6 s of it on every page |
+| INP | **AT RISK** (no field data; lab proxy TBT 1.4-3.4 s, far above the ~200 ms comfort zone) | Single 1.9 s long task from the React/Next runtime chunk while evaluating the three.js scene |
+| CLS | **PASS** (0 on all five pages) | Dimensions/fill containers on images, font-display: swap, fixed-size video slots |
 
-- Blocks the main thread during initialization (~200-500ms)
-- Creates a persistent WebGL context consuming GPU resources
-- Runs `useFrame` continuously, creating constant main thread work
-- Competes directly with LCP element rendering
-- Loads three.js, @react-three/fiber, @react-three/drei, and maath on every page
+**LCP phase breakdown (Lighthouse):** TTFB 700-980 ms (throttled network; real server TTFB is 60-70 ms), Load Delay ~0, Load Time 0-1.3 s, **Render Delay 2,211-3,569 ms** -- the main thread, not the network, is the LCP bottleneck on every page.
 
-**Impact:** +2-4 seconds to LCP, +100-300ms to INP
-**Fix:** Replace with a CSS-only starfield animation, or lazy-load with `requestIdleCallback` after LCP fires. If WebGL is essential, defer initialization until after the page is interactive.
-
----
-
-## Issue #2: Multiple Autoplay Videos (CRITICAL - LCP, CLS)
-
-**Files:**
-- `components/main/hero.tsx` -- `blackhole.webm` (hero background)
-- `components/main/encryption.tsx` -- `encryption-bg.webm`
-- `components/main/skills.tsx` -- `skills-bg.webm`
-- `components/main/footer.tsx` -- `blackhole.webm` (second instance)
-
-Four `<video autoPlay>` elements load simultaneously. Key problems:
-
-1. **Hero video has no poster attribute** -- shows nothing until video loads, delaying perceived LCP
-2. **No preload strategy** -- `preload="false"` is not a valid value (should be `preload="none"`)
-3. **`blackhole.webm` loads twice** -- hero and footer use the same video file
-4. **No lazy loading on below-fold videos** -- encryption-bg and skills-bg load immediately
-5. **Videos lack width/height attributes** -- causes layout shifts as they load
-6. **Video format** -- only WebM provided, no MP4 fallback for Safari compatibility
-
-**Impact:** +1-3 seconds to LCP, +0.1-0.2 CLS
-**Fix:**
-- Add `poster` attribute to hero video with a compressed JPEG/WebP still frame
-- Change below-fold videos to `preload="none"` (valid value) and use Intersection Observer to trigger playback
-- Set explicit dimensions on all video elements
-- Add MP4 fallback for Safari
-- Consider replacing decorative background videos with CSS gradients or lightweight animations
+**Page weight (initial load, compressed):** `/` 1,859 KB, `/sk` 2,137 KB, `/toolkit` 2,066 KB, `/chatkit` 2,067 KB, blog post 1,337 KB. Media (blackhole.webm) is 1.3-1.5 MB of that on `/` and `/sk`. JS is ~391-398 KB compressed (~1.3 MB+ uncompressed) and is nearly identical on every page, including legal pages and blog posts.
 
 ---
 
-## Issue #3: Every Component is Client-Rendered (HIGH - LCP)
+## Findings
 
-Every component in the project uses `"use client"`:
+### CRITICAL
 
-- `hero-content.tsx` -- "use client"
-- `about-us.tsx` -- "use client"
-- `skills.tsx` -- "use client"
-- `encryption.tsx` -- "use client"
-- `projects.tsx` -- "use client"
-- `process.tsx` -- "use client"
-- `team.tsx` -- "use client"
-- `contact-us.tsx` -- "use client"
-- `navbar.tsx` -- "use client"
-- `footer.tsx` -- "use client"
-- `star-background.tsx` -- "use client"
+#### C1. Three.js + react-three-fiber still ship on every page (~213 KB br, 54% of all JS)
 
-This means Next.js cannot server-render any meaningful content. The HTML sent to the browser is essentially an empty shell, and all content must wait for JS to download, parse, and execute.
+The 2026-03 audit's #1 recommendation ("remove Three.js starfield from layout") was **not** implemented in the rebuild. Confirmed by downloading and fingerprinting the production chunks:
 
-**Impact:** +2-4 seconds to LCP on slow connections
-**Fix:**
-- Convert static sections (AboutUs, Skills description, Process, Team bios, Encryption content) to Server Components
-- Extract only the interactive parts (animations, hover effects) into small client component wrappers
-- The text content of most sections could render as pure HTML from the server
+| Chunk | Compressed (br) | Uncompressed | Contents |
+|-------|-----------------|--------------|----------|
+| `b536a0f1-0bc70055616c4f4d.js` | 166.8 KB | 652 KB | three.js core (WebGLRenderer, PointsMaterial) |
+| `7602-4e7992b955d47cef.js` | 45.8 KB | 134 KB | @react-three/fiber + glue |
+| `3841-9ab29cbe541d529e.js` | 35.1 KB | 100 KB | framer-motion |
+| `fd9d1056-...js` | 54.1 KB | 169 KB | react + react-dom |
+| `2117-0f410736e75fc897.js` | 32.3 KB | 121 KB | Next/React runtime |
 
----
+Both three.js chunks are referenced in the `<head>` of **all 14 pages** (they sit in the shared `(marketing)/layout` graph) -- blog articles and legal pages pay 213 KB compressed / ~786 KB uncompressed of WebGL code for a decorative starfield. Direct measured consequences:
 
-## Issue #4: Excessive Framer Motion Animations (HIGH - INP, CLS)
+- Script Evaluation 3.8-4.0 s of main-thread work per page (throttled)
+- Longest task 1,756-1,899 ms attributed to the runtime chunk evaluating/mounting the scene
+- LCP Render Delay 2.2-3.6 s (= the entire LCP problem; TTFB and asset loading are fine)
+- Lighthouse flags ~40 KB of `b536a0f1` as unused even while the starfield runs
 
-Nearly every element on the page has Framer Motion animations:
+**Fix (in order of payoff):**
+1. Replace the starfield with a CSS/canvas-2D particle effect (~2-3 KB). This alone should move every page from ~55 to ~80+ and cut LCP by 1.5-2 s.
+2. If WebGL must stay: `next/dynamic(() => import('./star-background'), { ssr: false })` **plus** mount only after `requestIdleCallback`/first user interaction, so it never competes with hydration and LCP. Also render it only on desktop (`matchMedia('(min-width: 768px)')`) -- mobile gets the worst of the CPU cost and the least visual benefit.
+3. Either way, verify with the bundle analyzer that three.js leaves the shared layout graph (it must be imported only inside the dynamically-imported component).
 
-- **whileInView animations** on every section heading and card
-- **Mouse-tracking 3D perspective transforms** on every card (about-us, projects, process, team) using `useMotionValue`, `useSpring`, and `useTransform`
-- **Continuous hover animations**: floating particles (6 per card), scanning line effects, pulsing border glows, shine sweep effects
-- **Animation on every mousemove event** with `getBoundingClientRect()` calls
+**Expected impact:** LCP -1.5 to -2 s, TBT -50 to -70%, ~213 KB less JS on every page.
 
-The `ServiceCard` in `skills.tsx` alone has:
-- 4 animated border draw effects
-- 4 animated corner brackets
-- A scanning line animation (infinite loop)
-- A pulsing border glow (infinite loop)
-- 4 corner glow effects with box-shadow animations (infinite loops)
-- 6 floating particle animations
-- A mouse-following glow effect
-- A shine sweep effect
+#### C2. `blackhole.webm` (740 KB) downloads twice per page view on `/` and `/sk`
 
-This pattern is repeated across `about-us.tsx`, `projects.tsx`, `process.tsx`, and `team.tsx`.
+Two `<video>` elements (hero, rotated, and a second lower one) both reference `<source src="/videos/blackhole.webm">`. `preload="none"` is set, but `autoPlay` overrides it -- both elements begin fetching immediately and in parallel, so the browser cannot serve the second from cache. Lighthouse network log confirms: `/` fetched 740 KB + 570 KB, `/sk` fetched 740 KB + 740 KB of the same file. That is **1.3-1.5 MB of media** on a marketing page whose LCP is the video's poster, and it competes for bandwidth exactly during the LCP window on slow connections.
 
-**Impact:** INP 300-600ms on mid-range devices, continuous main thread blocking
-**Fix:**
-- Replace Framer Motion whileInView with CSS `@keyframes` + `IntersectionObserver` (native)
-- Use CSS transforms instead of JS-driven mouse tracking
-- Remove or drastically reduce particle effects and continuous animations
-- Use `will-change: transform` sparingly (currently applied via `.transform-gpu` to many elements)
-- Consider `content-visibility: auto` for below-fold sections
+**Fix options:**
+- Give the second (below-fold) video `autoplay` only via IntersectionObserver: keep `preload="none"`, no `autoplay` attribute in markup, call `.play()` when it scrolls into view. First video will then be in HTTP cache (asset is `immutable`, so the second use is free).
+- Or drop the second video entirely and reuse the 47 KB poster with a CSS effect.
+- Also consider re-encoding: 757 KB for a looping background is trimmable to ~300-400 KB (lower bitrate/resolution/duration; it sits behind content at reduced opacity).
 
----
+**Expected impact:** -570 to -740 KB per view, faster video start, less bandwidth contention around LCP.
 
-## Issue #5: Dual Font Loading Strategy (MEDIUM - LCP, CLS)
+### HIGH
 
-**Files:** `app/layout.tsx`, `app/globals.css`
+#### H1. LCP 3.9-4.5 s driven entirely by main-thread render delay
 
-Two font loading mechanisms are used simultaneously:
+On every page the LCP phase profile is the same: real TTFB is excellent (60-70 ms edge-cached; the 700-980 ms in the table is simulated slow-4G), load delay ~0, but **render delay 2.2-3.6 s** while hydration and the WebGL scene evaluate. This is the downstream symptom of C1 plus global framer-motion. Fixing C1 is the fix; two additional cheap wins:
 
-1. `next/font/google` for Inter (line 2 of layout.tsx) -- optimal, uses font-display: swap
-2. `@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap")` in globals.css line 1 -- render-blocking CSS import
+- Preload the LCP poster on `/` and `/sk`: `<link rel="preload" as="image" href="/videos/blackhole-poster.webp" fetchpriority="high">` (poster is currently discovered late via the `<video>` element).
+- Audit which sections genuinely need `"use client"` + framer-motion; entrance animations on static sections can be CSS `@keyframes` + IntersectionObserver, letting chunk `3841` (100 KB unc.) leave the shared graph.
 
-The `@import` in CSS is render-blocking. The browser must:
-1. Download globals.css
-2. Discover the @import
-3. Make a new request to fonts.googleapis.com
-4. Download the font CSS
-5. Download the font file
+#### H2. Dead font preloaded on all 14 pages: Cedarville Cursive (22.6 KB)
 
-This creates a 4-request waterfall chain before the page can render.
+`7ab6c71e1cbd6ab6-s.p.woff2` (Cedarville Cursive via next/font) is `<link rel="preload" as="font">` in the head of every page, but the generated `.cursive`/`__className_a58734` class **appears in zero rendered pages**. Font preloads are high priority and compete with critical CSS/JS inside the LCP window.
 
-**Impact:** +200-500ms to LCP, potential FOUT causing CLS
-**Fix:**
-- Use `next/font/google` for Cedarville Cursive as well (already used for Inter)
-- Remove the `@import` from globals.css entirely
-- If Cedarville Cursive is not actually used visibly (only `.cursive` class), remove it entirely
+**Fix:** remove the Cedarville Cursive `next/font` instantiation from the layout (and the `--font-cedarville-cursive` plumbing in globals). If a page later needs it, instantiate it in that page's module only. Saves 22.6 KB of high-priority bytes everywhere.
 
----
+### MEDIUM
 
-## Issue #6: No Resource Hints or Preloading (MEDIUM - LCP)
+#### M1. `/sk` always pays a late, non-preloaded 83.5 KB font (Inter latin-ext)
 
-**File:** `app/layout.tsx`
+Slovak diacritics fall in the `latin-ext` unicode-range, so `/sk` pages always fetch `8e9860b6e62d6359-s.woff2` (83.5 KB -- the largest single font) *after* CSS parses, on top of the preloaded 48 KB latin subset. `display: swap` prevents invisible text and CLS measured 0, but Slovak visitors get a visible font swap and `/sk` carries 154 KB of fonts vs 70 KB on English pages.
 
-The layout has no `<link rel="preload">`, `<link rel="preconnect">`, or `<link rel="dns-prefetch">` hints in the `<head>`.
+**Fix:** in the SK layout/head add `<link rel="preload" as="font" type="font/woff2" crossorigin href="/_next/static/media/8e9860b6e62d6359-s.woff2">` (or set the next/font `subsets: ['latin', 'latin-ext']` so Next emits the preload on SK routes). Longer term, self-subset Inter to latin + Slovak codepoints only -- 83.5 KB is the full latin-ext block, most of it unused.
 
-Missing preconnections:
-- `fonts.googleapis.com` (for the CSS @import)
-- `fonts.gstatic.com` (for font files)
-- EmailJS domain (loaded in contact form)
+#### M2. `/toolkit` HTML is 303 KB because 146 KB of RSC flight data is inlined
 
-Missing preloads:
-- Hero video (`/videos/blackhole.webm`) -- the LCP element background
-- Logo image (`/logo.png`) -- above the fold in navbar
+The document is 296 KB raw (20-24 KB is typical for the other pages' payload class). Breakdown: 146 KB of `self.__next_f.push` flight data, of which a **single 124 KB block** serializes the entire skills-directory dataset as props to a client component -- on top of the same content already present as rendered HTML (33 KB text). Users download the directory content roughly twice, and the browser parses 146 KB of inline JS before hydration.
 
-**Fix:**
-Add to layout.tsx `<head>`:
-```tsx
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-<link rel="preload" as="video" href="/videos/blackhole.webm" type="video/webm" />
-<link rel="preload" as="image" href="/logo.png" />
-```
+**Fix:** render the skill list/cards in a Server Component and pass only what the interactive part needs (e.g., ids + filter fields for the client-side filter, not full descriptions/content). Rule of thumb: any prop crossing the server-to-client boundary is shipped twice.
+
+#### M3. `/blog` index over-serializes: 68 KB flight data for 2 KB of visible text
+
+Same pattern as M2 at smaller scale -- the blog index inlines 68 KB of flight data (likely full post metadata/excerpts/JSON passed to a client list) while rendering only ~2 KB of text. The blog post page inlines 52 KB. Trim the props crossing to client components (cards need title, slug, date, excerpt -- not full content or full schema objects).
+
+#### M4. TBT/INP headroom: 6 tasks >50 ms per page, worst 1.9 s
+
+Even discounting local-CPU inflation, a single ~1.9 s task (scene mount + hydration) will translate to poor INP for any user who taps during load on a mid-range phone. Largely resolved by C1/H1; additionally keep hover/scroll handlers passive and avoid `getBoundingClientRect()` in mousemove paths that survived the rebuild.
+
+### LOW
+
+#### L1. Useless self-preconnect; missing hints where they'd help
+
+Every page emits `<link rel="preconnect" href="https://mdntech.org">` + `dns-prefetch` to itself -- the connection is already open (that's how the HTML arrived). Remove; replace with the poster preload from H1 (and M1's font preload on `/sk`).
+
+#### L2. Poster image can be ~half its size
+
+`blackhole-poster.webp` is 47.5 KB and is the LCP image on `/` and `/sk`. A darker, blurred background frame compresses well -- re-export at lower quality or as AVIF; ~20 KB is achievable with no visible difference behind overlaid text.
+
+#### L3. JSON-LD duplicated inside flight data
+
+FAQ/ItemList JSON-LD blocks on `/toolkit` (and others) appear twice in the HTML: once as `application/ld+json` and again escaped inside the RSC flight stream (~12 KB duplicated on `/toolkit`). Byte waste only -- SEO parsing is unaffected. Rendering the `<script type="application/ld+json">` outside any client-component boundary avoids the duplication.
 
 ---
 
-## Issue #7: Navbar Uses backdrop-blur (MEDIUM - INP)
+## What is working well (keep it this way)
 
-**File:** `components/main/navbar.tsx` line 12
-
-```tsx
-className="... backdrop-blur-md z-50"
-```
-
-`backdrop-filter: blur()` is one of the most expensive CSS properties. Applied to a fixed navbar, it forces the GPU to re-composite every frame during scrolling. This is especially harmful because the Three.js canvas is animating behind it.
-
-Also present in:
-- Mobile menu backdrop (line 64): `backdrop-blur-sm`
-- Mobile menu (line 71): `backdrop-blur-lg`
-- Multiple card components: `backdrop-blur-sm`
-
-**Impact:** Janky scrolling, +50-150ms to INP on mid-range devices
-**Fix:** Remove `backdrop-blur` from the fixed navbar. Use a solid or semi-transparent background instead. Keep blur only for modal overlays that appear briefly.
+- **CLS = 0 on all tested pages** -- images have explicit dimensions or fill containers, videos have fixed-height slots, fonts use `display: swap` with fallback metric adjustment.
+- **TTFB 60-70 ms** -- all 14 pages are prerendered (`X-Vercel-Cache: PRERENDER/HIT`), served from Vercel edge (fra1) with Brotli.
+- **Static assets** are `public, max-age=31536000, immutable`, correctly fingerprinted.
+- **next/image** delivers AVIF (e.g., a 1080 px portfolio PNG arrives as 18.9 KB AVIF) with sensible `sizes` and lazy loading below the fold.
+- **Zero third-party scripts.** The `/sk` chat widget is first-party, mounts client-side after hydration, injects no external blocking script, and caused no measured CLS. Its cost is inside the shared JS bundle (counted in C1/H1 numbers).
+- Old audit's fixed items confirmed in production: video `poster` + valid `preload="none"`, no Google Fonts CSS `@import`, next/font self-hosting with preload of the primary subset.
 
 ---
 
-## Issue #8: Images Without Optimization (MEDIUM - LCP, CLS)
+## Prioritized plan (expected effect on mobile lab scores)
 
-### Logo in Navbar
-```tsx
-<Image src="/logo.png" alt="M.D.N Tech" width={32} height={32} />
-```
-PNG format for a small logo. Should be SVG or WebP.
+| # | Action | Effort | Expected impact |
+|---|--------|--------|-----------------|
+| 1 | C1: remove/defer three.js + R3F from the shared layout | M | LCP -1.5-2 s, TBT -50-70%, score ~55 -> ~80 |
+| 2 | C2: IntersectionObserver-gate the second video (kill duplicate 740 KB) | S | -0.6-0.7 MB/view, faster hero video |
+| 3 | H2: drop dead Cedarville Cursive preload | S | 22.6 KB high-priority bytes off every page |
+| 4 | H1: preload hero poster with fetchpriority=high on `/` and `/sk` | S | LCP -100-300 ms on video-LCP pages |
+| 5 | M1: preload/subset latin-ext Inter for `/sk` | S | No visible font swap for SK users |
+| 6 | M2/M3: trim server-to-client props on `/toolkit` and `/blog` | M | /toolkit HTML 303 KB -> ~140 KB |
+| 7 | L1/L2: hint cleanup, recompress poster | S | Marginal |
 
-### Team Member Images
-```tsx
-<Image src={member.image} width={128} height={128} />
-```
-Team photos at 128x128 -- format unknown but likely PNG/JPG. Should use Next.js Image optimization with WebP/AVIF output.
-
-### World Map SVG
-```tsx
-<Image src="/world-map.svg" width={1200} height={800} />
-```
-Large SVG loaded for background decoration. Should be lazy loaded (it has `priority={false}` which is good).
-
-### Service Icons
-Multiple SVG icons loaded for each service card (6 icons) and tech result cards (6 icons).
-
-**Fix:**
-- Convert logo to SVG
-- Ensure team photos use Next.js Image component with proper sizing (already using `<Image>`)
-- Verify `next.config.js` has image optimization enabled (currently no image config present)
-- Add explicit `sizes` prop to responsive images for better srcset generation
+After items 1-4, re-run PSI (quota permitting, or with an API key) and check CrUX for field LCP/INP once traffic accumulates -- field data is the ground truth Google uses at the 75th percentile.
 
 ---
 
-## Issue #9: next.config.js Missing Performance Optimizations (MEDIUM)
+## Category score: 55/100
 
-**File:** `next.config.js`
-
-The current config only sets security headers. Missing optimizations:
-
-```js
-// Missing configurations:
-module.exports = {
-  // No image optimization config
-  // No webpack bundle analysis
-  // No experimental optimizations
-  // No output: 'standalone' for smaller deployments
-  // No compiler options for removing console.log in production
-  // No modularizeImports for react-icons (tree-shaking)
-}
-```
-
-**Fix:** Add to next.config.js:
-```js
-const nextConfig = {
-  images: {
-    formats: ['image/avif', 'image/webp'],
-  },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-  modularizeImports: {
-    'react-icons/fa': { transform: 'react-icons/fa/{{member}}' },
-    'react-icons/rx': { transform: 'react-icons/rx/{{member}}' },
-  },
-  // ... existing headers config
-};
-```
-
----
-
-## Issue #10: Swiper CSS Imported Globally (LOW)
-
-**File:** `components/main/projects.tsx` lines 13-14
-
-```tsx
-import 'swiper/css';
-import 'swiper/css/pagination';
-```
-
-Swiper CSS and JS are imported even though the Swiper carousel section is currently commented out (lines 376-422). This dead code still gets bundled.
-
-**Impact:** ~30-50 KB of unnecessary CSS/JS
-**Fix:** Remove Swiper imports entirely since the carousel is commented out, or dynamically import if re-enabled.
-
----
-
-## Issue #11: Invalid Video Preload Value (LOW)
-
-**Files:** `encryption.tsx` line 19, `skills.tsx` line 349
-
-```tsx
-preload="false"  // Invalid -- should be preload="none"
-```
-
-The valid values for `preload` are: `"none"`, `"metadata"`, `"auto"`, or `""`. The string `"false"` is not a valid value and browsers will treat it as the default (`"auto"` or browser-dependent), meaning videos will preload despite the intent to prevent it.
-
-**Fix:** Change to `preload="none"` in both files.
-
----
-
-## Issue #12: EmailJS Loaded Eagerly (LOW - Bundle Size)
-
-**File:** `components/main/contact-us.tsx`
-
-```tsx
-import emailjs from "@emailjs/browser";
-```
-
-EmailJS is statically imported at the top of the contact form component. Since ContactUs is near the bottom of the page, this could be dynamically imported.
-
-**Fix:**
-```tsx
-const handleSubmit = async (e: React.FormEvent) => {
-  const emailjs = (await import("@emailjs/browser")).default;
-  // ... rest of handler
-};
-```
-
----
-
-## Prioritized Recommendations
-
-### P0 -- Critical (Expected LCP improvement: 3-5 seconds)
-
-1. **Remove Three.js starfield from layout** -- Replace with CSS-only animation or load lazily after LCP
-2. **Defer below-fold videos** -- Use `preload="none"` and Intersection Observer for playback
-3. **Add poster image to hero video** -- Provide instant visual content before video loads
-4. **Convert static sections to Server Components** -- Render HTML on server for AboutUs, Skills, Process, Team, Encryption
-
-### P1 -- High (Expected INP improvement: 100-300ms)
-
-5. **Replace Framer Motion whileInView with CSS animations** -- Reduce JS on main thread
-6. **Remove mouse-tracking 3D effects** or limit to desktop only with `matchMedia`
-7. **Remove backdrop-blur from fixed navbar** -- Use solid background
-8. **Reduce particle/glow animation count** -- Maximum 2-3 per card, not 10+
-
-### P2 -- Medium (Expected improvement: 200-500ms LCP, 0.05-0.1 CLS)
-
-9. **Fix font loading** -- Move Cedarville Cursive to `next/font/google`, remove CSS @import
-10. **Add resource hints** -- Preconnect to font origins, preload hero assets
-11. **Add image optimization config** to next.config.js (AVIF/WebP formats)
-12. **Fix invalid preload="false"** on video elements
-
-### P3 -- Low (Bundle size reduction)
-
-13. **Remove Swiper imports** -- Carousel code is commented out
-14. **Dynamic import EmailJS** -- Only load when form is submitted
-15. **Add modularizeImports** for react-icons tree-shaking
-16. **Remove console.log in production** via compiler option
-
----
-
-## Estimated Impact of All Fixes
-
-| Metric | Current (est.) | After P0 | After P0+P1 | After All |
-|--------|---------------|----------|-------------|-----------|
-| LCP | 5-8s | 2.5-4s | 2-3s | 1.5-2.5s |
-| INP | 300-600ms | 250-500ms | 100-200ms | 80-150ms |
-| CLS | 0.15-0.35 | 0.05-0.15 | 0.03-0.1 | <0.05 |
-| JS Bundle | ~1.2-1.5 MB | ~500-700 KB | ~300-500 KB | ~200-350 KB |
-| Lighthouse | 25-40 | 50-65 | 70-80 | 85-95 |
-
----
-
-## Architecture Recommendation
-
-The site would benefit significantly from a fundamental architectural shift:
-
-1. **Server Components by default** -- Only wrap interactive elements (hover effects, forms, video controls) in `"use client"` boundaries
-2. **Progressive enhancement** -- Render all text content as server HTML, then hydrate interactive features
-3. **Remove Three.js entirely** -- A CSS starfield achieves 90% of the visual effect at 1% of the cost
-4. **Use CSS animations** for entrance effects instead of Framer Motion where possible
-5. **Consider Astro or partial hydration** if most pages are content-heavy with minimal interactivity
-
----
-
-## Files Analyzed
-
-- `app/layout.tsx` -- Root layout with Three.js canvas
-- `app/page.tsx` -- Homepage with 8 sections
-- `app/globals.css` -- Global styles with render-blocking font import
-- `next.config.js` -- Minimal config, missing optimizations
-- `package.json` -- Heavy dependency list
-- `config/index.ts` -- Site metadata configuration
-- `components/main/star-background.tsx` -- Three.js WebGL starfield
-- `components/main/hero.tsx` -- Hero with autoplay video
-- `components/main/hero-content.tsx` -- Framer Motion hero content
-- `components/main/navbar.tsx` -- Fixed navbar with backdrop-blur
-- `components/main/about-us.tsx` -- Client component with complex animations
-- `components/main/skills.tsx` -- Client component with video + animated cards
-- `components/main/encryption.tsx` -- Client component with video background
-- `components/main/process.tsx` -- Client component with animated timeline
-- `components/main/projects.tsx` -- Client component with Swiper imports
-- `components/main/team.tsx` -- Client component with team cards
-- `components/main/contact-us.tsx` -- Client component with EmailJS
-- `components/main/footer.tsx` -- Client component with video
+Rationale: CLS is perfect and the delivery layer (edge caching, TTFB, compression, image pipeline, no third parties) is near-ideal, but every tested page fails lab LCP (3.9-4.5 s) and carries an interactivity liability (TBT 1.4-3.4 s throttled) caused by one architectural decision -- a ~786 KB (unc.) WebGL decoration in the shared layout -- plus a duplicated 740 KB background video. Both are contained, well-understood fixes; implementing items 1-4 above should put the site in the 80-90 lab range with genuine "good" CWV headroom.

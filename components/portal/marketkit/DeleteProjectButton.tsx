@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
-import { deleteProject } from '@/app/portal/marketkit/actions'
+import { deleteProject } from '@/app/(en)/portal/marketkit/actions'
 
 export function DeleteProjectButton({ projectId, projectName }: { projectId: string; projectName: string }) {
   const router = useRouter()

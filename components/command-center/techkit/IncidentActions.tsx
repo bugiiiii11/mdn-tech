@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { acknowledgeAlert, resolveAlert } from '@/app/command-center/techkit/actions'
+import { acknowledgeAlert, resolveAlert } from '@/app/(en)/command-center/techkit/actions'
 
 export function IncidentActions({ alertId, status }: { alertId: string; status: string }) {
   const [pending, startTransition] = useTransition()

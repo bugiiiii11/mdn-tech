@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 66) -- mdntech.sk live, widget origin bug, SK legal pages + CRM rebuild (rotated 2026-08-19)
+
+- **mdntech.sk + www LIVE, 308 -> mdntech.org/sk** (C5 done). Vercel's native domain redirect could NOT be used: it only maps a host to the SAME path, so the bare .sk would have landed on the English homepage. Rule lives in `next.config.js` `redirects()` with `has: [{type:"host"}]` -- redirects run BEFORE middleware, so .sk traffic never pays for a Supabase session refresh, and query strings forward so campaign UTMs survive. Websupport DNS: apex A `216.198.79.1`, www CNAME to the vercel-dns host; **the apex AAAA is the record people forget** -- leave it and IPv6 visitors keep hitting the parking page while IPv4 works.
+- **The chatbot was invisible on /sk, and the same root cause silently broke CUSTOMER widgets.** The site canonicalised onto the apex and `www.mdntech.org` became a 308, but all three widget entry points still hard-coded www. (a) Our CSP is `script-src 'self'` and www is a separate ORIGIN to CSP, so the script was blocked outright. (b) Worse: the message POST sends `Content-Type: application/json` -> CORS preflight -> **browsers refuse to follow redirects on a preflight**, so OPTIONS on www returned 308 with no CORS headers. Verified on prod (www -> 308 no ACAO, apex -> 204 with it). Fix: `widget.js` now normalises www -> apex (repairs snippets ALREADY pasted into customer sites without them editing anything -- the script tag follows the redirect, gets the new file, and it points itself back), `SkChatWidget` loads `/widget.js` relatively, both embed snippets emit the apex. Verified end-to-end with a real streamed reply.
+- **Task 0a3 done** -- SK bot re-seeded twice (new logo, then apex `launcher_icon`).
+- **SK legal pages** at `/sk/ochrana-osobnych-udajov` + `/sk/obchodne-podmienky`, section numbering 1:1 with the English so the two can be diffed; English prevails on discrepancy (that clause was already in the EN pages). Built as STATIC server components on purpose -- the EN pages are `"use client"`, which is why they ship with no `metadata`/title/canonical. Shared shell in `components/legal/legal-primitives.tsx`. SK footer was pointing Slovak labels at the English documents.
+- Two EN legal corrections made to keep the versions honestly in sync: sessionStorage campaign attribution (C3) was never disclosed in the cookie section, and the terms still named **Railway** as host instead of Supabase.
+- **CRM section rebuilt** -- it was proving itself with a screenshot of the client's WEBSITE, which answers the wrong question. Now leads with six named modules matching a delivered system's menu; `SK_CRM_SCREENSHOT` is NULL-GATED so the section reads complete until the sanitised Command Center export lands.
+- **All of the above is LIVE** (`dea616a`): user supplied the 1920x1080 Command Center capture, gate flipped, deployed and verified on prod (screenshot + caption render, both legal pages 200, local SEO section present). Bot re-seeded LAST, after the deploy, and confirmed with a live question -- it now names all six CRM modules.
+- **Royal Stroje: new Lokalne SEO section** built only on what is verifiable in the live page source (LocalBusiness + geo + opening hours, FAQPage, locality-first title, NAP). Rankings deliberately NOT claimed -- user chose "describe the work only" over generic "popredne pozicie".
+
 ## What Was Done (Session 65) -- chatbot 400 fix + final logo rolled out sitewide (C7) (rotated 2026-08-19)
 
 - **The SK chatbot never answered a single message, and it was not Claude.** `widget.js` sends `conversationId: null` on the first message; the schema had `UUID.optional()`, and zod `.optional()` rejects `null` -> 400 before the bot lookup. No conversation was ever created, so the id stayed null forever. Fixed server-side with `.nullish()` (cached widget.js copies in visitors' browsers keep sending null) plus the widget. Confirmed against prod. **Lesson: C2 shipped in S64 without one end-to-end conversation being clicked through.**
@@ -234,6 +245,7 @@
 | 55 | 2026-08-12/13 | S54 fix pass completed (60/60) + adversarial re-verify: 37 new findings, unapplied |
 | 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
 | 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
+| 58 | 2026-08-14 | Hero rebuild: one full-viewport shell across /, /sk, /chatkit, /toolkit |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 
