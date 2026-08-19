@@ -1,6 +1,13 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getPostById, getRelatedPosts, getAllPosts, toPostPreview } from "@/data/blog-posts";
+import {
+  blogBreadcrumb,
+  getPostById,
+  getRelatedPosts,
+  getAllPosts,
+  toPostPreview,
+} from "@/data/blog-posts";
+import { organizationRef, SITE_URL } from "@/components/product-pages/schema";
 import BlogPostContent from "./BlogPostContent";
 
 interface PageProps {
@@ -97,41 +104,61 @@ export default async function BlogPostPage({ params }: PageProps) {
   // spare articles per page.
   const relatedPosts = getRelatedPosts(post.id, 2).map(toPostPreview);
 
-  // Article JSON-LD schema for rich snippets
+  // BlogPosting + BreadcrumbList in one @graph.
+  //
+  // The breadcrumb items come from blogBreadcrumb() — the SAME function
+  // BlogPostContent renders the visible trail from, per the rule in
+  // components/product-pages/schema.ts. Before S70 this page carried no
+  // BreadcrumbList precisely because there was no visible trail; the trail
+  // exists now, so the schema is honest again. If the trail is ever removed,
+  // remove this node with it.
+  //
+  // author is a Person, not the Organization it used to be: an org byline
+  // carries no E-E-A-T signal, and `post.author` is a real, findable person.
+  // No `sameAs` until FOUNDER.linkedin holds a real profile URL — a
+  // placeholder link is a named anti-reference in PRODUCT.md.
+  const breadcrumb = blogBreadcrumb(post);
+
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.metaDescription || post.excerpt,
-    image: `https://mdntech.org${post.image || "/og-image.png"}`,
-    datePublished: post.published,
-    dateModified: post.updated ?? post.published,
-    author: {
-      "@type": "Organization",
-      name: post.author,
-      url: "https://mdntech.org",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "M.D.N Tech FZE",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://mdntech.org/brand/png/logo-final-white-on-black-1000.png",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": `${SITE_URL}/blog/${post.id}#article`,
+        headline: post.title,
+        description: post.metaDescription || post.excerpt,
+        image: `${SITE_URL}${post.image || "/og-image.png"}`,
+        inLanguage: "en",
+        datePublished: post.published,
+        dateModified: post.updated ?? post.published,
+        author: {
+          "@type": "Person",
+          name: post.author,
+          ...(post.authorRole ? { jobTitle: post.authorRole } : {}),
+          url: `${SITE_URL}/about`,
+          worksFor: organizationRef(),
+        },
+        publisher: organizationRef(),
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `${SITE_URL}/blog/${post.id}`,
+        },
+        keywords: post.tags.join(", "),
+        articleSection: post.category,
       },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://mdntech.org/blog/${post.id}`,
-    },
-    keywords: post.tags.join(", "),
-    articleSection: post.category,
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${SITE_URL}/blog/${post.id}#breadcrumb`,
+        itemListElement: breadcrumb.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: `${SITE_URL}${crumb.href}`,
+        })),
+      },
+    ],
   };
 
-  // No BreadcrumbList here on purpose: these pages render no visible
-  // breadcrumb trail, and schema without a matching visible trail is the
-  // mismatch the S58 sitewide removal existed to fix (this file was missed).
-  // When the /blog/[slug] redesign adds a visible trail, re-add the schema
-  // alongside it — copy the pattern from /sk/referencie/royal-stroje.
   return (
     <>
       <script

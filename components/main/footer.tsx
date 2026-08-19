@@ -25,8 +25,12 @@ const MARKETING_ROUTES: Partial<Record<MarketingProduct["id"], string>> = {
 // max-w-full + break-words, not just w-fit: w-fit resolves to max-content, so
 // a long unbreakable string (contact@mdntech.org) sized past the 320px column
 // and was silently cut off by the footer's overflow-x-hidden.
+// inline-flex + min-h-[24px], not just text-sm: a 14px/20px link is a 20px tap
+// target, under the 24px floor Lighthouse audits (SEO audit item 17). Every
+// call site sits in a `flex flex-col gap-2.5` column, so the taller box adds
+// hit area without moving anything.
 const linkClass =
-  "text-sm text-gray-400 hover:text-white transition-colors w-fit max-w-full break-words";
+  "text-sm text-gray-400 hover:text-white transition-colors inline-flex min-h-[24px] items-center w-fit max-w-full break-words";
 const headingClass =
   "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 

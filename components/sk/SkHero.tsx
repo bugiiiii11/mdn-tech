@@ -36,12 +36,17 @@ export const SkHero = () => {
             className="hero-enter-left flex flex-col gap-2 text-4xl md:text-6xl xl:text-7xl font-bold text-white w-full max-w-full text-center"
             style={delay(0.3)}
           >
+            {/* Two block spans, not a hard <br>: the break only ever separated
+                the two lines, but at 390px line one still wrapped on its own
+                and stranded "chatboty" alone on a third line. `text-balance`
+                lets the browser even out that wrap ("Web, CRM a" / "AI
+                chatboty") instead. Copy is untouched — the H1 wording is a
+                standing guardrail (SEO audit item 19). */}
             <span className="break-words">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500">
+              <span className="block text-balance text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500">
                 {SK_HERO.titleLine1}
               </span>
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">
+              <span className="block text-balance text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">
                 {SK_HERO.titleLine2}
               </span>
             </span>

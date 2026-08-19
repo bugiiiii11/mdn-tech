@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan nearly cleared: S68 fixed Critical #1+#2 + quick wins, S69 closed #3, #8, #10-13, #16 (committed, NOT deployed)** -- remaining: #15 blog refresh bundle + low backlog (`seo-audit/ACTION-PLAN.md`). Portal still gated behind `APP_LIVE`.
-- **Session count:** 69
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan is CLOSED as a build queue** (S68 Critical #1+#2, S69 #3/#8/#10-13/#16, S70 #15/#17/#19/#21); only #22 real reviews remains, and it needs customers. **S69 + S70 are committed LOCALLY and NOT deployed -- the .sk deep-link redirect fix is not live yet.** Portal still gated behind `APP_LIVE`.
+- **Session count:** 70
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 60 | 2026-08-15 | APP_LIVE portal gate + merge to main; website rebuild live on prod |
 | 61 | 2026-08-15 | /sk realizacie refresh (4 projects, fresh captures) + SK footer on the EN shell |
 | 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 | 63 | 2026-08-16 | /sk rework built: CRM flagship + Kto sme + FAQ + Royal Stroje case study (feat/sk-rework, unmerged) |
@@ -22,17 +21,7 @@
 | 67 | 2026-08-19 | /sk copy pass (keyword H1, honest scope) + widget leak onto EN pages fixed |
 | 68 | 2026-08-19 | SEO re-audit 76/100 + Critical #1/#2 fixed (blog images, lang=sk, hreflang, three.js off critical path) |
 | 69 | 2026-08-19 | SEO action plan: #3, #8, #10-13, #16 closed; #16 finding corrected (RSC seed tree is architectural) |
-
-## What Was Done (Session 68) -- SEO re-audit (76/100) + Critical #1/#2 and the quick wins fixed
-
-- **Re-audit (0a2/C6) via 6 parallel subagents; all of `seo-audit/` regenerated**: FULL-AUDIT-REPORT.md (score 76/100, category table, handoff-verdicts table, do-not-do guardrails), ACTION-PLAN.md (22 items, the standing work queue), 6 specialist reports, 13 screenshots. `screenshots/sk_mobile_fullpage.png` captures the S67 mobile section order for Martin's pending review.
-- **Blog images never existed** -- `/blog/*.jpg` were soft-404s breaking Article rich results. New `scripts/generate-blog-images.mjs` (same seeded OG-card composition; titles duplicated by design, sync on change) -> `public/blog/*.jpg`, wired as og:image/twitter:image. Blog dates now ISO (`published`/`updated` fields in `data/blog-posts.ts`) -- the old parser silently stamped TODAY on failure. Blog BreadcrumbList REMOVED (schema without a visible trail; re-add with the trail during the /blog/[slug] redesign, pattern = Royal Stroje).
-- **Root layout split into `app/(en)/layout.tsx` + `app/(sk)/layout.tsx`** (shared shell `app/base-layout.tsx`) -- the only way Next can vary `<html lang>`; all four Slovak pages served `lang="en"` before. KEEP THE TWO IDENTICAL except `lang`. Cross-locale nav is now a full document load. Killed the user's RUNNING DEV SERVER to unlock the `app/` rename -- Martin: restart `npm run dev`.
-- **hreflang for the legal pairs declared on BOTH sides** (EN server layouts + SK page metadata + sitemap). The S66 "use client blocks metadata" note was OUTDATED -- `app/(en)/(marketing)/privacy/layout.tsx` had already solved it; no page split was needed. Sitemap lastmods corrected from git (11/14 were stale); changefreq/priority dropped everywhere.
-- **Critical #2: three.js (652 KB chunk) is out of EVERY page's blocking graph.** `LazyStarsCanvas` mounts the starfield at browser idle and SKIPS blog articles + legal pages entirely; `CosmicNebula` is dynamic(ssr:false). Verified: no built page references the three.js chunks. Never re-import `star-background` statically.
-- **Hero entrances converted framer-motion -> CSS** (`.hero-enter-left/-up` in globals.css, all 6 hero variants) -- framer server-rendered the LCP h1 at inline opacity:0 until hydration (LCP 3.9-4.5s on 60ms TTFB). fill-mode is `backwards` ON PURPOSE: a forwards fill pins `transform` and eats framer hover gestures (/blog featured card).
-- /about honesty: years-for-corporates 30+ -> 20+ (user call; 50+ contracts / 100+ partnerships confirmed correct by user). Dead Cedarville Cursive font removed. **mdntech.com is a THIRD PARTY (forwards to mdntech.ca)** -- the ".com 301" idea is dead.
-- All verified in the `.next-verify` build output (lang, hreflang links, chunk graph, hero opacity, icons); `tsconfig.json` auto-rewrite reverted.
+| 70 | 2026-08-19 | SEO action plan closed out: blog refresh (#15/#7), tap targets, /sk H1 wrap, internal links |
 
 ## What Was Done (Session 69) -- SEO action plan: #3, #8, #10-13, #16 closed
 
@@ -45,9 +34,20 @@
 - `SK_NAP.address` (new) must stay in sync with `COMPANY_LEGAL_LINE`; the seed script does not read it, so no bot re-seed was needed.
 - #13 was fixed with SK-footer clearance (`pr-20 sm:pr-0` on the bottom block) -- `widget.js` deliberately untouched (customer embeds share it).
 
+## What Was Done (Session 70) -- SEO action plan closed out: #15, #17, #19, #21
+
+- **The build queue in `ACTION-PLAN.md` is now EMPTY.** Only #20 (a tooling note, nothing to fix) and #22 (real ChatKit reviews, needs customers) remain. Committed, **NOT deployed** -- S69 and S70 are both still local.
+- **#15 fixed the staleness class, not just the instance.** "Latest Features (March 2026)" -> "Beyond the Basics"; the version-pinned "Opus 4.6 with Effort Levels" subsection now describes what effort IS and links the docs, under a callout stating outright that the section does not track model versions. **Do not reintroduce a dated feature list** -- it goes stale in one release cycle. Both "coming soon" placeholders gone (the /blog pill became a ChatKit/ToolKit cross-link; the `isFullArticle` block was dead code).
+- **Two blog claims were wrong, not merely uncited.** METR now states the real result (16 devs, ~19% slower) AND that METR has since labelled it historical; A2A is Linux-Foundation-governed, not "Google's". Everything else got attribution: SWE-bench, Claude Code docs, effort docs, API pricing, MCP, A2A, Hacken H1-2025 (the $3.1bn/$1.8bn/$263m figures), OpenZeppelin, Chainlink VRF, EIP-20/721/1155.
+- **New contract:** citations ride on `ContentBlock.links` (+ `linksLabel`) in `data/blog-posts.ts` and render as a trailing "Source(s):" line via `BlockLinks` -- outside the block's own element, so a list stays a list. Add a citation with the claim, never after.
+- **`AUTHOR` in `data/blog-posts.ts` must stay in sync by hand with `FOUNDER` in `constants/index.ts`** -- deliberately NOT imported: that module pulls react-icons into the blog client graph, which S69 had just trimmed. Article schema author is a Person (`jobTitle`, `worksFor`); no `sameAs` until `FOUNDER.linkedin` is real (Martin task 9).
+- **#7 closed with #15:** visible breadcrumb + BreadcrumbList both built from `blogBreadcrumb()` -- one array, per the schema.ts rule. Remove the schema node if the trail ever goes.
+- #17 tap targets: `inline-flex min-h-[24px] items-center` on footer `linkClass`, both breadcrumb trails, /toolkit "Source" links, shared code-block Copy. #19: the /sk H1's hard `<br>` became two `block` spans with `text-balance` -- **H1 copy untouched**, that guardrail stands. #21's finding was half-wrong (money->post deep links already existed); the missing direction was posts -> /toolkit, /chatkit, /about.
+- Verified in `.next-verify`: Person + BreadcrumbList JSON-LD, breadcrumb nav, every citation URL, zero stale strings. tsc + lint clean; `tsconfig.json` auto-rewrite reverted (it happens on every build -- always check).
+
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
-0b. **Restart your dev server** -- S68 had to kill it (it held a lock on `app/(marketing)` during the root-layout split). If it 500s, delete `.next/` first. `.next-stale-1777403470/` can still be deleted via Explorer; `.next-verify/` stays (legitimate build-verify dir).
+0b. **Dev server** -- S68 had to kill it during the root-layout split; if `npm run dev` 500s, delete `.next/` first. `.next-stale-1777403470/` can be deleted via Explorer; `.next-verify/` stays (build-verify dir).
 
 0. **EmailJS template: add attribution (5 min, blocks C3 payoff):** emailjs.com -> the contact template -> add a line `Zdroj: {{attribution}}` (optionally also `{{form_id}}`, `{{landing_page}}`). Until then the forms SEND the UTM data but the inbox never shows it. Also: review the SK chatbot's answers at admin.mdntech.org/chatbots/46ef0a99...; KB edits that should persist belong in `constants/sk.ts` + re-run `scripts/seed-sk-chatbot.mjs`.
 
@@ -68,8 +68,8 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0a5 | **SEO action plan remainder** | `seo-audit/ACTION-PLAN.md` -- S68 did 1-2, 4-7, 9, 14, 18; S69 did 3, 8, 10-13, 16. **First: deploy prod, then verify one mdntech.sk deep link (#10) -- gates the partner campaign.** Remaining: **#15 blog refresh bundle** (= the queued /blog/[slug] redesign: stale March claims, Person authorship + schema, outbound citations per the /toolkit pattern, visible breadcrumb + BreadcrumbList) + low backlog #17 tap targets, #19 /sk H1 `<br>` at 390px, #21 internal links, #22 real reviews post-launch. Guardrails in FULL-AUDIT-REPORT.md still apply. |
-| 0a4 | **Royal Stroje consent for the CRM screenshot** | `public/portfolio/royal-crm-katalog.png` is LIVE on /sk (content pre-reviewed, overview redacted). Folds into Martin task 7. Pull by setting `SK_CRM_SCREENSHOT` back to `null` if they object. |
+| 0a5 | **DEPLOY S69 + S70 to prod** (only SEO work left) | Nothing buildable remains in `seo-audit/ACTION-PLAN.md`. What is left is shipping it: push `main` (**user must ask -- never push unprompted**), then **verify one mdntech.sk deep link on prod (ACTION-PLAN #10) -- that gates the ~150 partner emails.** Then eyeball /blog + /blog/[slug] live (breadcrumb, byline, Source lines) and re-run the Rich Results test on one article. Only #22 (real ChatKit reviews, post-launch) stays open. Guardrails in FULL-AUDIT-REPORT.md still apply. |
+| 0a4 | **Royal Stroje consent for the CRM screenshot** | Nothing left on our side -- the image exists and is LIVE on /sk (content pre-reviewed, overview redacted; user confirmed S70). Purely the consent conversation now, folded into Martin task 7. Pull by setting `SK_CRM_SCREENSHOT` back to `null` if they object. |
 | 0a | **SK-C leftovers** | Only C4 LinkedIn vanity slug (Martin task 9) remains. Campaign gate: founder/Filip inputs resolved BEFORE the ~150 partner emails (early September) + fix ACTION-PLAN #10 first. |
 | 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. Remaining gate: Phase 2 checkout + human legal read of /privacy. Verify built HTML has app links back, no "Coming soon" survives. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250); 3 mock-checkout routes (`app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/`) collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" on Scale; 2.7 policy build (12-mo expiry, refund window, chargeback clawback, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Ledger: SELECT-only to `authenticated`, writes service-role; read migration 020 first. |
@@ -88,7 +88,8 @@
 |------|---------|
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
 | `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) |
-| `seo-audit/ACTION-PLAN.md` + `FULL-AUDIT-REPORT.md` | The SEO work queue (22 items, S68) + score/verdicts/GUARDRAILS -- read before any SEO or copy-adjacent change |
+| `seo-audit/ACTION-PLAN.md` + `FULL-AUDIT-REPORT.md` | The SEO queue (22 items, all closed but #20/#22) + score/verdicts/GUARDRAILS -- read before any SEO or copy-adjacent change |
+| `data/blog-posts.ts` | ALL blog copy + the `ContentBlock.links` citation contract + `blogBreadcrumb()` (schema and visible trail share it) + `AUTHOR` (hand-synced with `FOUNDER`, never imported) |
 | `PRODUCT.md` / `DESIGN.md` | Brand register + "Event Horizon" visual system. Read BOTH before any design or copy work |
 | `app/base-layout.tsx` + `app/(en)|(sk)/layout.tsx` | The TWO root layouts -- exist only so /sk ships `lang="sk"`; keep them identical except `lang`; cross-locale nav = full page load |
 | `lib/marketing/products.ts` | THE portal gate: `APP_LIVE` (default CLOSED), `appCta()`, `isAppHref()` -- grep APP_LIVE before adding any link to app.mdntech.org |

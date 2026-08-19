@@ -1,6 +1,18 @@
 // Blog post data with rich content support
 // Each content item can be a paragraph, heading, list, code block, or callout
 
+/**
+ * An attributed link. Same shape as FaqLink in components/product-pages/faq.tsx
+ * — the house pattern for a link that follows prose rather than sitting inside
+ * it, so the sentence stays a plain string and the citation stays checkable.
+ */
+export interface ContentLink {
+  label: string;
+  href: string;
+  /** External links open in a new tab and use <a>; internal ones use next/link. */
+  external?: boolean;
+}
+
 export interface ContentBlock {
   type: 'paragraph' | 'heading' | 'subheading' | 'list' | 'code' | 'callout' | 'quote' | 'image';
   content?: string;
@@ -9,6 +21,14 @@ export interface ContentBlock {
   variant?: 'info' | 'warning' | 'tip' | 'stat';
   alt?: string;
   src?: string;
+  /**
+   * Citations for the claim this block makes, rendered as a trailing line under
+   * it. Every number, benchmark and study named in the prose should carry one —
+   * /toolkit's attributed links are the house standard (SEO audit item 15).
+   */
+  links?: ContentLink[];
+  /** Defaults to "Source"/"Sources". Set it when the links are not citations. */
+  linksLabel?: string;
 }
 
 export interface BlogPost {
@@ -58,6 +78,32 @@ export function toPostPreview({
   return { id, title, excerpt, category, date, readTime, tags };
 }
 
+/**
+ * The trail an article page RENDERS and the BreadcrumbList it EMITS, from one
+ * array — the rule in components/product-pages/schema.ts: schema may only
+ * describe navigation a visitor can actually see. Pure function, so the client
+ * half recomputes it instead of receiving it as flight data.
+ */
+export const blogBreadcrumb = (post: Pick<BlogPost, "id" | "title">) => [
+  { name: "Home", href: "/" },
+  { name: "Blog", href: "/blog" },
+  { name: post.title, href: `/blog/${post.id}` },
+];
+
+/**
+ * Named authorship (SEO audit item 15): "M.D.N Tech Team" cannot carry an
+ * E-E-A-T Person node, so every post is bylined to the founder, who owns the
+ * editorial line here.
+ *
+ * MUST STAY IN SYNC with `FOUNDER` in `constants/index.ts` — deliberately
+ * duplicated rather than imported, because that module pulls react-icons and
+ * this one is in the /blog client bundle's import graph (S69 kept it lean).
+ */
+const AUTHOR = {
+  name: "Martin Jeřábek",
+  role: "Founder & CEO",
+} as const;
+
 export const BLOG_POSTS: BlogPost[] = [
   {
     id: "claude-code-complete-guide",
@@ -68,15 +114,18 @@ export const BLOG_POSTS: BlogPost[] = [
     category: "AI & Engineering",
     date: "March 13, 2026",
     published: "2026-03-13",
-    updated: "2026-08-14",
+    updated: "2026-08-19",
     readTime: "15 min read",
-    author: "M.D.N Tech Team",
-    authorRole: "Engineering Team",
+    author: AUTHOR.name,
+    authorRole: AUTHOR.role,
     tags: ["Claude Code", "AI Development", "Productivity", "Developer Tools", "Agentic AI"],
     content: [
       {
         type: "paragraph",
-        content: "The software development landscape has fundamentally shifted. In under a year, Claude Code went from research preview to one of the most widely used AI coding tools. Anthropic's frontier models post record scores on SWE-bench Verified — a published benchmark of real GitHub issues, not a marketing number — and the practical effect is that an AI agent can now carry real engineering tasks end to end. It's not just another autocomplete tool."
+        content: "The software development landscape has fundamentally shifted. In under a year, Claude Code went from research preview to one of the most widely used AI coding tools. Anthropic's frontier models post record scores on SWE-bench Verified — a published benchmark of real GitHub issues, not a marketing number — and the practical effect is that an AI agent can now carry real engineering tasks end to end. It's not just another autocomplete tool.",
+        links: [
+          { label: "SWE-bench", href: "https://www.swebench.com/", external: true },
+        ]
       },
       {
         type: "callout",
@@ -110,7 +159,19 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "The productivity picture is more nuanced than vendor marketing suggests. Controlled studies report meaningful speedups on well-scoped tasks, while a 2025 METR study famously found that experienced developers working on codebases they knew deeply could even be slower with AI in the loop. Both results are real. The difference is workflow: the gains come from how you structure the collaboration, not from the tool alone. In our own day-to-day work, this is where the time actually comes back:"
+        content: "The productivity picture is more nuanced than vendor marketing suggests. Controlled studies report meaningful speedups on well-scoped tasks, while a randomised trial run by METR in early 2025 famously found the opposite: sixteen experienced open-source developers took about 19% longer on tasks in repositories they knew deeply, even though they believed AI had sped them up. Worth knowing before you quote that number, though: METR has since labelled the result historical, because it measured tools and workflows from the first half of 2025. Both findings are real, and the difference is workflow — the gains come from how you structure the collaboration, not from the tool alone. In our own day-to-day work, this is where the time actually comes back:",
+        links: [
+          {
+            label: "the original METR study",
+            href: "https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/",
+            external: true,
+          },
+          {
+            label: "METR's own update on it",
+            href: "https://metr.org/blog/2026-02-24-uplift-update/",
+            external: true,
+          },
+        ]
       },
       {
         type: "list",
@@ -136,7 +197,10 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Installation is straightforward: use npm to install globally, or Homebrew on macOS. Once installed, verify with the version command. The VS Code extension is available in the marketplace — search for 'Claude Code' and install with one click."
+        content: "Installation is straightforward: use npm to install globally, or Homebrew on macOS. Once installed, verify with the version command. The VS Code extension is available in the marketplace — search for 'Claude Code' and install with one click.",
+        links: [
+          { label: "the official install guide", href: "https://code.claude.com/docs", external: true },
+        ]
       },
       {
         type: "subheading",
@@ -238,11 +302,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "heading",
-        content: "Latest Features (March 2026)"
+        content: "Beyond the Basics"
       },
       {
         type: "paragraph",
-        content: "Claude Code is evolving rapidly. Here are the newest capabilities:"
+        content: "Past the everyday loop of editing, testing and reviewing, a handful of capabilities change how much of the work you can hand over. These are the ones we lean on:"
       },
       {
         type: "subheading",
@@ -282,11 +346,26 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "subheading",
-        content: "Opus 4.6 with Effort Levels"
+        content: "Effort Levels"
       },
       {
         type: "paragraph",
-        content: "The latest Opus 4.6 model defaults to medium effort for Max subscribers. Effort levels are now simplified to low/medium/high with visual indicators (○ ◐ ●). Use /effort auto to reset to default behavior."
+        content: "Effort is the dial between thoroughness and cost. Set it low and the model scopes tightly to what you asked; set it high and it plans, explores and verifies its own work before answering. Our rule of thumb: low for mechanical edits, high for anything where being wrong is expensive. The exact ladder and the default for your plan move with each model release, so read them from the docs rather than from a blog post — including this one.",
+        links: [
+          {
+            label: "the effort parameter documentation",
+            href: "https://platform.claude.com/docs/en/build-with-claude/effort",
+            external: true,
+          },
+        ]
+      },
+      {
+        type: "callout",
+        variant: "warning",
+        content: "Everything in this section ships on a release cadence measured in weeks. We describe what each capability is for, deliberately not which model or flag currently carries it — check the changelog before you quote a version number at anyone.",
+        links: [
+          { label: "Claude Code documentation", href: "https://code.claude.com/docs", external: true },
+        ]
       },
       {
         type: "heading",
@@ -323,7 +402,7 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: "callout",
         variant: "tip",
-        content: "The winning combination for serious developers: Cursor Pro ($20) + Claude Pro ($20) = $40/month total. That's the cost of 30 minutes of freelance development time."
+        content: "The winning combination for serious developers: Cursor Pro ($20) + Claude Pro ($20) = $40/month total. That's the cost of 30 minutes of freelance development time. Subscription prices are the ones published as we wrote this — confirm the current plans before you budget."
       },
       {
         type: "heading",
@@ -389,15 +468,26 @@ export const BLOG_POSTS: BlogPost[] = [
           "Run /init in your project to generate a CLAUDE.md",
           "Customize CLAUDE.md with your specific patterns and commands",
           "Start with simple tasks — file edits, test generation, documentation",
-          "Install a few proven skills — our free, MIT-licensed ToolKit collection at mdntech.org/toolkit is a one-command start",
+          "Install a few proven skills — our free, MIT-licensed ToolKit collection is a one-command start",
           "Gradually expand to complex refactoring and architecture work",
           "Set up hooks for automation as your workflow matures"
+        ],
+        linksLabel: "More on this site",
+        links: [
+          { label: "the ToolKit skill directory", href: "/toolkit" },
         ]
       },
       {
         type: "callout",
         variant: "info",
-        content: "Claude Code is included with Claude Pro ($20/month) and Max ($100-200/month) subscriptions, or pay-as-you-go through the Claude API. There is no free tier — but a Pro subscription is enough to evaluate it seriously."
+        content: "Claude Code is included with Claude Pro ($20/month) and Max ($100-200/month) subscriptions, or pay-as-you-go through the Claude API. There is no free tier — but a Pro subscription is enough to evaluate it seriously.",
+        links: [
+          {
+            label: "current API pricing",
+            href: "https://platform.claude.com/docs/en/pricing",
+            external: true,
+          },
+        ]
       },
       {
         type: "heading",
@@ -424,12 +514,12 @@ export const BLOG_POSTS: BlogPost[] = [
     metaDescription: "Complete guide to agentic AI systems in 2026. Learn about multi-agent architectures, MCP and A2A protocols, enterprise adoption rates, and how autonomous AI agents are transforming industries.",
     image: "/blog/agentic-ai-systems.jpg",
     published: "2026-03-10",
-    updated: "2026-08-14",
+    updated: "2026-08-19",
     category: "AI & Engineering",
     date: "March 10, 2026",
     readTime: "16 min read",
-    author: "M.D.N Tech Team",
-    authorRole: "Engineering Team",
+    author: AUTHOR.name,
+    authorRole: AUTHOR.role,
     tags: ["Agentic AI", "AI Agents", "Multi-Agent Systems", "MCP", "Enterprise AI", "Autonomous Systems"],
     content: [
       {
@@ -443,7 +533,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "At M.D.N Tech, agentic systems are our daily work: ChatKit, our support chatbot product, runs autonomous learning loops in production, and our own development happens through multi-agent Claude Code workflows. This guide shares what we've learned about architecting, deploying, and scaling AI agents in production environments."
+        content: "At M.D.N Tech, agentic systems are our daily work: ChatKit, our support chatbot product, runs autonomous learning loops in production, and our own development happens through multi-agent Claude Code workflows. This guide shares what we've learned about architecting, deploying, and scaling AI agents in production environments.",
+        linksLabel: "More on this site",
+        links: [
+          { label: "how ChatKit works", href: "/chatkit" },
+        ]
       },
       {
         type: "heading",
@@ -567,7 +661,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "The agentic ecosystem matured rapidly in 2025-2026 as two critical protocols emerged: Anthropic's Model Context Protocol (MCP) for tool integration, and Google's Agent-to-Agent (A2A) protocol for inter-agent communication."
+        content: "The agentic ecosystem matured rapidly in 2025-2026 as two critical protocols emerged: Anthropic's Model Context Protocol (MCP) for tool integration, and the Agent2Agent (A2A) protocol for inter-agent communication — launched by Google and since donated to the Linux Foundation, which is what turned it from a vendor initiative into a standard worth building against.",
+        links: [
+          { label: "the MCP specification", href: "https://modelcontextprotocol.io", external: true },
+          { label: "the A2A protocol", href: "https://a2a-protocol.org", external: true },
+        ]
       },
       {
         type: "subheading",
@@ -879,17 +977,21 @@ export const BLOG_POSTS: BlogPost[] = [
     metaDescription: "Complete guide to EVM smart contract development. Learn ERC-20, ERC-721, ERC-1155 standards, security best practices, Chainlink VRF integration, and lessons from 50+ deployments.",
     image: "/blog/smart-contracts-guide.jpg",
     published: "2026-03-01",
-    updated: "2026-08-14",
+    updated: "2026-08-19",
     category: "Blockchain & Web3",
     date: "March 1, 2026",
     readTime: "18 min read",
-    author: "M.D.N Tech Team",
-    authorRole: "Engineering Team",
+    author: AUTHOR.name,
+    authorRole: AUTHOR.role,
     tags: ["Smart Contracts", "Solidity", "ERC-721", "ERC-1155", "Chainlink VRF", "Web3 Security"],
     content: [
       {
         type: "paragraph",
-        content: "Smart contracts are the backbone of decentralized applications, DeFi protocols, and NFT ecosystems. At M.D.N Tech, we've deployed over 50 production smart contracts across multiple chains — from token launches and NFT collections to complex DeFi mechanisms and on-chain lotteries. This guide distills everything we've learned about building secure, gas-efficient, and production-ready smart contracts."
+        content: "Smart contracts are the backbone of decentralized applications, DeFi protocols, and NFT ecosystems. At M.D.N Tech, we've deployed over 50 production smart contracts across multiple chains — from token launches and NFT collections to complex DeFi mechanisms and on-chain lotteries. This guide distills everything we've learned about building secure, gas-efficient, and production-ready smart contracts.",
+        linksLabel: "More on this site",
+        links: [
+          { label: "who we are and what we have shipped", href: "/about" },
+        ]
       },
       {
         type: "callout",
@@ -911,7 +1013,14 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: "callout",
         variant: "warning",
-        content: "Security firms tracked roughly $3.1 billion in Web3 losses in the first half of 2025 alone — already surpassing all of 2024. Most exploited protocols had passed at least one security audit."
+        content: "Security firms tracked roughly $3.1 billion in Web3 losses in the first half of 2025 alone — already surpassing all of 2024. Most exploited protocols had passed at least one security audit.",
+        links: [
+          {
+            label: "Hacken's H1 2025 Web3 security report",
+            href: "https://hacken.io/insights/h1-2025-security-report/",
+            external: true,
+          },
+        ]
       },
       {
         type: "paragraph",
@@ -920,10 +1029,17 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: "list",
         items: [
-          "Access control exploits caused roughly $1.8 billion in losses (mostly Q1 2025)",
+          "Access control exploits caused roughly $1.8 billion in losses — about 59% of the total, and mostly Q1 2025",
           "Reentrancy and logic bugs led to hundreds of millions in stolen assets",
           "Phishing and social engineering spiked past half a billion dollars",
-          "Smart contract bugs themselves accounted for a further ~$260 million"
+          "Smart contract bugs themselves accounted for a further ~$260 million, around 8% of the total"
+        ],
+        links: [
+          {
+            label: "Hacken's H1 2025 Web3 security report",
+            href: "https://hacken.io/insights/h1-2025-security-report/",
+            external: true,
+          },
         ]
       },
       {
@@ -936,7 +1052,10 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "ERC-20 remains the foundation of fungible tokens on Ethereum and EVM-compatible chains. Despite being well-established, ERC-20 implementations still account for significant vulnerabilities."
+        content: "ERC-20 remains the foundation of fungible tokens on Ethereum and EVM-compatible chains. Despite being well-established, ERC-20 implementations still account for significant vulnerabilities.",
+        links: [
+          { label: "EIP-20, the standard itself", href: "https://eips.ethereum.org/EIPS/eip-20", external: true },
+        ]
       },
       {
         type: "subheading",
@@ -1007,7 +1126,11 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "ERC-1155 allows a single contract to manage multiple token types — both fungible and non-fungible. It supports batch transfers, reducing gas costs by up to 90% for multi-item operations."
+        content: "ERC-1155 allows a single contract to manage multiple token types — both fungible and non-fungible. It supports batch transfers, reducing gas costs by up to 90% for multi-item operations.",
+        links: [
+          { label: "EIP-721", href: "https://eips.ethereum.org/EIPS/eip-721", external: true },
+          { label: "EIP-1155", href: "https://eips.ethereum.org/EIPS/eip-1155", external: true },
+        ]
       },
       {
         type: "list",
@@ -1021,7 +1144,10 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "For gaming items with random attributes, the implementation extends ERC-1155 and integrates Chainlink VRF. Token IDs represent different rarity tiers (common, rare, legendary). When a user mints, the contract requests randomness from Chainlink. Once fulfilled, the random number determines rarity — typically 5% legendary, 15% rare, 80% common. The token is then minted to the user's address with the determined rarity."
+        content: "For gaming items with random attributes, the implementation extends ERC-1155 and integrates Chainlink VRF. Token IDs represent different rarity tiers (common, rare, legendary). When a user mints, the contract requests randomness from Chainlink. Once fulfilled, the random number determines rarity — typically 5% legendary, 15% rare, 80% common. The token is then minted to the user's address with the determined rarity.",
+        links: [
+          { label: "Chainlink VRF documentation", href: "https://docs.chain.link/vrf", external: true },
+        ]
       },
       {
         type: "callout",
@@ -1106,7 +1232,14 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: "paragraph",
-        content: "Access control failures were the single largest loss category in early 2025. Use OpenZeppelin's AccessControl or Ownable2Step for safe ownership transfers."
+        content: "Access control failures were the single largest loss category in early 2025. Use OpenZeppelin's AccessControl or Ownable2Step for safe ownership transfers.",
+        links: [
+          {
+            label: "OpenZeppelin access control docs",
+            href: "https://docs.openzeppelin.com/contracts/5.x/access-control",
+            external: true,
+          },
+        ]
       },
       {
         type: "list",

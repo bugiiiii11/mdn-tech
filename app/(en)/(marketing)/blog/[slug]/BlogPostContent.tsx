@@ -1,9 +1,69 @@
 "use client";
 
+import { Fragment } from "react";
 import { motion } from "framer-motion";
 import { slideInFromTop } from "@/lib/motion";
 import Link from "next/link";
-import { ContentBlock, BlogPost, BlogPostPreview } from "@/data/blog-posts";
+import { PROSE_LINK_CLASS } from "@/components/product-pages/primitives";
+import {
+  blogBreadcrumb,
+  ContentBlock,
+  ContentLink,
+  BlogPost,
+  BlogPostPreview,
+} from "@/data/blog-posts";
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/**
+ * "2026-08-19" -> "August 19, 2026". Split on the ISO separator rather than
+ * handing the string to Date: the parser this replaces was locale-dependent and
+ * silently stamped TODAY whenever it failed, fabricating freshness (S68).
+ */
+const formatIsoDate = (iso: string) => {
+  const [year, month, day] = iso.split("-").map(Number);
+  const name = MONTHS[month - 1];
+  return name && year && day ? `${name} ${day}, ${year}` : iso;
+};
+
+/**
+ * Citations for the block above, on their own line (SEO audit item 15). Rendered
+ * outside the block's own element so a <ul> stays a list and a callout keeps its
+ * single paragraph — the trailing-link pattern from the product-page FAQ.
+ */
+const BlockLinks = ({
+  links,
+  label,
+}: {
+  links: ContentLink[];
+  label?: string;
+}) => (
+  <p className="-mt-3 mb-6 text-sm text-gray-400">
+    {label ?? (links.length > 1 ? "Sources" : "Source")}:{" "}
+    {links.map((link, i) => (
+      <span key={link.href}>
+        {i > 0 ? ", " : null}
+        {link.external ? (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={PROSE_LINK_CLASS}
+          >
+            {link.label}
+          </a>
+        ) : (
+          <Link href={link.href} className={PROSE_LINK_CLASS}>
+            {link.label}
+          </Link>
+        )}
+      </span>
+    ))}
+  </p>
+);
 
 // Content block renderer
 const renderContent = (block: ContentBlock, index: number) => {
@@ -149,11 +209,46 @@ interface BlogPostContentProps {
 }
 
 export default function BlogPostContent({ post, relatedPosts }: BlogPostContentProps) {
-  const isFullArticle = post.content.length > 3;
+  const breadcrumb = blogBreadcrumb(post);
 
   return (
     <main className="min-h-screen w-full pt-20">
       <article className="relative flex flex-col items-center justify-center py-20 px-4 md:px-8 lg:px-20 overflow-hidden">
+        {/* Visible breadcrumb — the BreadcrumbList in page.tsx is built from
+            this same array, so the schema cannot claim a trail the reader
+            cannot see. min-h-[24px] keeps the links a legal tap target. */}
+        <nav aria-label="Breadcrumb" className="relative z-10 mb-8 w-full max-w-4xl">
+          <ol className="flex flex-wrap items-center justify-center gap-x-2 text-xs md:text-sm text-gray-400">
+            {breadcrumb.map((crumb, index) => {
+              const isLast = index === breadcrumb.length - 1;
+              return (
+                <li key={crumb.href} className="flex items-center gap-x-2">
+                  {index > 0 ? (
+                    <span aria-hidden="true" className="text-gray-600">
+                      /
+                    </span>
+                  ) : null}
+                  {isLast ? (
+                    <span
+                      aria-current="page"
+                      className="inline-flex min-h-[24px] items-center text-gray-300 line-clamp-1"
+                    >
+                      {crumb.name}
+                    </span>
+                  ) : (
+                    <Link
+                      href={crumb.href}
+                      className="inline-flex min-h-[24px] items-center transition-colors hover:text-cyan-400"
+                    >
+                      {crumb.name}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
+
         {/* Header - Clean style like Terms page */}
         <motion.div
           initial="hidden"
@@ -164,8 +259,22 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           <h1 className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 mb-6">
             {post.title}
           </h1>
+          {/* Named byline, matching the Person node in the Article schema —
+              "M.D.N Tech Team" carried no E-E-A-T signal at all. */}
           <p className="text-lg text-gray-400">
-            {post.date}
+            By{" "}
+            <Link href="/about" className={PROSE_LINK_CLASS}>
+              {post.author}
+            </Link>
+            {post.authorRole ? `, ${post.authorRole}` : null}
+          </p>
+          <p className="mt-1 text-sm text-gray-400">
+            Published {post.date}
+            {post.updated && post.updated !== post.published
+              ? ` · Updated ${formatIsoDate(post.updated)}`
+              : null}
+            {" · "}
+            {post.readTime}
           </p>
         </motion.div>
 
@@ -212,22 +321,18 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
                 {post.excerpt}
               </p>
 
-              {/* Article Content */}
+              {/* Article Content. Citations ride alongside their block rather
+                  than inside it — see BlockLinks. */}
               <div className="prose prose-invert prose-lg max-w-none">
-                {post.content.map((block, index) => renderContent(block, index))}
+                {post.content.map((block, index) => (
+                  <Fragment key={index}>
+                    {renderContent(block, index)}
+                    {block.links?.length ? (
+                      <BlockLinks links={block.links} label={block.linksLabel} />
+                    ) : null}
+                  </Fragment>
+                ))}
               </div>
-
-              {/* Coming Soon Notice - only show for placeholder articles */}
-              {!isFullArticle && (
-                <div className="mt-12 p-6 rounded-lg bg-[#7042f810] border border-purple-500/20">
-                  <div className="flex items-center gap-3">
-                    <span className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-                    <p className="text-gray-400">
-                      Full article content coming soon. Check back for the complete piece.
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Related Posts */}

@@ -129,13 +129,18 @@ export default function RoyalStrojeCaseStudyPage() {
                     </span>
                   ) : null}
                   {isLast ? (
-                    <span aria-current="page" className="text-gray-300">
+                    <span
+                      aria-current="page"
+                      className="inline-flex min-h-[24px] items-center text-gray-300"
+                    >
                       {crumb.name}
                     </span>
                   ) : (
+                    /* min-h-[24px]: text-xs breadcrumbs are a 16px tap target
+                       without it, under the audited floor (SEO item 17). */
                     <Link
                       href={crumb.href}
-                      className="transition-colors hover:text-cyan-400"
+                      className="inline-flex min-h-[24px] items-center transition-colors hover:text-cyan-400"
                     >
                       {crumb.name}
                     </Link>

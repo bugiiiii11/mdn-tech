@@ -135,7 +135,7 @@ export const Directory = () => (
                       href={skill.installationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`font-medium ${PROSE_LINK_CLASS}`}
+                      className={`inline-flex min-h-[24px] items-center ${PROSE_LINK_CLASS}`}
                     >
                       <span className="sr-only">
                         Source for {skill.name}

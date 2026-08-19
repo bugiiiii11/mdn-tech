@@ -43,7 +43,7 @@ export const CodeBlock = ({ code, label }: CodeBlockProps) => {
         <button
           type="button"
           onClick={handleCopy}
-          className="rounded px-2 py-1 -my-1 text-xs font-medium text-cyan-400 transition-colors duration-300 hover:text-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          className="inline-flex min-h-[24px] items-center rounded px-2 py-1 -my-1 text-xs font-medium text-cyan-400 transition-colors duration-300 hover:text-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
         >
           {copied ? "Copied" : "Copy"}
           {/* Fold the label into the accessible name — a page with ~10 of

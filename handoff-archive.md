@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 68) -- SEO re-audit (76/100) + Critical #1/#2 and the quick wins fixed (rotated 2026-08-19)
+
+- **Re-audit (0a2/C6) via 6 parallel subagents; all of `seo-audit/` regenerated**: FULL-AUDIT-REPORT.md (score 76/100, category table, handoff-verdicts table, do-not-do guardrails), ACTION-PLAN.md (22 items, the standing work queue), 6 specialist reports, 13 screenshots. `screenshots/sk_mobile_fullpage.png` captures the S67 mobile section order for Martin's pending review.
+- **Blog images never existed** -- `/blog/*.jpg` were soft-404s breaking Article rich results. New `scripts/generate-blog-images.mjs` (same seeded OG-card composition; titles duplicated by design, sync on change) -> `public/blog/*.jpg`, wired as og:image/twitter:image. Blog dates now ISO (`published`/`updated` fields in `data/blog-posts.ts`) -- the old parser silently stamped TODAY on failure. Blog BreadcrumbList REMOVED (schema without a visible trail; S70 later added the trail and restored the schema with it).
+- **Root layout split into `app/(en)/layout.tsx` + `app/(sk)/layout.tsx`** (shared shell `app/base-layout.tsx`) -- the only way Next can vary `<html lang>`; all four Slovak pages served `lang="en"` before. KEEP THE TWO IDENTICAL except `lang`. Cross-locale nav is now a full document load.
+- **hreflang for the legal pairs declared on BOTH sides** (EN server layouts + SK page metadata + sitemap). The S66 "use client blocks metadata" note was OUTDATED -- `app/(en)/(marketing)/privacy/layout.tsx` had already solved it; no page split was needed. Sitemap lastmods corrected from git (11/14 were stale); changefreq/priority dropped everywhere.
+- **Critical #2: three.js (652 KB chunk) is out of EVERY page's blocking graph.** `LazyStarsCanvas` mounts the starfield at browser idle and SKIPS blog articles + legal pages entirely; `CosmicNebula` is dynamic(ssr:false). Verified: no built page references the three.js chunks. Never re-import `star-background` statically.
+- **Hero entrances converted framer-motion -> CSS** (`.hero-enter-left/-up` in globals.css, all 6 hero variants) -- framer server-rendered the LCP h1 at inline opacity:0 until hydration (LCP 3.9-4.5s on 60ms TTFB). fill-mode is `backwards` ON PURPOSE: a forwards fill pins `transform` and eats framer hover gestures (/blog featured card).
+- /about honesty: years-for-corporates 30+ -> 20+ (user call; 50+ contracts / 100+ partnerships confirmed correct by user). Dead Cedarville Cursive font removed. **mdntech.com is a THIRD PARTY (forwards to mdntech.ca)** -- the ".com 301" idea is dead.
+
 ## What Was Done (Session 67) -- /sk copy pass + the chat widget leaking onto the English site (rotated 2026-08-19)
 
 - **The widget bug is the one worth remembering.** `widget.js` appends `#mdn-chat-widget` straight to `document.body`, which no React tree owns -- so the footer's "English" link (a client-side `<Link href="/">`) carried the Slovak bot onto the English pages, which have no bot. A direct load of mdntech.org was always clean, which is why it looked like an English-page bug and is not. `next/script` cannot fix either half: it does not remove injected DOM, and it will not re-execute a cached script when the visitor navigates back. `SkChatWidget` is now a client component that injects and removes its own `<script>`; `widget.js` bails out of `init()` when `script.isConnected` is false, so an in-flight `/config` fetch cannot re-mount the bubble after teardown. Customer embeds never take that branch -- their tag stays connected. Verified on prod: mounts on /sk, gone on /, back again on return. (S68 adds a second belt: EN<->SK navigation is now a full document load -- see the root-layout split.)
@@ -257,6 +267,7 @@
 | 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
 | 58 | 2026-08-14 | Hero rebuild: one full-viewport shell across /, /sk, /chatkit, /toolkit |
 | 59 | 2026-08-14 | /about + /blog on hero shell; founder-forward team; constellation blog cards |
+| 60 | 2026-08-15 | APP_LIVE portal gate + merge to main; website rebuild live on prod |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

@@ -3,7 +3,7 @@
 **Generated:** August 19, 2026 (Session 68)
 **Current Score:** 76/100 (March baseline was 58)
 **Target:** 85+/100 -- realistic once the Critical + High items land; performance is worth ~5 weighted points alone.
-**Status (S69, 2026-08-19):** done in S68: 1, 2, 4-7, 9, 14, 18. Done in S69: 3, 8, 10-13, 16 (see the DONE notes in place). Remaining queue: 15 (blog refresh bundle -- the queued /blog/[slug] redesign), 17, 19-22.
+**Status (S70, 2026-08-19):** done in S68: 1, 2, 4-7, 9, 14, 18. Done in S69: 3, 8, 10-13, 16. Done in S70: 15, 17, 19, 21 (see the DONE notes in place). **Remaining: 20 (tooling note, nothing to fix) and 22 (real ChatKit reviews -- post-launch, needs real customers). The build queue is otherwise empty; the open work is the prod deploy + the .sk deep-link check under item 10.**
 
 Guardrails (do not re-open): /sk H1 + "Co robime" H2 stay as written; no fabricated ratings/claims; no ChatKit installUrl while gated; no schema-only breadcrumbs.
 
@@ -43,9 +43,8 @@ Contradicts hreflang + og:locale and mislabels the pages for the exact market /s
 **Effort:** 1 h | **Files:** `app/sitemap.ts`, `data/blog-posts.ts`
 Home/about say 2026-07-16 (rebuild shipped mid-August); /terms says 2026-01-20 but changed 2026-08-18. Add `updated?: string` to the blog data model (lastmod is structurally wired to publish date today). Corrected `app/sitemap.ts` included in `sitemap-audit.md`. Also: drop the inconsistent changefreq/priority (3/14 URLs) and the dead date-regex at lines 10-13 while in there.
 
-### 7. Blog BreadcrumbList without visible breadcrumbs
-**Effort:** 1-2 h | **File:** `app/(marketing)/blog/[slug]/page.tsx`
-The S58 sitewide removal missed the 3 blog posts: schema present, no visible trail -- the exact mismatch it was meant to fix. Either copy the Royal Stroje pattern (visible `aria-label` trail + schema) or delete the schema block.
+### 7. Blog BreadcrumbList without visible breadcrumbs -- DONE (S68 removed the schema, S70 restored both)
+S68 deleted the orphaned schema. S70 added the visible trail and re-emitted the BreadcrumbList alongside it, both from `blogBreadcrumb()` -- see item 15.
 
 ### 8. /sk ProfessionalService lacks `address` -- DONE S69 (2026-08-19)
 `PostalAddress` (the FZE registered seat, structured in `SK_NAP.address` -- must stay in sync with `COMPANY_LEGAL_LINE`) added to the /sk schema. `areaServed` keeps the market claim on Slovakia. The chatbot seed script does not read the new fields, so no re-seed was needed.
@@ -74,9 +73,14 @@ Footer clearance, not a widget change (`widget.js` is shared with customer embed
 **Effort:** 1 h | **File:** `app/(marketing)/blog/[slug]/page.tsx:91-104`
 `dateModified` hardcoded equal to `datePublished`; locale-dependent `Date` parsing silently stamps TODAY on failure (fabricated freshness). Store ISO dates in `data/blog-posts.ts` (pairs with item 6's `updated` field), emit ISO `article:published_time`.
 
-### 15. Blog refresh bundle (queued /blog/[slug] redesign)
-**Effort:** 0.5-1 day, combine with the redesign already queued in the handoff
-Frozen since 2026-03-13 with time-stamped claims ("Latest Features (March 2026)") and a 5-month-old "coming soon" badge. Bundle into one pass: update stale claims, add Person authorship (Martin) with Person schema + byline, add outbound citations (METR, SWE-bench etc. are mentioned but uncited -- /toolkit's 23 attributed links are the house pattern), fix items 1/7/14 in the same files.
+### 15. Blog refresh bundle -- DONE S70 (2026-08-19)
+- **Staleness fixed at the root, not reset.** "Latest Features (March 2026)" is now "Beyond the Basics" and the version-pinned "Opus 4.6 with Effort Levels" subsection describes what effort *is* and links the docs for the current ladder, under a callout saying outright that this section does not track model versions. Do not reintroduce a dated feature list -- it goes stale in one release cycle.
+- **Both "coming soon" placeholders removed.** The /blog index pill became a prose cross-link into /chatkit and /toolkit (also item 21); the `isFullArticle` placeholder block in BlogPostContent was dead code (every post is long) and is gone.
+- **Person authorship.** Posts are bylined to the founder (`AUTHOR` in `data/blog-posts.ts`, **kept in sync by hand with `FOUNDER` in `constants/index.ts`** -- deliberately not imported, that module pulls react-icons into the blog client graph). Article schema author is a Person with `jobTitle` + `worksFor`; publisher is `organizationRef()`. No `sameAs` until `FOUNDER.linkedin` is real.
+- **Citations shipped** via a new `links?: ContentLink[]` (+ `linksLabel`) field on `ContentBlock`, rendered as a trailing "Source(s):" line by `BlockLinks`. Attribution added for SWE-bench, METR, Claude Code docs, the effort parameter, API pricing, MCP, A2A, Hacken's H1 2025 report (the $3.1bn / $1.8bn / $263m figures), OpenZeppelin, Chainlink VRF and EIP-20/721/1155.
+- **The METR claim was corrected, not just cited:** the post now gives the actual result (16 devs, ~19% slower) and says METR has since labelled it historical. A2A is no longer described as "Google's" -- it is Linux Foundation-governed.
+- **Item 7 closed with it:** visible breadcrumb + BreadcrumbList are both built from `blogBreadcrumb()` in `data/blog-posts.ts` -- one array, per the schema.ts rule. If the trail is ever removed, remove the schema node with it.
+- Byline block also carries published/updated/read-time; `formatIsoDate()` splits the ISO string instead of parsing it (the parser S68 replaced silently stamped TODAY on failure).
 
 ### 16. /toolkit + /blog over-serialization -- DONE S69 (2026-08-19), with a finding correction
 The /blog half was the real waste and is fixed: client cards (`BlogHero`, `BlogPostCard`, `RelatedPostCard`) now take `BlogPostPreview` (id/title/excerpt/category/date/readTime/tags), never full `BlogPost` -- the index shipped every article's entire `content` array as props (~90 KB -> 62 KB) and each article page inlined its 2 related articles in full (verified gone). `Section` also moved to the server half of the primitives (only its animated heading is a client leaf), so no section's card tree crosses the boundary as client props anymore.
@@ -86,11 +90,11 @@ The /blog half was the real waste and is fixed: client cards (`BlogHero`, `BlogP
 
 ## Low -- backlog
 
-17. Tap targets sub-24px: footer links (20px), breadcrumbs (16px), /toolkit copy buttons + "Source" links (59 targets on that page).
+17. Tap targets sub-24px -- **DONE S70.** `inline-flex min-h-[24px] items-center` on the footer `linkClass` (every call site is a `flex flex-col gap-2.5` column, so nothing moved), on both breadcrumb trails, on /toolkit's "Source" links, and on the shared code-block Copy button. The directory link also dropped its duplicated `font-medium` -- `PROSE_LINK_CLASS` is used bare by contract.
 18. Dead Cedarville Cursive font preload on all 14 pages (22.6 KB, `.cursive` class unused) -- actually a 10-minute quick win, do it with item 2.
-19. /sk H1 hard `<br>` isolates "chatboty" on its own line at 390px -- swap to responsive break or non-breaking group.
+19. /sk H1 hard `<br>` isolates "chatboty" at 390px -- **DONE S70.** The `<br>` became two `block` spans with `text-balance` (Tailwind 3.4.1), so the browser evens out line one instead of stranding a word. H1 copy untouched -- that guardrail still stands.
 20. Scroll-reveal holds below-fold sections at opacity 0 -- any screenshot/preview tooling must scroll through first (bit the visual agent; first full-page capture was 19/20 black).
-21. Blog posts: zero internal links from money pages to posts and back beyond nav -- add contextual cross-links.
+21. Blog internal links -- **DONE S70, and the finding was half-right.** Money pages already deep-linked into the Claude Code guide (`components/chatkit/knowledge-base.tsx`, `components/toolkit/what-is-a-skill.tsx`) plus /blog from three more places; what was genuinely missing was the return path. Posts now carry contextual links out (guide -> /toolkit, agentic -> /chatkit, contracts -> /about) and the /blog index closes on a ChatKit/ToolKit line instead of the retired "coming soon" pill.
 22. Consider collecting real ChatKit reviews post-launch to unlock `aggregateRating` (never fabricate).
 
 ---
