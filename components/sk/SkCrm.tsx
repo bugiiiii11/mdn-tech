@@ -1,11 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import type { IconType } from "react-icons";
 import {
-  FiArrowRight,
   FiBarChart2,
   FiCalendar,
   FiCheckCircle,
@@ -137,57 +135,29 @@ export const SkCrm = () => {
         })}
       </ul>
 
-      {/* What "na mieru" buys you, and the live receipt for it. */}
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch mt-6">
-        <motion.ul
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className={`flex flex-col justify-center gap-5 p-6 sm:p-8 ${GLASS_CARD_CLASS}`}
-        >
-          {SK_CRM.benefits.map((benefit) => (
-            <li key={benefit} className="flex items-start gap-3">
-              <FiCheckCircle
-                aria-hidden="true"
-                className="mt-1 h-5 w-5 flex-shrink-0 text-cyan-400"
-              />
-              <span className="text-sm md:text-base text-gray-300 leading-relaxed">
-                {benefit}
-              </span>
-            </li>
-          ))}
-        </motion.ul>
-
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.12 }}
-        >
-          <Link
-            href={SK_CRM.reference.caseStudy.href}
-            className={`group flex h-full flex-col justify-center p-6 sm:p-8 transition-all duration-300 hover:bg-[#7042f825] hover:border-cyan-400/40 ${GLASS_CARD_CLASS}`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wider text-cyan-400/80 mb-2">
-              {SK_CRM.reference.eyebrow}
-            </p>
-            <h3 className="text-lg md:text-xl font-bold text-white mb-2">
-              {SK_CRM.reference.name}
-            </h3>
-            <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              {SK_CRM.reference.description}
-            </p>
-            <span className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 group-hover:text-cyan-300 transition-colors">
-              {SK_CRM.reference.caseStudy.label}
-              <FiArrowRight
-                aria-hidden="true"
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
-              />
+      {/* What "na mieru" buys you. Full width since the Royal Stroje reference
+          card was removed (2026-08-19) — it spoke about the whole delivery, not
+          the CRM, and the case study is already linked from Realizácie. Two
+          columns on md+ so four short lines do not read as a lonely stack. */}
+      <motion.ul
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className={`w-full max-w-5xl mt-6 grid grid-cols-1 md:grid-cols-2 gap-5 p-6 sm:p-8 ${GLASS_CARD_CLASS}`}
+      >
+        {SK_CRM.benefits.map((benefit) => (
+          <li key={benefit} className="flex items-start gap-3">
+            <FiCheckCircle
+              aria-hidden="true"
+              className="mt-1 h-5 w-5 flex-shrink-0 text-cyan-400"
+            />
+            <span className="text-sm md:text-base text-gray-300 leading-relaxed">
+              {benefit}
             </span>
-          </Link>
-        </motion.div>
-      </div>
+          </li>
+        ))}
+      </motion.ul>
 
       <motion.a
         initial={{ opacity: 0, y: 20 }}

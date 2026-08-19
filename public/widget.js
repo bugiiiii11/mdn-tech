@@ -122,6 +122,11 @@
   function init(config) {
     // Don't render if disabled (e.g., free-tier limit reached)
     if (config.disabled) return;
+    // The host removed our script tag while the config request was in flight,
+    // which is how our own SPA tears the widget down when the visitor leaves a
+    // Slovak page. Mounting now would drop the bubble onto whatever page they
+    // navigated to. Customer embeds never hit this -- their tag stays put.
+    if (!script.isConnected) return;
     CONFIG = config;
     var color = config.primaryColor || '#7c3aed';
     var borderColor = color;

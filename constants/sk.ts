@@ -68,10 +68,13 @@ export const SK_NAV_LINKS = [
 // --- Hero ----------------------------------------------------------------
 
 export const SK_HERO = {
-  titleLine1: "Expandujte",
-  titleLine2: "svoj biznis online.",
+  // H1 carries the page's three head keywords (web / CRM / AI chatbot) in line
+  // one and the benefit in line two (user decision 2026-08-19). Both lines are
+  // deliberately short: at lg the H1 renders at 7xl and a longer line wraps.
+  titleLine1: "Web, CRM a AI chatboty",
+  titleLine2: "pre rast vášho biznisu.",
   subtitle:
-    "Web · CRM systémy · AI chatboty · SEO — digitálne riešenia pre slovenské firmy.",
+    "Na mieru slovenským firmám — od biznis analýzy cez dizajn a SEO až po spustenie a podporu.",
   ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "#kontakt" },
   ctaSecondary: { label: "Pozrite realizácie", href: "#realizacie" },
 } as const;
@@ -101,7 +104,7 @@ export const SK_VALUE_LADDER = [
     step: "01",
     title: "Biznis analýza (AI)",
     description:
-      "Najprv pochopíme váš biznis, prescanujeme konkurenciu a nájdeme možnosti rastu. Odhalíme, čo váš biznis potrebuje — webová stránka, mobilná aplikácia, admin portál, či CRM systém.",
+      "Najprv pochopíme, ako vaša firma funguje, preveríme konkurenciu a nájdeme možnosti rastu. Odhalíme, čo váš biznis naozaj potrebuje — webová stránka, klientsky portál, sociálne siete, SEO či CRM systém.",
     price: "Zdarma k webu",
     highlight: true,
   },
@@ -110,7 +113,7 @@ export const SK_VALUE_LADDER = [
     step: "02",
     title: "Web na mieru",
     description:
-      "Profesionálny a rýchly web, ktorý zviditeľňuje vašu značku a prináša nových zákazníkov.",
+      "Profesionálny a rýchly web, ktorý zviditeľňuje vašu značku a prináša nových zákazníkov. Ak máte vlastné texty, fotky a grafiku, web je hotový skôr a vyjde vás lacnejšie. Ak nie, netrápte sa tým — po vzájomnej diskusii pripravíme dizajn na mieru, vizuálnu identitu aj celý obsah za vás.",
     price: "od 1 000 €",
     highlight: false,
   },
@@ -119,7 +122,7 @@ export const SK_VALUE_LADDER = [
     step: "03",
     title: "SEO + viditeľnosť",
     description:
-      "Aby vás zákazníci našli skôr ako konkurenciu. Lokálne Google leady, vyhľadávanie cez AI, technické a obsahové SEO.",
+      "Aby vás zákazníci našli skôr ako konkurenciu. Analýza kľúčových slov, technické SEO a rýchlosť webu, obsah a texty pre vyhľadávače, profil Google Moja Firma a lokálne vyhľadávanie v okolí. Web pripravíme aj na odporúčania cez AI (ChatGPT, Google AI) a výsledky sledujeme v Google Analytics a Search Console.",
     price: "od 500 €",
     highlight: false,
   },
@@ -159,19 +162,19 @@ export const SK_WHY_US = [
     icon: "cpu",
     title: "AI = rýchlejšie a modernejšie",
     description:
-      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodávame špičkový výsledok za rozumnú cenu a výrazne rýchlejšie ako konkurenčné IT firmy.",
+      "Pracujeme s najnovšími AI nástrojmi a systémami, takže dodávame špičkový výsledok za rozumnú cenu a za zlomok času, ktorý si klasický vývoj vyžaduje.",
   },
   {
     icon: "check",
     title: "Reálne výsledky",
     description:
-      "Živé weby, ktoré sme vytvorili pre slovenských podnikateľov. Reálne referencie, ktoré si viete pozrieť.",
+      "Weby slovenských firiem, ktoré si viete hneď otvoriť a preklikať. Nižšie ukazujeme slovenské realizácie — súbežne dodávame projekty aj pre klientov v zahraničí.",
   },
   {
     icon: "users",
     title: "Skúsený tím",
     description:
-      "Naši programátori majú dlhoročné skúsenosti s tvorbou komplexných aplikácií, portálov, AI systémov, či blockchainu. Kladieme dôraz na projektový manažment a prácu s najnovšími technológiami.",
+      "Naši programátori majú dlhoročné skúsenosti s tvorbou komplexných aplikácií, portálov, AI systémov aj integrácií na existujúce softvéry. Kladieme dôraz na projektový manažment a prácu s najnovšími technológiami.",
   },
 ] as const;
 
@@ -234,12 +237,12 @@ export const SK_PROCESS = [
     step: "02",
     title: "Biznis analýza",
     description:
-      "Pochopíme váš biznis, nájdeme možnosti rastu a navrhneme riešenie na mieru s jasnou cenou.",
+      "Dostanete dokument s návrhom riešenia, rozsahom prác a pevnou cenou — ešte predtým, než čokoľvek podpíšete.",
   },
   {
     icon: "code",
     step: "03",
-    title: "Postavíme to",
+    title: "Vývoj a dodanie",
     description:
       "Web alebo systém dodáme v rekordnom čase — otestované, zabezpečené a pripravené na zákazníkov.",
   },
@@ -306,7 +309,7 @@ export const SK_CRM = {
       icon: "calendar",
       title: "Kalendár a úlohy",
       description:
-        "Termíny, vrátenia a servis zapíšete rovno do kalendára. Tím vidí, čo sa deje dnes a čo je na budúci týždeň.",
+        "Jednoduchý projektový manažment priamo v systéme. Konkrétne úlohy, termíny či servis zapíšete na presný deň a hodinu — tím vidí, čo sa deje dnes a čo je na budúci týždeň.",
     },
     {
       icon: "reports",
@@ -321,16 +324,10 @@ export const SK_CRM = {
     "Napojenie na web, e-mail a chatbota",
     "Odovzdanie so zaškolením, podpora po spustení",
   ],
-  reference: {
-    eyebrow: "Referencia",
-    name: "royalstroje.sk",
-    description:
-      "Web s katalógom strojov, CRM na správu požičovne, lokálne SEO a AI chatbot — pre jedného klienta.",
-    caseStudy: {
-      label: "Pozrite si prípadovú štúdiu",
-      href: "/sk/referencie/royal-stroje",
-    },
-  },
+  // No reference card here on purpose (user decision 2026-08-19): the old one
+  // described the whole Royal Stroje delivery (web + SEO + chatbot), which
+  // pulls the reader out of the CRM argument mid-section. The case study is
+  // already linked from Realizácie, where it belongs.
   cta: { label: "Chcem nezáväznú konzultáciu k CRM", href: "#kontakt" },
 } as const;
 

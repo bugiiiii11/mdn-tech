@@ -28,7 +28,7 @@ export const SkValueLadder = () => {
         }}
         className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500 py-6 text-center"
       >
-        Čo robíme
+        Čo pre vás urobíme — web, SEO, CRM a AI chatboty
       </motion.h2>
 
       <motion.p

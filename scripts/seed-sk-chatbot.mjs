@@ -114,10 +114,6 @@ const entries = [
       ``,
       `## Čo z toho firma má`,
       bullets(SK_CRM.benefits),
-      ``,
-      `## Referencia`,
-      `${SK_CRM.reference.name} — ${SK_CRM.reference.description}`,
-      `Prípadová štúdia: ${SK_CRM.reference.caseStudy.href}`,
     ].join("\n"),
   },
   {

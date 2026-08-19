@@ -30,7 +30,10 @@ export const SkHero = () => {
           {/* Headline */}
           <motion.h1
             variants={slideInFromLeft(0.3)}
-            className="flex flex-col gap-2 text-4xl md:text-6xl lg:text-7xl font-bold text-white w-full max-w-full text-center"
+            // 7xl is held back to xl: the keyword-led line one is longer than
+            // the old "Expandujte", and at 72px it would wrap into a three-line
+            // headline on 1024-1279px screens.
+            className="flex flex-col gap-2 text-4xl md:text-6xl xl:text-7xl font-bold text-white w-full max-w-full text-center"
           >
             <span className="break-words">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-cyan-500">

@@ -105,16 +105,19 @@ export default function SkLandingPage() {
           __html: JSON.stringify(professionalServiceSchema),
         }}
       />
-      {/* Section order (rework plan v1.0): services → CRM flagship → proof
-          (references) → who we are → process → FAQ → contact. Trust builds
-          top-down; the invoicing FAQ sits right before the form. */}
+      {/* Section order (rework plan v1.0, resequenced 2026-08-19): services →
+          CRM flagship → why us → proof (references) → who we are → process →
+          FAQ → contact. Trust builds top-down; "Prečo my" now makes the claims
+          and Realizácie immediately backs them with live sites, instead of the
+          proof arriving before the argument. The invoicing FAQ still sits
+          right before the form. */}
       <div className="flex flex-col gap-10 md:gap-16 max-w-full">
         <SkHero />
         <SkForWhom />
         <SkValueLadder />
         <SkCrm />
-        <SkPortfolio />
         <SkWhyUs />
+        <SkPortfolio />
         <SkAbout />
         <SkProcess />
         <SkFaq />

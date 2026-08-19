@@ -43,6 +43,12 @@ const SK_DOMAIN_HOSTS = ["mdntech.sk", "www.mdntech.sk"];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Two Next processes cannot share a build directory: a `npm run build` run
+  // while `npm run dev` is up overwrites `.next/` under the dev server and it
+  // starts serving 500s. Set NEXT_DIST_DIR to verify a build without touching
+  // a running dev server (e.g. `NEXT_DIST_DIR=.next-verify npm run build`).
+  // Unset everywhere that matters, including Vercel, so the default holds.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     formats: ["image/avif", "image/webp"],
   },
