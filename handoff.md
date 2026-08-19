@@ -79,7 +79,7 @@
 | 9 | SignaKit portal section | Hidden for MVP. |
 | 14 | Delete `.next-stale-1777403470/` + `.next-verify/` | Local only; safety hook blocks `rm -rf .*` -- delete via Explorer or `rmdir /s /q`. `.next-verify/` is a S65 leftover: two Next processes cannot share `.next/`, so local visual QA has to build into its own dir (both are gitignored). Worth a hook pattern fix to allow build dirs at the repo root. |
 | 15 | SK Part B + domain 301 | Client-repo footer links -> mdntech.org/sk; `.com -> .org` 301 (mdntech.com is NOT on the Vercel project -- check where it is registered before assuming). mdntech.sk DONE in S66. |
-| 16 | User wants further /sk copy edits | Stated at the end of S66, BEFORE the SEO audit runs. Nothing specified yet -- ask what they want changed. All /sk copy lives in `constants/sk.ts` + `sk-case-studies.ts`; re-seed the bot after (0a5). |
+| 16 | User wants further /sk copy edits | Stated at the end of S66, BEFORE the SEO audit runs. Nothing specified yet -- ask what they want changed. All /sk copy lives in `constants/sk.ts` + `sk-case-studies.ts`. **Re-seed the bot AFTER the copy deploys**, never before -- the KB is built from those same constants, so seeding first leaves the bot describing a page the site does not show yet: `node --env-file=.env.local --experimental-strip-types scripts/seed-sk-chatbot.mjs`. |
 
 ## Key Files
 
