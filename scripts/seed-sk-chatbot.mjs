@@ -149,19 +149,16 @@ const entries = [
       `**${CS.localSeo.title}**`,
       CS.localSeo.intro,
       titled(CS.localSeo.items, "title", "description"),
-      // Describe the work, never rankings in our voice — the note carries
-      // that boundary into the bot's answers; rankings appear only inside
-      // the owner's attributed quote below.
-      CS.localSeo.note,
+      // Rankings never appear in our voice — only inside the owner's
+      // attributed quote below.
       ``,
       `**${CS.story.title}**`,
       titled(CS.story.milestones, "title", "description"),
       ``,
-      // Founder-supplied numbers (honesty gate opened 2026-08-19). The note
-      // travels with them so the bot attributes the figures to the owner.
+      // Qualitative outcomes (user decision 2026-08-20): no client counts or
+      // timings in our voice — the bot must not invent any either.
       `**${CS.results.title}**`,
-      CS.results.stats.map((stat) => `- ${stat.value} — ${stat.label}`).join("\n"),
-      CS.results.note,
+      titled(CS.results.items, "title", "description"),
       ``,
       `**Referencia majiteľa (cituj presne, neuprav ani neskracuj čísla):**`,
       `„${CS.quote.text}“`,

@@ -307,41 +307,35 @@ export default function RoyalStrojeCaseStudyPage() {
           })}
         </ul>
 
-        {/* gray-400, not 500: the note carries the honesty boundary, so it
-            sits ON the legibility floor, not under it. */}
-        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-400">
-          {CS.localSeo.note}
-        </p>
       </section>
 
-      {/* Výsledky — the honesty gate opened 2026-08-19: every figure is the
-          founder's own (see constants/sk-case-studies.ts), and the note below
-          the cards says exactly that. */}
+      {/* Výsledky — deliberately qualitative (user decision 2026-08-20):
+          what the work delivers, no counts or timings in our voice. */}
       <section className="mx-auto flex w-full max-w-4xl flex-col px-4 py-10 md:px-8">
         <h2 className="bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text py-6 text-center text-3xl font-semibold text-transparent md:text-4xl">
           {CS.results.title}
         </h2>
 
         <div className="mt-4 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
-          {CS.results.stats.map((stat) => (
-            <div
-              key={stat.value}
-              className={`flex flex-col items-center p-6 text-center sm:p-8 ${GLASS_CARD_CLASS}`}
-            >
-              {/* Cyan figures: numbers are proof (Bent Light Rule). */}
-              <p className="text-3xl font-bold text-cyan-400 md:text-4xl">
-                {stat.value}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-gray-300">
-                {stat.label}
-              </p>
-            </div>
-          ))}
+          {CS.results.items.map((item) => {
+            const Icon = SOLUTION_ICONS[item.icon];
+            return (
+              <div key={item.title} className={`p-6 ${GLASS_CARD_CLASS}`}>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-purple-500/30 bg-gradient-to-br from-purple-500/20 to-cyan-500/20">
+                  {Icon ? (
+                    <Icon aria-hidden="true" className="h-6 w-6 text-cyan-400" />
+                  ) : null}
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-white">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-400">
+                  {item.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
-
-        <p className="mt-8 text-center text-sm italic leading-relaxed text-gray-400">
-          {CS.results.note}
-        </p>
       </section>
 
       {/* Slovami majiteľa — the centrepiece testimonial. Visible quote only:

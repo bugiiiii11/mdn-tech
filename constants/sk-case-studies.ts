@@ -3,14 +3,16 @@
 // metadata + JSON-LD).
 //
 // HONESTY GATE — SATISFIED 2026-08-19: the founder (Peter Krivosudský)
-// supplied a written first-person account of the collaboration, the numbers
-// in `results`, and consent for his name, the case study, the build story and
-// the CRM screenshot. The quote is his text, lightly edited for length and
-// diacritics with his explicit permission ("slová môžme upraviť podľa
-// potreby"). Standing rules that survive the gate:
+// supplied a written first-person account of the collaboration and consent
+// for his name, the case study, the build story and the CRM screenshot. The
+// quote is his text, lightly edited for length, diacritics and one softened
+// figure ("vyše 100 klientov" -> "množstvo stálych klientov") with his
+// explicit permission ("slová môžme upraviť podľa potreby"). Standing rules
+// that survive the gate:
 //   - Search RANKINGS appear ONLY inside his attributed quote, never in our
-//     own voice (FULL-AUDIT-REPORT guardrail; localSeo.note carries this).
-//   - Every number in `results` is his, not ours — `results.note` says so.
+//     own voice (FULL-AUDIT-REPORT guardrail).
+//   - `results` is deliberately QUALITATIVE (user decision 2026-08-20):
+//     no client counts or timings in our voice anywhere on the page.
 //   - No Review/aggregateRating schema: first-party testimonials on the
 //     provider's own site are self-serving per Google's guidelines, and the
 //     audit guardrail bans fabricated review markup outright.
@@ -30,7 +32,7 @@ export const SK_CS_ROYAL_STROJE = {
 
   hero: {
     title: "Royal Stroje: web, CRM a AI chatbot pre požičovňu stavebných strojov",
-    lede: "Jedna firma, jeden dodávateľ, jeden systém: web s katalógom strojov postavený na lokálne vyhľadávanie, CRM presne podľa procesov požičovne a chatbot, ktorý odpovedá aj mimo otváracích hodín.",
+    lede: "Web s katalógom strojov postavený na lokálne vyhľadávanie, CRM presne podľa procesov požičovne a chatbot, ktorý odpovedá aj mimo otváracích hodín.",
     image: "/portfolio/royalstroje.jpg",
     imageAlt: "Náhľad webu royalstroje.sk",
     ctaPrimary: { label: "Nezáväzná konzultácia zdarma", href: "/sk#kontakt" },
@@ -94,7 +96,7 @@ export const SK_CS_ROYAL_STROJE = {
   localSeo: {
     title: "Lokálne SEO: aby firmu našli ľudia zo Senca",
     intro:
-      "Požičovňu si nikto nevyberá podľa toho, kto má najkrajší web — ale podľa toho, kto sa zobrazí, keď v Senci niekto hľadá „požičovňa náradia“. Web sme preto od začiatku stavali na lokálne vyhľadávanie, nie až dodatočne.",
+      "Požičovňu si nikto nevyberá podľa toho, kto má najkrajší web — ale podľa toho, kto sa zobrazí, keď v Senci niekto hľadá „požičovňa náradia“. Web sme preto na lokálne vyhľadávanie stavali od prvého dňa.",
     items: [
       {
         icon: "map",
@@ -112,16 +114,15 @@ export const SK_CS_ROYAL_STROJE = {
         icon: "faq",
         title: "Časté otázky vo výsledkoch vyhľadávania",
         description:
-          "Sekcia s otázkami je označená markupom FAQPage, takže odpovede o cenách, dovoze či dostupnosti sa môžu zobraziť priamo vo vyhľadávaní — ešte pred klikom na web.",
+          "Sekcia s otázkami je označená markupom FAQPage, takže odpovede o cenách, dovoze či podmienkach požičania sa môžu zobraziť priamo vo vyhľadávaní — ešte pred klikom na web.",
       },
       {
         icon: "phone",
         title: "Jednotné kontaktné údaje",
         description:
-          "Názov, adresa a telefón sú naprieč webom v jednom presnom tvare. Rozhádzané údaje sú jeden z najčastejších dôvodov, prečo sa firme lokálne výsledky nehnú.",
+          "Názov, adresa a telefón sú naprieč webom v jednom presnom tvare. Konzistentné údaje pomáhajú Googlu firmu jednoznačne rozpoznať a posilňujú jej dôveryhodnosť v lokálnych výsledkoch.",
       },
     ],
-    note: "Pozície vo vyhľadávaní v našom mene neuvádzame, kým ich nevieme doložiť dátami. To, čo vyhľadávanie firme prinieslo, popisuje majiteľ vlastnými slovami v citáte nižšie.",
   },
 
   // The founder's narrative, retold in our voice — the facts and their order
@@ -133,10 +134,10 @@ export const SK_CS_ROYAL_STROJE = {
       "Od nejasného zadania po systém, ktorý firma používa každý deň — spolupráca rástla krok za krokom, presne tak, ako rástla samotná požičovňa.",
     milestones: [
       {
-        period: "Marec 2026",
+        period: "Začiatok spolupráce",
         title: "Zadanie bez pevných kontúr",
         description:
-          "Jednoduchý web, prehľadný katalóg strojov podľa kategórií a čo najlepšia viditeľnosť na Googli. Predstavu o dizajne, štruktúre a textoch klient nemal — návrhy sme pripravili my a doladili ich spolu s majiteľom.",
+          "Jednoduchý web, prehľadný katalóg strojov podľa kategórií a čo najlepšia viditeľnosť na Googli. Klient nemal jasnú predstavu o dizajne, štruktúre ani textoch — skúšali sme rôzne návrhy a v spoločnej diskusii sa postupne dopracovali ku konečnému výsledku.",
       },
       {
         period: "Týždeň pred otvorením prevádzky",
@@ -151,7 +152,7 @@ export const SK_CS_ROYAL_STROJE = {
           "Štruktúrované dáta, obsah na lokálne dopyty a jednotné kontaktné údaje — presne tá práca, ktorú popisuje sekcia vyššie. Dopyty začali prichádzať priamo z vyhľadávania.",
       },
       {
-        period: "Po prvej stovke zákazníkov",
+        period: "Automatizácia procesov",
         title: "Royal Command Center — CRM na mieru",
         description:
           "Rast priniesol novú potrebu: poriadok v operatíve. Vznikol systém, v ktorom si majiteľ spravuje katalóg strojov, databázu klientov, faktúry a prehľady o prevádzke — z kancelárie aj z mobilu.",
@@ -163,41 +164,45 @@ export const SK_CS_ROYAL_STROJE = {
           "Články na témy, ktoré si majiteľ vybral sám, a chatbot vyškolený na obsahu webu, ktorý odpovedá 24/7 — aj keď má požičovňa zatvorené.",
       },
       {
-        period: "August 2026",
+        period: "Dnes",
         title: "Kalendár a úlohy — systém rastie ďalej",
         description:
-          "Zatiaľ posledné rozšírenie Command Centra: úlohy a termíny priamo v systéme. Digitálny produkt sa vyvíja presne podľa potrieb firmy — a neprestáva.",
+          "Zatiaľ posledné rozšírenie Command Centra: úlohy a termíny priamo v systéme. Digitálny produkt sa vyvíja presne podľa potrieb firmy — a rastie naďalej.",
       },
     ],
   },
 
-  // Every figure below is the FOUNDER'S, from his written account — the note
-  // says so on the page. Nothing here comes from our own measurement.
+  // Qualitative outcomes, no figures (user decision 2026-08-20): concrete
+  // numbers repeated the timeline above and the quote below, so the section
+  // now states what the work DELIVERS. Icons resolve via SOLUTION_ICONS on
+  // the page.
   results: {
     title: "Výsledky",
-    stats: [
+    items: [
       {
-        value: "Týždeň",
-        label:
-          "pred otvorením prevádzky bol web naživo — prvé dopyty prišli ešte pred doladením SEO",
+        icon: "globe",
+        title: "Funkčný a prehľadný web",
+        description:
+          "Rýchla a kvalitná vizitka firmy — katalóg strojov, ktorý si zákazník prezrie sám, s jasným kontaktom na jeden klik.",
       },
       {
-        value: "100+",
-        label:
-          "zákazníkov krátko po spustení — impulz pre CRM a automatizáciu procesov",
+        icon: "search",
+        title: "SEO, ktoré privádza dopyty",
+        description:
+          "Kvalitne nastavené lokálne vyhľadávanie zvyšuje počet dopytov a otvára firme možnosti ďalšieho rastu.",
       },
       {
-        value: "5 mesiacov",
-        label:
-          "od prvého webu po CRM, blog a AI chatbota — jeden partner, jeden systém",
+        icon: "database",
+        title: "CRM systém na mieru",
+        description:
+          "Prehľady, databáza klientov a automatizácia procesov posúvajú fungovanie firmy na vyššiu úroveň.",
       },
     ],
-    note: "Všetky čísla pochádzajú priamo od majiteľa firmy — z jeho vlastného zhrnutia spolupráce, ktoré citujeme nižšie. Pozície vo vyhľadávaní v našom mene neuvádzame, kým ich nevieme doložiť dátami.",
   },
 
   quote: {
     title: "Slovami majiteľa",
-    text: "Poprosil som Martina, aby mi spravil jednoduchý web s prehľadným katalógom strojov — jasnú predstavu o dizajne, štruktúre či textoch som pritom nemal. Veľmi si vážim jeho trpezlivosť a kreativitu: z veľmi nejasného zadania dokázal vytvoriť skvelý výsledok. Ani som sa nenazdal a už mi začali volať klienti, ešte predtým, než bolo SEO úplne doladené. V nasledujúcich týždňoch Martin vycibril SEO, čo nás dostalo na prvé miesta vo vyhľadávaní prenájmu strojov a náradia v Senci. Pomerne rýchlo sme mali vyše 100 klientov — a tak vzniklo Royal Command Center, v ktorom si dnes spravujem katalóg strojov, ukladám klientov, vytváram faktúry a zapisujem úlohy do kalendára. Jedného dňa som sa zobudil a na webe mi svietil chatbot, ktorý je online nepretržite. Náš digitálny produkt sa vyvíja presne podľa našich potrieb. Služby M.D.N Tech odporúčam všetkými desiatimi.",
+    text: "Poprosil som Martina, aby mi spravil jednoduchý web s prehľadným katalógom strojov — jasnú predstavu o dizajne, štruktúre či textoch som pritom nemal. Veľmi si vážim jeho trpezlivosť a kreativitu: z veľmi nejasného zadania dokázal vytvoriť skvelý výsledok. Ani som sa nenazdal a už mi začali volať klienti, ešte predtým, než bolo SEO úplne doladené. V nasledujúcich týždňoch Martin vycibril SEO, čo nás dostalo na prvé miesta vo vyhľadávaní prenájmu strojov a náradia v Senci. Pomerne rýchlo sme mali množstvo stálych klientov — a tak vzniklo Royal Command Center, v ktorom si dnes spravujem katalóg strojov, ukladám klientov, vytváram faktúry a zapisujem úlohy do kalendára. Jedného dňa som sa zobudil a na webe mi svietil chatbot, ktorý je online nepretržite. Náš digitálny produkt sa vyvíja presne podľa našich potrieb. Služby M.D.N Tech odporúčam všetkými desiatimi.",
     author: "Peter Krivosudský",
     role: "majiteľ, Royal Stroje",
   },
