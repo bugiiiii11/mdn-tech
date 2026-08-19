@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { fadeUp } from "@/components/product-pages/primitives";
-import type { BlogPost } from "@/data/blog-posts";
+import type { BlogPostPreview } from "@/data/blog-posts";
 
 import { BANNER_BG, Constellation, DEFAULT_BANNER_BG } from "./constellation";
 
@@ -14,11 +14,15 @@ import { BANNER_BG, Constellation, DEFAULT_BANNER_BG } from "./constellation";
 // is reserved for h1/h2 — the Gradient Crown Rule), and the excerpt is
 // gray-300, not gray-400 (the Legibility Floor Rule: if it matters, it is not
 // muted).
+//
+// BlogPostPreview, never BlogPost: this is a client component, so its props
+// are serialized into the RSC flight payload — a full post would ship the
+// whole article per card (see the note on the type).
 export const BlogPostCard = ({
   post,
   index,
 }: {
-  post: BlogPost;
+  post: BlogPostPreview;
   index: number;
 }) => (
   <motion.article

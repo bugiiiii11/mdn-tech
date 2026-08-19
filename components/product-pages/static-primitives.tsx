@@ -2,11 +2,17 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-// The purely-static half of the product-page shell. NO 'use client' HERE, AND
-// DO NOT ADD ONE: these three components have no hooks, no framer-motion and no
-// event handlers, so keeping them out of the client boundary lets the twelve
-// server components under components/toolkit/ and components/chatkit/ render
-// them as plain markup instead of as client references.
+import { SectionHeading } from "./motion-primitives";
+
+// The server-renderable half of the product-page shell. NO 'use client' HERE,
+// AND DO NOT ADD ONE: keeping these out of the client boundary lets the server
+// components under components/toolkit/ and components/chatkit/ render them as
+// plain markup instead of as client references. Section composes the animated
+// SectionHeading (a client leaf) but is itself a server component — that is
+// the point: only the title/intro strings cross the boundary, never the
+// section's children, so a card grid is not re-serialized into the RSC flight
+// as client props (/toolkit shipped 124 KB of duplicate flight data when
+// Section lived in ./motion-primitives).
 //
 // The animated half lives in ./motion-primitives (which does carry the
 // directive); ./primitives re-exports both so no import site has to know which
@@ -19,6 +25,45 @@ import { cn } from "@/lib/utils";
 // should use this constant bare, never with appended weight or colour classes.
 export const PROSE_LINK_CLASS =
   "font-medium text-cyan-400 transition-colors duration-300 hover:text-cyan-300";
+
+type SectionProps = {
+  id: string;
+  title: string;
+  intro?: string;
+  children: ReactNode;
+  className?: string;
+  /** Widens the content column from max-w-4xl to max-w-6xl for grids. */
+  wide?: boolean;
+};
+
+export const Section = ({
+  id,
+  title,
+  intro,
+  children,
+  className,
+  wide = false,
+}: SectionProps) => (
+  <section
+    id={id}
+    className={cn(
+      "relative flex w-full max-w-full flex-col items-center justify-center gap-3 scroll-mt-24 py-20 px-4 md:px-20",
+      className
+    )}
+  >
+    <SectionHeading title={title} intro={intro} />
+
+    <div
+      className={cn(
+        "flex w-full flex-col items-center",
+        wide ? "max-w-6xl" : "max-w-4xl",
+        !intro && "mt-4"
+      )}
+    >
+      {children}
+    </div>
+  </section>
+);
 
 export const GlassCard = ({
   children,

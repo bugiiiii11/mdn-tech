@@ -3,6 +3,7 @@
 **Generated:** August 19, 2026 (Session 68)
 **Current Score:** 76/100 (March baseline was 58)
 **Target:** 85+/100 -- realistic once the Critical + High items land; performance is worth ~5 weighted points alone.
+**Status (S69, 2026-08-19):** done in S68: 1, 2, 4-7, 9, 14, 18. Done in S69: 3, 8, 10-13, 16 (see the DONE notes in place). Remaining queue: 15 (blog refresh bundle -- the queued /blog/[slug] redesign), 17, 19-22.
 
 Guardrails (do not re-open): /sk H1 + "Co robime" H2 stay as written; no fabricated ratings/claims; no ChatKit installUrl while gated; no schema-only breadcrumbs.
 
@@ -23,9 +24,8 @@ Three.js + r3f = ~786 KB uncompressed, 54% of all JS, loaded on blog and legal p
 - Exempt above-the-fold text from the scroll-reveal initial `opacity:0` (or set initial visible + animate on hydration only below the fold).
 - Do not load the three.js chunk at all on /blog/*, /privacy, /terms and the SK legal pages.
 
-### 3. blackhole.webm downloads twice per view
-**Impact:** 1.3-1.5 MB media per load on / and /sk | **Effort:** 1-2 h
-Two autoplay `<video>` elements fetch the same 740 KB file in parallel (autoplay overrides `preload="none"`). Render one video element (or gate the second by viewport/media query so only one mounts), add `poster` + `fetchpriority="high"` on the poster so LCP does not wait for video.
+### 3. blackhole.webm downloads twice per view -- DONE S69 (2026-08-19)
+Two autoplay `<video>` elements fetched the same 740 KB file in parallel (autoplay overrides `preload="none"`). Fixed: the footer bookend passes `lazy` to `BlackholeVideo`, which renders the poster `<img>` alone until an IntersectionObserver (1000px rootMargin) sees it -- by then the hero's fetch is in HTTP cache. Verified in build output: one `<video>` per page. Bonus: blog/legal pages now defer the footer video entirely until scrolled near.
 
 ---
 
@@ -47,9 +47,8 @@ Home/about say 2026-07-16 (rebuild shipped mid-August); /terms says 2026-01-20 b
 **Effort:** 1-2 h | **File:** `app/(marketing)/blog/[slug]/page.tsx`
 The S58 sitewide removal missed the 3 blog posts: schema present, no visible trail -- the exact mismatch it was meant to fix. Either copy the Royal Stroje pattern (visible `aria-label` trail + schema) or delete the schema block.
 
-### 8. /sk ProfessionalService lacks `address`
-**Effort:** 30 min | **File:** /sk JSON-LD source (grep `ProfessionalService` in constants/components)
-Without `address` the page is ineligible for LocalBusiness-family rich results despite otherwise solid markup + FAQPage. Use the FZE registered address already published in the footer/legal line.
+### 8. /sk ProfessionalService lacks `address` -- DONE S69 (2026-08-19)
+`PostalAddress` (the FZE registered seat, structured in `SK_NAP.address` -- must stay in sync with `COMPANY_LEGAL_LINE`) added to the /sk schema. `areaServed` keeps the market claim on Slovakia. The chatbot seed script does not read the new fields, so no re-seed was needed.
 
 ### 9. /about pre-honesty-pass numbers -- OWNER DECISION
 **Effort:** 30 min once decided | **File:** /about content source
@@ -59,21 +58,17 @@ Without `address` the page is ineligible for LocalBusiness-family rich results d
 
 ## Medium -- fix within a month
 
-### 10. mdntech.sk deep paths 404
-**Effort:** 30 min | **File:** `next.config.js` redirects()
-`mdntech.sk/referencie/royal-stroje` -> 308 -> `mdntech.org/referencie/royal-stroje` -> 404. The host-based catch-all must map `/:path*` -> `/sk/:path*` (special-case paths already starting with /sk to avoid doubling). Matters before the ~150-partner email campaign if any .sk deep links go out.
+### 10. mdntech.sk deep paths 404 -- DONE S69 (2026-08-19)
+The host-based catch-all in `next.config.js` now maps `/:path*` -> `mdntech.org/sk/:path*`, with a `/sk/:path*` pass-through rule above it so already-prefixed paths do not double. Campaign deep links on .sk are safe. (Needs a prod deploy before the partner campaign; verify one deep link after.)
 
-### 11. SK legal pages inherit the English OG block
-**Effort:** 30 min | **Files:** SK legal page metadata
-og:title English, og:url pointing at the homepage, og:locale en_US. Set proper openGraph in each SK legal page's metadata export.
+### 11. SK legal pages inherit the English OG block -- DONE S69 (2026-08-19)
+Full Slovak openGraph + twitter blocks (sk_SK, correct og:url, `/og-image-sk.png`) on both SK legal pages, restating every field because a page-level block replaces the root wholesale. Verified in build output.
 
-### 12. Mobile hero: dead "Coming soon" button above the live CTA
-**Effort:** 30 min | **Files:** hero CTA stacks on / and /chatkit
-First thumb target in the hero does nothing while the portal is gated. Reorder so the live CTA is first on mobile, or visually demote/remove the dead button until APP_LIVE.
+### 12. Mobile hero: dead "Coming soon" button above the live CTA -- DONE S69 (2026-08-19)
+The gated primary gets `order-last sm:order-none` on / (landing hero) and in PageHero (applies only while `primaryCta.disabled`, so /chatkit demotes and /toolkit's live primary is untouched). Desktop row order unchanged.
 
-### 13. /sk chat bubble overlaps footer registration line at 390px
-**Effort:** 30 min | **Files:** `public/widget.js` / `SkChatWidget.tsx` (bubble offset), or footer bottom padding on /sk
-Evidence: `screenshots/sk_mobile_footer_widget.png`. Add scroll-position-aware offset or footer clearance. (Keep the S67 teardown behavior intact -- see handoff Key Files warning.)
+### 13. /sk chat bubble overlaps footer registration line at 390px -- DONE S69 (2026-08-19)
+Footer clearance, not a widget change (`widget.js` is shared with customer embeds): the SK footer bottom block gets `pr-20 sm:pr-0`, so the legal line and link row wrap short of the bubble's fixed column (right 64px at <=480px, right 76px up to sm). S67 teardown untouched.
 
 ### 14. Blog dateModified + fragile date parsing
 **Effort:** 1 h | **File:** `app/(marketing)/blog/[slug]/page.tsx:91-104`
@@ -83,9 +78,9 @@ Evidence: `screenshots/sk_mobile_footer_widget.png`. Add scroll-position-aware o
 **Effort:** 0.5-1 day, combine with the redesign already queued in the handoff
 Frozen since 2026-03-13 with time-stamped claims ("Latest Features (March 2026)") and a 5-month-old "coming soon" badge. Bundle into one pass: update stale claims, add Person authorship (Martin) with Person schema + byline, add outbound citations (METR, SWE-bench etc. are mentioned but uncited -- /toolkit's 23 attributed links are the house pattern), fix items 1/7/14 in the same files.
 
-### 16. /toolkit ships its content twice (303 KB HTML)
-**Effort:** 2-4 h | **Files:** /toolkit page -> client components
-A single 124 KB RSC flight block re-serializes the whole skills directory as client props (same pattern on /blog, 68 KB). Move filtering/search to a server boundary or pass IDs + render server-side so the directory is serialized once.
+### 16. /toolkit + /blog over-serialization -- DONE S69 (2026-08-19), with a finding correction
+The /blog half was the real waste and is fixed: client cards (`BlogHero`, `BlogPostCard`, `RelatedPostCard`) now take `BlogPostPreview` (id/title/excerpt/category/date/readTime/tags), never full `BlogPost` -- the index shipped every article's entire `content` array as props (~90 KB -> 62 KB) and each article page inlined its 2 related articles in full (verified gone). `Section` also moved to the server half of the primitives (only its animated heading is a client leaf), so no section's card tree crosses the boundary as client props anymore.
+**Correction to the original finding:** /toolkit stays ~303 KB. The 124-130 KB flight block is Next's inlined RSC seed tree of the RENDERED page -- App Router inlines it for hydration on every page regardless of client boundaries, so "serialize once" is not achievable by moving boundaries; the ~140 KB target would require rendering less directory content. Do not re-attempt via restructuring.
 
 ---
 

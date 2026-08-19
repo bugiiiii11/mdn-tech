@@ -1,14 +1,18 @@
 import { BlogHero } from "@/components/blog/hero";
 import { BlogPostCard } from "@/components/blog/post-card";
 import { Section } from "@/components/product-pages/primitives";
-import { getAllPosts } from "@/data/blog-posts";
+import { getAllPosts, toPostPreview } from "@/data/blog-posts";
 
 // Blog index (2026-08-14 rebuild): full-viewport hero on the shared shell with
 // the latest post featured inside the fold, then the remaining posts on the
 // product-page Section/card grammar. This file is a server component — the
 // motion lives in components/blog/*; metadata stays in ./layout.tsx.
+//
+// toPostPreview() is load-bearing, not tidiness: BlogHero and BlogPostCard are
+// client components, so whatever object they receive is serialized into the
+// page's RSC flight data — full posts inlined every article's content here.
 export default function BlogPage() {
-  const [featured, ...rest] = getAllPosts();
+  const [featured, ...rest] = getAllPosts().map(toPostPreview);
 
   return (
     <main className="h-full w-full overflow-x-hidden">

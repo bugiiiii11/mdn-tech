@@ -61,7 +61,9 @@ export const LandingHero = () => {
             {/* "Start Free" goes to the portal, so it becomes an inert state
                 while the portal is closed (APP_LIVE). The secondary button
                 keeps the fold actionable — it leads to the product sections,
-                which is where a visitor can still do something today. */}
+                which is where a visitor can still do something today.
+                order-last: on mobile the stack is vertical and the first thumb
+                target must be the live CTA, not the dead state. */}
             {APP_LIVE ? (
               <motion.a
                 whileHover={{ scale: 1.05 }}
@@ -72,7 +74,10 @@ export const LandingHero = () => {
                 Start Free
               </motion.a>
             ) : (
-              <span aria-disabled="true" className={HERO_CTA_DISABLED_CLASS}>
+              <span
+                aria-disabled="true"
+                className={`${HERO_CTA_DISABLED_CLASS} order-last sm:order-none`}
+              >
                 Coming soon
               </span>
             )}

@@ -36,6 +36,31 @@ export const metadata: Metadata = {
       "x-default": "/privacy",
     },
   },
+  // A page-level openGraph/twitter object REPLACES the root one wholesale
+  // (shallow merge) — without this block the page inherited the English
+  // homepage card (en_US locale, og:url pointing at /).
+  openGraph: {
+    type: "website",
+    locale: "sk_SK",
+    url: "https://mdntech.org/sk/ochrana-osobnych-udajov",
+    siteName: "M.D.N Tech",
+    title: "Ochrana osobných údajov | M.D.N Tech",
+    description: "Ako M.D.N Tech FZE spracúva a chráni vaše osobné údaje.",
+    images: [
+      {
+        url: "/og-image-sk.png",
+        width: 1200,
+        height: 630,
+        alt: "M.D.N Tech — digitálny partner pre slovenské firmy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ochrana osobných údajov | M.D.N Tech",
+    description: "Ako M.D.N Tech FZE spracúva a chráni vaše osobné údaje.",
+    images: ["/og-image-sk.png"],
+  },
   robots: {
     index: true,
     follow: true,

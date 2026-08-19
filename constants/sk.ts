@@ -52,6 +52,14 @@ export const SK_NAP = {
   whatsappHref: "https://wa.me/971582283256",
   email: "contact@mdntech.org",
   emailHref: "mailto:contact@mdntech.org",
+  // The FZE registered address — MUST stay in sync with COMPANY_LEGAL_LINE
+  // in lib/marketing/links.ts (the one legal footprint the site claims).
+  // Feeds the ProfessionalService `address` on /sk (LocalBusiness eligibility).
+  address: {
+    streetAddress: "Al Shmookh Business Center, One UAQ, UAQ Free Trade Zone",
+    addressLocality: "Umm Al Quwain",
+    addressCountry: "AE",
+  },
 } as const;
 
 // --- Section anchors -----------------------------------------------------

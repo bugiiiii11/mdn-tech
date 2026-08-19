@@ -70,6 +70,12 @@ const professionalServiceSchema = {
   availableLanguage: ["sk", "en"],
   email: SK_NAP.email,
   telephone: SK_NAP.phoneIntl,
+  // Registered seat, not a Slovak branch — required for LocalBusiness-family
+  // rich results; areaServed above keeps the market claim on Slovakia.
+  address: {
+    "@type": "PostalAddress",
+    ...SK_NAP.address,
+  },
   serviceType: [
     "Tvorba webových stránok",
     "CRM systémy na mieru",

@@ -10,7 +10,7 @@ import {
   HERO_SECTION_CLASS,
 } from "@/components/main/hero-shell";
 import { enterDelay } from "@/components/product-pages/primitives";
-import type { BlogPost } from "@/data/blog-posts";
+import type { BlogPostPreview } from "@/data/blog-posts";
 
 import { BANNER_BG, Constellation, DEFAULT_BANNER_BG } from "./constellation";
 
@@ -23,7 +23,10 @@ import { BANNER_BG, Constellation, DEFAULT_BANNER_BG } from "./constellation";
 // Heading semantics: h1 (page) -> sr-only h2 "Featured" -> h3 (article title),
 // so the visible white title never competes with the gradient-crowned h2
 // grammar and no heading level is skipped.
-export const BlogHero = ({ featured }: { featured: BlogPost }) => (
+//
+// BlogPostPreview, never BlogPost: client component — its props ship in the
+// RSC flight payload, and a full post would inline the entire article here.
+export const BlogHero = ({ featured }: { featured: BlogPostPreview }) => (
   <div id="blog-top" className={HERO_SECTION_CLASS}>
     <BlackholeVideo className={HERO_BLACKHOLE_CLASS} />
 

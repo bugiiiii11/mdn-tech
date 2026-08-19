@@ -32,6 +32,33 @@ export const metadata: Metadata = {
       "x-default": "/terms",
     },
   },
+  // A page-level openGraph/twitter object REPLACES the root one wholesale
+  // (shallow merge) — without this block the page inherited the English
+  // homepage card (en_US locale, og:url pointing at /).
+  openGraph: {
+    type: "website",
+    locale: "sk_SK",
+    url: "https://mdntech.org/sk/obchodne-podmienky",
+    siteName: "M.D.N Tech",
+    title: "Obchodné podmienky | M.D.N Tech",
+    description:
+      "Rozsah služieb, platobné podmienky, duševné vlastníctvo a riešenie sporov pri spolupráci s M.D.N Tech FZE.",
+    images: [
+      {
+        url: "/og-image-sk.png",
+        width: 1200,
+        height: 630,
+        alt: "M.D.N Tech — digitálny partner pre slovenské firmy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obchodné podmienky | M.D.N Tech",
+    description:
+      "Rozsah služieb, platobné podmienky, duševné vlastníctvo a riešenie sporov pri spolupráci s M.D.N Tech FZE.",
+    images: ["/og-image-sk.png"],
+  },
   robots: {
     index: true,
     follow: true,

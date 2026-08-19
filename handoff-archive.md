@@ -1,5 +1,15 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 67) -- /sk copy pass + the chat widget leaking onto the English site (rotated 2026-08-19)
+
+- **The widget bug is the one worth remembering.** `widget.js` appends `#mdn-chat-widget` straight to `document.body`, which no React tree owns -- so the footer's "English" link (a client-side `<Link href="/">`) carried the Slovak bot onto the English pages, which have no bot. A direct load of mdntech.org was always clean, which is why it looked like an English-page bug and is not. `next/script` cannot fix either half: it does not remove injected DOM, and it will not re-execute a cached script when the visitor navigates back. `SkChatWidget` is now a client component that injects and removes its own `<script>`; `widget.js` bails out of `init()` when `script.isConnected` is false, so an in-flight `/config` fetch cannot re-mount the bubble after teardown. Customer embeds never take that branch -- their tag stays connected. Verified on prod: mounts on /sk, gone on /, back again on return. (S68 adds a second belt: EN<->SK navigation is now a full document load -- see the root-layout split.)
+- **Copy pass over all of /sk, driven by the user reading it as a business owner.** H1 is now keyword-led ("Web, CRM a AI chatboty / pre rast vasho biznisu"); the 7xl step is held back to `xl` because the longer line wraps to three lines at 1024-1279px. "prescanujeme" is gone (not standard Slovak).
+- **Two honesty edits the user insisted on, both worth keeping as rules.** "Web na mieru" now says plainly that supplying texts and graphics is cheaper and faster, but that we cover design, identity and copy when the client has none. And "Realne vysledky" carries NO project count and no claim that anything but the websites is clickable (foreign projects named in one clause instead).
+- Also toned down: no comparison to "konkurencne IT firmy", blockchain out of the team card. Process step 02 names its deliverable. **Realizacie moved BELOW Preco my** -- claims first, live sites as proof after.
+- **CRM section lost its royalstroje.sk reference card** (data, render and chatbot KB): it described the whole delivery in the middle of a CRM argument. The case study stays linked from Realizacie.
+- **`NEXT_DIST_DIR` in `next.config.js`**: `NEXT_DIST_DIR=.next-verify npm run build` verifies without touching `.next/`. Unset on Vercel. The build rewrites `tsconfig.json` -- revert that file before committing.
+- Bot re-seeded AFTER the deploy and verified with a live question.
+
 ## What Was Done (Session 66) -- mdntech.sk live, widget origin bug, SK legal pages + CRM rebuild (rotated 2026-08-19)
 
 - **mdntech.sk + www LIVE, 308 -> mdntech.org/sk** (C5 done). Vercel's native domain redirect could NOT be used: it only maps a host to the SAME path, so the bare .sk would have landed on the English homepage. Rule lives in `next.config.js` `redirects()` with `has: [{type:"host"}]` -- redirects run BEFORE middleware, so .sk traffic never pays for a Supabase session refresh, and query strings forward so campaign UTMs survive. Websupport DNS: apex A `216.198.79.1`, www CNAME to the vercel-dns host; **the apex AAAA is the record people forget** -- leave it and IPv6 visitors keep hitting the parking page while IPv4 works.
@@ -246,6 +256,7 @@
 | 56 | 2026-08-13 | S55 re-verify findings applied (36/37) + branch pushed; gate green |
 | 57 | 2026-08-14 | Task 0 visual QA passed (sticky + 320px, footer fix) + 0a /about + blog honesty polish |
 | 58 | 2026-08-14 | Hero rebuild: one full-viewport shell across /, /sk, /chatkit, /toolkit |
+| 59 | 2026-08-14 | /about + /blog on hero shell; founder-forward team; constellation blog cards |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

@@ -31,10 +31,13 @@ const headingClass =
   "text-white text-xs font-semibold uppercase tracking-wider mb-4";
 
 // Shared blackhole bookend above the footer. BlackholeVideo carries the
-// reduced-motion + poster handling (WCAG 2.2.2).
+// reduced-motion + poster handling (WCAG 2.2.2). `lazy` because the hero
+// mounts the same video above the fold — without it both fetch the full
+// 740 KB file in parallel on first paint.
 const FooterBookend = () => (
   <div className="relative w-full max-w-full overflow-hidden" style={{ height: "270px" }}>
     <BlackholeVideo
+      lazy
       className="absolute top-0 left-0 w-full max-w-full pointer-events-none object-contain -z-10"
       style={{ height: "540px" }}
     />
@@ -153,8 +156,11 @@ const SkFooter = () => {
             </div>
           </div>
 
-          {/* Bottom line */}
-          <div className="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
+          {/* Bottom line. pr-20 below sm: the ChatKit bubble (widget.js) is
+              fixed over the right 64px of the viewport on mobile and sat on
+              top of the legal line at 390px — the clearance makes the text
+              wrap short of the bubble's column. */}
+          <div className="pt-6 pr-20 sm:pr-0 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-400">
             <p className="leading-relaxed">{COMPANY_LEGAL_LINE}</p>
             <div className="flex items-center gap-4 flex-shrink-0">
               {/* Slovak translations, not the English originals — these

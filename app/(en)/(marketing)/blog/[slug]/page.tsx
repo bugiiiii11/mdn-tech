@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { getPostById, getRelatedPosts, getAllPosts } from "@/data/blog-posts";
+import { getPostById, getRelatedPosts, getAllPosts, toPostPreview } from "@/data/blog-posts";
 import BlogPostContent from "./BlogPostContent";
 
 interface PageProps {
@@ -92,7 +92,10 @@ export default async function BlogPostPage({ params }: PageProps) {
     );
   }
 
-  const relatedPosts = getRelatedPosts(post.id, 2);
+  // Trimmed to previews: BlogPostContent is a client component, so these
+  // objects serialize into the flight payload — full posts inlined two whole
+  // spare articles per page.
+  const relatedPosts = getRelatedPosts(post.id, 2).map(toPostPreview);
 
   // Article JSON-LD schema for rich snippets
   const articleSchema = {

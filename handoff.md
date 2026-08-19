@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO re-audit (0a2/C6) DONE in S68: health score 76/100 (March baseline 58); Critical #1+#2 and the quick wins are FIXED and pushed** -- the remaining work queue is `seo-audit/ACTION-PLAN.md`. Portal still gated behind `APP_LIVE`.
-- **Session count:** 68
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan nearly cleared: S68 fixed Critical #1+#2 + quick wins, S69 closed #3, #8, #10-13, #16 (committed, NOT deployed)** -- remaining: #15 blog refresh bundle + low backlog (`seo-audit/ACTION-PLAN.md`). Portal still gated behind `APP_LIVE`.
+- **Session count:** 69
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 59 | 2026-08-14 | /about + /blog on hero shell; founder-forward team; constellation blog cards |
 | 60 | 2026-08-15 | APP_LIVE portal gate + merge to main; website rebuild live on prod |
 | 61 | 2026-08-15 | /sk realizacie refresh (4 projects, fresh captures) + SK footer on the EN shell |
 | 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
@@ -22,16 +21,7 @@
 | 66 | 2026-08-18 | mdntech.sk live (C5) + widget www/CORS fix + SK legal pages + CRM section rebuild |
 | 67 | 2026-08-19 | /sk copy pass (keyword H1, honest scope) + widget leak onto EN pages fixed |
 | 68 | 2026-08-19 | SEO re-audit 76/100 + Critical #1/#2 fixed (blog images, lang=sk, hreflang, three.js off critical path) |
-
-## What Was Done (Session 67) -- /sk copy pass + the chat widget leaking onto the English site
-
-- **The widget bug is the one worth remembering.** `widget.js` appends `#mdn-chat-widget` straight to `document.body`, which no React tree owns -- so the footer's "English" link (a client-side `<Link href="/">`) carried the Slovak bot onto the English pages, which have no bot. A direct load of mdntech.org was always clean, which is why it looked like an English-page bug and is not. `next/script` cannot fix either half: it does not remove injected DOM, and it will not re-execute a cached script when the visitor navigates back. `SkChatWidget` is now a client component that injects and removes its own `<script>`; `widget.js` bails out of `init()` when `script.isConnected` is false, so an in-flight `/config` fetch cannot re-mount the bubble after teardown. Customer embeds never take that branch -- their tag stays connected. Verified on prod: mounts on /sk, gone on /, back again on return. (S68 adds a second belt: EN<->SK navigation is now a full document load -- see the root-layout split.)
-- **Copy pass over all of /sk, driven by the user reading it as a business owner.** H1 is now keyword-led ("Web, CRM a AI chatboty / pre rast vasho biznisu"); the 7xl step is held back to `xl` because the longer line wraps to three lines at 1024-1279px. "prescanujeme" is gone (not standard Slovak).
-- **Two honesty edits the user insisted on, both worth keeping as rules.** "Web na mieru" now says plainly that supplying texts and graphics is cheaper and faster, but that we cover design, identity and copy when the client has none. And "Realne vysledky" carries NO project count and no claim that anything but the websites is clickable (foreign projects named in one clause instead).
-- Also toned down: no comparison to "konkurencne IT firmy", blockchain out of the team card. Process step 02 names its deliverable. **Realizacie moved BELOW Preco my** -- claims first, live sites as proof after.
-- **CRM section lost its royalstroje.sk reference card** (data, render and chatbot KB): it described the whole delivery in the middle of a CRM argument. The case study stays linked from Realizacie.
-- **`NEXT_DIST_DIR` in `next.config.js`**: `NEXT_DIST_DIR=.next-verify npm run build` verifies without touching `.next/`. Unset on Vercel. The build rewrites `tsconfig.json` -- revert that file before committing.
-- Bot re-seeded AFTER the deploy and verified with a live question.
+| 69 | 2026-08-19 | SEO action plan: #3, #8, #10-13, #16 closed; #16 finding corrected (RSC seed tree is architectural) |
 
 ## What Was Done (Session 68) -- SEO re-audit (76/100) + Critical #1/#2 and the quick wins fixed
 
@@ -43,6 +33,17 @@
 - **Hero entrances converted framer-motion -> CSS** (`.hero-enter-left/-up` in globals.css, all 6 hero variants) -- framer server-rendered the LCP h1 at inline opacity:0 until hydration (LCP 3.9-4.5s on 60ms TTFB). fill-mode is `backwards` ON PURPOSE: a forwards fill pins `transform` and eats framer hover gestures (/blog featured card).
 - /about honesty: years-for-corporates 30+ -> 20+ (user call; 50+ contracts / 100+ partnerships confirmed correct by user). Dead Cedarville Cursive font removed. **mdntech.com is a THIRD PARTY (forwards to mdntech.ca)** -- the ".com 301" idea is dead.
 - All verified in the `.next-verify` build output (lang, hreflang links, chunk graph, hero opacity, icons); `tsconfig.json` auto-rewrite reverted.
+
+## What Was Done (Session 69) -- SEO action plan: #3, #8, #10-13, #16 closed
+
+- Everything in the 0a5 "next by impact" queue except #15: blackhole double-fetch, /sk address schema, .sk deep-path redirects, mobile hero CTA order, widget/footer overlap, SK legal OG, over-serialization. Each carries a DONE note in `ACTION-PLAN.md`; all verified in the `.next-verify` build output, lint clean. **Committed, NOT deployed.**
+- **The #16 finding was half-wrong; the correction is documented in ACTION-PLAN.** /toolkit's ~303 KB is Next's inlined RSC seed tree of the RENDERED page -- App Router ships it regardless of client boundaries, so it cannot shrink by restructuring; do NOT re-attempt. The real waste was /blog: client cards received full `BlogPost` objects, inlining every article's `content` in the index (~90 -> 62 KB) and two whole spare articles per article page.
+- **New contract: client blog components take `BlogPostPreview`, never `BlogPost`** (`toPostPreview()` in `data/blog-posts.ts`). TS structural typing will NOT catch a full post passed where a preview is expected -- map explicitly at every call site.
+- `Section` moved to the server half of the product-page primitives; only `SectionHeading` (animated h2/intro) is a client leaf. Keep that boundary.
+- `BlackholeVideo` gained `lazy` (footer bookend only): poster `<img>` until IntersectionObserver proximity, so the hero's fetch is the only one at load. The img must stay the SAME URL as the poster attr (one cached file) -- the eslint-disable there is deliberate.
+- mdntech.sk redirects now ADD the /sk prefix (pass-through rule above the catch-all prevents doubling). **Deploy + verify one .sk deep link on prod BEFORE the partner campaign.**
+- `SK_NAP.address` (new) must stay in sync with `COMPANY_LEGAL_LINE`; the seed script does not read it, so no bot re-seed was needed.
+- #13 was fixed with SK-footer clearance (`pr-20 sm:pr-0` on the bottom block) -- `widget.js` deliberately untouched (customer embeds share it).
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
@@ -67,7 +68,7 @@
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0a5 | **SEO action plan remainder -- the standing marketing queue** | `seo-audit/ACTION-PLAN.md` (S68). Done in S68: items 1-2 (partially: #2 fully), 4-7, 9, 18 + the #14 date fix. Next by impact: **Critical #3** blackhole.webm double-fetch (740 KB x2 on / and /sk); **#8** /sk ProfessionalService missing `address` (blocks LocalBusiness rich results); **#10** mdntech.sk deep paths 404 (redirect drops /sk prefix -- fix BEFORE the partner campaign); **#12** mobile hero: dead "Coming soon" stacks above the live CTA; **#13** widget bubble overlaps footer at 390px; **#11** SK legal OG block; **#15** blog refresh bundle (= queued /blog/[slug] redesign); **#16** /toolkit ships content twice (303 KB HTML). Respect the do-not-do guardrails in FULL-AUDIT-REPORT.md. |
+| 0a5 | **SEO action plan remainder** | `seo-audit/ACTION-PLAN.md` -- S68 did 1-2, 4-7, 9, 14, 18; S69 did 3, 8, 10-13, 16. **First: deploy prod, then verify one mdntech.sk deep link (#10) -- gates the partner campaign.** Remaining: **#15 blog refresh bundle** (= the queued /blog/[slug] redesign: stale March claims, Person authorship + schema, outbound citations per the /toolkit pattern, visible breadcrumb + BreadcrumbList) + low backlog #17 tap targets, #19 /sk H1 `<br>` at 390px, #21 internal links, #22 real reviews post-launch. Guardrails in FULL-AUDIT-REPORT.md still apply. |
 | 0a4 | **Royal Stroje consent for the CRM screenshot** | `public/portfolio/royal-crm-katalog.png` is LIVE on /sk (content pre-reviewed, overview redacted). Folds into Martin task 7. Pull by setting `SK_CRM_SCREENSHOT` back to `null` if they object. |
 | 0a | **SK-C leftovers** | Only C4 LinkedIn vanity slug (Martin task 9) remains. Campaign gate: founder/Filip inputs resolved BEFORE the ~150 partner emails (early September) + fix ACTION-PLAN #10 first. |
 | 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. Remaining gate: Phase 2 checkout + human legal read of /privacy. Verify built HTML has app links back, no "Coming soon" survives. |

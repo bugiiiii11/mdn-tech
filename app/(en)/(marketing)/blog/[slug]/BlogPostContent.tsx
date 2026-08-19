@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { slideInFromTop } from "@/lib/motion";
 import Link from "next/link";
-import { ContentBlock, BlogPost } from "@/data/blog-posts";
+import { ContentBlock, BlogPost, BlogPostPreview } from "@/data/blog-posts";
 
 // Content block renderer
 const renderContent = (block: ContentBlock, index: number) => {
@@ -129,8 +129,10 @@ const renderContent = (block: ContentBlock, index: number) => {
   }
 };
 
-// Related post card
-const RelatedPostCard = ({ post }: { post: BlogPost }) => (
+// Related post card. BlogPostPreview, never BlogPost: this file is a client
+// component, so these props ship inside the RSC flight payload — two full
+// posts here inlined two entire spare articles into every article's HTML.
+const RelatedPostCard = ({ post }: { post: BlogPostPreview }) => (
   <Link href={`/blog/${post.id}`} className="block group">
     <div className="p-4 rounded-lg border border-[#7042f830] bg-[#7042f810] hover:border-purple-500/50 transition-all duration-300">
       <span className="text-xs text-purple-400 mb-2 block">{post.category}</span>
@@ -143,7 +145,7 @@ const RelatedPostCard = ({ post }: { post: BlogPost }) => (
 
 interface BlogPostContentProps {
   post: BlogPost;
-  relatedPosts: BlogPost[];
+  relatedPosts: BlogPostPreview[];
 }
 
 export default function BlogPostContent({ post, relatedPosts }: BlogPostContentProps) {

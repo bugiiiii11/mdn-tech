@@ -3,10 +3,11 @@
 // THIS FILE IS A BARREL AND MUST NOT CARRY 'use client'. It is deliberately a
 // server module so that the two halves keep their own boundaries:
 //
-//   ./static-primitives  — GlassCard, StatChip, CheckItem. Plain markup, no
-//                          directive, so server sections render them inline.
+//   ./static-primitives  — Section, GlassCard, StatChip, CheckItem. No
+//                          directive, so server sections render them inline
+//                          (Section's animated heading is its own client leaf).
 //   ./motion-primitives  — 'use client'. Everything that touches framer-motion:
-//                          fadeUp, CtaButton, PageHero, Section, CtaBand.
+//                          fadeUp, CtaButton, PageHero, SectionHeading, CtaBand.
 //
 // A 'use client' directive here would turn every re-export into a client
 // reference again and undo the split, which is the whole reason the barrel is
@@ -19,6 +20,7 @@ export {
   CheckItem,
   GlassCard,
   PROSE_LINK_CLASS,
+  Section,
   StatChip,
 } from "./static-primitives";
 
@@ -27,7 +29,6 @@ export {
   CtaButton,
   FADE_UP,
   PageHero,
-  Section,
   enterDelay,
   fadeUp,
   type CtaLink,

@@ -32,6 +32,32 @@ export interface BlogPost {
   content: ContentBlock[];
 }
 
+/**
+ * The card/hero-sized slice of a post. Client components (BlogHero,
+ * BlogPostCard) must take THIS, never BlogPost: every prop crossing the
+ * server-to-client boundary is serialized into the RSC flight payload, and
+ * passing full posts shipped every article's entire `content` array inside
+ * the /blog index HTML — 68 KB of flight data for 2 KB of visible text.
+ * TypeScript will not catch a full BlogPost passed where a preview is
+ * expected (structural typing), so map through toPostPreview() explicitly.
+ */
+export type BlogPostPreview = Pick<
+  BlogPost,
+  "id" | "title" | "excerpt" | "category" | "date" | "readTime" | "tags"
+>;
+
+export function toPostPreview({
+  id,
+  title,
+  excerpt,
+  category,
+  date,
+  readTime,
+  tags,
+}: BlogPost): BlogPostPreview {
+  return { id, title, excerpt, category, date, readTime, tags };
+}
+
 export const BLOG_POSTS: BlogPost[] = [
   {
     id: "claude-code-complete-guide",

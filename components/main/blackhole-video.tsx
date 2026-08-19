@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // The accretion-disc scenery, in one place.
 //
@@ -11,6 +11,12 @@ import { useEffect, useRef } from "react";
 // stands in. That also spares the 757 KB download on those sessions.
 //
 // aria-hidden + pointer-events-none: it is scenery, never content.
+//
+// `lazy`: autoplay overrides preload="none", so every mounted instance fetches
+// the full file immediately. Pages mount this twice (hero + footer bookend),
+// which doubled the 740 KB download on first paint. The below-fold instance
+// passes `lazy` and shows the poster alone until it nears the viewport; by the
+// time the video mounts, the hero's fetch has the file in HTTP cache.
 
 // Hero framing constants live in components/main/hero-shell.ts — this file stays
 // the video element alone.
@@ -18,10 +24,30 @@ import { useEffect, useRef } from "react";
 type Props = {
   className?: string;
   style?: React.CSSProperties;
+  lazy?: boolean;
 };
 
-export const BlackholeVideo = ({ className, style }: Props) => {
+export const BlackholeVideo = ({ className, style, lazy = false }: Props) => {
   const ref = useRef<HTMLVideoElement>(null);
+  const posterRef = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(!lazy);
+
+  useEffect(() => {
+    if (ready) return;
+    const poster = posterRef.current;
+    if (!poster || !("IntersectionObserver" in window)) {
+      setReady(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setReady(true);
+      },
+      { rootMargin: "1000px 0px" },
+    );
+    observer.observe(poster);
+    return () => observer.disconnect();
+  }, [ready]);
 
   useEffect(() => {
     const video = ref.current;
@@ -42,7 +68,24 @@ export const BlackholeVideo = ({ className, style }: Props) => {
     apply();
     query.addEventListener("change", apply);
     return () => query.removeEventListener("change", apply);
-  }, []);
+  }, [ready]);
+
+  if (!ready) {
+    return (
+      // Raw <img>, not next/image: it must be the SAME URL as the <video>
+      // poster attribute so the browser caches one file — an optimized copy
+      // would be a second download of a frame the video ships anyway.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        ref={posterRef}
+        src="/videos/blackhole-poster.webp"
+        alt=""
+        aria-hidden="true"
+        className={className}
+        style={style}
+      />
+    );
+  }
 
   return (
     <video

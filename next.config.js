@@ -64,7 +64,10 @@ const nextConfig = {
   async redirects() {
     // Order matters: "/" is also matched by "/:path*" (zero segments), so the
     // root rule has to come first for each host or the bare domain would land
-    // on the English homepage.
+    // on the English homepage. Every SK page lives under mdntech.org/sk/...,
+    // so deep .sk paths get the /sk prefix ADDED (mdntech.sk/referencie/x ->
+    // mdntech.org/sk/referencie/x); forwarding the raw path 404'd every deep
+    // link. Paths already starting with /sk pass through un-doubled.
     return SK_DOMAIN_HOSTS.flatMap((host) => [
       {
         source: "/",
@@ -73,9 +76,15 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/sk/:path*",
+        has: [{ type: "host", value: host }],
+        destination: "https://mdntech.org/sk/:path*",
+        permanent: true,
+      },
+      {
         source: "/:path*",
         has: [{ type: "host", value: host }],
-        destination: "https://mdntech.org/:path*",
+        destination: "https://mdntech.org/sk/:path*",
         permanent: true,
       },
     ]);

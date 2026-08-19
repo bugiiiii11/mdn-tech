@@ -170,7 +170,14 @@ export const PageHero = ({
           className="hero-enter-up mt-10 flex flex-col sm:flex-row items-center gap-4"
           style={enterDelay(0.5)}
         >
-          <CtaButton cta={primaryCta} variant="primary" size="lg" />
+          {/* A gated primary ("Coming soon") drops below the live secondary on
+              mobile — the first thumb target in the fold must do something. */}
+          <CtaButton
+            cta={primaryCta}
+            variant="primary"
+            size="lg"
+            className={primaryCta.disabled ? "order-last sm:order-none" : undefined}
+          />
           {secondaryCta ? (
             <CtaButton cta={secondaryCta} variant="secondary" size="lg" />
           ) : null}
@@ -180,31 +187,21 @@ export const PageHero = ({
   </div>
 );
 
-type SectionProps = {
-  id: string;
-  title: string;
-  intro?: string;
-  children: ReactNode;
-  className?: string;
-  /** Widens the content column from max-w-4xl to max-w-6xl for grids. */
-  wide?: boolean;
-};
-
-export const Section = ({
-  id,
+/**
+ * The animated title/intro pair inside Section (./static-primitives). Only
+ * these two strings cross the client boundary — Section itself is a server
+ * component precisely so a section's card tree is NOT re-serialized into the
+ * RSC flight as client props (the /toolkit directory alone put 124 KB of
+ * duplicate flight data in the HTML when Section lived in this file).
+ */
+export const SectionHeading = ({
   title,
   intro,
-  children,
-  className,
-  wide = false,
-}: SectionProps) => (
-  <section
-    id={id}
-    className={cn(
-      "relative flex w-full max-w-full flex-col items-center justify-center gap-3 scroll-mt-24 py-20 px-4 md:px-20",
-      className
-    )}
-  >
+}: {
+  title: string;
+  intro?: string;
+}) => (
+  <>
     <motion.h2
       initial="hidden"
       whileInView="visible"
@@ -226,17 +223,7 @@ export const Section = ({
         {intro}
       </motion.p>
     ) : null}
-
-    <div
-      className={cn(
-        "flex w-full flex-col items-center",
-        wide ? "max-w-6xl" : "max-w-4xl",
-        !intro && "mt-4"
-      )}
-    >
-      {children}
-    </div>
-  </section>
+  </>
 );
 
 type CtaBandProps = {
