@@ -32,16 +32,17 @@ const starter = CREDIT_PACKS[0];
 
 // Add-on pricing and authorship counts are derived, never typed by hand, so the
 // FAQ (and the FAQPage schema built from it) cannot drift from what we charge
-// or from who actually wrote the ToolKit catalogue.
+// or from who actually wrote the ToolKit catalogue. Unlocks are priced in
+// CREDITS since the Phase 2 credit bank (S72).
 const priceOf = (id: string) =>
-  FEATURES.find((feature) => feature.id === id)?.priceLabel ?? "";
+  FEATURES.find((feature) => feature.id === id)?.creditLabel ?? "";
 
 const extraChatbotPrice = priceOf("extra_chatbot");
 
 const cheapestAddOn =
   FEATURES.filter((feature) => feature.scope !== "account").sort(
-    (a, b) => a.priceCents - b.priceCents
-  )[0]?.priceLabel ?? "";
+    (a, b) => a.creditCost - b.creditCost
+  )[0]?.creditLabel ?? "";
 
 type FaqLink = { href: string; label: string };
 type FaqEntry = { question: string; answer: string; link?: FaqLink };
@@ -59,7 +60,7 @@ const FAQS: FaqEntry[] = [
   },
   {
     question: "How much does ChatKit cost?",
-    answer: `ChatKit runs on credits instead of a monthly subscription. One credit covers one chatbot reply, and packs start at ${starter.priceLabel} for ${starter.credits.toLocaleString("en-US")} credits. Credits do not expire monthly and there is no recurring charge. Optional add-ons such as auto-learning or weekly reports are separate one-time unlocks starting at ${cheapestAddOn}. Payment is not live yet — while checkout is being set up, credits are granted from inside the app and no card is charged today; the full price list lives on the ChatKit page.`,
+    answer: `ChatKit runs on credits instead of a monthly subscription. One credit covers one chatbot reply, and packs start at ${starter.priceLabel} for ${starter.credits.toLocaleString("en-US")} credits. There is no monthly reset and no recurring charge — credits sit on one account balance, are shared by all your chatbots, and are valid for 12 months from purchase. Optional add-ons such as auto-learning or weekly reports are one-time unlocks paid from the same credits, starting at ${cheapestAddOn}. Payment is not live yet — while checkout is being set up, credits are granted from inside the app and no card is charged today; the full price list lives on the ChatKit page.`,
   },
   {
     question: "Is the free trial really free?",
@@ -87,7 +88,7 @@ const FAQS: FaqEntry[] = [
   },
   {
     question: "How many chatbots can I create?",
-    answer: `Every account starts with ${BASE_CHATBOT_LIMIT === 1 ? "one chatbot" : `${BASE_CHATBOT_LIMIT} chatbots`}. If you run several brands or sites, extra chatbot slots are a one-time ${extraChatbotPrice} unlock each, and every chatbot keeps its own knowledge base, styling, credits, and domain allow-list.`,
+    answer: `Every account starts with ${BASE_CHATBOT_LIMIT === 1 ? "one chatbot" : `${BASE_CHATBOT_LIMIT} chatbots`}. If you run several brands or sites, extra chatbot slots are a one-time ${extraChatbotPrice} unlock each. Every chatbot keeps its own knowledge base, styling, and domain allow-list, while all of them share your account's credit balance.`,
   },
   {
     question: "Who builds M.D.N Tech, and do you take custom projects?",

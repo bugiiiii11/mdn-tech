@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan CLOSED and DEPLOYED (S71):** case study final (founder story + quote), .sk deep-link redirect verified on prod, GSC live (sitemap 14 URLs, key pages requested). Campaign is TECHNICALLY ready -- remaining gates are EmailJS attribution + Filip FAQ answers. Portal still gated behind `APP_LIVE`.
-- **Session count:** 71
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **Phase 2 credit bank DEPLOYED (S72):** migration 022 (account-level `credits_ledger`) on prod; Stripe behind `PaymentProvider` (mock fallback until keys); unlocks in credits; pushed to main -> Vercel auto-deploy. Campaign gates unchanged: EmailJS attribution + Filip FAQ. Portal still gated behind `APP_LIVE` -- stays closed until fully ready (user call S72).
+- **Session count:** 72
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 | 63 | 2026-08-16 | /sk rework built: CRM flagship + Kto sme + FAQ + Royal Stroje case study (feat/sk-rework, unmerged) |
 | 64 | 2026-08-16 | /sk rework merged + LIVE; C3 UTM attribution; C2 SK chatbot live with branded widget |
 | 65 | 2026-08-17 | Chatbot 400 fix (null conversationId) + final logo rolled out sitewide (C7) + new OG cards |
@@ -22,17 +21,18 @@
 | 69 | 2026-08-19 | SEO action plan: #3, #8, #10-13, #16 closed; #16 finding corrected (RSC seed tree is architectural) |
 | 70 | 2026-08-19 | SEO action plan closed out: blog refresh (#15/#7), tap targets, /sk H1 wrap, internal links |
 | 71 | 2026-08-20 | Royal Stroje case study final + DEPLOYED; GSC live; campaign technically ready |
+| 72 | 2026-08-20 | Phase 2 credit bank: migration 022 on prod, Stripe adapter, checkout collapse (local) |
 
-## What Was Done (Session 70) -- SEO action plan closed out: #15, #17, #19, #21
+## What Was Done (Session 72) -- Phase 2 credit bank: ledger + Stripe + checkout collapse
 
-- **The build queue in `ACTION-PLAN.md` is now EMPTY.** Only #20 (a tooling note, nothing to fix) and #22 (real ChatKit reviews, needs customers) remain. Committed, **NOT deployed** -- S69 and S70 are both still local.
-- **#15 fixed the staleness class, not just the instance.** "Latest Features (March 2026)" -> "Beyond the Basics"; the version-pinned "Opus 4.6 with Effort Levels" subsection now describes what effort IS and links the docs, under a callout stating outright that the section does not track model versions. **Do not reintroduce a dated feature list** -- it goes stale in one release cycle. Both "coming soon" placeholders gone (the /blog pill became a ChatKit/ToolKit cross-link; the `isFullArticle` block was dead code).
-- **Two blog claims were wrong, not merely uncited.** METR now states the real result (16 devs, ~19% slower) AND that METR has since labelled it historical; A2A is Linux-Foundation-governed, not "Google's". Everything else got attribution: SWE-bench, Claude Code docs, effort docs, API pricing, MCP, A2A, Hacken H1-2025 (the $3.1bn/$1.8bn/$263m figures), OpenZeppelin, Chainlink VRF, EIP-20/721/1155.
-- **New contract:** citations ride on `ContentBlock.links` (+ `linksLabel`) in `data/blog-posts.ts` and render as a trailing "Source(s):" line via `BlockLinks` -- outside the block's own element, so a list stays a list. Add a citation with the claim, never after.
-- **`AUTHOR` in `data/blog-posts.ts` must stay in sync by hand with `FOUNDER` in `constants/index.ts`** -- deliberately NOT imported: that module pulls react-icons into the blog client graph, which S69 had just trimmed. Article schema author is a Person (`jobTitle`, `worksFor`); no `sameAs` until `FOUNDER.linkedin` is real (Martin task 9).
-- **#7 closed with #15:** visible breadcrumb + BreadcrumbList both built from `blogBreadcrumb()` -- one array, per the schema.ts rule. Remove the schema node if the trail ever goes.
-- #17 tap targets: `inline-flex min-h-[24px] items-center` on footer `linkClass`, both breadcrumb trails, /toolkit "Source" links, shared code-block Copy. #19: the /sk H1's hard `<br>` became two `block` spans with `text-balance` -- **H1 copy untouched**, that guardrail stands. #21's finding was half-wrong (money->post deep links already existed); the missing direction was posts -> /toolkit, /chatkit, /about.
-- Verified in `.next-verify`: Person + BreadcrumbList JSON-LD, breadcrumb nav, every citation URL, zero stale strings. tsc + lint clean; `tsconfig.json` auto-rewrite reverted (it happens on every build -- always check).
+- **Migration `022_credit_bank.sql` APPLIED to prod + verified** (Management API; key in `.env.local` `SUPABASE_MANAGEMENT_API_KEY`, ref `ijfgwzacaabzeknlpaff`). Account-level append-only `credits_ledger`; `spend_credits()` (advisory-lock, overdraft raises `insufficient_credits`, verified live); `credit_balance()`; both EXECUTE service-role-only (revoking PUBLIC strips service_role too -- explicit grant-back required, done). Roll-up: 2,000 credits migrated for the 1 legacy customer, expires_at NULL (grandfathered).
+- **DELIBERATELY NOT DONE in 022: zeroing `chatbots.credits_purchased`.** Deployed prod code still meters off that column; new code never reads it. After THIS build deploys, write a cleanup migration (zero/retire the column) -- until then do not re-read it anywhere.
+- **PaymentProvider abstraction (`lib/payments/`)**: Stripe adapter = hosted Checkout, inline `price_data`, required company-name field (B2B 2.5); VAT/tax_id collection deferred to Filip's 2.0b answers. No `STRIPE_SECRET_KEY` -> `getPaymentProvider()` returns null and routes fall back to instant mock grants (provider 'mock'), so Martin's E2E works today. **Paid grants happen ONLY in `/api/webhooks/stripe`**, idempotent via unique `(provider, provider_ref)`.
+- **3 mock routes DELETED** -> `/api/portal/credits/purchase` (packId + returnTo; Stripe url or mock grant) and `/api/portal/unlock` (spend-first, auto `recredit` row if the unlock flip fails, 402 + balance on insufficient). App-side ledger access ONLY via `lib/portal/credits.ts`.
+- **Pricing (confirmed 2026-08-06, do not change):** unlocks in credits -- conversations 500, analytics 750, reports 1000, learning 1250, extra_chatbot 1250 (`FeatureDef.creditCost/creditLabel`; priceCents/priceLabel are GONE from features). Enterprise $999/40k exists `hidden: true`; **always render `visibleCreditPacks()`, never `CREDIT_PACKS`**. "Best value" moved Growth -> Scale. Signup grant 50 credits in `handle_new_user()` -- number pending Martin (plan 3.1).
+- **Metering (`lib/chat/usage.ts`):** trial stays per-chatbot (30 via `messages_used`), then `CREDITS_PER_MESSAGE` ledger spend per reply; spend-after-reply race logs and rides free (next check blocks). New `ChatbotUsage` shape {mode internal|trial|credits, balance}; UsageMeter/upgrade pages/settings rebuilt around the account balance.
+- **Marketing copy truth pass:** "credits never expire" and "each chatbot keeps its own credits" are now FALSE -- replaced everywhere with 12-month validity + one shared account balance (pricing.tsx honesty constraint #3 flipped, documented in its header; payment language stays no-buy until keys go live).
+- Deferred to later sessions: expiry-sweep cron (first expiry mid-2027), chargeback clawback + account suspend, low-balance email (2.7g), refund/ToS text, Stripe E2E 2.6. tsc/lint/build all green. **Pushed to main (user request) -> Vercel auto-deploy; portal stays gated (`APP_LIVE` untouched).**
 
 ## What Was Done (Session 71) -- Royal Stroje case study final + DEPLOYED + GSC live
 
@@ -49,7 +49,7 @@
 
 0. **EmailJS template: add attribution (5 min, blocks C3 payoff):** emailjs.com -> the contact template -> add a line `Zdroj: {{attribution}}` (optionally also `{{form_id}}`, `{{landing_page}}`). Until then the forms SEND the UTM data but the inbox never shows it. Also: review the SK chatbot's answers at admin.mdntech.org/chatbots/46ef0a99...; KB edits that should persist belong in `constants/sk.ts` + re-run `scripts/seed-sk-chatbot.mjs`.
 
-1. **Stripe UAE activation (CRITICAL PATH, start this week):** dashboard.stripe.com -> create account for the FZE: trade license 7813, Emirates ID + residence visa, Wio account details. Verification takes 1-2 weeks and gates Phase 2 payments.
+1. **Stripe UAE activation (CRITICAL PATH, start this week):** dashboard.stripe.com -> create account for the FZE: trade license 7813, Emirates ID + residence visa, Wio account details. Verification takes 1-2 weeks. The code side is DONE (S72) -- once verified: add `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` to Vercel (test keys first), create a dashboard webhook for `checkout.session.completed` -> `https://app.mdntech.org/api/webhooks/stripe`, then tell the next session "Stripe keys live" (runs E2E 2.6). Also confirm the 50-credit signup grant number.
 2. **Supabase auth email templates (10 min):** project `ijfgwzacaabzeknlpaff` -> Authentication -> Emails: copy each file from `supabase/email-templates/` (5 files) into the matching template Source, Save. Then URL Configuration: Site URL `https://app.mdntech.org`; Redirect URLs `https://app.mdntech.org/auth/callback` + `http://localhost:3000/auth/callback`.
 3. **ChatKit cron secret + Resend key (5 min):** random 32+ char string -> Vercel env `CHATKIT_CRON_SECRET` (Production) + redeploy; confirm `RESEND_API_KEY` listed. Supabase SQL: `select vault.create_secret('<value>', 'chatkit_cron_secret');`
 4. **Dub account for MarketKit B3 (10 min):** dub.co -> API key -> `.env.local` `DUB_API_KEY=dub_...` -> tell next session "Dub key ready".
@@ -60,16 +60,16 @@
 9. **Founder card assets (2 min):** paste your personal LinkedIn URL in chat (fills `FOUNDER.linkedin`) and optionally drop a real photo over `public/team/1.jpg`. Also: claim the LinkedIn vanity slug `/company/mdntech` (C4, last SK-C item).
 10. **Inviting a teammate (since S51):** Supabase SQL: `insert into team_invites (email, role) values ('kolega@mdntech.org', 'engineer');` then they sign up on that email. Confirm the ~50-credit signup promo grant number (plan SS3.1).
 
-## What To Do Next -- campaign gates + Phase 2 credit bank
+## What To Do Next -- commit/deploy S72 + campaign gates + Phase 2 remainder
 
-**Three tracks: Phase 2 credit bank (product), campaign send-off (marketing), launch gates.**
+**Three tracks: Phase 2 remainder (product), campaign send-off (marketing), launch gates.**
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
 | 0a | **Campaign send-off gates** (~150 partner emails, early September) | Site + case study + GSC all DONE and verified (S71). Remaining: EmailJS attribution line (Martin 0), Filip FAQ #4/#5 (Martin 6), C4 LinkedIn vanity slug (Martin 9). Campaign plan: `MindPalace/Projects/MDN-Tech/Kampan-Royal-Stroje-2026-09.md`. |
 | 0a6 | **GSC follow-up** (~2026-08-24, Martin task 7) | Coverage + Performance check; then optional: royalstroje.sk property (Websupport TXT -- data that could later back ranking claims in OUR voice in the case study), Bing import from GSC, GA4 (= plan B1). |
 | 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. Remaining gate: Phase 2 checkout + human legal read of /privacy. Verify built HTML has app links back, no "Coming soon" survives. |
-| 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250); 3 mock-checkout routes (`app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/`) collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" on Scale; 2.7 policy build (12-mo expiry, refund window, chargeback clawback, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Ledger: SELECT-only to `authenticated`, writes service-role; read migration 020 first. |
+| 1 | **Phase 2 remainder** | S72 DEPLOYED. Next: smoke-test portal flows on prod behind the gate (buy pack mock, unlock 402 path, meter) -- Martin task 5 covers the guided version. Then: cleanup migration zeroing `chatbots.credits_purchased`. When Martin reports Stripe keys live: E2E 2.6 (success / decline / duplicate webhook must not double-grant -- idempotency is the `(provider, provider_ref)` unique index), revisit pricing.tsx "payment not live" disclosure + upgrade-page mock notes (auto-hide on `STRIPE_SECRET_KEY`). Still open from 2.7: expiry-sweep cron, chargeback clawback + suspend (`charge.dispute.created` in webhook), low-balance email, refund/ToS text. |
 | 3 | Phase 3.5 E2E + CI | Port S51+S52 probe scripts into a committed suite; GitHub Actions (tsc, lint, build, E2E). Zero tests today. |
 | 4 | Widen Phase 1 controls | Authenticated portal routes still unlimited; nonce-based CSP via middleware next. |
 | 5 | ChatKit Voice (Cartesia Sonic-3) | Deferred. ~6h. |
@@ -86,13 +86,11 @@
 | `handoff.md` / `handoff-archive.md` | Live state (capped ~150 lines) / full history (never read on start) |
 | `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` | MASTER launch checklist (Phases 0-8) |
 | `seo-audit/ACTION-PLAN.md` + `FULL-AUDIT-REPORT.md` | The SEO queue (22 items, all closed but #20/#22) + score/verdicts/GUARDRAILS -- read before any SEO or copy-adjacent change |
-| `data/blog-posts.ts` | ALL blog copy + the `ContentBlock.links` citation contract + `blogBreadcrumb()` (schema and visible trail share it) + `AUTHOR` (hand-synced with `FOUNDER`, never imported) |
+| `lib/portal/plans.ts` + `lib/portal/credits.ts` + `lib/payments/` | Billing source of truth (packs $ / unlocks in credits / hidden Enterprise) + the ONLY app-side ledger access + PaymentProvider/Stripe. Render `visibleCreditPacks()`, never `CREDIT_PACKS` |
 | `PRODUCT.md` / `DESIGN.md` | Brand register + "Event Horizon" visual system. Read BOTH before any design or copy work |
 | `app/base-layout.tsx` + `app/(en)|(sk)/layout.tsx` | The TWO root layouts -- exist only so /sk ships `lang="sk"`; keep them identical except `lang`; cross-locale nav = full page load |
 | `lib/marketing/products.ts` | THE portal gate: `APP_LIVE` (default CLOSED), `appCta()`, `isAppHref()` -- grep APP_LIVE before adding any link to app.mdntech.org |
 | `constants/sk.ts` + `sk-case-studies.ts` | ALL /sk copy + data AND the chatbot KB source -- edit here, then re-run `scripts/seed-sk-chatbot.mjs` (wipes Command Center KB edits; `--dry` to preview) |
 | `public/widget.js` + `SkChatWidget.tsx` | Widget API base MUST resolve to the APEX (CORS preflight cannot follow the www 308); our pages load `/widget.js` relatively and TEAR IT DOWN on unmount -- never swap back to `next/script` |
-| `components/main/lazy-stars-canvas.tsx` | The ONLY way the three.js starfield may load (idle-mounted, skipped on reading pages) -- never import `star-background` statically (S68 LCP fix) |
-| `public/brand/README.md` | Logo source of truth + every surface the mark is wired into (favicons, OG cards, blog cards) and the regenerate commands |
 | NEVER hard-code these | `lib/portal/plans.ts` (prices/allowances), `lib/marketing/toolkit-catalogue.ts` (skill counts), `lib/chat/rate-limit-rules.ts` (limiter numbers), `lib/marketing/links.ts` (`COMPANY_LEGAL_LINE`). Marketing copy interpolates from all four |
-| `supabase/migrations/{020_security_fixpack,021_chatkit_hardening}.sql` | Security model. Read 020 before touching billing columns |
+| `supabase/migrations/{020,022}.sql` | Security model + credit bank. Read BOTH before touching billing; ledger writes are service-role only, `credits_purchased` is retired legacy (do not read) |

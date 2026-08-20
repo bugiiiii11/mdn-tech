@@ -142,8 +142,8 @@ export const IncludedAndUnlocks = () => (
         Optional one-time unlocks
       </h3>
       <p className="text-sm md:text-base text-gray-300 text-center mb-9 max-w-2xl mx-auto leading-relaxed">
-        One payment each, per chatbot, permanent. Not subscriptions, and none of
-        them are needed for the chatbot to work.
+        One credit spend each, per chatbot, permanent. Not subscriptions, and
+        none of them are needed for the chatbot to work.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,7 +152,7 @@ export const IncludedAndUnlocks = () => (
             <h4 className="text-base font-semibold text-white mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
               {feature.name}
               <span className="text-xs font-medium text-gray-400 border border-white/[0.12] rounded-full px-2 py-0.5 whitespace-nowrap">
-                {feature.priceLabel} once
+                {feature.creditLabel} once
               </span>
             </h4>
             <p className="text-sm text-gray-300 leading-relaxed">
@@ -168,11 +168,11 @@ export const IncludedAndUnlocks = () => (
           One more unlock sits at account level rather than on a single chatbot:{" "}
           <span className="text-white font-medium">{extraChatbot.name}</span>{" "}
           <span className="text-xs font-medium text-gray-400 border border-white/[0.12] rounded-full px-2 py-0.5 whitespace-nowrap">
-            {extraChatbot.priceLabel} once
+            {extraChatbot.creditLabel} once
           </span>
           . Every account starts with {chatbotAllowanceLabel()}, and each slot
-          you add is a separate chatbot with its own knowledge
-          base, styling, domain list and credits.
+          you add is a separate chatbot with its own knowledge base, styling
+          and domain list, sharing your account&apos;s credit balance.
         </p>
       ) : null}
     </motion.div>

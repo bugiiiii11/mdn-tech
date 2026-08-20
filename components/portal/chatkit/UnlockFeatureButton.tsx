@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Loader2, Lock, Check } from 'lucide-react'
 
@@ -15,9 +16,13 @@ type Props = {
   comingSoon?: boolean
 }
 
+// Unlocks are CREDIT spends now (one POST to /api/portal/unlock), so the
+// failure that needs real UI is 402 insufficient_credits — it links straight
+// to the credit packs.
 export function UnlockFeatureButton({ featureId, label, chatbotId, unlocked, comingSoon }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [needsCredits, setNeedsCredits] = useState(false)
   const router = useRouter()
 
   if (unlocked) {
@@ -40,17 +45,19 @@ export function UnlockFeatureButton({ featureId, label, chatbotId, unlocked, com
   async function handleUnlock() {
     setLoading(true)
     setError(null)
+    setNeedsCredits(false)
     try {
-      const url = chatbotId
-        ? `/api/portal/chatbot/${chatbotId}/feature`
-        : '/api/portal/feature'
-      const res = await fetch(url, {
+      const res = await fetch('/api/portal/unlock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ featureId }),
+        body: JSON.stringify({ featureId, chatbotId }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
+        if (res.status === 402) {
+          setNeedsCredits(true)
+          throw new Error(body.message || 'Not enough credits.')
+        }
         throw new Error(body.error || 'Unlock failed')
       }
       router.refresh()
@@ -70,7 +77,19 @@ export function UnlockFeatureButton({ featureId, label, chatbotId, unlocked, com
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
         {loading ? 'Processing…' : label}
       </button>
-      {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+      {error && (
+        <p className="text-xs text-red-400 text-center">
+          {error}
+          {needsCredits && (
+            <>
+              {' '}
+              <Link href="/portal/upgrade" className="text-purple-300 hover:text-purple-200 underline">
+                Buy credits
+              </Link>
+            </>
+          )}
+        </p>
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Check, Coins, Sparkles, ShieldCheck } from 'lucide-react'
-import { FREE_TRIAL_MESSAGES, CREDIT_PACKS, FEATURES } from '@/lib/portal/plans'
+import { FREE_TRIAL_MESSAGES, FEATURES, visibleCreditPacks } from '@/lib/portal/plans'
 
 export function ChatKitPricing() {
   const perBotFeatures = FEATURES.filter((f) => f.scope === 'chatbot')
@@ -15,8 +15,8 @@ export function ChatKitPricing() {
           Start free. Pay only for what you use.
         </h2>
         <p className="text-gray-400 text-sm md:text-base mt-3">
-          Every chatbot starts with {FREE_TRIAL_MESSAGES} free messages. After that, top up credits — 1 credit
-          per message, never expiring. No subscriptions.
+          Every chatbot starts with {FREE_TRIAL_MESSAGES} free messages. After that, replies draw one credit
+          each from your account balance — one balance for all your chatbots and unlocks. No subscriptions.
         </p>
       </div>
 
@@ -27,7 +27,7 @@ export function ChatKitPricing() {
           <h3 className="text-sm font-medium text-white">Message credits</h3>
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
-          {CREDIT_PACKS.map((pack) => (
+          {visibleCreditPacks().map((pack) => (
             <div
               key={pack.id}
               className={`bg-[#0d0d20]/80 border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden flex flex-col gap-4 ${
@@ -63,7 +63,7 @@ export function ChatKitPricing() {
                   </li>
                   <li className="flex items-center gap-1.5 text-gray-200">
                     <Check className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
-                    Credits never expire
+                    Spend on any chatbot or unlock
                   </li>
                 </ul>
               </div>
@@ -87,7 +87,7 @@ export function ChatKitPricing() {
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-sm font-medium text-white">{feature.name}</span>
                 <span className="text-sm font-semibold text-white whitespace-nowrap">
-                  {feature.status === 'coming-soon' ? 'Soon' : feature.priceLabel}
+                  {feature.status === 'coming-soon' ? 'Soon' : feature.creditLabel}
                 </span>
               </div>
               <p className="text-xs text-gray-500 flex-1">{feature.tagline}</p>
@@ -116,8 +116,8 @@ export function ChatKitPricing() {
             <h3 className="text-white font-medium text-sm">Why credits instead of a subscription?</h3>
             <p className="text-xs text-gray-400 leading-relaxed">
               A recurring bill only makes sense for predictable traffic. Credits fit every case — light, seasonal,
-              or spiky — because you only pay for the messages your chatbot actually answers, and what you buy
-              never expires. Unlock the extra features you want, once, and skip the ones you don&apos;t.
+              or spiky — because you only pay for the messages your chatbot actually answers. Unlock the extra
+              features you want, once, and skip the ones you don&apos;t.
             </p>
           </div>
         </div>
@@ -141,7 +141,8 @@ export function ChatKitPricing() {
             <span className="text-gray-500 group-open:rotate-180 transition-transform">⌄</span>
           </summary>
           <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-            Never. Credits are per chatbot and stay on the balance until used. Stack as many packs as you like.
+            Credits are valid for 12 months from purchase and sit on one account balance shared by all your
+            chatbots. Stack as many packs as you like — each pack keeps its own 12-month window.
           </p>
         </details>
 
@@ -162,8 +163,8 @@ export function ChatKitPricing() {
             <span className="text-gray-500 group-open:rotate-180 transition-transform">⌄</span>
           </summary>
           <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-            No. Each unlock — conversation viewer, analytics, and more — is a one-time payment per chatbot. Buy it
-            once and it stays on for that chatbot. Reach us at{' '}
+            No. Each unlock — conversation viewer, analytics, and more — is a one-time credit spend per chatbot.
+            Unlock it once and it stays on for that chatbot. Reach us at{' '}
             <a href="mailto:contact@mdntech.org" className="text-purple-300 hover:text-purple-200">
               contact@mdntech.org
             </a>

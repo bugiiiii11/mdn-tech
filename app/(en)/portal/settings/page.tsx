@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PortalShell } from '@/components/portal/PortalShell'
 import { UserCircle2, Mail, Building2, CalendarClock, Coins, ArrowUpRight, Bot } from 'lucide-react'
 import { FREE_TRIAL_MESSAGES, chatbotLimit } from '@/lib/portal/plans'
+import { creditBalance } from '@/lib/portal/credits'
 import { AccountSecurity } from '@/components/portal/settings/AccountSecurity'
 
 export default async function PortalSettingsPage() {
@@ -13,9 +14,10 @@ export default async function PortalSettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
-  const [{ data: customer }, { count: chatbotCount }] = await Promise.all([
+  const [{ data: customer }, { count: chatbotCount }, balance] = await Promise.all([
     supabase.from('customers').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('chatbots').select('id', { count: 'exact', head: true }).eq('owner_id', user.id),
+    creditBalance(user.id),
   ])
 
   if (!customer) redirect('/portal/login')
@@ -64,8 +66,9 @@ export default async function PortalSettingsPage() {
 
           <div className="bg-[#0a0a14] border border-white/5 rounded-lg p-4 space-y-2">
             <p className="text-sm text-gray-200">
-              Credits fuel messages — {FREE_TRIAL_MESSAGES} free per chatbot, then 1 credit per message. No
-              subscription. Premium features are one-time unlocks per chatbot.
+              Account balance: <span className="font-semibold text-white">{balance.toLocaleString()}</span>{' '}
+              credits. Every chatbot gets {FREE_TRIAL_MESSAGES} free messages, then replies draw one credit
+              each from this balance. No subscription — feature unlocks are one-time credit spends.
             </p>
             <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
               <Bot className="w-3.5 h-3.5 text-gray-500" />

@@ -23,7 +23,7 @@ import { chatbotAllowanceLabel, featureById } from "@/lib/portal/plans";
 // The extra-chatbot price and the base slot count are read from
 // lib/portal/plans.ts, never typed.
 
-const EXTRA_CHATBOT_PRICE = featureById("extra_chatbot")?.priceLabel ?? "";
+const EXTRA_CHATBOT_PRICE = featureById("extra_chatbot")?.creditLabel ?? "";
 
 const scenarios = [
   {
@@ -55,7 +55,7 @@ const scenarios = [
     categories: ["about", "pricing", "faq"],
     entries:
       "One chatbot per client site, each with its own knowledge base, colour and domain list.",
-    outcome: `A support layer you can hand over at the end of a project. Each additional chatbot is a one-time ${EXTRA_CHATBOT_PRICE} slot unlock, and every chatbot keeps its own separate credits, content and settings — nothing is shared between them.`,
+    outcome: `A support layer you can hand over at the end of a project. Each additional chatbot is a one-time ${EXTRA_CHATBOT_PRICE} slot unlock, and every chatbot keeps its own separate content and settings — they draw on one shared credit balance, so you top up in one place.`,
   },
 ];
 

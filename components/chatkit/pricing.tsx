@@ -15,34 +15,36 @@ import {
 import { APP_LIVE, APP_URL, appCta } from "@/lib/marketing/products";
 import {
   CREDITS_PER_MESSAGE,
-  CREDIT_PACKS,
   FREE_TRIAL_MESSAGES,
   chatbotAllowanceLabel,
   creditsPerReplyLabel,
   featureById,
+  visibleCreditPacks,
 } from "@/lib/portal/plans";
 
 // The commercial section — the site's first real ChatKit price list.
 //
 // DATA DISCIPLINE: there is not one hard-coded currency figure, credit amount
-// or per-message rate in this file. Everything is mapped out of CREDIT_PACKS
-// and FEATURES in lib/portal/plans.ts, including which pack is highlighted
-// (pack.highlight) and how many packs there are. Phase 2 re-prices the unlocks
-// in credits; when that lands, this section changes because plans.ts changes.
+// or per-message rate in this file. Everything is mapped out of
+// visibleCreditPacks() and FEATURES in lib/portal/plans.ts, including which
+// pack is highlighted (pack.highlight) and how many packs there are. Unlocks
+// are priced in CREDITS since the Phase 2 credit bank (S72). Always map
+// visibleCreditPacks(), never CREDIT_PACKS — Enterprise exists hidden.
 //
-// PAYMENT LANGUAGE — hard constraint: no payment processor is integrated
-// (both purchase routes write status 'mock'), so this is a published price
-// list, not a checkout. No "buy", "secure payment", "cards accepted",
-// "invoice", "refund" or "money-back" language appears anywhere, and the only
-// button in the section is the free-trial CTA. The word "checkout" appears
-// exactly once — in the closing paragraph's disclosure that it is NOT live
-// yet, which is the honest statement of the constraint rather than a hedge
-// around it.
+// PAYMENT LANGUAGE — hard constraint: the Stripe integration exists but is
+// NOT LIVE (no keys until Martin's Stripe UAE account clears), so this is a
+// published price list, not a checkout. No "buy", "secure payment", "cards
+// accepted", "invoice", "refund" or "money-back" language appears anywhere,
+// and the only button in the section is the free-trial CTA. The word
+// "checkout" appears exactly once — in the closing paragraph's disclosure
+// that it is NOT live yet, which is the honest statement of the constraint
+// rather than a hedge around it. Revisit that disclosure when keys go live.
 //
-// HONESTY CONSTRAINT #3: credits live on chatbots.credits_purchased, per
-// chatbot. One ACCOUNT is true; one BALANCE is not. Stated explicitly below.
+// HONESTY CONSTRAINT #3 (flipped by the S72 credit bank): credits now live on
+// the ACCOUNT (credits_ledger); one balance is shared by all the account's
+// chatbots. Stated explicitly below.
 
-const EXTRA_CHATBOT_PRICE = featureById("extra_chatbot")?.priceLabel ?? "";
+const EXTRA_CHATBOT_PRICE = featureById("extra_chatbot")?.creditLabel ?? "";
 
 // en-US digit grouping without toLocaleString: this is a client component, so
 // a formatter runs on both sides of the hydration boundary, and the runtime's
@@ -63,8 +65,8 @@ const mechanics = [
     body: `Visitor questions cost nothing. Only the chatbot's answer moves the counter, once, after the reply has finished streaming. Because it is ${creditsPerReplyLabel()}, the credit number and the message number are the same number — there is no conversion to work out.`,
   },
   {
-    title: "Credits do not expire and do not reset.",
-    body: "Your allowance is the free trial plus every credit you have ever added, measured against the total number of replies given. There is no monthly reset, no expiry date and no use-it-or-lose-it window. Stop topping up and you simply stop spending.",
+    title: "No monthly reset, no subscription clock.",
+    body: "One balance sits on your account and every chatbot draws from it. There is no monthly reset and no recurring charge — credits are simply valid for 12 months from purchase, and each pack you add keeps its own 12-month window. Stop topping up and you simply stop spending.",
   },
   {
     title: `You start with ${FREE_TRIAL_MESSAGES} free messages and no card.`,
@@ -101,8 +103,8 @@ export const Pricing = () => (
       ))}
     </motion.div>
 
-    {/* The packs. Mapped from CREDIT_PACKS — order, highlight and every figure
-        come from the data. */}
+    {/* The packs. Mapped from visibleCreditPacks() — order, highlight and
+        every figure come from the data, and hidden packs stay hidden. */}
     <motion.div
       initial="hidden"
       whileInView="visible"
@@ -111,13 +113,13 @@ export const Pricing = () => (
       className="w-full mt-16"
     >
       <h3 className="text-lg font-semibold text-white mb-8 text-center">
-        {CREDIT_PACKS.length === 3
+        {visibleCreditPacks().length === 3
           ? "The three credit packs"
-          : `The ${CREDIT_PACKS.length} credit packs`}
+          : `The ${visibleCreditPacks().length} credit packs`}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {CREDIT_PACKS.map((pack) => (
+        {visibleCreditPacks().map((pack) => (
           <GlassCard
             key={pack.id}
             className={
@@ -175,9 +177,9 @@ export const Pricing = () => (
       <p className="text-sm md:text-base text-gray-300 leading-relaxed">
         Every account starts with {chatbotAllowanceLabel()}, and additional
         slots are a one-time {EXTRA_CHATBOT_PRICE} each. Credits sit on the
-        chatbot, not on the account: two chatbots on the same login have two
-        separate balances, two knowledge bases and two sets of settings, and
-        credits do not move between them.
+        account, not on any single chatbot: two chatbots on the same login
+        keep separate knowledge bases and settings, but they share one credit
+        balance — and the same credits pay for feature unlocks.
       </p>
     </motion.div>
 

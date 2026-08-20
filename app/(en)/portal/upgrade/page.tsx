@@ -3,23 +3,31 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Check, Coins, Bot, Sparkles } from 'lucide-react'
+import { ChevronLeft, CheckCircle2, Coins, Bot, Sparkles, XCircle } from 'lucide-react'
 import { PortalShell } from '@/components/portal/PortalShell'
+import { BuyCreditsButton } from '@/components/portal/chatkit/BuyCreditsButton'
 import { UnlockFeatureButton } from '@/components/portal/chatkit/UnlockFeatureButton'
+import { creditBalance } from '@/lib/portal/credits'
 import {
   FREE_TRIAL_MESSAGES,
-  CREDIT_PACKS,
   FEATURES,
+  visibleCreditPacks,
   chatbotLimit,
   featureById,
 } from '@/lib/portal/plans'
 
-export default async function AccountUpgradePage() {
+export default async function AccountUpgradePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ purchase?: string }>
+}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portal/login')
 
-  const [{ data: customer }, { count: chatbotCount }] = await Promise.all([
+  const { purchase } = await searchParams
+
+  const [{ data: customer }, { count: chatbotCount }, balance] = await Promise.all([
     supabase
       .from('customers')
       .select('extra_chatbot_slots')
@@ -29,6 +37,7 @@ export default async function AccountUpgradePage() {
       .from('chatbots')
       .select('id', { count: 'exact', head: true })
       .eq('owner_id', user.id),
+    creditBalance(user.id),
   ])
 
   const extraSlots = customer?.extra_chatbot_slots ?? 0
@@ -36,6 +45,7 @@ export default async function AccountUpgradePage() {
   const used = chatbotCount ?? 0
   const extraChatbot = featureById('extra_chatbot')!
   const perBotFeatures = FEATURES.filter((f) => f.scope === 'chatbot')
+  const paymentsLive = Boolean(process.env.STRIPE_SECRET_KEY)
 
   return (
     <PortalShell variant="marketing">
@@ -48,42 +58,71 @@ export default async function AccountUpgradePage() {
           ChatKit
         </Link>
 
+        {purchase === 'success' && (
+          <div className="flex items-center gap-2 bg-green-500/10 border border-green-400/30 rounded-xl px-4 py-3">
+            <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
+            <p className="text-sm text-green-300">Purchase complete — credits added to your account.</p>
+          </div>
+        )}
+        {purchase === 'cancelled' && (
+          <div className="flex items-center gap-2 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3">
+            <XCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <p className="text-sm text-gray-300">Checkout cancelled — no card was charged.</p>
+          </div>
+        )}
+
         <div>
           <p className="text-xs text-cyan-400/80 font-mono uppercase tracking-wider mb-2">Billing</p>
           <h1 className="text-2xl md:text-3xl font-bold text-white">
             Pay only for what you use.
           </h1>
           <p className="text-gray-400 text-sm mt-3 max-w-2xl">
-            No subscriptions. Every chatbot starts with {FREE_TRIAL_MESSAGES} free messages, then you top up
-            credits — 1 credit per message, never expiring. Premium features are one-time unlocks you buy once
-            and keep.
+            No subscriptions. Every chatbot starts with {FREE_TRIAL_MESSAGES} free messages, then replies draw
+            one credit each from your account balance. The same credits pay for one-time feature unlocks.
+            Credits are valid for 12 months from purchase.
           </p>
         </div>
 
-        {/* How credits work */}
+        {/* Balance + credit packs */}
         <section className="bg-[#0d0d20]/60 border border-white/[0.06] rounded-2xl p-6 backdrop-blur-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <Coins className="w-4 h-4 text-purple-300" />
-            <h2 className="text-sm font-medium text-white">Message credits</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-purple-300" />
+              <h2 className="text-sm font-medium text-white">Account credits</h2>
+            </div>
+            <span className="text-sm text-gray-300">
+              Balance: <span className="font-semibold text-white">{balance.toLocaleString()}</span> credits
+            </span>
           </div>
           <div className="grid sm:grid-cols-3 gap-3">
-            {CREDIT_PACKS.map((pack) => (
+            {visibleCreditPacks().map((pack) => (
               <div
                 key={pack.id}
-                className={`bg-[#0a0a14] border rounded-xl p-4 ${
+                className={`bg-[#0a0a14] border rounded-xl p-4 flex flex-col gap-3 ${
                   pack.highlight ? 'border-purple-400/30' : 'border-white/5'
                 }`}
               >
-                <div className="flex items-baseline justify-between">
-                  <span className="text-lg font-semibold text-white">{pack.priceLabel}</span>
-                  <span className="text-[11px] text-gray-500">{pack.perCreditLabel}</span>
+                <div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-lg font-semibold text-white">{pack.priceLabel}</span>
+                    <span className="text-[11px] text-gray-500">{pack.perCreditLabel}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {pack.credits.toLocaleString()} credits · {pack.name}
+                    {pack.highlight && <span className="text-purple-300"> · Best value</span>}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{pack.credits.toLocaleString()} credits · {pack.name}</p>
+                <BuyCreditsButton
+                  packId={pack.id}
+                  label={`Buy ${pack.name}`}
+                  returnTo="/portal/upgrade"
+                  primary={pack.highlight}
+                />
               </div>
             ))}
           </div>
           <p className="text-xs text-gray-500">
-            Credits are purchased per chatbot from its own page. Open a chatbot to top it up.
+            One balance for your whole account — every chatbot and every unlock draws from it.
           </p>
         </section>
 
@@ -102,7 +141,7 @@ export default async function AccountUpgradePage() {
               </p>
             </div>
             <div className="sm:w-48">
-              <UnlockFeatureButton featureId="extra_chatbot" label={`Add a chatbot — ${extraChatbot.priceLabel}`} />
+              <UnlockFeatureButton featureId="extra_chatbot" label={`Add a chatbot — ${extraChatbot.creditLabel}`} />
             </div>
           </div>
         </section>
@@ -114,7 +153,7 @@ export default async function AccountUpgradePage() {
             <h2 className="text-sm font-medium text-white">Per-chatbot feature unlocks</h2>
           </div>
           <p className="text-xs text-gray-500 -mt-2">
-            Unlock these from an individual chatbot&apos;s page. One-time payment, per chatbot.
+            Unlock these from an individual chatbot&apos;s page. One-time credit spend, per chatbot.
           </p>
           <div className="grid sm:grid-cols-2 gap-3">
             {perBotFeatures.map((feature) => (
@@ -127,17 +166,19 @@ export default async function AccountUpgradePage() {
                   <p className="text-xs text-gray-500 mt-0.5">{feature.tagline}</p>
                 </div>
                 <span className="text-xs whitespace-nowrap font-mono text-gray-400">
-                  {feature.status === 'coming-soon' ? 'Soon' : feature.priceLabel}
+                  {feature.status === 'coming-soon' ? 'Soon' : feature.creditLabel}
                 </span>
               </div>
             ))}
           </div>
         </section>
 
-        <p className="text-xs text-gray-500 text-center leading-relaxed">
-          Mock checkout for now — unlocks are granted instantly so you can verify the flow. Real payment goes live
-          the moment our account is activated. No card is charged today.
-        </p>
+        {!paymentsLive && (
+          <p className="text-xs text-gray-500 text-center leading-relaxed">
+            Mock checkout for now — credits and unlocks are granted instantly so you can verify the flow. Real
+            payment goes live the moment our account is activated. No card is charged today.
+          </p>
+        )}
 
         <p className="text-xs text-gray-500 text-center">
           Questions?{' '}

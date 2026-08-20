@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 70) -- SEO action plan closed out: #15, #17, #19, #21 (rotated 2026-08-20)
+
+- **The build queue in `ACTION-PLAN.md` is now EMPTY.** Only #20 (a tooling note, nothing to fix) and #22 (real ChatKit reviews, needs customers) remain. Committed, **NOT deployed** -- S69 and S70 are both still local.
+- **#15 fixed the staleness class, not just the instance.** "Latest Features (March 2026)" -> "Beyond the Basics"; the version-pinned "Opus 4.6 with Effort Levels" subsection now describes what effort IS and links the docs, under a callout stating outright that the section does not track model versions. **Do not reintroduce a dated feature list** -- it goes stale in one release cycle. Both "coming soon" placeholders gone (the /blog pill became a ChatKit/ToolKit cross-link; the `isFullArticle` block was dead code).
+- **Two blog claims were wrong, not merely uncited.** METR now states the real result (16 devs, ~19% slower) AND that METR has since labelled it historical; A2A is Linux-Foundation-governed, not "Google's". Everything else got attribution: SWE-bench, Claude Code docs, effort docs, API pricing, MCP, A2A, Hacken H1-2025 (the $3.1bn/$1.8bn/$263m figures), OpenZeppelin, Chainlink VRF, EIP-20/721/1155.
+- **New contract:** citations ride on `ContentBlock.links` (+ `linksLabel`) in `data/blog-posts.ts` and render as a trailing "Source(s):" line via `BlockLinks` -- outside the block's own element, so a list stays a list. Add a citation with the claim, never after.
+- **`AUTHOR` in `data/blog-posts.ts` must stay in sync by hand with `FOUNDER` in `constants/index.ts`** -- deliberately NOT imported: that module pulls react-icons into the blog client graph, which S69 had just trimmed. Article schema author is a Person (`jobTitle`, `worksFor`); no `sameAs` until `FOUNDER.linkedin` is real (Martin task 9).
+- **#7 closed with #15:** visible breadcrumb + BreadcrumbList both built from `blogBreadcrumb()` -- one array, per the schema.ts rule. Remove the schema node if the trail ever goes.
+- #17 tap targets: `inline-flex min-h-[24px] items-center` on footer `linkClass`, both breadcrumb trails, /toolkit "Source" links, shared code-block Copy. #19: the /sk H1's hard `<br>` became two `block` spans with `text-balance` -- **H1 copy untouched**, that guardrail stands. #21's finding was half-wrong (money->post deep links already existed); the missing direction was posts -> /toolkit, /chatkit, /about.
+- Verified in `.next-verify`: Person + BreadcrumbList JSON-LD, breadcrumb nav, every citation URL, zero stale strings. tsc + lint clean; `tsconfig.json` auto-rewrite reverted (it happens on every build -- always check).
+
 ## What Was Done (Session 69) -- SEO action plan: #3, #8, #10-13, #16 closed (rotated 2026-08-20)
 
 - Everything in the 0a5 "next by impact" queue except #15: blackhole double-fetch, /sk address schema, .sk deep-path redirects, mobile hero CTA order, widget/footer overlap, SK legal OG, over-serialization. Each carries a DONE note in `ACTION-PLAN.md`; all verified in the `.next-verify` build output, lint clean.
@@ -279,6 +290,7 @@
 | 58 | 2026-08-14 | Hero rebuild: one full-viewport shell across /, /sk, /chatkit, /toolkit |
 | 59 | 2026-08-14 | /about + /blog on hero shell; founder-forward team; constellation blog cards |
 | 60 | 2026-08-15 | APP_LIVE portal gate + merge to main; website rebuild live on prod |
+| 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 
 Full pre-v3 handoff.md archived verbatim on 2026-07-17 (Session 44, handoff v3 migration). Newer rotations get prepended ABOVE this line.
 

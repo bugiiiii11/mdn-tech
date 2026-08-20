@@ -50,9 +50,9 @@ const included = [
   },
 ];
 
-// Paid one-time unlocks. Prices come from the billing source of truth.
+// Paid one-time unlocks, priced in credits. From the billing source of truth.
 const priceOf = (id: string) =>
-  FEATURES.find((feature) => feature.id === id)?.priceLabel ?? "";
+  FEATURES.find((feature) => feature.id === id)?.creditLabel ?? "";
 
 const addOns = [
   {
