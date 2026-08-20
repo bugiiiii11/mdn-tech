@@ -4,15 +4,14 @@
 
 ## Current State
 
-- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan is CLOSED as a build queue** (S68 Critical #1+#2, S69 #3/#8/#10-13/#16, S70 #15/#17/#19/#21); only #22 real reviews remains, and it needs customers. **S69 + S70 are committed LOCALLY and NOT deployed -- the .sk deep-link redirect fix is not live yet.** Portal still gated behind `APP_LIVE`.
-- **Session count:** 70
+- **Phase:** LAUNCH PLAN ACTIVE -- master checklist `MindPalace/Projects/MDN-Tech/MDN-Tech-Launch-Plan-2026-08.md` (MVP launch target ~31.08). **SEO action plan CLOSED and DEPLOYED (S71):** case study final (founder story + quote), .sk deep-link redirect verified on prod, GSC live (sitemap 14 URLs, key pages requested). Campaign is TECHNICALLY ready -- remaining gates are EmailJS attribution + Filip FAQ answers. Portal still gated behind `APP_LIVE`.
+- **Session count:** 71
 - **Products:** TechKit LIVE (7 crons), MarketKit A+B-core LIVE (B3 Dub go-live pending), ChatKit live w/ credits-only mock checkout (Voice deferred), ToolKit public page live.
 
 ## Session Summary (last 10 -- full table + sessions 1-46 detail in handoff-archive.md)
 
 | # | Date | Title |
 |---|------|-------|
-| 61 | 2026-08-15 | /sk realizacie refresh (4 projects, fresh captures) + SK footer on the EN shell |
 | 62 | 2026-08-16 | ChatKit privacy disclosure (0c) -- /privacy Section 3 + stale-processor cleanup |
 | 63 | 2026-08-16 | /sk rework built: CRM flagship + Kto sme + FAQ + Royal Stroje case study (feat/sk-rework, unmerged) |
 | 64 | 2026-08-16 | /sk rework merged + LIVE; C3 UTM attribution; C2 SK chatbot live with branded widget |
@@ -22,17 +21,7 @@
 | 68 | 2026-08-19 | SEO re-audit 76/100 + Critical #1/#2 fixed (blog images, lang=sk, hreflang, three.js off critical path) |
 | 69 | 2026-08-19 | SEO action plan: #3, #8, #10-13, #16 closed; #16 finding corrected (RSC seed tree is architectural) |
 | 70 | 2026-08-19 | SEO action plan closed out: blog refresh (#15/#7), tap targets, /sk H1 wrap, internal links |
-
-## What Was Done (Session 69) -- SEO action plan: #3, #8, #10-13, #16 closed
-
-- Everything in the 0a5 "next by impact" queue except #15: blackhole double-fetch, /sk address schema, .sk deep-path redirects, mobile hero CTA order, widget/footer overlap, SK legal OG, over-serialization. Each carries a DONE note in `ACTION-PLAN.md`; all verified in the `.next-verify` build output, lint clean. **Committed, NOT deployed.**
-- **The #16 finding was half-wrong; the correction is documented in ACTION-PLAN.** /toolkit's ~303 KB is Next's inlined RSC seed tree of the RENDERED page -- App Router ships it regardless of client boundaries, so it cannot shrink by restructuring; do NOT re-attempt. The real waste was /blog: client cards received full `BlogPost` objects, inlining every article's `content` in the index (~90 -> 62 KB) and two whole spare articles per article page.
-- **New contract: client blog components take `BlogPostPreview`, never `BlogPost`** (`toPostPreview()` in `data/blog-posts.ts`). TS structural typing will NOT catch a full post passed where a preview is expected -- map explicitly at every call site.
-- `Section` moved to the server half of the product-page primitives; only `SectionHeading` (animated h2/intro) is a client leaf. Keep that boundary.
-- `BlackholeVideo` gained `lazy` (footer bookend only): poster `<img>` until IntersectionObserver proximity, so the hero's fetch is the only one at load. The img must stay the SAME URL as the poster attr (one cached file) -- the eslint-disable there is deliberate.
-- mdntech.sk redirects now ADD the /sk prefix (pass-through rule above the catch-all prevents doubling). **Deploy + verify one .sk deep link on prod BEFORE the partner campaign.**
-- `SK_NAP.address` (new) must stay in sync with `COMPANY_LEGAL_LINE`; the seed script does not read it, so no bot re-seed was needed.
-- #13 was fixed with SK-footer clearance (`pr-20 sm:pr-0` on the bottom block) -- `widget.js` deliberately untouched (customer embeds share it).
+| 71 | 2026-08-20 | Royal Stroje case study final + DEPLOYED; GSC live; campaign technically ready |
 
 ## What Was Done (Session 70) -- SEO action plan closed out: #15, #17, #19, #21
 
@@ -44,6 +33,15 @@
 - **#7 closed with #15:** visible breadcrumb + BreadcrumbList both built from `blogBreadcrumb()` -- one array, per the schema.ts rule. Remove the schema node if the trail ever goes.
 - #17 tap targets: `inline-flex min-h-[24px] items-center` on footer `linkClass`, both breadcrumb trails, /toolkit "Source" links, shared code-block Copy. #19: the /sk H1's hard `<br>` became two `block` spans with `text-balance` -- **H1 copy untouched**, that guardrail stands. #21's finding was half-wrong (money->post deep links already existed); the missing direction was posts -> /toolkit, /chatkit, /about.
 - Verified in `.next-verify`: Person + BreadcrumbList JSON-LD, breadcrumb nav, every citation URL, zero stale strings. tsc + lint clean; `tsconfig.json` auto-rewrite reverted (it happens on every build -- always check).
+
+## What Was Done (Session 71) -- Royal Stroje case study final + DEPLOYED + GSC live
+
+- **0a4 + 0a5 CLOSED; campaign technically ready.** Founder consent + written account arrived -> case study completed (story timeline, qualitative Vysledky, "Slovami majitela" testimonial), pull-quote on the /sk Royal Stroje card, bot KB rebuilt from CS fields and re-seeded after each deploy. Pushed S69+S70+S71 to main; .sk deep-link redirect verified on prod incl. www (ACTION-PLAN #10 done); /blog S70 changes verified live.
+- **Founder feedback pass (1b1e1b5) set standing copy rules -- never reintroduce:** timeline labels are EVERGREEN (no month names: "Zaciatok spoluprace / Automatizacia procesov / Dnes"); Vysledky is QUALITATIVE (no client counts or timings in our voice anywhere on the page); the quote says "mnozstvo stalych klientov" (100+ deliberately softened); no "neuvadzame" disclaimers.
+- Rankings appear ONLY inside the attributed founder quote; NO Review/aggregateRating schema (self-serving per Google). Both rules documented in the `constants/sk-case-studies.ts` header comment.
+- **GSC LIVE:** domain property mdntech.org verified via DNS TXT under the personal Google account (business-account creation blocked on phone verification -- add `contact@mdntech.org` as second Owner later; it is NOT a Google account, mail is on Hostinger). Sitemap submitted (14 pages, Success); key pages requested for indexing 2026-08-20; stale `www` sitemap row flagged for deletion.
+- Rich Results on the case study: 3 valid items (Article, Breadcrumb, Organization); "non-critical" flags are optional-field hints, no action needed.
+- DNS facts: mdntech.org DNS + mail = Hostinger (dns-parking.com NS); mdntech.sk = Websupport.
 
 ## Martin's Tasks (detailed -- do these, then report back in chat)
 
@@ -57,20 +55,19 @@
 4. **Dub account for MarketKit B3 (10 min):** dub.co -> API key -> `.env.local` `DUB_API_KEY=dub_...` -> tell next session "Dub key ready".
 5. **Browser E2E pass (15 min, after 2+3):** login at `localhost:3000/portal/login`, buy credit pack + unlock feature, thumbs-down + Auto-learning "Run now", Weekly reports "Run now" + check inbox.
 6. **Ask Filip:** compliance answers (plan SS2.0b); confirm /sk FAQ #4 (staging-UAE/produkcia-EU wording + DPA) and #5 (governing law / vzorova zmluva) -- blocks campaign send, not the deploy.
-7. **Royal Stroje founder input (blocks case-study completion, not deploy):** 2-3 measurable numbers, a 2-3 sentence quote + consent for name/photo/logo, confirm the Zadanie framing, and tell them their (sanitised) CRM screenshot is on our site (task 0a4). Goes into `constants/sk-case-studies.ts`.
+7. **GSC follow-up (~2026-08-24):** open Search Console -> Indexing -> Pages (is everything from the sitemap indexed?) + Performance (first query data). Delete the stale `www.mdntech.org/sitemap.xml` row (three-dots menu). Report findings in chat.
 8. **Royal Works tags (1 min):** /sk card ships Web / Lokalne SEO / Dizajn na mieru (inferred). Confirm or correct in chat.
 9. **Founder card assets (2 min):** paste your personal LinkedIn URL in chat (fills `FOUNDER.linkedin`) and optionally drop a real photo over `public/team/1.jpg`. Also: claim the LinkedIn vanity slug `/company/mdntech` (C4, last SK-C item).
 10. **Inviting a teammate (since S51):** Supabase SQL: `insert into team_invites (email, role) values ('kolega@mdntech.org', 'engineer');` then they sign up on that email. Confirm the ~50-credit signup promo grant number (plan SS3.1).
 
-## What To Do Next -- ChatKit remaining work + SEO action plan
+## What To Do Next -- campaign gates + Phase 2 credit bank
 
-**Three tracks: Phase 2 credit bank (product), SEO action plan (marketing), launch gates.**
+**Three tracks: Phase 2 credit bank (product), campaign send-off (marketing), launch gates.**
 
 | Priority | Task | Status / Notes |
 |----------|------|----------------|
-| 0a5 | **DEPLOY S69 + S70 to prod** (only SEO work left) | Nothing buildable remains in `seo-audit/ACTION-PLAN.md`. What is left is shipping it: push `main` (**user must ask -- never push unprompted**), then **verify one mdntech.sk deep link on prod (ACTION-PLAN #10) -- that gates the ~150 partner emails.** Then eyeball /blog + /blog/[slug] live (breadcrumb, byline, Source lines) and re-run the Rich Results test on one article. Only #22 (real ChatKit reviews, post-launch) stays open. Guardrails in FULL-AUDIT-REPORT.md still apply. |
-| 0a4 | **Royal Stroje consent for the CRM screenshot** | Nothing left on our side -- the image exists and is LIVE on /sk (content pre-reviewed, overview redacted; user confirmed S70). Purely the consent conversation now, folded into Martin task 7. Pull by setting `SK_CRM_SCREENSHOT` back to `null` if they object. |
-| 0a | **SK-C leftovers** | Only C4 LinkedIn vanity slug (Martin task 9) remains. Campaign gate: founder/Filip inputs resolved BEFORE the ~150 partner emails (early September) + fix ACTION-PLAN #10 first. |
+| 0a | **Campaign send-off gates** (~150 partner emails, early September) | Site + case study + GSC all DONE and verified (S71). Remaining: EmailJS attribution line (Martin 0), Filip FAQ #4/#5 (Martin 6), C4 LinkedIn vanity slug (Martin 9). Campaign plan: `MindPalace/Projects/MDN-Tech/Kampan-Royal-Stroje-2026-09.md`. |
+| 0a6 | **GSC follow-up** (~2026-08-24, Martin task 7) | Coverage + Performance check; then optional: royalstroje.sk property (Websupport TXT -- data that could later back ranking claims in OUR voice in the case study), Bing import from GSC, GA4 (= plan B1). |
 | 0d | **Open the portal (when ready)** | Set `NEXT_PUBLIC_APP_LIVE=true` in Vercel Production + redeploy. Remaining gate: Phase 2 checkout + human legal read of /privacy. Verify built HTML has app links back, no "Coming soon" survives. |
 | 1 | **Phase 2 credit bank (ChatKit billing rebuild)** | 2.1 account-level `credits_ledger` (append-only) + migrate balances; 2.4b unlocks re-priced in credits (conv 500 / analytics 750 / reports 1000 / learning 1250 / extra bot 1250); 3 mock-checkout routes (`app/api/portal/{chatbot/[id]/purchase,chatbot/[id]/feature,feature}/`) collapse into ONE credit purchase + ledger spends; 2.4 hidden Enterprise $999/40k + "Best value" on Scale; 2.7 policy build (12-mo expiry, refund window, chargeback clawback, 50-credit signup grant, low-balance email). `PaymentProvider` abstraction + Stripe test mode can start before Martin's live keys. Ledger: SELECT-only to `authenticated`, writes service-role; read migration 020 first. |
 | 3 | Phase 3.5 E2E + CI | Port S51+S52 probe scripts into a committed suite; GitHub Actions (tsc, lint, build, E2E). Zero tests today. |

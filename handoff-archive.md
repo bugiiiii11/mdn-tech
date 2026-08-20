@@ -1,5 +1,16 @@
 # Handoff Archive (do not read on /start)
 
+## What Was Done (Session 69) -- SEO action plan: #3, #8, #10-13, #16 closed (rotated 2026-08-20)
+
+- Everything in the 0a5 "next by impact" queue except #15: blackhole double-fetch, /sk address schema, .sk deep-path redirects, mobile hero CTA order, widget/footer overlap, SK legal OG, over-serialization. Each carries a DONE note in `ACTION-PLAN.md`; all verified in the `.next-verify` build output, lint clean.
+- **The #16 finding was half-wrong; the correction is documented in ACTION-PLAN.** /toolkit's ~303 KB is Next's inlined RSC seed tree of the RENDERED page -- App Router ships it regardless of client boundaries, so it cannot shrink by restructuring; do NOT re-attempt. The real waste was /blog: client cards received full `BlogPost` objects, inlining every article's `content` in the index (~90 -> 62 KB) and two whole spare articles per article page.
+- **New contract: client blog components take `BlogPostPreview`, never `BlogPost`** (`toPostPreview()` in `data/blog-posts.ts`). TS structural typing will NOT catch a full post passed where a preview is expected -- map explicitly at every call site.
+- `Section` moved to the server half of the product-page primitives; only `SectionHeading` (animated h2/intro) is a client leaf. Keep that boundary.
+- `BlackholeVideo` gained `lazy` (footer bookend only): poster `<img>` until IntersectionObserver proximity, so the hero's fetch is the only one at load. The img must stay the SAME URL as the poster attr (one cached file) -- the eslint-disable there is deliberate.
+- mdntech.sk redirects now ADD the /sk prefix (pass-through rule above the catch-all prevents doubling). Deployed + verified on prod in S71.
+- `SK_NAP.address` (new) must stay in sync with `COMPANY_LEGAL_LINE`; the seed script does not read it, so no bot re-seed was needed.
+- #13 was fixed with SK-footer clearance (`pr-20 sm:pr-0` on the bottom block) -- `widget.js` deliberately untouched (customer embeds share it).
+
 ## What Was Done (Session 68) -- SEO re-audit (76/100) + Critical #1/#2 and the quick wins fixed (rotated 2026-08-19)
 
 - **Re-audit (0a2/C6) via 6 parallel subagents; all of `seo-audit/` regenerated**: FULL-AUDIT-REPORT.md (score 76/100, category table, handoff-verdicts table, do-not-do guardrails), ACTION-PLAN.md (22 items, the standing work queue), 6 specialist reports, 13 screenshots. `screenshots/sk_mobile_fullpage.png` captures the S67 mobile section order for Martin's pending review.
